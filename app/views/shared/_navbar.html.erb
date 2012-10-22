@@ -1,0 +1,39 @@
+<ul class="nav">
+  <%= link_to("eXtension People",root_path,:class=>'brand')%>
+</ul>
+
+<!-- Core Navigation -->
+<%- if !@hide_navbar%>
+<ul class="nav">
+  <li class="divider-vertical"></li>
+
+  <%= form_tag('#', { :class => 'navbar-search pull-left' }) do -%>
+    <%= text_field_tag :q, params[:q], {:class => 'search-query span3', :placeholder => 'Find colleagues', :autocomplete => 'off'} -%>
+  <%- end -%>
+  <li class="divider-vertical"></li>
+
+
+  <%= nav_item('#','My Profile') %>
+  <%= nav_item('#','Communities') %>
+  <%= nav_item('#','Colleagues') %>
+  <%= nav_item('#','Activity') %>
+  <%= nav_item('#','Numbers') %>
+</ul>
+
+
+<!-- right pulldown -->
+<ul class="nav pull-right">
+  <%- if @currentaccount -%>
+  <li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= @currentaccount.fullname %><b class="caret"></b></a>
+    <ul class="dropdown-menu">
+      <%= nav_item(contributor_path(@currentaccount),'Your Contributions') %>
+      <li class="divider"></li>
+      <%= nav_item('#','Sign out') %>
+    </ul>
+  </li>
+  <%- else -%>
+    <%= nav_item('#','Sign in') %>
+  <%- end -%>
+</ul>
+<%- end -%>

@@ -5,6 +5,9 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
-People::Application.routes.draw do
-  root :to => 'home#index'
+class HomeController < ApplicationController
+
+  def index
+  end
+  
 end
