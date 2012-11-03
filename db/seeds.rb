@@ -20,8 +20,8 @@ end
 
 
 def account_transfer_query
-  columns = Account.column_names.reject{|n| n == 'password_digest'}
-  insert_clause = "#{@my_database}.#{Account.table_name} (#{columns.join(',')})"
+  columns = Person.column_names.reject{|n| n == 'password_digest'}
+  insert_clause = "#{@my_database}.#{Person.table_name} (#{columns.join(',')})"
   from_clause = "#{@darmok_database}.accounts"
   select_columns = []
   columns.each do |c|

@@ -5,7 +5,7 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
-class Account < ActiveRecord::Base
+class Person < ActiveRecord::Base
   belongs_to :county
   belongs_to :location
   belongs_to :position

@@ -1,7 +1,7 @@
 class InitialSchema < ActiveRecord::Migration
   def change
 
-    create_table "accounts", :force => true do |t|
+    create_table "people", :force => true do |t|
       t.string   "idstring", :limit => 80, :null => false
       t.string   "password_digest"
       t.string   "legacy_password", :limit => 40
@@ -35,9 +35,9 @@ class InitialSchema < ActiveRecord::Migration
       t.timestamps
     end
 
-    add_index "accounts", ["email"], :name => "email_ndx", :unique => true
-    add_index "accounts", ["idstring"], :name => "idstring_ndx", :unique => true
-    add_index "accounts", ["vouched", "retired"], :name => "validity_ndx"
+    add_index "people", ["email"], :name => "email_ndx", :unique => true
+    add_index "people", ["idstring"], :name => "idstring_ndx", :unique => true
+    add_index "people", ["vouched", "retired"], :name => "validity_ndx"
 
 
     create_table "counties", :force => true do |t|
