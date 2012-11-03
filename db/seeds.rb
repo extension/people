@@ -40,6 +40,13 @@ def account_transfer_query
   account_transfer_query
 end
 
+def google_account_transfer_query
+  query = <<-END_SQL.gsub(/\s+/, " ").strip
+    INSERT INTO #{@my_database}.#{GoogleAccount.table_name} SELECT * FROM #{@darmok_database}.google_accounts
+  END_SQL
+  query
+end
+
 def county_transfer_query
   query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{@my_database}.#{County.table_name} SELECT * FROM #{@darmok_database}.counties
@@ -61,7 +68,38 @@ def position_transfer_query
   query
 end
 
+def community_transfer_query
+  select_columns = Community.column_names
+  insert_clause = "#{@my_database}.#{Community.table_name} (#{select_columns.join(',')})"
+  from_clause = "#{@darmok_database}.communities"
+  select_clause = "#{select_columns.join(',')}"
+  where_clause = "#{from_clause}.entrytype IN (1,2,3)"
+  transfer_query = "INSERT INTO #{insert_clause} SELECT #{select_clause} FROM #{from_clause} WHERE #{where_clause}"
+  transfer_query
+end
+
+def community_connections_transfer_query
+  query = <<-END_SQL.gsub(/\s+/, " ").strip
+    INSERT INTO #{@my_database}.#{CommunityConnection.table_name} SELECT * FROM #{@darmok_database}.communityconnections
+  END_SQL
+  query
+end
+
+def google_groups_transfer_query
+  query = <<-END_SQL.gsub(/\s+/, " ").strip
+    INSERT INTO #{@my_database}.#{GoogleGroup.table_name} SELECT * FROM #{@darmok_database}.google_groups
+  END_SQL
+  query
+end
+
+
+
 announce_and_run_query('Transferring accounts',account_transfer_query)
+announce_and_run_query('Transferring google accounts',google_account_transfer_query)
 announce_and_run_query('Transferring counties',county_transfer_query)
 announce_and_run_query('Transferring locations',location_transfer_query)
 announce_and_run_query('Transferring positions',position_transfer_query)
+announce_and_run_query('Transferring communities',community_transfer_query)
+announce_and_run_query('Transferring community connections',community_connections_transfer_query)
+announce_and_run_query('Transferring google groups',google_groups_transfer_query)
+
