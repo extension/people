@@ -2,38 +2,39 @@
   <%= link_to("eXtension People",root_path,:class=>'brand')%>
 </ul>
 
+<%- if !@hide_navbar -%>
+
 <!-- Core Navigation -->
-<%- if !@hide_navbar%>
-<ul class="nav">
-  <li class="divider-vertical"></li>
+<%- if current_person -%>
+  <ul class="nav">
+    <li class="divider-vertical"></li>
 
-  <%= form_tag('#', { :class => 'navbar-search pull-left' }) do -%>
-    <%= text_field_tag :q, params[:q], {:class => 'search-query span3', :placeholder => 'Find colleagues', :autocomplete => 'off'} -%>
-  <%- end -%>
-  <li class="divider-vertical"></li>
+    <%= form_tag('#', { :class => 'navbar-search pull-left' }) do -%>
+      <%= text_field_tag :q, params[:q], {:class => 'search-query span3', :placeholder => 'Find colleagues', :autocomplete => 'off'} -%>
+    <%- end -%>
+    <li class="divider-vertical"></li>
 
 
-  <%= nav_item('#','My Profile') %>
-  <%= nav_item('#','Communities') %>
-  <%= nav_item('#','Colleagues') %>
-  <%= nav_item('#','Activity') %>
-  <%= nav_item('#','Numbers') %>
-</ul>
+    <%= nav_item('#','My Profile') %>
+    <%= nav_item('#','Communities') %>
+    <%= nav_item('#','Colleagues') %>
+    <%= nav_item('#','Numbers') %>
+  </ul>
+<%- end -%>
 
 
 <!-- right pulldown -->
 <ul class="nav pull-right">
-  <%- if @currentaccount -%>
+  <%- if current_person -%>
   <li class="dropdown">
-    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= @currentaccount.fullname %><b class="caret"></b></a>
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= current_person.fullname %><b class="caret"></b></a>
     <ul class="dropdown-menu">
-      <%= nav_item(contributor_path(@currentaccount),'Your Contributions') %>
       <li class="divider"></li>
-      <%= nav_item('#','Sign out') %>
+      <%= nav_item(signout_path,'Sign out') %>
     </ul>
   </li>
   <%- else -%>
-    <%= nav_item('#','Sign in') %>
+    <%= nav_item(signin_path,'Sign in') %>
   <%- end -%>
 </ul>
 <%- end -%>

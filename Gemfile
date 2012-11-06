@@ -21,6 +21,9 @@ group :assets do
   gem 'jquery-tablesorter'
 end
 
+# mobile device detection
+gem 'mobile-fu'
+
 # server settings
 gem "rails_config"
 
@@ -53,8 +56,6 @@ gem 'airbrake'
 # memcached
 gem 'dalli'
 
-#god
-gem "god", :require => false
 
 group :development do
   # require the powder gem
