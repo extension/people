@@ -17,5 +17,6 @@ People::Application.routes.draw do
   match "account/reset_password" => "account#reset_password", :via => [:get, :post], :as => 'reset_password'
   match "account/confirm" => "account#confirm_email", :via => [:get, :post], :as => 'confirm'
 
+  match "debug/session_information", to: "debug#session_information"
 
 end
