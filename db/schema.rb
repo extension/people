@@ -11,7 +11,19 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121022190415) do
+ActiveRecord::Schema.define(:version => 20121120185335) do
+
+  create_table "auth_logs", :force => true do |t|
+    t.integer  "person_id"
+    t.integer  "auth_code",  :null => false
+    t.integer  "fail_code"
+    t.string   "authname"
+    t.string   "site"
+    t.string   "ip_address"
+    t.datetime "created_at"
+  end
+
+  add_index "auth_logs", ["person_id"], :name => "person_ndx"
 
   create_table "communities", :force => true do |t|
     t.integer  "entrytype",                            :default => 0,     :null => false
