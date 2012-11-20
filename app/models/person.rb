@@ -6,21 +6,20 @@
 #  see LICENSE file
 
 class AuthenticationError < StandardError
+  attr :error_code
+  attr :person_id
+
+  def initialize(options = {})
+    @error_code = options[:error_code]
+    @person_id = options[:person_id]
+  end
+
 end
 
 class Person < ActiveRecord::Base
   belongs_to :county
   belongs_to :location
   belongs_to :position
-
-  # authentication constants
-  AUTH_SUCCESS = 42
-
-  AUTH_UNKNOWN = -1
-  AUTH_INVALID_ID = 1
-  AUTH_PASSWORD_EXPIRED = 2
-  AUTH_INVALID_PASSWORD = 3
-  AUTH_ACCOUNT_RETIRED = 4
 
   # account status
   STATUS_CONTRIBUTOR = 0
@@ -56,13 +55,13 @@ class Person < ActiveRecord::Base
     end
 
     if(check_person.nil?)
-      raise AuthenticationError, AUTH_INVALID_ID
+      raise AuthenticationError.new(error_code: AuthLog::AUTH_INVALID_ID)
     elsif check_person.retired?
-      raise AuthenticationError, AUTH_ACCOUNT_RETIRED
+      raise AuthenticationError.new(error_code: AuthLog::AUTH_ACCOUNT_RETIRED, person_id: check_person.id)
     elsif(check_person.legacy_password.blank?)
-      raise AuthenticationError, AUTH_PASSWORD_EXPIRED
+      raise AuthenticationError.new(error_code: AuthLog::AUTH_PASSWORD_EXPIRED, person_id: check_person.id)
     elsif(!check_person.check_password(password))
-      raise AuthenticationError, AUTH_INVALID_PASSWORD
+      raise AuthenticationError.new(error_code: AuthLog::AUTH_INVALID_PASSWORD, person_id: check_person.id)
     end
     check_person
   end
@@ -76,45 +75,6 @@ class Person < ActiveRecord::Base
    (Digest::SHA1.hexdigest(clear_password_string) == self.legacy_password)
   end
 
-  def auth_status_check
-    if(self.retired?)
-      AUTH_ACCOUNT_RETIRED
-    elsif(self.legacy_password.blank?)
-      AUTH_PASSWORD_EXPIRED
-    elsif(self.account_status == STATUS_SIGNUP)
-      AUTH_SIGNUP_CONFIRM
-    elsif(!self.vouched?)
-      case self.account_status
-      when STATUS_CONFIRMEMAIL
-        AUTH_EMAIL_NOTCONFIRM
-      when STATUS_INVALIDEMAIL
-        AUTH_INVALID_EMAIL
-      when STATUS_INVALIDEMAIL_FROM_SIGNUP
-        AUTH_INVALID_EMAIL
-      else
-        AUTH_ACCOUNT_NOTVOUCHED
-      end
-    else
-      case self.account_status
-      when STATUS_CONTRIBUTOR
-        AUTH_SUCCESS
-      when STATUS_PARTICIPANT
-        AUTH_SUCCESS
-      when STATUS_REVIEWAGREEMENT
-        AUTH_SUCCESS
-      when STATUS_REVIEW
-        AUTH_ACCOUNT_REVIEW
-      when User::STATUS_INVALIDEMAIL
-        AUTH_INVALID_EMAIL
-      when User::STATUS_INVALIDEMAIL_FROM_SIGNUP
-        AUTH_INVALID_EMAIL
-      when User::STATUS_CONFIRMEMAIL
-        AUTH_EMAIL_NOTCONFIRM
-      else
-        AUTH_UNKNOWN
-      end
-    end
-  end
 
 
 
