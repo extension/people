@@ -5,7 +5,7 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
-class AccountController < ApplicationController
+class AccountsController < ApplicationController
 
   def signout
     set_current_person(nil)
@@ -45,7 +45,21 @@ class AccountController < ApplicationController
   def confirm_email
   end
 
-  def signup
+  def new
+    if(params[:person])
+      @person = Person.new(params[:person])
+    else
+      @person = Person.new
+    end
+  end
+
+  def readme
+    # just in case we got here from an openid login
+    session[:last_opierequest] = nil
+     
+    if(!params[:invite].nil?)
+      @invitation = Invitation.find_by_token(params[:invite])
+    end
   end
 
 

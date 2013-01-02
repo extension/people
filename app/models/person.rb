@@ -75,7 +75,9 @@ class Person < ActiveRecord::Base
    (Digest::SHA1.hexdigest(clear_password_string) == self.legacy_password)
   end
 
-
+  def signup_affiliation
+    ''
+  end    
 
 
 end

@@ -153,6 +153,7 @@ ActiveRecord::Schema.define(:version => 20121120185335) do
     t.string   "base_login_string"
     t.integer  "login_increment"
     t.integer  "primary_account_id"
+    t.text     "signup_affiliation"
     t.string   "affiliation"
     t.text     "additionaldata"
     t.datetime "created_at",                                                :null => false

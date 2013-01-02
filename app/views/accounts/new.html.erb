@@ -1,0 +1,75 @@
+<% @page_title = "Sign up - eXtension" %>
+
+<div class="page-header">
+  <h2>eXension Sign Up <a name="signup_top"></a></h2>
+</div>
+
+
+
+<div class="row">
+  <div class="span8">
+
+    <%= form_for(@person, :url => new_account_path) do |f| -%>
+    
+      <p><span class="help-block">Fields marked with an asterisk (<em class="required">*</em>) are required</span></p>
+
+      <%- if(!@invitation.nil?) -%>
+        <%= hidden_field_tag('invite',@invitation.token) %>
+      <%- end -%>
+
+      <fieldset>
+        <label for="person_first_name"><strong>First Name: <em class="required">*</em></strong></label>
+        <%= f.text_field(:first_name) %>
+        
+        <label for="person_last_name"><strong>Last Name: <em class="required">*</em></strong></label>
+        <%= f.text_field(:last_name) %>
+
+        <label for="person_email"><strong>Email Address: <em class="required">*</em></strong></label>
+        <%= f.text_field(:email,{class: 'span4'}) %>
+        <span class="help-block">Using a .edu or .gov email address if you have one will speed up account review.</span>
+
+        <label for="person_password"><strong>Password <em class="required">*</em></strong></label>
+        <%= f.password_field(:password, :value => '') %>
+        <span class="help-block">minimum six characters</span>
+
+        <label for="person_phonenumber"><strong>Preferred Phone Number:</strong></label>
+        <%= f.text_field(:phonenumber, {:value => number_to_phone(@person.phonenumber,:area_code => true)}) %>
+
+        <label for="person_title"><strong>Title:</strong></label>
+        <%= f.text_field(:title) %>
+
+        <label for="person_time_zone"><strong>Time zone:</strong></label>
+        <%= f.time_zone_select(:time_zone, ActiveSupport::TimeZone.us_zones, {:default => "Eastern Time (US & Canada)"}, {class: 'span4'}) %>
+      </fieldset>
+
+      <fieldset>
+        <legend>Your Connection to Extension</legend>
+        <label>Please list someone in Extension with whom you have a connection, and tell us how you would like to be involved with eXtension.<em class="required">*</em></label>
+        <%= f.text_area(:signup_affiliation, rows: 3, class: 'span4') %>
+      </fieldset>
+
+
+      <fieldset>
+        <legend>Your Location</legend>
+      </fieldset>
+
+      <fieldset>
+        <legend>Your Institution/Affiliation</legend>
+      </fieldset>
+
+      <fieldset>
+        <legend>Your Position</legend>
+      </fieldset>
+
+    <%- end # end form -%> 
+  </div>
+
+      <div class="span4">
+        <div class="well">
+        <h4>Registration Help</h4>
+        <p><%= link_to('I forgot my password', '#') %></p>
+        <p>Already registered? <%= link_to('Sign-in', signin_path) %></p>
+        </div>
+    </div>
+  </div>
+
