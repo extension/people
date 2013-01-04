@@ -6,9 +6,11 @@
 #  see LICENSE file
 
 class ApplicationController < ActionController::Base
+  include AuthLib
   protect_from_forgery
   has_mobile_fu false
   helper_method :current_person
+  before_filter :signin_required
 
 
   def set_current_person(person)

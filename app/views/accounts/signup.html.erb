@@ -1,4 +1,4 @@
-<% @page_title = "Sign up - eXtension" %>
+<%- @page_title = "Sign up - eXtension" -%>
 
 <div class="page-header">
   <h2>eXension Sign Up <a name="signup_top"></a></h2>
@@ -9,7 +9,7 @@
 <div class="row">
   <div class="span8">
 
-    <%= form_for(@person, :url => new_account_path) do |f| -%>
+    <%= form_for(@person, :url => accounts_path) do |f| -%>
     
       <p><span class="help-block">Fields marked with an asterisk (<em class="required">*</em>) are required</span></p>
 
@@ -60,6 +60,9 @@
       <fieldset>
         <legend>Your Position</legend>
       </fieldset>
+
+      <p><%= submit_tag "Sign up", :class => "btn btn-primary" %> <%= link_to "Cancel", root_path, :class => "btn" %></p>
+
 
     <%- end # end form -%> 
   </div>

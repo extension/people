@@ -6,4 +6,6 @@
 #  see LICENSE file
 
 class County < ActiveRecord::Base
+  has_many :people
+  belongs_to :location
 end

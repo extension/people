@@ -1,0 +1,32 @@
+<% @page_title = "Dump Dump Debugging" %>
+
+<%- if !session -%>
+  <h2>No session data</h2>
+<%- else -%>
+  <h2>Your Session Information</h2>
+  <table class='table'>
+    <%- session.each do |key,value|%>
+      <tr>
+        <td><%= key %></td>
+        <td><%= value %></td>
+      </tr>
+     <%- end -%>
+     <td>request_ip</td>
+     <td><%= request.remote_ip %></td>
+  </table>
+<%- end -%>
+
+<%- if params.blank? -%>
+  <h2>No params data</h2>
+<%- else -%>
+  <h2>Your Provided Params Information</h2>
+  <table class='table'>
+    <%- params.each do |key,value|%>
+      <tr>
+        <td><%= key %></td>
+        <td><%= debug(value) %></td>
+      </tr>
+     <%- end -%>
+  </table>
+<%- end -%>
+

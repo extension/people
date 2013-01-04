@@ -8,13 +8,12 @@
 People::Application.routes.draw do
   root :to => 'home#index'
 
-  resources :accounts 
-
+  resources :accounts, only: [:create]
+  
   # named routes for account actions
   match "signin", to: "accounts#signin", via: [:get,:post], :as => 'signin'
   match "signout", to: "accounts#signout", via: [:get], :as => 'signout'
-
-  match "signup", to: "accounts#new", via: [:get,:post], :as => 'signup'
+  match "signup", to: "accounts#signup", via: [:get,:post], :as => 'signup'
 
 
   match "account/reset_password" => "account#reset_password", :via => [:get, :post], :as => 'reset_password'
