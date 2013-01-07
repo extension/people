@@ -81,7 +81,7 @@ end
 
 def community_connections_transfer_query
   query = <<-END_SQL.gsub(/\s+/, " ").strip
-    INSERT INTO #{@my_database}.#{CommunityConnection.table_name} SELECT * FROM #{@darmok_database}.communityconnections
+    INSERT INTO #{@my_database}.#{CommunityConnection.table_name} SELECT * FROM #{@darmok_database}.communityconnections WHERE connectiontype != 'nointerest'
   END_SQL
   query
 end

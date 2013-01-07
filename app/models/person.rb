@@ -35,6 +35,14 @@ class Person < ActiveRecord::Base
   STATUS_OK = 100
 
 
+  has_many :community_connections, dependent: :destroy
+  has_many :communities, through: :community_connections, 
+                         select:  "community_connections.connectiontype as connectiontype, 
+                                   community_connections.sendnotifications as sendnotifications, 
+                                   communities.*"
+    
+  scope :validaccounts, where("retired = #{false} and vouched = #{true}")
+
   def self.check_idstring_for_openid(idstring)
     idstring.strip!
     if(/^(http|https):\/\/people.extension.org\/([a-zA-Z]+[a-zA-Z0-9]+)$/ =~ idstring)

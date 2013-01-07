@@ -2,10 +2,14 @@
 #  Copyright (c) North Carolina State University
 #  Developed with funding for the National eXtension Initiative.
 # === LICENSE:
-#  BSD(-compatible)
 #  see LICENSE file
 
-class CommunityConnection < ActiveRecord::Base
-  belongs_to :community
-  belongs_to :person
+class CommunitiesController < ApplicationController
+
+  def index
+  end
+
+  def show
+  end
+
 end
