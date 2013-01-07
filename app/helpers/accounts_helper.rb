@@ -1,8 +1,8 @@
 # === COPYRIGHT:
-# Copyright (c) 2012 North Carolina State University
+# Copyright (c) North Carolina State University
 # === LICENSE:
 # see LICENSE file
-module AccountHelper
+module AccountsHelper
 
   def signin_prompt_string
     if(session[:last_opierequest].present? and trust_root = session[:last_opierequest].trust_root)

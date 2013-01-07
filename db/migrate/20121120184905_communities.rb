@@ -27,6 +27,7 @@ class Communities < ActiveRecord::Migration
     add_index "communities", ["name"], :name => "communities_name_index", :unique => true
     add_index "communities", ["referer_domain"], :name => "index_communities_on_referer_domain"
     add_index "communities", ["shortname"], :name => "index_communities_on_shortname", :unique => true
+    add_index "communities", ["entrytype"], :name => "entrytype_ndx"
 
     create_table "community_connections", :force => true do |t|
       t.integer  "person_id"

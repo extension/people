@@ -7,6 +7,7 @@
 class CommunitiesController < ApplicationController
 
   def index
+    @approved_joined_counts = Community.approved.connected_counts('joined')
   end
 
   def show

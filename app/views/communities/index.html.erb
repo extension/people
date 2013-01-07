@@ -1,0 +1,68 @@
+<%- @page_title = "eXtension Communities" -%>
+
+<div class="page-header">
+  <h2>eXtension Communities and Institutions</h2>
+</div>
+
+<div class="row">
+  <div class="span6">
+    <%= render(:partial => 'find_community_form') %>
+    <p>Can't find a community? <%= link_to("Create a new one",new_community_path)%>.</p>
+
+    <h3>Browse</h3>
+    <p><%= link_to("Browse the list of communities",browse_communities_path)%></p>
+
+
+    <%- if current_person.invited_communities.count > 0 -%>
+    <h3>Pending Invitations</h3>
+    <dl class="dl-horizontal">
+      <% current_person.community_invitations.each do |community|%>
+        <dt><%= link_to(community.name,community_url(community)) %></dt>
+        <dd><%= display_invited_as(community.connectioncode) %></dd>
+      <% end %>
+    </dl>
+    <%- end -%>
+
+    <%- if current_person.pending_communities.count > 0 -%>
+    <h3>Pending Approvals</h3>
+    <dl class="dl-horizontal">
+      <% current_person.community_invitations.each do |community|%>
+        <dt><%= link_to(community.name,community_url(community)) %></dt>
+      <% end %>
+    </dl>
+    <%- end -%>
+
+
+    <h3>Your Communities and Institutions</h3>
+    <%- if current_person.connected_communities.count > 0 -%>
+    <dl class="dl-horizontal">
+      <% current_person.connected_communities.each do |community|%>
+        <dt><%= link_to(community.name,community_url(community)) %></dt>
+        <dd><%= community.connectiontype.capitalize %></dd>
+      <% end %>
+    </dl>
+    <%- else -%>
+      <p>You haven't yet joined or indicated an interest in any communities</p>
+    <%- end -%>
+
+    <h3>Newest Communities</h3>
+    <dl>
+      <%- Community.order('created_at DESC').limit(5).each do |community| -%>
+      <dt><%= link_to(community.name,community_url(community)) %></dt>
+      <dd><em><%= community.entrytype_to_s %> - <%= community.memberfilter_to_s %></em></dd>
+      <dd><%= community.description %></dd>
+      <%- end -%>
+    </dl>
+    <p><%= link_to("More...",newest_communities_path)%></p>
+  </div>
+
+  <div class="span6">
+    <h3>eXtension Communities of Practice</h3>
+    <dl>
+      <%- Community.approved.order('name ASC').each do |community| -%>
+      <dt><%= link_to(community.name,community_url(community)) %></dt>
+      <dd><%= @approved_joined_counts[community.id] || 0 %> joined</dd>
+      <%- end -%>
+    </dl>
+  </div>
+</div>

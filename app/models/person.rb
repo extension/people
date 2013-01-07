@@ -38,7 +38,8 @@ class Person < ActiveRecord::Base
   has_many :community_connections, dependent: :destroy
   has_many :communities, through: :community_connections, 
                          select:  "community_connections.connectiontype as connectiontype, 
-                                   community_connections.sendnotifications as sendnotifications, 
+                                   community_connections.sendnotifications as sendnotifications,
+                                   community_connections.connectioncode as connectioncode, 
                                    communities.*"
     
   scope :validaccounts, where("retired = #{false} and vouched = #{true}")
@@ -85,7 +86,23 @@ class Person < ActiveRecord::Base
 
   def signup_affiliation
     ''
-  end    
+  end
+
+  def signup_affiliation=(affiliation_text)
+    # TODO
+  end
+
+  def invited_communities
+    self.communities.where("connectiontype = 'invited'")
+  end
+
+  def pending_communities
+    self.communities.where("connectiontype = 'wantstojoin'")
+  end
+
+  def connected_communities
+    self.communities.where("connectiontype IN ('member','leader','interest')")
+  end
 
 
 end

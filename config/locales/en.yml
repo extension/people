@@ -2,4 +2,14 @@
 # See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
 
 en:
-  hello: "Hello world"
+  communities:
+      entrytypes:
+        approved: 'eXtension Community of Practice'
+        user_contributed: 'User created community'
+        institution: 'Institution'
+        unknown: 'Unknown community type'
+      memberfilters:
+        open: 'Open Membership'
+        moderated: 'Moderated Membership'
+        invitation: 'Invitation Only Membership'
+        unknown: 'Unknown member type'
