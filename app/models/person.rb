@@ -98,7 +98,7 @@ class Person < ActiveRecord::Base
   end
 
   def pending_communities
-    self.communities.where("connectiontype = 'wantstojoin'")
+    self.communities.where("connectiontype = 'pending'")
   end
 
   def connected_communities

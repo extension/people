@@ -98,9 +98,7 @@
           <dd><a href="http://data.extension.org/groups/<%= @community.id %>">Group Information</a></dd>
           <%- if !@community.cached_content_tags.blank? -%>
             <dt>www.extension.org/preview</dt>
-            <%- @community.cached_content_tags.each do |tagname| -%>
-              <dd><%= link_to("content checklist (tag: #{tagname})", preview_tag_url(:content_tag => content_tag_url_display_name(tagname))) %></dd>
-            <%- end -%>
+            <dd>#TODO</dd>
           <%- end -%>
         <%- end -%>
         </dl>
