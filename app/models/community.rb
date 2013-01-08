@@ -106,7 +106,7 @@ class Community < ActiveRecord::Base
   end
   
   def memberfilter_label
-    MEMBERFILTER_LABELS[self.memberfilter].present? ? ENTRYTYPE_LABELS[self.memberfilter] : 'unknown'
+    MEMBERFILTER_LABELS[self.memberfilter].present? ? MEMBERFILTER_LABELS[self.memberfilter] : 'unknown'
   end
 
   def memberfilter_to_s
