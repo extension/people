@@ -5,10 +5,25 @@
 module AuthLib
 
   def current_person
+    if(!@current_person)
+      if(session[:person_id])
+        @current_person = Person.find_by_id(session[:person_id])
+      end
+    end
     @current_person
   end
 
-  protected
+  private
+
+  def set_current_person(person)
+    if(person.blank?)
+      @current_person = nil
+      reset_session
+    else
+      @current_person = person
+      session[:person_id] = person.id
+    end
+  end
   
   # TODO: review this, not sure the last_login_at is working 
   def is_authorized?(person)

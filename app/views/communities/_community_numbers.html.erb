@@ -1,0 +1,27 @@
+<ul id="comm_population">
+    <li>
+        <span><%= @community.leaders.count %></span>
+        <%= link_if_not_zero(@community.leaders.count, (@community.is_institution? ? 'Institutional Team' : 'Leaders') , connections_community_path(@community, :connectiontype => 'leaders')) %>
+    </li>
+    <li>
+        <span><%= (@community.members.count) %></span>
+        <%= link_if_not_zero(@community.members.count,'Members', connections_community_path(@community, :connectiontype => 'members')) %>
+    </li>
+  <% if @community.memberfilter == Community::MODERATED %>
+      <li>
+          <span><%= @community.pending.count %></span>
+          <%= link_if_not_zero(@community.wantstojoin.count,'People who want to join', connections_community_path(@community, :connectiontype => 'wantstojoin')) %>
+      </li>
+  <% end %>
+  <li>
+      <span><%=  @community.invited.count %></span>
+      <%= link_if_not_zero(@community.invited.count,'Invitations', connections_community_path(@community, :connectiontype => 'invited')) %>
+      <%- if (current_person.can_invite_others_to_community?(@community))  -%>
+      <span><%= link_to('Invite people to join', invitations_community_path(@community), class: 'btn') %></span>
+      <%- end -%>
+  </li>
+    <li>
+        <span><%= (@community.interested.count) %></span>
+        <%= link_if_not_zero(@community.interested.count,'Interest', connections_community_path(@community.id, :connectiontype => 'interest')) %>
+    </li>
+</ul>

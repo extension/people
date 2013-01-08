@@ -25,4 +25,39 @@ module ApplicationHelper
     list_item_class = current_page?(path) ? " class='active'" : ''
     "<li#{list_item_class}>#{link_to(label,path)}</li>".html_safe
   end
+
+
+  def link_if_not_zero(count,label,path,htmloptions = {})
+    if(count.to_i > 0)
+      label.html_safe
+    else
+      link_to(label,path,htmloptions).html_safe
+    end
+  end
+
+  def display_time(time)
+    if(time.blank?)
+      ''
+    else
+      time.strftime("%B %e, %Y, %l:%M %p %Z")
+    end
+  end
+
+
+  def link_to_person(person,options = {})
+    show_unknown = options[:show_unknown] || false
+    show_systemuser = options[:show_systemuser] || false
+    nolink = options[:nolink] || false
+
+    if person.nil?
+      show_unknown ? 'Unknown' : 'System'
+    elsif(person.id == 1 and !show_systemuser)
+      'System'
+    elsif(nolink)
+      "#{person.fullname}"
+    else
+      link_to(person.fullname,colleague_path(person)).html_safe
+    end
+  end
+
 end

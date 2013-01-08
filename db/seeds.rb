@@ -86,11 +86,27 @@ def community_connections_transfer_query
   query
 end
 
+def community_connections_change_wantstojoin_to_pending
+  query = <<-END_SQL.gsub(/\s+/, " ").strip
+    UPDATE #{@my_database}.#{CommunityConnection.table_name} SET connectiontype = 'pending' WHERE connectiontype = 'wantstojoin'
+  END_SQL
+  query
+end
+
 def google_groups_transfer_query
   query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{@my_database}.#{GoogleGroup.table_name} SELECT * FROM #{@darmok_database}.google_groups
   END_SQL
   query
+end
+
+def lists_transfer_query
+  select_columns = MailmanList.column_names
+  insert_clause = "#{@my_database}.#{MailmanList.table_name} (#{select_columns.join(',')})"
+  from_clause = "#{@darmok_database}.lists"
+  select_clause = "#{select_columns.join(',')}"
+  transfer_query = "INSERT INTO #{insert_clause} SELECT #{select_clause} FROM #{from_clause}"
+  transfer_query
 end
 
 
@@ -102,5 +118,7 @@ announce_and_run_query('Transferring locations',location_transfer_query)
 announce_and_run_query('Transferring positions',position_transfer_query)
 announce_and_run_query('Transferring communities',community_transfer_query)
 announce_and_run_query('Transferring community connections',community_connections_transfer_query)
+announce_and_run_query('Modifying community connection type of wantstojoin',community_connections_change_wantstojoin_to_pending)
 announce_and_run_query('Transferring google groups',google_groups_transfer_query)
+announce_and_run_query('Transferring lists',lists_transfer_query)
 

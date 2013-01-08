@@ -84,12 +84,13 @@ class Person < ActiveRecord::Base
    (Digest::SHA1.hexdigest(clear_password_string) == self.legacy_password)
   end
 
+  # TODO
   def signup_affiliation
     ''
   end
 
+  # TODO
   def signup_affiliation=(affiliation_text)
-    # TODO
   end
 
   def invited_communities
@@ -103,6 +104,46 @@ class Person < ActiveRecord::Base
   def connected_communities
     self.communities.where("connectiontype IN ('member','leader','interest')")
   end
+
+  def is_community_leader?(community)
+    self.connection_with_community(community) == 'leader'
+  end
+
+  def can_invite_others_to_community?(community)
+    connection = self.connection_with_community(community)
+    if(self.is_admin? or (connection == 'leader'))
+      true
+    elsif(community.memberfilter == Community::OPEN)
+      ['member','leader'].include?(connection)
+    else
+      false
+    end
+  end
+
+  def can_edit_community?(community)
+    self.is_admin? or self.is_community_leader?(community)
+  end
+  
+  def connection_with_community(community)
+     if(connection = self.community_connections.where(community_id: community.id).first)
+      case connection.connectiontype
+      when 'invited'
+        case connection.connectioncode
+        when CommunityConnection::INVITEDLEADER
+          'invitedleader'
+        when CommunityConnection::INVITEDMEMBER
+          'invitedmember'
+        else
+          'invited'
+        end
+      else
+        connection.connectiontype
+      end
+    else
+      'none'
+    end
+  end
+
 
 
 end

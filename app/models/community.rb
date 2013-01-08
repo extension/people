@@ -34,9 +34,9 @@ class Community < ActiveRecord::Base
     'members' => "connectiontype = 'member'",
     'leaders' => "connectiontype = 'leader'",
     'invited' => "connectiontype = 'invited'",
-    'wantstojoin' => "connectiontype = 'wantstojoin'",
+    'pending' => "connectiontype = 'pending'",
     'interested' => "connectiontype = 'interest'",
-    'interested_list' => "connectiontype IN ('wantstojoin',interest','leader')"
+    'interested_list' => "connectiontype IN ('pending',interest','leader')"
   }
 
            
@@ -46,15 +46,20 @@ class Community < ActiveRecord::Base
     'interest' => 'Interested in Community',
     'invited' => 'Community Invitation'}
 
-
+  belongs_to :creator, :class_name => "Person", :foreign_key => "created_by"
   has_many :community_connections, :dependent => :destroy
-
   has_many :people, through: :community_connections, 
                     select:  "community_connections.connectiontype as connectiontype, 
                               community_connections.sendnotifications as sendnotifications, 
                               people.*"
 
+  has_many :mailman_lists
+
   scope :approved, where(entrytype: APPROVED)
+
+  def is_institution?
+    (self.entrytype == INSTITUTION)
+  end
 
   def connected(connection)
     if(CONNECTION_CONDITIONS[connection])
@@ -64,24 +69,48 @@ class Community < ActiveRecord::Base
     end
   end
 
+  def leaders
+    connected('leaders')
+  end
+
   def joined
     connected('joined')
   end
 
+  def members
+    connected('members')
+  end
+
+  def interested
+    connected('interested')
+  end
+
+  def pending
+    connected('pending')
+  end
+
+  def invited
+    connected('invited')
+  end
+
+  def entrytype_label
+    ENTRYTYPE_LABELS[self.entrytype].present? ? ENTRYTYPE_LABELS[self.entrytype] : 'unknown'
+  end
+
   def entrytype_to_s
-    if !ENTRYTYPE_LABELS[self.entrytype].nil?
-      I18n.translate("communities.entrytypes.#{ENTRYTYPE_LABELS[self.entrytype]}")     
-    else
-      I18n.translate("communities.entrytypes.unknown")     
-    end
+    I18n.translate("communities.entrytypes.#{self.entrytype_label}")     
+  end
+
+  def entrytype_display_label
+    self.is_institution? ? 'institution' : 'community'
   end
   
+  def memberfilter_label
+    MEMBERFILTER_LABELS[self.memberfilter].present? ? ENTRYTYPE_LABELS[self.memberfilter] : 'unknown'
+  end
+
   def memberfilter_to_s
-    if !MEMBERFILTER_LABELS[self.memberfilter].nil?
-      I18n.translate("communities.memberfilters.#{MEMBERFILTER_LABELS[self.memberfilter]}")     
-    else
-      I18n.translate("communities.memberfilters.unknown")     
-    end
+    I18n.translate("communities.memberfilters.#{self.memberfilter_label}")     
   end
 
   def self.connected_counts(connection)
@@ -91,6 +120,20 @@ class Community < ActiveRecord::Base
       end
     else
       {}
+    end
+  end
+
+  def self.find_by_shortname_or_id(searchterm,raise_not_found = true)
+    if(searchterm.to_i > 0)
+      community = self.where(id: searchterm).first
+    else
+      community = self.where(shortname: searchterm).first
+    end
+
+    if(raise_not_found and community.nil?)
+      raise ActiveRecord::RecordNotFound
+    else
+      community
     end
   end
 

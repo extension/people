@@ -42,4 +42,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
+
+  def admin_mode?
+    if(current_person.present? && current_person.is_admin?)
+      return true
+    else
+      return false
+    end
+  end
+  
 end

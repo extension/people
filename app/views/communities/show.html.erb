@@ -1,0 +1,112 @@
+<%- @page_title = "#{@community.name} - Community Information" -%>
+
+<div class="page-header">
+    <div id="titleblock" class="<%= @community.entrytype_label -%>">
+      <h2><%= @community.name%></h2>
+      <p><%= @community.entrytype_to_s -%></p>
+    </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+    <p id="description">
+      <%= @community.description.html_safe -%>
+      <%- if(current_person.can_edit_community?(@community)) -%>
+        <p><small class="edit"><%= link_to 'edit', edit_community_path(@community) -%></small></p>
+      <%- end -%>
+    </p>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="span6">
+
+      <h2>People</h2>
+      <div id="connectiontocommunity">
+        <h2>#TODO</h2>
+      </div>
+
+      <div id="communitynumbers" class="dashmodule">
+      <%= render(:partial => 'community_numbers') -%>
+      </div>
+
+      <h2>Community Information</h2>
+      <div id="communityreports" class="dashmodule">
+      <p><%= link_to("Community Activity (todo)", '#') -%></p>
+      <p><%= link_to("Community Membership Statistics (todo)",'#') -%></p>
+      </div>
+
+      <h2>
+        <%= @community.entrytype_display_label.capitalize -%> Mailing Lists
+        <%- if(current_person.can_edit_community?(@community)) -%>
+          <small><%= link_to 'edit (todo)', '#' -%></small>
+        <%- end -%>
+      </h2>
+      <div id="communitymailinglists" class="dashmodule">
+        <% if @community.mailman_lists.count == 0 %>
+          <p>No lists have been created for this <%= @community.entrytype_display_label %>.</p>
+        <% else %>
+        <ul class="mailing_lists">
+          <% @community.mailman_lists.each do |mailinglist| %>
+            <li>
+                <span class="mailto"><%= mail_to("#{mailinglist.name}@lists.extension.org", mailinglist.name) %><em></em></span>
+                <%= mailinglist.connectiontype %>
+            </li>
+          <% end %>
+        </ul>
+        <% end %>
+      </div>
+    </div>
+
+
+    <div class="span6">
+      <h2>
+        <%= @community.entrytype_display_label.capitalize -%> Attributes
+        <%- if(current_person.can_edit_community?(@community)) -%>
+          <small><%= link_to 'edit (todo)', '#' -%></small>
+        <%- end -%>
+      </h2>
+      
+
+      
+      <div class="dashmodule">
+
+        <dl>
+          <dt>Community Type:</dt>
+          <dd><%= @community.entrytype_to_s -%></dd>
+          <dt>Membership:</dt>
+          <dd><%= @community.memberfilter_to_s -%></dd>
+          <dt>Created by:</dt>
+          <dd><%= link_to_person(@community.creator) -%></dd>
+          <dt>Created:</dt>
+          <dd><%= display_time(@community.created_at) -%></dd>
+        </dl>
+      </div>
+
+      <%- if (@community.connect_to_drupal? and @community.drupal_node_id) or @community.is_launched? -%>
+      <h2>Elsewhere in eXtension</h2>
+      <div class="dashmodule">
+        <p><em>Links to information for this community in other eXtension applications</em></p>
+        <dl>
+        <%- if (@community.connect_to_drupal? and @community.drupal_node_id) -%>
+          <dt>create.extension.org</dt>
+          <dd><a href="http://create.extension.org/node/<%= @community.drupal_node_id %>">Community Dashboard</a></dd>
+        <%- end -%>
+        <%- if  @community.is_launched? -%>
+          <dt>data.extension.org</dt>
+          <dd><a href="http://data.extension.org/groups/<%= @community.id %>">Group Information</a></dd>
+          <%- if !@community.cached_content_tags.blank? -%>
+            <dt>www.extension.org/preview</dt>
+            <%- @community.cached_content_tags.each do |tagname| -%>
+              <dd><%= link_to("content checklist (tag: #{tagname})", preview_tag_url(:content_tag => content_tag_url_display_name(tagname))) %></dd>
+            <%- end -%>
+          <%- end -%>
+        <%- end -%>
+        </dl>
+      </div>
+      <%- end -%>
+
+    </div>
+  </div>
+

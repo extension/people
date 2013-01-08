@@ -20,7 +20,15 @@ People::Application.routes.draw do
       get :browse
       get :newest
     end
+
+    member do
+      get :connections
+      get :invitations
+    end
+
   end
+
+  resources :colleagues, only: [:index, :show]
 
 
   match "account/reset_password" => "account#reset_password", :via => [:get, :post], :as => 'reset_password'

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121120185335) do
+ActiveRecord::Schema.define(:version => 20130108195600) do
 
   create_table "auth_logs", :force => true do |t|
     t.integer  "person_id"
@@ -49,6 +49,7 @@ ActiveRecord::Schema.define(:version => 20121120185335) do
     t.datetime "updated_at",                                              :null => false
   end
 
+  add_index "communities", ["entrytype"], :name => "entrytype_ndx"
   add_index "communities", ["name"], :name => "communities_name_index", :unique => true
   add_index "communities", ["referer_domain"], :name => "index_communities_on_referer_domain"
   add_index "communities", ["shortname"], :name => "index_communities_on_shortname", :unique => true
@@ -123,6 +124,19 @@ ActiveRecord::Schema.define(:version => 20121120185335) do
 
   add_index "locations", ["fipsid"], :name => "fipsid_ndx", :unique => true
   add_index "locations", ["name"], :name => "name_ndx", :unique => true
+
+  create_table "mailman_lists", :force => true do |t|
+    t.integer  "community_id"
+    t.string   "name",                :limit => 50
+    t.string   "password"
+    t.datetime "last_mailman_update"
+    t.string   "connectiontype"
+    t.datetime "created_at",                        :null => false
+    t.datetime "updated_at",                        :null => false
+  end
+
+  add_index "mailman_lists", ["community_id", "connectiontype"], :name => "community_type_ndx", :unique => true
+  add_index "mailman_lists", ["name"], :name => "name_ndx", :unique => true
 
   create_table "people", :force => true do |t|
     t.string   "idstring",                 :limit => 80,                    :null => false

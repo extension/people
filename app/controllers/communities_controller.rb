@@ -11,6 +11,8 @@ class CommunitiesController < ApplicationController
   end
 
   def show
+    # will raise ActiveRecord::RecordNotFound on not found 
+    @community = Community.find_by_shortname_or_id(params[:id])
   end
 
 end
