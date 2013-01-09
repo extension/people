@@ -8,24 +8,27 @@
 class ProfileController < ApplicationController
 
   def index
+    #TODO
   end
 
   def public
+    #TODO
   end
 
   def account
+    #TODO
   end
 
   def communities
-  end
-
-  def lists
+    #TODO
   end
 
   def recent
+    #TODO
   end
 
   def password
+    #TODO
   end
 
   

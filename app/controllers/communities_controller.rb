@@ -15,4 +15,21 @@ class CommunitiesController < ApplicationController
     @community = Community.find_by_shortname_or_id(params[:id])
   end
 
+  def browse
+    #TODO
+  end
+
+  def newest
+    #TODO
+  end
+
+  def connections
+    #TODO
+  end
+
+  def invitations
+    #TODO
+  end
+
+
 end

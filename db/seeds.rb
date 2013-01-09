@@ -118,7 +118,7 @@ announce_and_run_query('Transferring locations',location_transfer_query)
 announce_and_run_query('Transferring positions',position_transfer_query)
 announce_and_run_query('Transferring communities',community_transfer_query)
 announce_and_run_query('Transferring community connections',community_connections_transfer_query)
-announce_and_run_query('Modifying community connection type of wantstojoin',community_connections_change_wantstojoin_to_pending)
+announce_and_run_query('Changing wantstojoin to pending',community_connections_change_wantstojoin_to_pending)
 announce_and_run_query('Transferring google groups',google_groups_transfer_query)
 announce_and_run_query('Transferring lists',lists_transfer_query)
 
