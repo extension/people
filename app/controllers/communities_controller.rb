@@ -15,22 +15,23 @@ class CommunitiesController < ApplicationController
     @community = Community.find_by_shortname_or_id(params[:id])
   end
 
-  def browse
-    #TODO
-  end
-
   def newest
-    #TODO
+    @communities = Community.order('created_at DESC').page(params[:page])
   end
 
   def connections
     # will raise ActiveRecord::RecordNotFound on not found 
     @community = Community.find_by_shortname_or_id(params[:id])
 
-    # hardcode to joined for now to test
-    #TODO FIXME
+    allowed_connections = Community::CONNECTION_CONDITIONS.keys
+    if(params[:connection] and allowed_connections.include?(params[:connection]))
+      connection = params[:connection]
+    else
+      connection = 'joined'
+    end
+    connection = params[:connection]
 
-    @connections = @community.joined.page(params[:page])
+    @connections = @community.connected(connection).page(params[:page])
   end
 
   def invitations

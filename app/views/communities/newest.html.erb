@@ -1,0 +1,22 @@
+<%- @page_title = "Communities - Most Recent" -%>
+
+<div class="page-header">
+  <h2><%= @page_title %></h2>
+</div>
+
+<p>#TODO Navigation</p>
+
+<div class="row">
+  <div class="span12">
+    <%= page_entries_info @communities %>
+    <%= paginate(@communities) %>
+
+    <%= render(partial: 'list', locals: {communitylist: @communities}) %>
+  </div>
+</div>
+
+
+
+
+
+

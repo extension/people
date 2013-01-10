@@ -9,10 +9,6 @@
     <%= render(:partial => 'find_community_form') %>
     <p>Can't find a community? <%= link_to("Create a new one",new_community_path)%>.</p>
 
-    <h3>Browse</h3>
-    <p><%= link_to("Browse the list of communities",browse_communities_path)%></p>
-
-
     <%- if current_person.invited_communities.count > 0 -%>
     <h3>Pending Invitations</h3>
     <dl class="dl-horizontal">

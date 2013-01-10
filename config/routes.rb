@@ -17,7 +17,6 @@ People::Application.routes.draw do
 
   resources :communities do 
     collection do
-      get :browse
       get :newest
     end
 
