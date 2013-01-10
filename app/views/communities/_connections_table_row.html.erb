@@ -1,0 +1,10 @@
+<td><%= link_to("#{person.fullname}", colleague_path(person)) %></td>
+<td><%= person.idstring %></td>
+<td><%= person.email %></td>            
+<td><%= primary_institution_name_for_person(person,'<span class="na">not specified</span>') %></td>
+<td><%= (person.affiliation.blank?) ? '<span class="na">&nbsp;</span>'.html_safe : person.affiliation %></td>        
+<td><%= (person.location.nil?) ? '<span class="na">n/a</span>'.html_safe : person.location.abbreviation %></td>        
+<td><%= community_connection_for_person(community,person) %></td>            
+<%- if showactions -%>
+<td class="connectionactions" id="connectionactions_<%= person.id %>">#TODO</td>
+<%- end -%>

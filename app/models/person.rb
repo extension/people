@@ -144,6 +144,10 @@ class Person < ActiveRecord::Base
     end
   end
 
+  def primary_institution
+    self.communities.institutions.where("connectioncode = #{CommunityConnection::PRIMARY_INSTITUTION}").first
+  end
+
 
 
 end

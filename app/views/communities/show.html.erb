@@ -96,7 +96,7 @@
         <%- if  @community.is_launched? -%>
           <dt>data.extension.org</dt>
           <dd><a href="http://data.extension.org/groups/<%= @community.id %>">Group Information</a></dd>
-          <%- if !@community.cached_content_tags.blank? -%>
+          <%- if @community.show_in_public_list? -%>
             <dt>www.extension.org/preview</dt>
             <dd>#TODO</dd>
           <%- end -%>

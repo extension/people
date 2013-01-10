@@ -29,9 +29,9 @@ module ApplicationHelper
 
   def link_if_not_zero(count,label,path,htmloptions = {})
     if(count.to_i > 0)
-      label.html_safe
-    else
       link_to(label,path,htmloptions).html_safe
+    else
+      label.html_safe
     end
   end
 

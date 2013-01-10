@@ -56,6 +56,7 @@ class Community < ActiveRecord::Base
   has_many :mailman_lists
 
   scope :approved, where(entrytype: APPROVED)
+  scope :institutions, where(entrytype: INSTITUTION)
 
   def is_institution?
     (self.entrytype == INSTITUTION)

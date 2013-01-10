@@ -13,3 +13,13 @@ en:
         moderated: 'Moderated Membership'
         invitation: 'Invitation Only Membership'
         unknown: 'Unknown member type'
+      connections:
+        none: 'No Connection'
+        invitedleader: 'Invited (Leader)'
+        invitedleader_institution: 'Invited (Instutitional Team)'
+        invitedmember: 'Invited (Member)'
+        pending: 'Pending Membership'
+        leader: 'Leader'
+        institutional_team: 'Institutional Team'
+        member: 'Member'
+        

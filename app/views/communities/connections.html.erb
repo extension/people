@@ -1,0 +1,32 @@
+<div class="row">
+  <div class="span12">
+    <%= page_entries_info @connections %>
+    <%= paginate(@connections) %>
+    <%- showactions = current_person.can_edit_community?(@community) -%>
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+        <th>Name</th>
+        <th>eXtensionID</th>
+        <th>Email</th>
+        <th>Institution</th>
+        <th>Other Affiliation</th>
+        <th>Location</th>
+        <th>Connection</th>
+        <%- if showactions -%>
+        <th>Actions</th>
+        <%- end -%>
+        </tr>
+      </thead>
+
+      <tbody>
+      <%- for person in @connections -%>
+        <tr id="connection_row_<%= person.id %>">
+          <%= render(:partial => 'connections_table_row', :locals => { community: @community, person: person, showactions: showactions, actionsclass: 'none' }) %>
+        </tr>
+      <%- end -%>
+      </tbody>
+    </table>
+
+  </div>
+</div>

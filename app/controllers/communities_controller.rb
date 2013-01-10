@@ -24,7 +24,13 @@ class CommunitiesController < ApplicationController
   end
 
   def connections
-    #TODO
+    # will raise ActiveRecord::RecordNotFound on not found 
+    @community = Community.find_by_shortname_or_id(params[:id])
+
+    # hardcode to joined for now to test
+    #TODO FIXME
+
+    @connections = @community.joined.page(params[:page])
   end
 
   def invitations
