@@ -12,4 +12,5 @@
  *= require twitter/bootstrap
  *= require bootstrap_overrides
  *= require twitter/bootstrap-responsive
+ *= require navbar
  */
