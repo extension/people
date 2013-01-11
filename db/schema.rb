@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130108195600) do
+ActiveRecord::Schema.define(:version => 20130111025906) do
 
   create_table "auth_logs", :force => true do |t|
     t.integer  "person_id"
@@ -140,7 +140,7 @@ ActiveRecord::Schema.define(:version => 20130108195600) do
 
   create_table "people", :force => true do |t|
     t.string   "idstring",                 :limit => 80,                    :null => false
-    t.string   "password_digest"
+    t.string   "password_hash"
     t.string   "legacy_password",          :limit => 40
     t.string   "first_name"
     t.string   "last_name"
@@ -185,5 +185,22 @@ ActiveRecord::Schema.define(:version => 20130108195600) do
   end
 
   add_index "positions", ["name"], :name => "name_ndx", :unique => true
+
+  create_table "social_network_connections", :force => true do |t|
+    t.integer  "person_id"
+    t.string   "network",     :limit => 96
+    t.string   "displayname"
+    t.string   "accountid",   :limit => 96
+    t.string   "description"
+    t.string   "accounturl"
+    t.integer  "privacy"
+    t.boolean  "is_public",                 :default => false
+    t.datetime "created_at",                                   :null => false
+    t.datetime "updated_at",                                   :null => false
+  end
+
+  add_index "social_network_connections", ["network", "accountid"], :name => "network_account_ndx"
+  add_index "social_network_connections", ["person_id"], :name => "person_ndx"
+  add_index "social_network_connections", ["privacy"], :name => "privacy_ndx"
 
 end

@@ -29,7 +29,6 @@ class CommunitiesController < ApplicationController
     else
       connection = 'joined'
     end
-    connection = params[:connection]
 
     @connections = @community.connected(connection).page(params[:page])
   end

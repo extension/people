@@ -3,7 +3,7 @@ class Accounts < ActiveRecord::Migration
 
     create_table "people", :force => true do |t|
       t.string   "idstring", :limit => 80, :null => false
-      t.string   "password_digest"
+      t.string   "password_hash"
       t.string   "legacy_password", :limit => 40
       t.string   "first_name"
       t.string   "last_name"

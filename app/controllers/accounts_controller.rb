@@ -72,102 +72,59 @@ class AccountsController < ApplicationController
     end
   end
 
-  # def create
-  #   render(template: 'debug/dump_params')
+  def create
     
-  #   if(!params[:invite].nil?)
-  #     @invitation = Invitation.find_by_token(params[:invite])
-  #   end
-    
-  #   # search for an existing account.  doing this here instead
-  #   # of validations because of historical presence of 'PublicUser'
-  #   # accounts - this will be removed when People is separated
-  #   if(params[:user] and params[:user][:email])
-  #     checkemail = params[:user][:email]
-  #     if(account = Account.find_by_email(checkemail))
-  #       # has existing user account
-  #       failuremsg = "Your email address has already been registered with us.  If you've forgotten your password for that account, please <a href='#{url_for(:controller => 'people/account', :action => :new_password)}'>request a new password</a>"
-  #       flash.now[:failure] = failuremsg
-  #       @user = User.new(params[:user])          
-  #       @locations = Location.displaylist
-  #       if(!(@user.location.nil?))  
-  #         @countylist = @user.location.counties
-  #         @institutionlist = @user.location.communities.institutions.find(:all, :order => 'name')
-  #       end
-  #       return render(:action => "new")
-  #     else
-  #       @user = User.new(params[:user])
-  #     end
-  #   end
+    if(!params[:invite].nil?)
+      @invitation = Invitation.find_by_token(params[:invite])
+    end
 
-  #   # institution?
-  #   if(!params[:primary_institution_id].nil? and params[:primary_institution_id] != 0)
-  #     @user.additionaldata = {} if @user.additionaldata.nil?
-  #     @user.additionaldata.merge!({:signup_institution_id => params[:primary_institution_id]})
-  #   end
-    
-  #   # affiliation/involvement?
-  #   if(!params[:signup_affiliation].blank?)
-  #     @user.additionaldata = {} if @user.additionaldata.nil?
-  #     @user.additionaldata.merge!({:signup_affiliation => Hpricot(params[:signup_affiliation].sanitize).to_html})
-  #   else
-  #     flash.now[:failure] = "Please let us know how you are involved with Cooperative Extension"
-  #     @locations = Location.displaylist
-  #     return render(:action => "new")
-  #   end
+    @person = Person.new(params[:person])
         
-  #   # STATUS_SIGNUP
-  #   @user.account_status = User::STATUS_SIGNUP
+    # STATUS_SIGNUP
+    @person.account_status = Person::STATUS_SIGNUP
     
-  #   # last login at == now
-  #   @user.last_login_at = Time.zone.now
+    # last login at == now
+    @person.last_login_at = Time.zone.now
     
-  #   begin
-  #     didsave = @user.save
-  #   rescue ActiveRecord::StatementInvalid => e
-  #     if(!(e.to_s =~ /duplicate/i))
-  #       raise
-  #     end
-  #   end
+    begin
+      didsave = @person.save
+    rescue ActiveRecord::StatementInvalid => e
+      if(!(e.to_s =~ /duplicate/i))
+        raise
+      end
+    end
     
-  #   if(!didsave)        
-  #     if(!@user.errors.on(:email).nil? and @user.errors.on(:email) == 'has already been taken')
-  #       failuremsg = "Your email address has already been registered with us.  If you've forgotten your password for that account, please <a href='#{url_for(:controller => 'people/account', :action => :new_password)}'>request a new password</a>"
-  #       flash.now[:failure] = failuremsg
-  #     elsif(!@user.errors.empty?)
-  #       failuremsg = "<h3>There were errors that prevented signup</h3>"
-  #       failuremsg += "<ul>"
-  #       @user.errors.each { |value,msg|
-  #         if (value == 'login')
-  #           failuremsg += "<li>That eXtensionID #{msg}</li>"
-  #         else
-  #           failuremsg += "<li>#{value} - #{msg}</li>"
-  #         end
-  #       }
-  #       failuremsg += "</ul>"          
-  #       flash.now[:failurelist] = failuremsg
-  #     end
-  #     @locations = Location.displaylist
-  #     if(!(@user.location.nil?))  
-  #       @countylist = @user.location.counties
-  #       @institutionlist = @user.location.communities.institutions.find(:all, :order => 'name')
-  #     end
-      
-  #     render(:action => "new")
-  #   else        
-  #     # automatically log them in
-  #     @currentuser = User.find_by_id(@user.id)
-  #     session[:userid] = @currentuser.id
-  #     session[:account_id] = @currentuser.id
-  #     signupdata = {}     
-  #     if(@invitation)
-  #       signupdata.merge!({:invitation => @invitation})
-  #     end
-  #     UserEvent.log_event(:etype => UserEvent::PROFILE,:user => @currentuser,:description => "initialsignup")
-  #     @currentuser.send_signup_confirmation(signupdata)
-  #     return redirect_to(:action => :confirmationsent)
-  #   end
-  # end
+    if(!didsave)        
+      if(!@person.errors.on(:email).nil? and @user.errors.on(:email) == 'has already been taken')
+        failuremsg = "Your email address has already been registered with us.  If you've forgotten your password for that account, please <a href='#{url_for(:controller => 'people/account', :action => :new_password)}'>request a new password</a>"
+        flash.now[:failure] = failuremsg
+      elsif(!@person.errors.empty?)
+        failuremsg = "<h3>There were errors that prevented signup</h3>"
+        failuremsg += "<ul>"
+        @person.errors.each { |value,msg|
+          if (value == 'login')
+            failuremsg += "<li>That eXtensionID #{msg}</li>"
+          else
+            failuremsg += "<li>#{value} - #{msg}</li>"
+          end
+        }
+        failuremsg += "</ul>"          
+        flash.now[:failurelist] = failuremsg
+      end
+      render(:action => "new")
+    else        
+      # automatically log them in
+      set_current_person(@person)
+      signupdata = {}     
+      if(@invitation)
+        signupdata.merge!({:invitation => @invitation})
+      end
+      #UserEvent.log_event(:etype => UserEvent::PROFILE,:user => @currentuser,:description => "initialsignup")
+      #current_person.send_signup_confirmation(signupdata)
+      #return redirect_to(:action => :confirmationsent)
+      render(template: 'debug/dump_params')
+    end
+  end
 
 
   private

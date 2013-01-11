@@ -57,6 +57,11 @@ gem 'airbrake'
 gem 'dalli'
 
 
+
+# validation helpers
+# uses the Mail gem to validate email: https://github.com/hallelujah/valid_email
+gem 'valid_email'
+
 group :development do
   # require the powder gem
   gem 'powder'

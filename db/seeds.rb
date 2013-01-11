@@ -20,7 +20,7 @@ end
 
 
 def account_transfer_query
-  reject_columns = ['password_digest']
+  reject_columns = ['password_hash']
   columns = Person.column_names.reject{|n| reject_columns.include?(n)}
   insert_clause = "#{@my_database}.#{Person.table_name} (#{columns.join(',')})"
   from_clause = "#{@darmok_database}.accounts"
@@ -109,6 +109,24 @@ def lists_transfer_query
   transfer_query
 end
 
+def social_network_transfer_query
+  insert_columns = SocialNetworkConnection.column_names
+  insert_clause = "#{@my_database}.#{SocialNetworkConnection.table_name} (#{insert_columns.join(',')})"
+  from_clause = "#{@darmok_database}.social_networks"
+  select_columns = []
+  insert_columns.each do |c|
+    case c
+    when 'person_id'
+      select_columns << "#{from_clause}.user_id"
+    else
+      select_columns << "#{from_clause}.#{c}"
+    end
+  end
+  select_clause = "#{select_columns.join(',')}"
+  transfer_query = "INSERT INTO #{insert_clause} SELECT #{select_clause} FROM #{from_clause}"
+  transfer_query
+end  
+
 
 
 announce_and_run_query('Transferring accounts',account_transfer_query)
@@ -121,4 +139,7 @@ announce_and_run_query('Transferring community connections',community_connection
 announce_and_run_query('Changing wantstojoin to pending',community_connections_change_wantstojoin_to_pending)
 announce_and_run_query('Transferring google groups',google_groups_transfer_query)
 announce_and_run_query('Transferring lists',lists_transfer_query)
+announce_and_run_query('Transferring social network connections',social_network_transfer_query)
+
+
 
