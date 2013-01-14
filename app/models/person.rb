@@ -25,6 +25,26 @@ class Person < ActiveRecord::Base
   validates :password, :length => { :in => 8..40 }, :allow_blank => true
   validates :signup_affiliation, :presence => true, :on => :create
   
+  ## associations
+  belongs_to :county
+  belongs_to :location
+  belongs_to :position
+  has_many :community_connections, dependent: :destroy
+  has_many :communities, through: :community_connections, 
+                         select:  "community_connections.connectiontype as connectiontype, 
+                                   community_connections.sendnotifications as sendnotifications,
+                                   community_connections.connectioncode as connectioncode, 
+                                   communities.*"
+  
+  ## scopes  
+  scope :validaccounts, where("retired = #{false} and vouched = #{true}")
+
+  ## filters
+
+  before_create :set_hashed_password
+  before_validation :set_idstring
+  
+
   ## constants
   # account status
   STATUS_CONTRIBUTOR = 0
@@ -39,19 +59,31 @@ class Person < ActiveRecord::Base
 
   STATUS_OK = 100
 
-  ## associations
-  belongs_to :county
-  belongs_to :location
-  belongs_to :position
-  has_many :community_connections, dependent: :destroy
-  has_many :communities, through: :community_connections, 
-                         select:  "community_connections.connectiontype as connectiontype, 
-                                   community_connections.sendnotifications as sendnotifications,
-                                   community_connections.connectioncode as connectioncode, 
-                                   communities.*"
-  
-  ## scopes  
-  scope :validaccounts, where("retired = #{false} and vouched = #{true}")
+
+  def set_hashed_password(options = {})
+    self.password_hash = Password.create(@password)
+    if(options[:save])
+      self.save!
+    end
+  end
+
+  # TODO - dump this when or if we can ever let people choose their own idstrings
+  def set_idstring(reset=false)
+    if(reset or self.idstring.blank?)
+      self.base_login_string = (self.first_name + self.last_name[0]).mb_chars.downcase.gsub!(/[^\w]/,'')
+    
+      # get maximum increment
+      if(max = self.class.maximum(:login_increment,:conditions => "base_login_string = '#{self.base_login_string}'"))
+        self.login_increment = max + 1
+      else
+        self.login_increment = 1
+      end
+    
+      # set login
+      self.idstring = "#{self.base_login_string}#{self.login_increment.to_s}"
+    end
+    return true
+  end
 
   def self.check_idstring_for_openid(idstring)
     idstring.strip!
@@ -76,7 +108,7 @@ class Person < ActiveRecord::Base
       raise AuthenticationError.new(error_code: AuthLog::AUTH_INVALID_ID)
     elsif check_person.retired?
       raise AuthenticationError.new(error_code: AuthLog::AUTH_ACCOUNT_RETIRED, person_id: check_person.id)
-    elsif(check_person.legacy_password.blank?)
+    elsif(check_person.password_hash.blank? and check_person.legacy_password.blank?)
       raise AuthenticationError.new(error_code: AuthLog::AUTH_PASSWORD_EXPIRED, person_id: check_person.id)
     elsif(!check_person.check_password(password))
       raise AuthenticationError.new(error_code: AuthLog::AUTH_INVALID_PASSWORD, person_id: check_person.id)
