@@ -19,8 +19,9 @@ def announce_and_run_query(label,query)
 end
 
 
+
 def account_transfer_query
-  reject_columns = ['password_hash']
+  reject_columns = ['password_hash','involvement']
   columns = Person.column_names.reject{|n| reject_columns.include?(n)}
   insert_clause = "#{@my_database}.#{Person.table_name} (#{columns.join(',')})"
   from_clause = "#{@darmok_database}.accounts"
@@ -128,7 +129,20 @@ def social_network_transfer_query
 end  
 
 
+def set_involvement_column
+  print "Setting involvement column..."
+  benchmark = Benchmark.measure do
+    Person.where("additionaldata LIKE '%:signup_affiliation%'").find_each do |person|
+      if(signup_affiliation = person.additionaldata[:signup_affiliation])
+        person.update_column(:involvement, signup_affiliation)
+      end
+    end
+  end
+  print "\t\tfinished in #{benchmark.real.round(1)}s\n"
+end
 
+
+# seed queries
 announce_and_run_query('Transferring accounts',account_transfer_query)
 announce_and_run_query('Transferring google accounts',google_account_transfer_query)
 announce_and_run_query('Transferring counties',county_transfer_query)
@@ -141,5 +155,7 @@ announce_and_run_query('Transferring google groups',google_groups_transfer_query
 announce_and_run_query('Transferring lists',lists_transfer_query)
 announce_and_run_query('Transferring social network connections',social_network_transfer_query)
 
+# data manipulation
+set_involvement_column
 
 

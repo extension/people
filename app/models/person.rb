@@ -22,8 +22,8 @@ class Person < ActiveRecord::Base
   validates :last_name, :presence => true
   validates :idstring, :presence => true, :uniqueness => true 
   validates :email, :presence => true, :email => true, :uniqueness => true
-  validates :password, :length => { :in => 8..40 }, :allow_blank => true
-  validates :signup_affiliation, :presence => true, :on => :create
+  validates :password, :length => { :in => 8..40 }, :presence => true, :on => :create
+  validates :involvement, :presence => true, :on => :create
   
   ## associations
   belongs_to :county
@@ -70,6 +70,7 @@ class Person < ActiveRecord::Base
   # TODO - dump this when or if we can ever let people choose their own idstrings
   def set_idstring(reset=false)
     if(reset or self.idstring.blank?)
+      return '' if (self.first_name.blank? or self.last_name.blank?)
       self.base_login_string = (self.first_name + self.last_name[0]).mb_chars.downcase.gsub!(/[^\w]/,'')
     
       # get maximum increment

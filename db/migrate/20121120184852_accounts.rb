@@ -31,6 +31,7 @@ class Accounts < ActiveRecord::Migration
       t.integer  "login_increment"
       t.integer  "primary_account_id"
       t.string   "affiliation"
+      t.text     "involvement"
       t.text     "additionaldata"
       t.timestamps
     end
