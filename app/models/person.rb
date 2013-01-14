@@ -23,7 +23,7 @@ class Person < ActiveRecord::Base
   validates :idstring, :presence => true, :uniqueness => true 
   validates :email, :presence => true, :email => true, :uniqueness => true
   validates :password, :length => { :in => 8..40 }, :presence => true, :on => :create
-  validates :signup_affiliation, :presence => true, :on => :create
+  validates :involvement, :presence => true, :on => :create
   
   ## associations
   belongs_to :county
