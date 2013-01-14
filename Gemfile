@@ -3,6 +3,9 @@ source 'http://systems.extension.org/rubygems/'
 
 gem 'rails', '3.2.11'
 
+# all things xml
+gem 'nokogiri'
+
 # data
 gem 'mysql2'
 

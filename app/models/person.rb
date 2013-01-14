@@ -10,10 +10,10 @@ class Person < ActiveRecord::Base
   include BCrypt
   serialize :additionaldata
 
-  attr_accessor :password, :signup_affiliation
+  attr_accessor :password
 
-  attr_accessible :first_name, :last_name, :email, :title, :phonenumber, :time_zone, :affiliation
-  attr_accessible :password, :signup_affiliation
+  attr_accessible :first_name, :last_name, :email, :title, :phonenumber, :time_zone, :affiliation, :involvement
+  attr_accessible :password
   attr_accessible :position_id, :position, :location_id, :location, :county_id, :county
 
 
