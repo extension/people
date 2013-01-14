@@ -56,6 +56,8 @@ gem 'airbrake'
 # memcached
 gem 'dalli'
 
+# forms
+gem 'simple_form'
 
 
 # validation helpers
