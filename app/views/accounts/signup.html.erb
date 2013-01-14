@@ -29,8 +29,7 @@
 
       <fieldset>
         <legend>Your Connection to Extension</legend>
-        <label>Please list someone in Extension with whom you have a connection, and tell us how you would like to be involved with eXtension.<em class="required">*</em></label>
-        <%= f.text_area(:signup_affiliation, rows: 3, class: 'span4') %>
+        <%= f.input :involvement, :input_html => { :rows => 3, :class => 'span4' }, :hint =>  "Please list someone in Extension with whom you have a connection, and tell us how you would like to be involved with eXtension." %>
       </fieldset>
 
 
