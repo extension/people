@@ -1,25 +1,82 @@
-set :application, "set your application name here"
-set :repository,  "set your repository location here"
+set :stages, %w(prod dev)
+set :default_stage, "dev"
+require 'capistrano/ext/multistage'
+require 'capatross'
+require "bundler/capistrano"
+require './config/boot'
+require 'airbrake/capistrano'
+ 
+set :application, "aae"
+set :repository,  "git@github.com:extension/people.git"
+set :scm, "git"
+set :user, "pacecar"
+set :use_sudo, false
+set :keep_releases, 5
+ssh_options[:forward_agent] = true
+set :port, 24
+set :bundle_flags, ''
+set :bundle_dir, ''
 
-# set :scm, :git # You can set :scm explicitly or Capistrano will make an intelligent guess based on known version control directory names
-# Or: `accurev`, `bzr`, `cvs`, `darcs`, `git`, `mercurial`, `perforce`, `subversion` or `none`
+before "deploy", "deploy:web:disable"
+after "deploy:update_code", "deploy:update_maint_msg"
+after "deploy:update_code", "deploy:link_and_copy_configs"
+after "deploy:update_code", "deploy:cleanup"
+after "deploy", "deploy:web:enable"
 
-role :web, "your web-server here"                          # Your HTTP server, Apache/etc
-role :app, "your app-server here"                          # This may be the same as your `Web` server
-role :db,  "your primary db-server here", :primary => true # This is where Rails migrations will run
-role :db,  "your slave db-server here"
+namespace :deploy do
+  
+  desc "Deploy the #{application} application with migrations"
+  task :default, :roles => :app do
+        
+    # Invoke deployment with migrations
+    deploy.migrations
+  end
+  
+  # Override default restart task
+  desc "Restart passenger"
+  task :restart, :roles => :app do
+    run "touch #{current_path}/tmp/restart.txt"
+  end
+  
+  # bundle installation in the system-wide gemset
+  desc "runs bundle update"
+  task :bundle_install do
+    run "cd #{release_path} && bundle install"
+  end
+    
+  desc "Update maintenance mode page/graphics (valid after an update code invocation)"
+  task :update_maint_msg, :roles => :app do
+     invoke_command "cp -f #{release_path}/public/maintenancemessage.html #{shared_path}/system/maintenancemessage.html"
+  end
+  
+  # Link up various configs (valid after an update code invocation)
+  task :link_and_copy_configs, :roles => :app do
+    run <<-CMD
+    rm -rf #{release_path}/config/database.yml && 
+    ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml &&
+    ln -nfs #{shared_path}/config/settings.local.yml #{release_path}/config/settings.local.yml &&
+    ln -nfs #{shared_path}/config/robots.txt #{release_path}/public/robots.txt
+    CMD
+  end
+  
+  [:start, :stop].each do |t|
+    desc "#{t} task is a no-op with mod_rails"
+    task t, :roles => :app do ; end
+  end
+  
+  # Override default web enable/disable tasks
+  namespace :web do
+      
+    desc "Put Apache in maintenancemode by touching the system/maintenancemode file"
+    task :disable, :roles => :app do
+      invoke_command "touch #{shared_path}/system/maintenancemode"
+    end
+  
+    desc "Remove Apache from maintenancemode by removing the system/maintenancemode file"
+    task :enable, :roles => :app do
+      invoke_command "rm -f #{shared_path}/system/maintenancemode"
+    end
+    
+  end  
+end 
 
-# if you want to clean up old releases on each deploy uncomment this:
-# after "deploy:restart", "deploy:cleanup"
-
-# if you're still using the script/reaper helper you will need
-# these http://github.com/rails/irs_process_scripts
-
-# If you are using Passenger mod_rails uncomment this:
-# namespace :deploy do
-#   task :start do ; end
-#   task :stop do ; end
-#   task :restart, :roles => :app, :except => { :no_release => true } do
-#     run "#{try_sudo} touch #{File.join(current_path,'tmp','restart.txt')}"
-#   end
-# end
