@@ -29,37 +29,28 @@
         <%= f.input :last_name %>
         <%= f.input :email, :input_html => { :class => 'span4' }, :hint =>  "Using a .edu or .gov email address if you have one will speed up account review." %>
         <%= f.input :password, :hint =>  "Minimum 8 characters." %>
+
+       <%= f.input :involvement, :input_html => { :rows => 3, :class => 'span4' },
+        :label => 'Connection with Extension',
+        :hint =>  "Please list someone in Extension with whom you have a connection, and tell us how you would like to be involved with eXtension." %>
+ 
         <%= f.input :phonenumber, :label => 'Phone number' %>
         <%= f.input :title %>
-        <%= f.input :time_zone, :priority => ActiveSupport::TimeZone.us_zones, :default => "Eastern Time (US & Canada)", :input_html => { :class => 'span4' }  %>
         <%= f.association :position, collection: Position.order('name'), :as => :radio_buttons %>
-      </fieldset>
-
-      <fieldset>
-        <legend>Your Connection to Extension</legend>
-        <%= f.input :involvement, :input_html => { :rows => 3, :class => 'span4' }, :hint =>  "Please list someone in Extension with whom you have a connection, and tell us how you would like to be involved with eXtension." %>
-      </fieldset>
-
-
-      <fieldset>
-        <legend>Your Location</legend>
         <%= f.association :location, collection: Location.order('entrytype,name'), include_blank: true %>
         <%= f.association :county, collection: (@person.location.blank? ? [] : @person.location.counties.order("name")), include_blank: true, wrapper_html: { id: 'county_select', style: @person.location.blank? ? 'display:none;' : '' } %>
-      </fieldset>
-
-      <fieldset>
-        <legend>Your Institution/Affiliation</legend>
         <%= f.association :institution, 
-                          collection: (@person.location.blank? ? Community.institutions.order("name") : @person.location.communities.institutions.order("name")), 
-                          include_blank: true, 
-                          wrapper_html: { id: 'institution_select'} %>
+                  collection: (@person.location.blank? ? Community.institutions.order("name") : @person.location.communities.institutions.order("name")), 
+                  include_blank: true, 
+                  wrapper_html: { id: 'institution_select'} %>
 
 
-        <%= f.input :affiliation, 
-                    :input_html => { :class => 'span4' }, 
-                    :hint =>  "Department or other affiliation at your institution or another institution if yours was not listed." %>
+<%= f.input :affiliation, 
+            :input_html => { :class => 'span4' }, 
+            :hint =>  "Department or other affiliation at your institution or another institution if yours was not listed." %>
 
       </fieldset>
+
 
       <p><%= submit_tag "Sign up", :class => "btn btn-primary" %> <%= link_to "Cancel", root_path, :class => "btn" %></p>
 
