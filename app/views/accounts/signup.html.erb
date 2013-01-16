@@ -29,9 +29,10 @@
         <%= f.input :last_name %>
         <%= f.input :email, :input_html => { :class => 'span4' }, :hint =>  "Using a .edu or .gov email address if you have one will speed up account review." %>
         <%= f.input :password, :hint =>  "Minimum 8 characters." %>
-        <%= f.input :phonenumber %>
+        <%= f.input :phonenumber, :label => 'Phone number' %>
         <%= f.input :title %>
         <%= f.input :time_zone, :priority => ActiveSupport::TimeZone.us_zones, :default => "Eastern Time (US & Canada)", :input_html => { :class => 'span4' }  %>
+        <%= f.association :position, collection: Position.order('name'), :as => :radio_buttons %>
       </fieldset>
 
       <fieldset>
@@ -48,10 +49,16 @@
 
       <fieldset>
         <legend>Your Institution/Affiliation</legend>
-      </fieldset>
+        <%= f.association :institution, 
+                          collection: (@person.location.blank? ? Community.institutions.order("name") : @person.location.communities.institutions.order("name")), 
+                          include_blank: true, 
+                          wrapper_html: { id: 'institution_select'} %>
 
-      <fieldset>
-        <legend>Your Position</legend>
+
+        <%= f.input :affiliation, 
+                    :input_html => { :class => 'span4' }, 
+                    :hint =>  "Department or other affiliation at your institution or another institution if yours was not listed." %>
+
       </fieldset>
 
       <p><%= submit_tag "Sign up", :class => "btn btn-primary" %> <%= link_to "Cancel", root_path, :class => "btn" %></p>
@@ -70,7 +77,8 @@
   </div>
 
   <script type="text/javascript">
-    $("#person_location_id").change(function() {     
+    $("#person_location_id").change(function() {
+
       $.post('<%= counties_for_location_data_path %>', { location: $(this).val() }, function(data) {
         if(!$.isEmptyObject(data)) {
           $("#county_select").show();
@@ -79,10 +87,21 @@
           $("#county_select").hide();
         }
       });
+
+      $.post('<%= institutions_for_location_data_path %>', { location: $(this).val() }, function(data) {
+        if(!$.isEmptyObject(data)) {
+          populateDropdown($("#person_institution_id"), data);
+        } else {
+          var data = <%= Community.institutions.order(:name).map{|institution| Hash[id: institution.id, name: institution.name]}.to_json.html_safe %>;
+          populateDropdown($("#person_institution_id"), data);
+        }
+      });
+
     });
  
     function populateDropdown(select, data) {
         select.html('');
+        select.append($('<option></option>').val('').html(''));
         $.each(data, function(id, option) {
             select.append($('<option></option>').val(option.id).html(option.name));
         });       

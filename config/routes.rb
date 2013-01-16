@@ -33,6 +33,7 @@ People::Application.routes.draw do
   resources :data, only: [:index] do
     collection do
       post :counties_for_location
+      post :institutions_for_location
     end
   end
 

@@ -14,7 +14,7 @@ class Person < ActiveRecord::Base
 
   attr_accessible :first_name, :last_name, :email, :title, :phonenumber, :time_zone, :affiliation, :involvement
   attr_accessible :password
-  attr_accessible :position_id, :position, :location_id, :location, :county_id, :county
+  attr_accessible :position_id, :position, :location_id, :location, :county_id, :county, :institution_id, :institution 
 
 
   ## validations
@@ -29,6 +29,8 @@ class Person < ActiveRecord::Base
   belongs_to :county
   belongs_to :location
   belongs_to :position
+  belongs_to :institution # primary institution
+
   has_many :community_connections, dependent: :destroy
   has_many :communities, through: :community_connections, 
                          select:  "community_connections.connectiontype as connectiontype, 

@@ -25,5 +25,22 @@ class DataController < ApplicationController
     render json: counties
   end
 
+
+
+  def institutions_for_location
+    if(find_location = params[:location])
+      if(find_location.to_i > 0)
+        location = Location.where(id: find_location).first
+      end
+      # TODO find by name or abbreviation if ever needed
+    end
+
+    if(location)
+      institutions = location.communities.institutions.order(:name).map{|institution| Hash[id: institution.id, name: institution.name]}
+    else
+      institutions = {}
+    end
+    render json: institutions
+  end
   
 end
