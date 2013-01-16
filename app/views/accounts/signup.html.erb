@@ -10,6 +10,13 @@
   <div class="span8">
 
     <%= simple_form_for(@person, url: accounts_path, class: 'form-horitzontal') do |f| -%>
+
+      <%- if notification = f.error_notification -%>
+        <div class="alert alert-error fade in">
+          <a class="close" data-dismiss="alert" href="#">&times;</a>
+          <%= notification %>
+        </div>
+      <%- end -%>
     
       <p><span class="help-block">Fields marked with an asterisk (<em class="required">*</em>) are required</span></p>
 
@@ -35,6 +42,8 @@
 
       <fieldset>
         <legend>Your Location</legend>
+        <%= f.association :location, collection: Location.order('entrytype,name'), include_blank: true %>
+        <%= f.association :county, collection: (@person.location.blank? ? [] : @person.location.counties.order("name")), include_blank: true, wrapper_html: { id: 'county_select', style: @person.location.blank? ? 'display:none;' : '' } %>
       </fieldset>
 
       <fieldset>
@@ -59,4 +68,24 @@
         </div>
     </div>
   </div>
+
+  <script type="text/javascript">
+    $("#person_location_id").change(function() {     
+      $.post('<%= counties_for_location_data_path %>', { location: $(this).val() }, function(data) {
+        if(!$.isEmptyObject(data)) {
+          $("#county_select").show();
+          populateDropdown($("#person_county_id"), data);
+        } else {
+          $("#county_select").hide();
+        }
+      });
+    });
+ 
+    function populateDropdown(select, data) {
+        select.html('');
+        $.each(data, function(id, option) {
+            select.append($('<option></option>').val(option.id).html(option.name));
+        });       
+    }
+</script>
 

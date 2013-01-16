@@ -29,6 +29,13 @@ People::Application.routes.draw do
 
   resources :colleagues, only: [:index, :show]
 
+  # json data endpoints
+  resources :data, only: [:index] do
+    collection do
+      post :counties_for_location
+    end
+  end
+
 
   match "account/reset_password" => "account#reset_password", :via => [:get, :post], :as => 'reset_password'
   match "account/confirm" => "account#confirm_email", :via => [:get, :post], :as => 'confirm'
