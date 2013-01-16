@@ -156,6 +156,7 @@ ActiveRecord::Schema.define(:version => 20130111025906) do
     t.integer  "position_id",                            :default => 0
     t.integer  "location_id",                            :default => 0
     t.integer  "county_id",                              :default => 0
+    t.integer  "institution_id",                         :default => 0
     t.boolean  "retired",                                :default => false
     t.boolean  "vouched",                                :default => false
     t.integer  "vouched_by",                             :default => 0

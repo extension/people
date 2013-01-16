@@ -21,7 +21,7 @@ end
 
 
 def account_transfer_query
-  reject_columns = ['password_hash','involvement']
+  reject_columns = ['password_hash','involvement','institution_id']
   columns = Person.column_names.reject{|n| reject_columns.include?(n)}
   insert_clause = "#{@my_database}.#{Person.table_name} (#{columns.join(',')})"
   from_clause = "#{@darmok_database}.accounts"
@@ -126,11 +126,35 @@ def social_network_transfer_query
   select_clause = "#{select_columns.join(',')}"
   transfer_query = "INSERT INTO #{insert_clause} SELECT #{select_clause} FROM #{from_clause}"
   transfer_query
-end  
+end
 
 
-def set_involvement_column
-  print "Setting involvement column..."
+def set_person_institution_column
+  print "Setting person's institution column..."
+  benchmark = Benchmark.measure do
+    # get the primaries
+    query = <<-END_SQL.gsub(/\s+/, " ").strip
+      UPDATE #{@my_database}.#{Person.table_name}, #{@my_database}.#{CommunityConnection.table_name} 
+      SET #{@my_database}.#{Person.table_name}.institution_id = #{@my_database}.#{CommunityConnection.table_name}.community_id
+      WHERE #{@my_database}.#{CommunityConnection.table_name}.person_id = #{@my_database}.#{Person.table_name}.id
+      AND #{@my_database}.#{CommunityConnection.table_name}.connectioncode = #{CommunityConnection::PRIMARY_INSTITUTION}
+    END_SQL
+    ActiveRecord::Base.connection.execute(query)
+
+    # get the belongs to 1 where they don't have a primary for some reason
+    Person.where("institution_id IS NULL").find_each do |person|
+      if(person.communities.institutions.count == 1)
+        person.update_column(:institution_id, person.communities.institutions.first.id)
+      end
+    end
+  end
+  print "\t\tfinished in #{benchmark.real.round(1)}s\n"
+end
+
+
+
+def set_person_involvement_column
+  print "Setting person's involvement column..."
   benchmark = Benchmark.measure do
     Person.where("additionaldata LIKE '%:signup_affiliation%'").find_each do |person|
       if(signup_affiliation = person.additionaldata[:signup_affiliation])
@@ -156,6 +180,7 @@ announce_and_run_query('Transferring lists',lists_transfer_query)
 announce_and_run_query('Transferring social network connections',social_network_transfer_query)
 
 # data manipulation
-set_involvement_column
+set_person_institution_column
+set_person_involvement_column
 
 
