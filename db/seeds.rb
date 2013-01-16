@@ -51,7 +51,7 @@ end
 
 def county_transfer_query
   query = <<-END_SQL.gsub(/\s+/, " ").strip
-    INSERT INTO #{@my_database}.#{County.table_name} SELECT * FROM #{@darmok_database}.counties
+    INSERT INTO #{@my_database}.#{County.table_name} SELECT * FROM #{@darmok_database}.counties WHERE #{@darmok_database}.counties.name != 'all'
   END_SQL
   query
 end
