@@ -8,8 +8,6 @@
 require 'bcrypt'
 class Person < ActiveRecord::Base
   include BCrypt
-  serialize :additionaldata
-
   attr_accessor :password
 
   attr_accessible :first_name, :last_name, :email, :title, :phonenumber, :time_zone, :affiliation, :involvement
@@ -38,6 +36,7 @@ class Person < ActiveRecord::Base
                                    community_connections.connectioncode as connectioncode, 
                                    communities.*"
   
+  has_many :email_aliases, as: :aliasable
   ## scopes  
   scope :validaccounts, where("retired = #{false} and vouched = #{true}")
 
@@ -45,6 +44,10 @@ class Person < ActiveRecord::Base
 
   before_create :set_hashed_password
   before_validation :set_idstring
+
+  after_create :create_email_forward
+  after_update :update_email_forward
+  after_save :update_email_aliases
   
 
   ## constants
@@ -61,6 +64,13 @@ class Person < ActiveRecord::Base
 
   STATUS_OK = 100
 
+  def validaccount?
+    if(self.retired? or !self.vouched? or self.account_status == STATUS_SIGNUP)
+      return false
+    else
+      return true
+    end
+  end  
 
   def set_hashed_password(options = {})
     self.password_hash = Password.create(@password)
@@ -195,6 +205,102 @@ class Person < ActiveRecord::Base
     self.communities.institutions.where("connectioncode = #{CommunityConnection::PRIMARY_INSTITUTION}").first
   end
 
+  def set_token(options = {})
+    if(self.token.blank?)
+      randval = rand
+      now = Time.now.to_s
+      self.token = Digest::SHA1.hexdigest(Settings.session_token+self.email+now+randval.to_s)
+      if(options[:save])
+        self.save!
+      end
+    end
+  end
+
+  # def send_signup_confirmation
+  #  self.set_token(save: true)  
+  #  token = UserToken.create(:user=>self,:tokentype=>UserToken::SIGNUP, :tokendata => tokendata)
+  #  Notification.create(:notifytype => Notification::CONFIRM_SIGNUP, :account => self, :send_on_create => true, :additionaldata => {:token_id => token.id})
+  #  return true
+  # end
+
+
+
+  # def send_email_confirmation(sendnow=true)
+  #  # update attributes
+  #  if(self.account_status != STATUS_CONFIRMEMAIL or self.emailconfirmed != false)
+  #   self.update_attributes(:account_status => STATUS_CONFIRMEMAIL,:email_event_at => Time.now.utc, :emailconfirmed => false)
+  #  end
+  
+  #  # create token
+  #  token = UserToken.create(:user=>self,:tokentype=>UserToken::EMAIL, :tokendata => {:email => self.email})
+   
+  #  # send email or create notification
+  #  Notification.create(:notifytype => Notification::CONFIRM_EMAIL, :account => self, :send_on_create => sendnow, :additionaldata => {:token_id => token.id})
+  #  return true
+  # end
+
+  def email_forward
+    self.email_aliases.where(mail_alias: self.idstring).first
+  end
+
+  def create_email_forward
+    self.set_email_forward(googleapps: false)
+  end
+
+  def update_email_forward
+    current_forward = self.email_forward
+    if(current_forward and current_forward.alias_type == EmailAlias::FORWARD)
+      current_forward.update_attributes({destination: self.email})
+    else
+      false
+    end
+  end
+
+  def set_email_forward(options = {})
+    return nil if(options[:destination].blank? and options[:googleapps].blank?)
+  
+    current_forward = self.email_forward
+    if(self.email =~ /extension\.org$/i)
+      if(options[:googleapps])
+        destination = "#{self.idstring}@apps.extension.org"
+        alias_type = EmailAlias::GOOGLEAPPS
+      elsif(options[:destination])
+        destination = options[:destination]
+        alias_type = EmailAlias::CUSTOM_FORWARD        
+      else
+        return nil
+      end
+    else
+      if(options[:googleapps])
+        destination = "#{self.idstring}@apps.extension.org"
+        alias_type = EmailAlias::GOOGLEAPPS
+      elsif(options[:destination])
+        destination = options[:destination]
+        alias_type = EmailAlias::CUSTOM_FORWARD        
+      else
+        destination = self.email
+        alias_type = EmailAlias::FORWARD  
+      end
+    end
+
+    if(current_forward)
+      current_forward.update_attributes({destination: destination, alias_type: alias_type})
+    else
+      self.email_aliases.create({mail_alias: self.idstring, destination: destination, alias_type: alias_type})
+    end
+  end
+
+  def update_email_aliases
+    if(!self.validaccount?)
+      self.email_aliases.update_all(disabled: true)
+    else
+      self.email_aliases.update_all(disabled: false)
+    end
+  end
+
+  def self.system_id
+    1
+  end
 
 
 end

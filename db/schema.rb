@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130111025906) do
+ActiveRecord::Schema.define(:version => 20130117020654) do
 
   create_table "auth_logs", :force => true do |t|
     t.integer  "person_id"
@@ -81,6 +81,20 @@ ActiveRecord::Schema.define(:version => 20130111025906) do
   add_index "counties", ["location_id"], :name => "location_ndx"
   add_index "counties", ["name"], :name => "name_ndx"
   add_index "counties", ["state_fipsid"], :name => "state_fipsid_ndx"
+
+  create_table "email_aliases", :force => true do |t|
+    t.string   "aliasable_type", :default => "0",   :null => false
+    t.integer  "aliasable_id",   :default => 0,     :null => false
+    t.string   "mail_alias",                        :null => false
+    t.string   "destination",                       :null => false
+    t.integer  "alias_type",     :default => 0,     :null => false
+    t.boolean  "disabled",       :default => false
+    t.datetime "created_at",                        :null => false
+    t.datetime "updated_at",                        :null => false
+  end
+
+  add_index "email_aliases", ["aliasable_type", "aliasable_id", "alias_type"], :name => "alisable_ndx"
+  add_index "email_aliases", ["mail_alias", "destination", "disabled"], :name => "postfix_select_ndx"
 
   create_table "google_accounts", :force => true do |t|
     t.integer  "person_id",        :default => 0,     :null => false

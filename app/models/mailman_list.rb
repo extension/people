@@ -7,4 +7,11 @@
 
 class MailmanList < ActiveRecord::Base
   belongs_to :community
+  has_many :email_aliases
+
+
+  def mailto
+    "#{self.name}@lists.extension.org"
+  end
+  
 end
