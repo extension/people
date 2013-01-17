@@ -1,0 +1,15 @@
+<%- @page_title = "eXtension Sign up - Thank you" -%>
+
+<div class="well">
+
+<h2>Thanks for signing up!</h2>
+
+<p>In order to confirm your email address, we've just sent an email to: <code class="email"><%= current_person.email %></code> <span class="help">(Incorrect address? Please <%= link_to('fix it in your profile', edit_profile_path(current_person))%>)</span></p>
+
+<p>The email should arrive within a few minutes. Once you receive it, either click the confirmation link or use the provided token to <%= link_to('confirm your account', confirm_accounts_path) %>.</p>
+
+</div>
+
+
+<%= render(:partial => 'email_help_notice') %>
+

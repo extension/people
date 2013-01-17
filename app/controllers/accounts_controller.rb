@@ -5,7 +5,8 @@
 #  see LICENSE file
 
 class AccountsController < ApplicationController
-  skip_before_filter :signin_required
+  skip_before_filter :signin_required, except: [:post_signup]
+  before_filter :signin_optional
 
   def signout
     set_current_person(nil)
@@ -74,10 +75,6 @@ class AccountsController < ApplicationController
 
   def create
     
-    if(!params[:invite].nil?)
-      @invitation = Invitation.find_by_token(params[:invite])
-    end
-
     @person = Person.new(params[:person])
         
     # STATUS_SIGNUP
@@ -85,20 +82,16 @@ class AccountsController < ApplicationController
     
     # last login at == now
     @person.last_login_at = Time.zone.now
-       
-    if(!@person.save)        
-      render(:action => "signup")
-    else        
+    
+    if(@person.save)
       # automatically log them in
       set_current_person(@person)
-      signupdata = {}     
-      if(@invitation)
-        signupdata.merge!({:invitation => @invitation})
-      end
+      current_person.send_signup_confirmation
+      # TODO log something
       #UserEvent.log_event(:etype => UserEvent::PROFILE,:user => @currentuser,:description => "initialsignup")
-      #current_person.send_signup_confirmation(signupdata)
-      #return redirect_to(:action => :confirmationsent)
-      render(template: 'debug/dump_params')
+      render(template: 'accounts/post_signup')
+    else
+      render(:action => "signup")
     end
   end
 

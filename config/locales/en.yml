@@ -3,24 +3,28 @@
 
 en:
   communities:
-      entrytypes:
-        approved: 'eXtension Community of Practice'
-        user_contributed: 'User created community'
-        institution: 'Institution'
-        unknown: 'Unknown community type'
-      memberfilters:
-        open: 'Open Membership'
-        moderated: 'Moderated Membership'
-        invitation: 'Invitation Only Membership'
-        unknown: 'Unknown member type'
-      connections:
-        none: 'No Connection'
-        invitedleader: 'Invited (Leader)'
-        invitedleader_institution: 'Invited (Instutitional Team)'
-        invitedmember: 'Invited (Member)'
-        pending: 'Pending Membership'
-        leader: 'Leader'
-        institutional_team: 'Institutional Team'
-        member: 'Member'
-        interest: 'Interest'
-        
+    entrytypes:
+      approved: 'eXtension Community of Practice'
+      user_contributed: 'User created community'
+      institution: 'Institution'
+      unknown: 'Unknown community type'
+    memberfilters:
+      open: 'Open Membership'
+      moderated: 'Moderated Membership'
+      invitation: 'Invitation Only Membership'
+      unknown: 'Unknown member type'
+    connections:
+      none: 'No Connection'
+      invitedleader: 'Invited (Leader)'
+      invitedleader_institution: 'Invited (Instutitional Team)'
+      invitedmember: 'Invited (Member)'
+      pending: 'Pending Membership'
+      leader: 'Leader'
+      institutional_team: 'Institutional Team'
+      member: 'Member'
+      interest: 'Interest'
+  email:
+    subjects:
+      email_confirmation: 'eXtension: Please confirm your email address' 
+
+  

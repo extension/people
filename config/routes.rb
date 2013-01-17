@@ -8,12 +8,20 @@
 People::Application.routes.draw do
   root :to => 'home#index'
 
-  resources :accounts, only: [:create]
+  resources :accounts, only: [:create] do
+    collection do
+      get :send_confirmation
+      get :confirm
+      post :confirm
+    end
+  end
 
   # named routes for special accounts paths
   match "signin", to: "accounts#signin", via: [:get,:post], :as => 'signin'
   match "signout", to: "accounts#signout", via: [:get], :as => 'signout'
   match "signup", to: "accounts#signup", via: [:get,:post], :as => 'signup'
+  match "account/reset_password" => "account#reset_password", :via => [:get, :post], :as => 'reset_password'
+
 
   resources :communities do 
     collection do
@@ -24,10 +32,11 @@ People::Application.routes.draw do
       get :connections
       get :invitations
     end
-
   end
 
   resources :colleagues, only: [:index, :show]
+
+  resources :profile
 
   # json data endpoints
   resources :data, only: [:index] do
@@ -37,10 +46,10 @@ People::Application.routes.draw do
     end
   end
 
-
-  match "account/reset_password" => "account#reset_password", :via => [:get, :post], :as => 'reset_password'
-  match "account/confirm" => "account#confirm_email", :via => [:get, :post], :as => 'confirm'
-
+  # debug paths
   match "debug/session_information", to: "debug#session_information"
+
+  # home paths
+  match "help", to: "home#help", via: [:get,:post], :as => 'help'
 
 end

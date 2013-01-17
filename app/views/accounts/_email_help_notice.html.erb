@@ -1,0 +1,13 @@
+<div class="well">
+  <h2>If you didn't receive the email yet...</h2>
+
+  <p>Sometimes emails can get delayed up to a few hours. It's also possible for email to be mistakenly flagged as spam by your email provider. You may want to check your Spam or Junk folders to see if it's there.</p>
+
+  <p>This email will be from: <code><%= Settings.email_from_name %> &lt;<%= Settings.email_from_address %>&gt;</code></p>
+
+  <p>with the subject: <code><%= I18n.translate("email.subjects.email_confirmation") %></code></p>
+
+  <p>If you don't receive the email within the next 24 hours,  
+    please try <%= link_to("sending another confirmation email", send_confirmation_accounts_path) %> or 
+    <%= link_to("contact us", help_path) %> for more information.</p>
+</div>

@@ -2,3 +2,6 @@ reserved_uids: [1,2,3,4,5,6,7,8]
 airbrake_api_key: 'use_local_settings'
 session_token: 'use_local_settings-use_local_settings'
 sudoers: ['use_local_settings']
+email_from_name:  'eXtension People Notification - Do Not Reply'
+email_from_address: 'peoplemail@extension.org'
+email_bcc_address: 'use_local_settings'
