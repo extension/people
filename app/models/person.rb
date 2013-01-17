@@ -14,7 +14,6 @@ class Person < ActiveRecord::Base
   attr_accessible :password
   attr_accessible :position_id, :position, :location_id, :location, :county_id, :county, :institution_id, :institution 
 
-
   ## validations
   validates :first_name, :presence => true
   validates :last_name, :presence => true
@@ -23,6 +22,14 @@ class Person < ActiveRecord::Base
   validates :password, :length => { :in => 8..40 }, :presence => true, :on => :create
   validates :involvement, :presence => true, :on => :create
   
+  ## filters
+  before_create :set_hashed_password
+  before_validation :set_idstring
+
+  after_create :create_email_forward
+  after_update :update_email_forward
+  after_save :update_email_aliases
+
   ## associations
   belongs_to :county
   belongs_to :location
@@ -37,17 +44,11 @@ class Person < ActiveRecord::Base
                                    communities.*"
   
   has_many :email_aliases, as: :aliasable
+  
   ## scopes  
   scope :validaccounts, where("retired = #{false} and vouched = #{true}")
 
-  ## filters
 
-  before_create :set_hashed_password
-  before_validation :set_idstring
-
-  after_create :create_email_forward
-  after_update :update_email_forward
-  after_save :update_email_aliases
   
 
   ## constants
@@ -216,28 +217,11 @@ class Person < ActiveRecord::Base
     end
   end
 
-  # def send_signup_confirmation
-  #  self.set_token(save: true)  
-  #  token = UserToken.create(:user=>self,:tokentype=>UserToken::SIGNUP, :tokendata => tokendata)
-  #  Notification.create(:notifytype => Notification::CONFIRM_SIGNUP, :account => self, :send_on_create => true, :additionaldata => {:token_id => token.id})
-  #  return true
-  # end
+  def send_signup_confirmation
+   self.set_token(save: true)  
+   Notification.create(notifiable: self, notification_type: Notification::CONFIRM_SIGNUP)
+  end
 
-
-
-  # def send_email_confirmation(sendnow=true)
-  #  # update attributes
-  #  if(self.account_status != STATUS_CONFIRMEMAIL or self.emailconfirmed != false)
-  #   self.update_attributes(:account_status => STATUS_CONFIRMEMAIL,:email_event_at => Time.now.utc, :emailconfirmed => false)
-  #  end
-  
-  #  # create token
-  #  token = UserToken.create(:user=>self,:tokentype=>UserToken::EMAIL, :tokendata => {:email => self.email})
-   
-  #  # send email or create notification
-  #  Notification.create(:notifytype => Notification::CONFIRM_EMAIL, :account => self, :send_on_create => sendnow, :additionaldata => {:token_id => token.id})
-  #  return true
-  # end
 
   def email_forward
     self.email_aliases.where(mail_alias: self.idstring).first

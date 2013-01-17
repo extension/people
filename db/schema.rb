@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130117020654) do
+ActiveRecord::Schema.define(:version => 20130117134137) do
 
   create_table "auth_logs", :force => true do |t|
     t.integer  "person_id"
@@ -128,6 +128,28 @@ ActiveRecord::Schema.define(:version => 20130117020654) do
 
   add_index "google_groups", ["community_id"], :name => "community_ndx", :unique => true
 
+  create_table "invitations", :force => true do |t|
+    t.integer  "created_by",                   :default => 0, :null => false
+    t.string   "token",          :limit => 40,                :null => false
+    t.string   "email",                                       :null => false
+    t.datetime "created_at",                                  :null => false
+    t.datetime "accepted_at"
+    t.integer  "person_id",                    :default => 0
+    t.datetime "reminder_at"
+    t.integer  "reminder_count",               :default => 0
+    t.text     "additionaldata"
+    t.integer  "resent_count",                 :default => 0
+    t.datetime "resent_at"
+    t.text     "message"
+    t.text     "resendmessage"
+    t.integer  "status",                       :default => 0
+  end
+
+  add_index "invitations", ["created_by"], :name => "creator_ndx"
+  add_index "invitations", ["email"], :name => "email_ndx"
+  add_index "invitations", ["person_id"], :name => "person_ndx"
+  add_index "invitations", ["token"], :name => "token_ndx"
+
   create_table "locations", :force => true do |t|
     t.integer "fipsid",                     :default => 0,  :null => false
     t.integer "entrytype",                  :default => 0,  :null => false
@@ -151,6 +173,18 @@ ActiveRecord::Schema.define(:version => 20130117020654) do
 
   add_index "mailman_lists", ["community_id", "connectiontype"], :name => "community_type_ndx", :unique => true
   add_index "mailman_lists", ["name"], :name => "name_ndx", :unique => true
+
+  create_table "notifications", :force => true do |t|
+    t.integer  "notifiable_id"
+    t.string   "notifiable_type",   :limit => 30
+    t.integer  "notification_type",                                  :null => false
+    t.datetime "delivery_time",                                      :null => false
+    t.integer  "delayed_job_id"
+    t.boolean  "processed",                       :default => false, :null => false
+    t.text     "additionaldata"
+    t.datetime "created_at",                                         :null => false
+    t.datetime "updated_at",                                         :null => false
+  end
 
   create_table "people", :force => true do |t|
     t.string   "idstring",                 :limit => 80,                    :null => false

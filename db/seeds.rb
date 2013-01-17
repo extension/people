@@ -179,6 +179,12 @@ def community_email_alias_query
   transfer_query
 end
 
+def invitations_transfer_query
+  query = <<-END_SQL.gsub(/\s+/, " ").strip
+    INSERT INTO #{@my_database}.#{Invitation.table_name} SELECT * FROM #{@darmok_database}.invitations
+  END_SQL
+  query
+end
 
 def set_person_institution_column
   print "Setting person's institution column..."
@@ -241,6 +247,7 @@ announce_and_run_query('Transferring lists',lists_transfer_query)
 announce_and_run_query('Transferring social network connections',social_network_transfer_query)
 announce_and_run_query('Transferring individual email aliases',individual_email_alias_query)
 announce_and_run_query('Transferring community email aliases',community_email_alias_query)
+announce_and_run_query('Transferring invitations',invitations_transfer_query)
 
 # data manipulation
 create_milfam_wordpress_list_email_alias

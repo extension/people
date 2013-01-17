@@ -50,15 +50,15 @@ class AccountsController < ApplicationController
     if(!request.post?)
       return render(template: 'accounts/eligibility_notice')
     end
-        
-    if(!params[:invite].nil?)
-      @invitation = Invitation.find_by_token(params[:invite])
-    end
-    
+      
     if params[:person]
       @person = Person.new(params[:person])
     else
       @person = Person.new
+    end
+
+    if(!params[:invite].nil? and invitation = Invitation.find_by_token(params[:invite]))
+      @person.invitation_id = invitation.id
     end
     
     @locations = Location.order('entrytype,name')
@@ -85,32 +85,8 @@ class AccountsController < ApplicationController
     
     # last login at == now
     @person.last_login_at = Time.zone.now
-    
-    begin
-      didsave = @person.save
-    rescue ActiveRecord::StatementInvalid => e
-      if(!(e.to_s =~ /duplicate/i))
-        raise
-      end
-    end
-    
-    if(!didsave)        
-      # if(!@person.errors.on(:email).nil? and @person.errors.on(:email) == 'has already been taken')
-      #   failuremsg = "Your email address has already been registered with us.  If you've forgotten your password for that account, please <a href='#{url_for(:controller => 'people/account', :action => :new_password)}'>request a new password</a>"
-      #   flash.now[:failure] = failuremsg
-      # elsif(!@person.errors.empty?)
-      #   failuremsg = "<h3>There were errors that prevented signup</h3>"
-      #   failuremsg += "<ul>"
-      #   @person.errors.each { |value,msg|
-      #     if (value == 'login')
-      #       failuremsg += "<li>That eXtensionID #{msg}</li>"
-      #     else
-      #       failuremsg += "<li>#{value} - #{msg}</li>"
-      #     end
-      #   }
-      #   failuremsg += "</ul>"          
-      #   flash.now[:failurelist] = failuremsg
-      # end
+       
+    if(!@person.save)        
       render(:action => "signup")
     else        
       # automatically log them in
