@@ -83,14 +83,14 @@ ActiveRecord::Schema.define(:version => 20130117020654) do
   add_index "counties", ["state_fipsid"], :name => "state_fipsid_ndx"
 
   create_table "email_aliases", :force => true do |t|
-    t.string   "aliasable_type", :default => "0",   :null => false
-    t.integer  "aliasable_id",   :default => 0,     :null => false
-    t.string   "mail_alias",                        :null => false
-    t.string   "destination",                       :null => false
-    t.integer  "alias_type",     :default => 0,     :null => false
-    t.boolean  "disabled",       :default => false
-    t.datetime "created_at",                        :null => false
-    t.datetime "updated_at",                        :null => false
+    t.string   "aliasable_type", :limit => 30, :default => "0",   :null => false
+    t.integer  "aliasable_id",                 :default => 0,     :null => false
+    t.string   "mail_alias",                                      :null => false
+    t.string   "destination",                                     :null => false
+    t.integer  "alias_type",                   :default => 0,     :null => false
+    t.boolean  "disabled",                     :default => false
+    t.datetime "created_at",                                      :null => false
+    t.datetime "updated_at",                                      :null => false
   end
 
   add_index "email_aliases", ["aliasable_type", "aliasable_id", "alias_type"], :name => "alisable_ndx"
