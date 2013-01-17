@@ -33,7 +33,8 @@ class Accounts < ActiveRecord::Migration
       t.integer  "primary_account_id"
       t.string   "affiliation"
       t.text     "involvement"
-      t.text     "additionaldata"
+      t.string   "token"
+      t.integer  "invitation_id"
       t.timestamps
     end
 

@@ -170,7 +170,8 @@ ActiveRecord::Schema.define(:version => 20130111025906) do
     t.integer  "primary_account_id"
     t.string   "affiliation"
     t.text     "involvement"
-    t.text     "additionaldata"
+    t.string   "token"
+    t.integer  "invitation_id"
     t.datetime "created_at",                                                :null => false
     t.datetime "updated_at",                                                :null => false
   end
