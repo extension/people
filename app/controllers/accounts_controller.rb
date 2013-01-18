@@ -104,13 +104,13 @@ class AccountsController < ApplicationController
       gourl = view_context.link_to('signup for an account',signup_path)
       explanation = "<p>The eXtensionID or email address was not found. Please check that ID/email again, or #{gourl}.</p>"
     when AuthLog::AUTH_INVALID_PASSWORD
-      gourl = view_context.link_to('set a new password',reset_password_path)
+      gourl = view_context.link_to('set a new password',accounts_reset_password_path)
       explanation = "<p>Your eXtension account password is incorrect. Please check your password again.  If you have forgotten your password, you can #{gourl} for your eXtension account.</p>"
     when AuthLog::AUTH_ACCOUNT_RETIRED
       gourl = view_context.link_to('contact us','#')
       explanation = "<p>Your eXtension account has been retired. Please #{gourl} for more information.</p>"
     when AuthLog::AUTH_PASSWORD_EXPIRED
-      gourl = view_context.link_to('set a new password',reset_password_path)
+      gourl = view_context.link_to('set a new password',accounts_reset_password_path)
       explanation = "<p>Your eXtension password has expired. Please #{gourl} for your eXtension account.</p>"
     else
       explanation = "<p>An unknown error occurred.</p>"

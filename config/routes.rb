@@ -5,23 +5,23 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
+# see config/initializers/add_named_route.rb for simple_named_route
+
 People::Application.routes.draw do
   root :to => 'home#index'
 
-  resources :accounts, only: [:create] do
-    collection do
-      get :send_confirmation
-      get :confirm
-      post :confirm
-    end
-  end
+  controller :accounts do
+    # non accounts/blah paths
+    match "signin", action: "signin", via: [:get,:post]
+    match "signout", action: "signout", via: [:get]
+    match "signup", action: "signup", via: [:get,:post]
+    # everything else
+    simple_named_route 'create', via: [:post]
+    simple_named_route 'send_confirmation'
+    simple_named_route 'reset_password'
+  end    
 
-  # named routes for special accounts paths
-  match "signin", to: "accounts#signin", via: [:get,:post], :as => 'signin'
-  match "signout", to: "accounts#signout", via: [:get], :as => 'signout'
-  match "signup", to: "accounts#signup", via: [:get,:post], :as => 'signup'
-  match "account/reset_password" => "account#reset_password", :via => [:get, :post], :as => 'reset_password'
-
+  resources :colleagues, only: [:index, :show]
 
   resources :communities do 
     collection do
@@ -34,22 +34,24 @@ People::Application.routes.draw do
     end
   end
 
-  resources :colleagues, only: [:index, :show]
-
-  resources :profile
-
   # json data endpoints
-  resources :data, only: [:index] do
-    collection do
-      post :counties_for_location
-      post :institutions_for_location
-    end
+  controller :data do
+    simple_named_route 'counties_for_location', via: [:post]
+    simple_named_route 'institutions_for_location', via: [:post]
   end
 
-  # debug paths
-  match "debug/session_information", to: "debug#session_information"
+  controller :debug do
+    simple_named_route 'session_information', via: [:get,:post]
+  end
 
-  # home paths
-  match "help", to: "home#help", via: [:get,:post], :as => 'help'
+  controller :home do
+    match "help", action: 'help', via: [:get,:post]
+  end
+
+
+  controller :profile do
+    simple_named_route 'index'
+  end
 
 end
+

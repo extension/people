@@ -9,7 +9,7 @@
 <div class="row">
   <div class="span8">
 
-    <%= simple_form_for(@person, url: accounts_path, class: 'form-horitzontal') do |f| -%>
+    <%= simple_form_for(@person, url: accounts_create_path, class: 'form-horizontal') do |f| -%>
 
       <%- if notification = f.error_notification -%>
         <div class="alert alert-error fade in">
@@ -70,7 +70,7 @@
   <script type="text/javascript">
     $("#person_location_id").change(function() {
 
-      $.post('<%= counties_for_location_data_path %>', { location: $(this).val() }, function(data) {
+      $.post('<%= data_counties_for_location_path %>', { location: $(this).val() }, function(data) {
         if(!$.isEmptyObject(data)) {
           $("#county_select").show();
           populateDropdown($("#person_county_id"), data);
@@ -79,7 +79,7 @@
         }
       });
 
-      $.post('<%= institutions_for_location_data_path %>', { location: $(this).val() }, function(data) {
+      $.post('<%= data_institutions_for_location_path %>', { location: $(this).val() }, function(data) {
         if(!$.isEmptyObject(data)) {
           populateDropdown($("#person_institution_id"), data);
         } else {
