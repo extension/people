@@ -1,0 +1,100 @@
+<h3>Personal Info <%= link_to "edit", :controller => 'profile', :action => 'edit' %></h3>
+
+<div class="vcard">
+  <div class="vcardHeader">
+  </div>
+  <p class="item">
+    <span class="vcardLabel">Full Name:</span>
+    <span class="fn"><%= current_person.fullname%></span>
+  </p>
+  <div class="n">
+  <p class="item">
+    <span class="vcardLabel">First Name:</span>
+    <span class="given-name"><%= current_person.first_name%></span>
+  </p>  
+  <p class="item">
+    <span class="vcardLabel">Last Name:</span>
+    <span class="family-name"><%= current_person.last_name%></span>
+  </p>
+  </div>
+  <p class="item">
+    <span class="vcardLabel">eXtensionID:</span>
+    <span class="extensionid"><%= current_person.idstring%></span>
+  </p>
+  <p class="item">
+    <span class="vcardLabel">Email:</span>
+    <span class="email"><%= current_person.email%></span>
+  </p>
+  <%- if !current_person.email_forward.blank? and current_person.email_forward.alias_type == EmailAlias::CUSTOM_FORWARD -%>
+    <p class="item">
+      <span class="vcardLabel">Email Forwards to:</span>
+      <span class="email"><%= current_person.email_forward.destination%></span>
+    </p>
+  <%- end -%>
+  
+  <p class="item">
+    <span class="vcardLabel">Preferred Phone:</span>
+    <span class="tel"><%= (current_person.phonenumber.nil? or current_person.phonenumber == '') ? '&nbsp;' : number_to_phone(current_person.phonenumber, :area_code => true)%></span>
+  </p>
+  <p class="item">
+    <span class="vcardLabel">Title:</span>
+    <span class="title"><%= (current_person.title.nil? or current_person.title == '') ? '&nbsp;': current_person.title %></span>
+  </p>
+  <p class="item">
+    <span class="vcardLabel">Position:</span>
+    <span class="role"><%= (current_person.position.nil? or current_person.position == '') ? '&nbsp;': current_person.position.name %></span>
+  </p>
+  <div class="org">
+    <p class="item">
+      
+      <%- if !current_person.primary_institution.nil? -%>
+          <span class="vcardLabel">Primary Institution:</span>
+          <span class="organization-name"><%= primary_institution_name_for_person(current_person,'&nbsp;') %>
+          <%= link_to('view/edit', community_path(current_person.primary_institution), :class => 'help') %>
+      <% else %>
+          <span class="vcardLabel missing">Primary Institution:</span>
+          <span class="organization-name"><%= current_person.primary_institution_name('&nbsp;') %>
+          <div class="primarydirs"><strong>Your primary institution is missing. Set it by joining that institution's community:</strong>
+              <ul>
+              <li>1) <%= link_to "Search for your institution", :controller => '/people/communities' %></li>
+              <li>2) Join </li>
+              <li>3) Check the "This is my primary institution" box</li>
+              </ul>
+              <span><em>Institution not listed? <%= link_to("Contact Us", :controller => 'help', :action => 'index') %> to get your institution listed</em></span>
+          </div>
+          <br class="clearing" />
+      <%- end -%>
+      </span>
+    </p>
+  </div>
+
+  <div class="org">
+    <p class="item">
+      <span class="vcardLabel">Other/Additional Affiliation:</span>
+      <span class="organization-name"><%= (current_person.affiliation.blank?) ? '&nbsp;': current_person.affiliation %></span>
+    </p>
+  </div>
+
+  <div class="adr"> 
+    <p class="item">
+      <span class="vcardLabel">Location:</span>
+      <span class="region"><%= (current_person.location.nil? or current_person.location == '') ? '&nbsp;': current_person.location.name %></span>
+    </p>
+    <p class="item">
+      <span class="vcardLabel">County:</span>
+      <span class="county-name"><%= (current_person.county.nil? or current_person.county == '') ? '&nbsp;': current_person.county.name %></span>
+    </p>
+  </div>
+  <p class="item">
+    <span class="vcardLabel">Time zone:</span>
+    <%- if current_person.has_time_zone? -%>
+      <span class="tz"><%= current_person.time_zone%></span>
+    <%- else -%>
+      <span class="tz">&nbsp;</span>
+    <%- end -%>
+  </p>
+  <p class="item">
+    <span class="vcardLabel">Announcements List:</span>
+    <span><%= (current_person.announcements) ? 'Subscribed': 'Not Subscribed' %></span>
+  </p>  
+</div>

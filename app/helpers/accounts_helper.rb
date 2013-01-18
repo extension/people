@@ -20,4 +20,13 @@ module AccountsHelper
     return 'Please Sign in'
   end
 
+
+  def primary_institution_name_for_person(person, niltext = 'not specified')
+    if(institution = person.primary_institution)
+      institution.name
+    else
+      niltext.html_safe
+    end
+  end
+  
 end

@@ -200,10 +200,8 @@ class Person < ActiveRecord::Base
     end
   end
 
-  # TODO review how this works
-  # https://basecamp.com/1851571/projects/945625-people/todos/26749251-address-primary
   def primary_institution
-    self.communities.institutions.where("connectioncode = #{CommunityConnection::PRIMARY_INSTITUTION}").first
+    self.communities.institutions.where(id: self.institution_id).first
   end
 
   def set_token(options = {})
@@ -284,6 +282,44 @@ class Person < ActiveRecord::Base
 
   def self.system_id
     1
+  end
+
+  # since we return a default string from timezone, this routine
+  # will allow us to check for a null/empty value so we can
+  # prompt people to come set one.
+  def has_time_zone?
+    tzinfo_time_zone_string = read_attribute(:time_zone)
+    return (!tzinfo_time_zone_string.blank?)
+  end
+
+  # override timezone writer/reader
+  # returns Eastern by default, use convert=false
+  # when you need a timezone string that mysql can handle
+  def time_zone(convert=true)
+    tzinfo_time_zone_string = read_attribute(:time_zone)
+    if(tzinfo_time_zone_string.blank?)
+      tzinfo_time_zone_string = DEFAULT_TIMEZONE
+    end
+
+    if(convert)
+      reverse_mappings = ActiveSupport::TimeZone::MAPPING.invert
+      if(reverse_mappings[tzinfo_time_zone_string])
+        reverse_mappings[tzinfo_time_zone_string]
+      else
+        nil
+      end
+    else
+      tzinfo_time_zone_string
+    end
+  end
+
+  def time_zone=(time_zone_string)
+    mappings = ActiveSupport::TimeZone::MAPPING
+    if(mappings[time_zone_string])
+      write_attribute(:time_zone, mappings[time_zone_string])
+    else
+      write_attribute(:time_zone, nil)
+    end
   end
 
 

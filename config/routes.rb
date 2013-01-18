@@ -23,6 +23,7 @@ People::Application.routes.draw do
 
   resources :colleagues, only: [:index, :show]
 
+
   resources :communities do 
     collection do
       get :newest
@@ -51,6 +52,7 @@ People::Application.routes.draw do
 
   controller :profile do
     simple_named_route 'index'
+    simple_named_route 'edit', via: [:get,:post]
   end
 
 end
