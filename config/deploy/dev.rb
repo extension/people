@@ -7,5 +7,5 @@ end
 server 'dev.people.extension.org', :app, :web, :db, :primary => true
 
 if(ENV['REBUILD'] == 'true')
-  after "deploy:update_code", "db:rebuild"
+  after "deploy:update_code", "deploy:db:rebuild"
 end
