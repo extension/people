@@ -21,14 +21,8 @@ end
 class OpieController < ApplicationController
   layout nil
   include OpenID::Server
-  include ApplicationHelper
   before_filter(:login_required, :only => [:decision])
   before_filter(:check_purgatory, :only => [:decision])
-  before_filter :turn_off_right_column
-
-  def ssl_allowed?
-    (!Rails.env.development?)
-  end
 
   def delegate
     @openiduser = User.find_by_login(params[:extensionid])
@@ -38,7 +32,6 @@ class OpieController < ApplicationController
     end
     # force format to be html
     params[:format] = 'html'
-    render(:layout => 'peopledelegate')
   end
 
   def index
@@ -47,7 +40,7 @@ class OpieController < ApplicationController
       opierequest = session[:last_opierequest]
       if(opierequest.nil?)
         flash[:failure] = "An error occurred during your OpenID login.  Please return to the site you were using and try again."
-        return redirect_to(people_welcome_url)
+        return redirect_to(root_url)
       else
         # clear it out of the session
         session[:last_opierequest] = nil
@@ -117,7 +110,7 @@ class OpieController < ApplicationController
               end # case
             end # askedfields
           end
-          render(:template => 'opie/decide', :layout => 'people')
+          render(:template => 'opie/decide', :layout => 'application')
         else
           @currentuser = nil
           session[:userid] = nil
@@ -350,10 +343,5 @@ EOS
       render :text => web_response.body, :status => 400
     end
   end
-
-  protected
-
-
-
 
 end
