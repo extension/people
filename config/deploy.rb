@@ -79,6 +79,13 @@ namespace :deploy do
       invoke_command "rm -f #{shared_path}/system/maintenancemode"
     end
     
-  end  
+  end
+
+  namespace :db do
+    desc "drop the database, create the database, run migrations, seed"
+    task :rebuild, :roles => :db, :only => {:primary => true} do
+      run "cd #{release_path} && #{rake} db:demo_rebuild RAILS_ENV=production"
+    end
+  end   
 end 
 
