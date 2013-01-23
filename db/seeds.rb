@@ -53,6 +53,7 @@ def account_transfer_query
   account_transfer_query
 end
 
+
 def google_account_transfer_query
   query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{@my_database}.#{GoogleAccount.table_name} SELECT * FROM #{@darmok_database}.google_accounts
@@ -209,7 +210,7 @@ def set_person_institution_column
 end
 
 
-def set_person_involvement_column
+def transform_person_additionaldata_data
   print "Setting person's involvement column..."
   benchmark = Benchmark.measure do
     DarmokAccount.where("additionaldata LIKE '%:signup_affiliation%'").find_each do |darmok_account|
@@ -222,6 +223,17 @@ def set_person_involvement_column
     end
   end
   print "\t\tfinished in #{benchmark.real.round(1)}s\n"
+
+  print "Setting person's institution column for signups..."
+  benchmark = Benchmark.measure do
+    Person.where(account_status: Person::STATUS_SIGNUP).all.each do |person|
+      darmok_account = DarmokAccount.find_by_id(person.id)
+      if(darmok_account.additionaldata and signup_institution_id = darmok_account.additionaldata[:signup_institution_id])
+        person.update_column(:institution_id, signup_institution_id)
+      end
+    end
+  end
+  print "\t\tfinished in #{benchmark.real.round(1)}s\n"  
 end
 
 def create_milfam_wordpress_list_email_alias
@@ -231,6 +243,14 @@ def create_milfam_wordpress_list_email_alias
     EmailAlias.create(aliasable: list, mail_alias: list.name, destination: list.mailto, alias_type: EmailAlias::FORWARD)
   end
   print "\t\tfinished in #{benchmark.real.round(1)}s\n"
+end
+
+def dump_never_completed_signups
+  print "Deleting accounts that have never completed signup (except those in last 14 days)..."
+  benchmark = Benchmark.measure do
+    Person.cleanup_signup_accounts
+  end
+  print "\t\tfinished in #{benchmark.real.round(1)}s\n" 
 end
 
 # seed queries
@@ -250,8 +270,10 @@ announce_and_run_query('Transferring community email aliases',community_email_al
 announce_and_run_query('Transferring invitations',invitations_transfer_query)
 
 # data manipulation
+dump_never_completed_signups
 create_milfam_wordpress_list_email_alias
 set_person_institution_column
-set_person_involvement_column
+transform_person_additionaldata_data
+
 
 

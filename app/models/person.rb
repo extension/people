@@ -44,7 +44,8 @@ class Person < ActiveRecord::Base
                                    communities.*"
   
   has_many :email_aliases, as: :aliasable
-  
+  has_one :google_account, dependent: :destroy
+
   ## scopes  
   scope :validaccounts, where("retired = #{false} and vouched = #{true}")
 
@@ -319,6 +320,13 @@ class Person < ActiveRecord::Base
       write_attribute(:time_zone, mappings[time_zone_string])
     else
       write_attribute(:time_zone, nil)
+    end
+  end
+
+
+  def self.cleanup_signup_accounts
+    self.where(account_status: STATUS_SIGNUP).where("created_at < ?",Time.now - 14.day).each do |person|
+      person.destroy
     end
   end
 
