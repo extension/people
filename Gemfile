@@ -62,6 +62,9 @@ gem 'dalli'
 # forms
 gem 'simple_form'
 
+# openid
+gem 'ruby-openid'
+
 
 # validation helpers
 # uses the Mail gem to validate email: https://github.com/hallelujah/valid_email
