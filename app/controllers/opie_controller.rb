@@ -6,9 +6,9 @@
 #  see LICENSE file or view at http://about.extension.org/wiki/LICENSE
 
 require "openid"
-require 'openid_ar_store'
 require 'openid/consumer/discovery'
 require 'openid/extensions/sreg'
+require 'openid/store/filesystem'
 
 # extend the data fields for the SReg Request/Response
 
@@ -277,7 +277,8 @@ EOS
   def server
     if @server.nil?
       endpoint = url_for(:action => 'index', :only_path => false)
-      store = ActiveRecordStore.new
+      dir = Pathname.new(RAILS_ROOT).join('openid').join('store')
+      store = OpenID::Store::Filesystem.new(dir)
       @server = Server.new(store,endpoint)
     end
     return @server
