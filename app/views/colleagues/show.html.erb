@@ -1,0 +1,10 @@
+<% @page_title = "Colleague Information for #{@colleague.fullname}" %>
+
+<p>#TODO navtabs</p>
+
+<div id="primary_column"> 
+
+    <h1><%= @colleague.fullname%></h1>
+    <%= render(:partial => 'colleague_information', locals: {colleague: @colleague}) %>
+    
+</div>

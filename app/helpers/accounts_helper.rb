@@ -28,5 +28,9 @@ module AccountsHelper
       niltext.html_safe
     end
   end
+
+  def space_the_final_frontier
+    '&nbsp;'.html_safe
+  end
   
 end

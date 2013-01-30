@@ -2,13 +2,11 @@
 #  Copyright (c) North Carolina State University
 #  Developed with funding for the National eXtension Initiative.
 # === LICENSE:
+#  BSD(-compatible)
 #  see LICENSE file
 
-class ColleaguesController < ApplicationController
+class AuthApproval < ActiveRecord::Base
+  belongs_to :person
 
-  def show
-    @colleague = Person.find(params[:id])
-  end
-
+  # TODO add a host whitelist for things to be auto-approved
 end
-
