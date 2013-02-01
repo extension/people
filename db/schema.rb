@@ -11,7 +11,13 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130117134137) do
+ActiveRecord::Schema.define(:version => 20130129215236) do
+
+  create_table "auth_approvals", :force => true do |t|
+    t.integer  "person_id",  :default => 0, :null => false
+    t.string   "trust_root",                :null => false
+    t.datetime "created_at",                :null => false
+  end
 
   create_table "auth_logs", :force => true do |t|
     t.integer  "person_id"
