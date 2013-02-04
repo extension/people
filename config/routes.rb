@@ -55,5 +55,19 @@ People::Application.routes.draw do
     simple_named_route 'edit', via: [:get,:post]
   end
 
+  controller :webmail do
+    match "/webmail/:mailer_cache_id/logo" => "webmail#logo", :as => 'webmail_logo'
+    match "/webmail/view/:hashvalue" => "webmail#view", :as => 'webmail_view'
+  end
+
+
+  # webmail example routing
+  namespace "webmail" do
+    namespace 'examples' do
+      match "/:action"
+    end
+  end
+
+
 end
 
