@@ -70,6 +70,10 @@ gem 'ruby-openid'
 # uses the Mail gem to validate email: https://github.com/hallelujah/valid_email
 gem 'valid_email'
 
+# used to post-process mail to convert styles to inline
+gem "csspool"
+gem "inline-style", "0.5.2ex"
+
 group :development do
   # require the powder gem
   gem 'powder'
@@ -79,4 +83,8 @@ group :development do
   # footnotes
   gem 'rails-footnotes', '>= 3.7.5.rc4'
   gem 'quiet_assets'
+
+  gem 'better_errors'
+  gem 'binding_of_caller'
+  gem 'meta_request'
 end
