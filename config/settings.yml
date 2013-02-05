@@ -5,3 +5,5 @@ sudoers: ['use_local_settings']
 email_from_name:  'eXtension People Notification - Do Not Reply'
 email_from_address: 'peoplemail@extension.org'
 email_bcc_address: 'use_local_settings'
+urlwriter_host: 'people.dev'
+app_location: 'localdev'

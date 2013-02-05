@@ -7,8 +7,8 @@
 class AccountMailer < ActionMailer::Base
   helper ApplicationHelper
   default_url_options[:host] = Settings.urlwriter_host
-  default from: "aae-notify@extension.org"
-  default bcc: "systemsmirror@extension.org"
+  default from: Settings.email_from_address
+  default bcc: Settings.email_bcc_address
   helper_method :ssl_root_url, :ssl_webmail_logo
   
 
