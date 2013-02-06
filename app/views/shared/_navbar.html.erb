@@ -15,9 +15,8 @@
     <li class="divider-vertical"></li>
 
 
-    <%= nav_item('#','My Profile') %>
     <%= nav_item(communities_path,'Communities') %>
-    <%= nav_item('#','Colleagues') %>
+    <%= nav_item(colleagues_path,'Colleagues') %>
     <%= nav_item('#','Numbers') %>
   </ul>
 <%- end -%>
@@ -28,7 +27,10 @@
   <%- if current_person -%>
   <li class="dropdown">
     <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= current_person.fullname %><b class="caret"></b></a>
+
     <ul class="dropdown-menu">
+       <%= nav_item(profile_index_path,'My Profile') %>
+       <li class='divider'></li>
       <%= nav_item(signout_path,'Sign out') %>
     </ul>
   </li>
