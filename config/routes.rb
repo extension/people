@@ -35,9 +35,9 @@ People::Application.routes.draw do
   end
 
   # json data endpoints
-  controller :data do
-    simple_named_route 'counties_for_location', via: [:post]
-    simple_named_route 'institutions_for_location', via: [:post]
+  controller :locations do
+    simple_named_route 'counties', via: [:post]
+    simple_named_route 'institutions', via: [:post]
   end
 
   controller :debug do

@@ -70,7 +70,7 @@
   <script type="text/javascript">
     $("#person_location_id").change(function() {
 
-      $.post('<%= data_counties_for_location_path %>', { location: $(this).val() }, function(data) {
+      $.post('<%= locations_counties_path %>', { location: $(this).val() }, function(data) {
         if(!$.isEmptyObject(data)) {
           $("#county_select").show();
           populateDropdown($("#person_county_id"), data);
@@ -79,7 +79,7 @@
         }
       });
 
-      $.post('<%= data_institutions_for_location_path %>', { location: $(this).val() }, function(data) {
+      $.post('<%= locations_institutions_path %>', { location: $(this).val() }, function(data) {
         if(!$.isEmptyObject(data)) {
           populateDropdown($("#person_institution_id"), data);
         } else {

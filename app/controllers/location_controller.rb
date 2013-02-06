@@ -5,11 +5,11 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
-class DataController < ApplicationController
+class LocationsController < ApplicationController
   skip_before_filter :signin_required
 
 
-  def counties_for_location
+  def counties
     if(find_location = params[:location])
       if(find_location.to_i > 0)
         location = Location.where(id: find_location).first
@@ -27,7 +27,7 @@ class DataController < ApplicationController
 
 
 
-  def institutions_for_location
+  def institutions
     if(find_location = params[:location])
       if(find_location.to_i > 0)
         location = Location.where(id: find_location).first
