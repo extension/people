@@ -15,6 +15,14 @@ module CommunitiesHelper
     end
   end
 
+  def description_for_community(community)
+    if(community.description.blank?)
+      '<em>No description provided</em>'.html_safe
+    else
+      community.description.html_safe
+    end
+  end
+
 
   def community_connection_for_person(community,person)
     connection = person.connection_with_community(community)

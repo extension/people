@@ -10,7 +10,7 @@
 <div class="row">
   <div class="span12">
     <p id="description">
-      <%= @community.description.html_safe -%>
+      <%= description_for_community(@community) -%>
       <%- if(current_person.can_edit_community?(@community)) -%>
         <p><small class="edit"><%= link_to 'edit', edit_community_path(@community) -%></small></p>
       <%- end -%>
