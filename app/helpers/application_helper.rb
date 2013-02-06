@@ -56,7 +56,7 @@ module ApplicationHelper
     elsif(nolink)
       "#{person.fullname}"
     else
-      link_to(person.fullname,colleague_path(person)).html_safe
+      link_to(person.fullname,person_path(person)).html_safe
     end
   end
 

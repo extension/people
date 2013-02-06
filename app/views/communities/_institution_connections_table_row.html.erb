@@ -1,4 +1,4 @@
-<td><%= link_to("#{person.fullname}", colleague_path(person)) %></td>
+<td><%= link_to("#{person.fullname}", person_path(person)) %></td>
 <td><%= person.idstring %></td>
 <td><%= person.email %></td>            
 <td><%= (person.affiliation.blank?) ? '<span class="na">&nbsp;</span>'.html_safe : person.affiliation %></td>        

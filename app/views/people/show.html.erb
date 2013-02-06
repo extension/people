@@ -1,0 +1,32 @@
+<% @page_title = "Profile for #{@person.fullname}" %>
+
+<p>#TODO navtabs</p>
+
+<div class="row">
+  <div class="span8">
+    <div class="row">
+      <p>#TODO Avatar <%= @person.fullname %></p>
+    </div>
+    <div class="row">
+      <p>#TODO bio</p>
+    </div>
+    <div class="row">
+      <%= render(:partial => 'profile_information', locals: {person: @person}) %>
+    </div>
+  </div>
+  <div class="span4">
+    <div class="well">
+      <p>#TODO edit</p>
+    </div>
+    <div class="well">
+      <p>#TODO communities</p>
+    </div>
+    <div class="well">
+      <p>#TODO social networks</p>
+    </div>
+    <div class="well">
+      <p>#TODO tags?</p>
+    </div>
+  </div>
+    
+</div>

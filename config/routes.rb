@@ -21,8 +21,7 @@ People::Application.routes.draw do
     simple_named_route 'reset_password'
   end    
 
-  resources :colleagues, only: [:index, :show]
-
+  resources :people, only: [:index, :show]
 
   resources :communities do 
     collection do
@@ -47,12 +46,6 @@ People::Application.routes.draw do
 
   controller :home do
     match "help", action: 'help', via: [:get,:post]
-  end
-
-
-  controller :profile do
-    simple_named_route 'index'
-    simple_named_route 'edit', via: [:get,:post]
   end
 
   controller :webmail do
