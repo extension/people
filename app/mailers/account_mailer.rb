@@ -5,12 +5,36 @@
 # see LICENSE file
 
 class AccountMailer < ActionMailer::Base
-  helper ApplicationHelper
+  helper MailerHelper
   default_url_options[:host] = Settings.urlwriter_host
   default from: Settings.email_from_address
   default bcc: Settings.email_bcc_address
   helper_method :ssl_root_url, :ssl_webmail_logo
   
+
+  def signup(options = {})
+    @person = options[:person]
+    @subject = "Please confirm your email address"
+    @will_cache_email = options[:cache_email].nil? ? true : options[:cache_email]
+    
+    if(!@person.email.blank?)
+      if(@will_cache_email)
+        # create a cached mail object that can be used for "view this in a browser" within
+        # the rendered email.
+        @mailer_cache = MailerCache.create(person: @person, cacheable: @person)
+      end
+      
+      return_email = mail(to: @person.email, subject: @subject)
+      
+      if(@mailer_cache)
+        # now that we have the rendered email - update the cached mail object
+        @mailer_cache.update_attribute(:markup, return_email.body.to_s)
+      end
+    end
+    
+    # the email if we got it
+    return_email
+  end
 
 
   def ssl_root_url
