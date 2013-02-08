@@ -19,6 +19,8 @@ People::Application.routes.draw do
     simple_named_route 'create', via: [:post]
     simple_named_route 'send_confirmation'
     simple_named_route 'reset_password'
+    simple_named_route 'missing_token'
+    simple_named_route 'review'
   end    
 
   resources :people, only: [:index, :show]

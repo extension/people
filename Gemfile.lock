@@ -231,6 +231,7 @@ DEPENDENCIES
   rails (= 3.2.11)
   rails-footnotes (>= 3.7.5.rc4)
   rails_config
+  rest-client
   ruby-openid
   sass-rails (~> 3.2.3)
   simple_form

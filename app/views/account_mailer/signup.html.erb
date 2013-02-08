@@ -12,24 +12,19 @@
 
 <div id="wrapper">
   <table cellpadding="0" cellspacing="0" border="0" align="center" width="599">
-    <%= render(:partial => 'shared_mailer/demo_notice') if @isdemo -%>
+    <%= render(:partial => 'shared_mailer/demo_notice') if is_demo? -%>
   <tr>
     <th align="left" class="bgcolor">
       <h1 id="people_logo"><%= mailer_logo %></h1>      
     </th>
   </tr>
-  
+
   <tr class="tagline">
     <td>tagline</td>
   </tr>
+
   <tr class="options">
-    <td>
-      <%- if @mailer_cache -%>
-        <%= link_to('View in a browser', webmail_view_url(hashvalue: @mailer_cache.hashvalue)) %>
-      <%- else -%>
-        <a href="">View in a browser</a> 
-      <%- end -%>
-    </td>
+    <td><%= view_in_browser_link %></td>
   </tr>
   
   <tr>

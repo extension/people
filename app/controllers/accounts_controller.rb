@@ -43,8 +43,35 @@ class AccountsController < ApplicationController
   def reset_password
   end
 
-  def confirm_email
+  def confirm_signup
+    # signup status check
+    if(current_person.account_status != Person::STATUS_SIGNUP)
+      flash[:notice] = "You have already confirmed your email address"
+      return redirect_to(root_url)
+    end
+    
+    if(params[:token].nil?)
+      return render(:template => 'account/missing_token')
+    end
+
+    if(current_person.token != params[:token])
+      return render(:template => 'account/invalid_token')
+    end
+
+    current_person.confirm_signup
+    if(current_person.vouched?)
+      return redirect_to(root_url)
+    else
+      return redirect_to(accounts_review_url)
+    end
   end
+
+  def confirm_reset
+  end
+
+  def confirm_change
+  end
+
 
   def signup
     reset_session

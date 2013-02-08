@@ -24,6 +24,7 @@ class Person < ActiveRecord::Base
   
   ## filters
   before_create :set_hashed_password
+  before_save :check_account_status
   before_validation :set_idstring
 
   after_create :create_email_forward
@@ -46,6 +47,7 @@ class Person < ActiveRecord::Base
   has_many :email_aliases, as: :aliasable
   has_one :google_account, dependent: :destroy
 
+  belongs_to :invitation
   ## scopes  
   scope :validaccounts, where("retired = #{false} and vouched = #{true}")
 
@@ -330,5 +332,191 @@ class Person < ActiveRecord::Base
     end
   end
 
+  def confirm_signup
+    now = Time.now.utc
+   
+    if(self.has_whitelisted_email?)
+      self.vouched = true 
+      self.vouched_by = self.id
+      self.vouched_at = now
+    end
+
+    # was this person invited? - even if can self-vouch, this will overwrite vouched_by
+    if(invitation = self.invitation)
+      if(self.has_whitelisted_email? or (invitation.email.downcase == self.email.downcase))
+       invitation.accept(self,now)
+       self.vouched = true 
+       self.vouched_by = invitation.person.id
+       self.vouched_at = now
+      else
+       # TODO:   what we really should do here is send an email to the person that made the invitation
+       # and ask them to vouch for the person with the different email that used the right invitation code
+       # but a different, non-whitelisted email.
+       invitation.status = Invitation::INVALID_DIFFERENTEMAIL
+       invitation.additionaldata = {:invalid_reason => 'invitation email does not match signup email', :signup_email => self.email}
+       invitation.save
+      end
+    end
+
+    # is there an unaccepted invitation with this email address in it? - then let's call it an accepted invitation
+    invitation = Invitation.where(email: self.email).where(status: Invitation::PENDING).first
+    if(!invitation.nil?)
+      invitation.accept(self,now)
+      self.vouched = true 
+      self.vouched_by = invitation.person.id
+      self.vouched_at = now
+    end  
+
+    # email settings
+    self.emailconfirmed = true
+    self.email_event_at = now
+    self.account_status = STATUS_OK # will get reset before_save via :check_account_status if not valid
+
+    if(self.save)
+      self.clear_token
+
+      # TODO logging
+      #UserEvent.log_event(:etype => UserEvent::PROFILE,:user => self,:description => "signup")
+      #Activity.log_activity(:user => self, :creator => self, :activitycode => Activity::SIGNUP, :appname => 'local')
+
+      if(self.vouched?)
+        # add to institution based on signup.
+        if(!self.institution.nil?)
+          # TODO community joining routines
+          # self.join_community(self.institution)
+        end
+
+        Notification.create(:notifytype => Notification::WELCOME, :account => @currentuser, :send_on_create => true)
+      else
+        self.post_account_review_request
+      end
+
+      return true
+    else
+      return false
+    end
+  end
+
+
+  def post_account_review_request
+    if(self.vouched?)
+      return true
+    end
+
+    request_options = {}
+    request_options['account_review_key'] = Settings.account_review_key
+    request_options['idstring'] = self.login
+    request_options['email'] = self.email
+    request_options['fullname'] = self.fullname
+    if (!self.affiliation.blank?)
+      request_options['additional_information'] = self.affiliation
+    end
+
+    begin
+    raw_result = RestClient.post(AppConfig.configtable['account_review_url'],
+                             request_options.to_json,
+                             :content_type => :json, :accept => :json)
+    rescue StandardError => e
+      raw_result = e.response
+    end
+    result = ActiveSupport::JSON.decode(raw_result.gsub(/'/,"\""))
+    if(result['success'])
+      #TODO log
+      # if(!self.additionaldata.blank?)
+      #   self.additionaldata = self.additionaldata.merge({:vouch_results => {:success => true, :request_id => result['question_id']}})
+      # else
+      #   self.additionaldata = {:vouch_results => {:success => true, :request_id => result['question_id']}}
+      # end
+      return true
+    else
+      #TODO log
+      # if(!self.additionaldata.blank?)
+      #   self.additionaldata = self.additionaldata.merge({:vouch_results => {:success => false, :error => result['message']}})
+      # else
+      #   self.additionaldata = {:vouch_results => {:success => false, :error => result['message']}}
+      # end
+      return false
+    end
+  end
+
+  def clear_token
+    self.update_column(:token,nil)
+  end
+
+
+  # def join_community_as_leader(community)
+  #  # only called for user community creation - so no activity/no notification necessary
+  #  self.modify_or_create_communityconnection(community,{:operation => 'add', :connectiontype => 'leader'})
+  # end
+  
+  # def join_community(community,notify=true)
+  #  activitycode = Activity::COMMUNITY_JOIN
+  #  notificationcode = notify ? Notification.translate_connection_to_code('join') : Notification::NONE
+  #  self.modify_or_create_communityconnection(community,{:activitycode => activitycode,:notificationcode => notificationcode, :operation => 'add', :connectiontype => 'member'})
+  # end
+  
+  # def wantstojoin_community(community,notify=true)
+  #  activitycode = Activity::COMMUNITY_WANTSTOJOIN
+  #  notificationcode = notify ? Notification.translate_connection_to_code('wantstojoin') : Notification::NONE
+  #  self.modify_or_create_communityconnection(community,{:activitycode => activitycode, :notificationcode => notificationcode, :operation => 'add', :connectiontype => 'wantstojoin'})
+  # end
+
+  #   def modify_or_create_communityconnection(community,options)
+  #  connector = options[:connector].nil? ? self : options[:connector]
+  #  success = modify_or_create_connection_to_community(community,options)
+  #  if(success)
+  #   if(options[:activitycode])
+  #     Activity.log_activity(:user => self,:creator => connector, :community => community, :activitycode => options[:activitycode], :appname => 'local')
+  #   end
+    
+  #   if(options[:notificationcode] and options[:notificationcode] != Notification::NONE)
+  #     Notification.create(:notifytype => options[:notificationcode], :account => self, :creator => connector, :community => community)
+  #     # FIXME: user events really shouldn't be based on notificationcodes, but such is life
+  #     if(connector != self)
+  #      UserEvent.log_event(:etype => UserEvent::COMMUNITY,:user => connector,:description => Notification.userevent(options[:notificationcode],self,community))
+  #      UserEvent.log_event(:etype => UserEvent::COMMUNITY,:user => self,:description => Notification.showuserevent(options[:notificationcode],self,connector,community))
+  #     else
+  #      UserEvent.log_event(:etype => UserEvent::COMMUNITY,:user => self,:description => Notification.userevent(options[:notificationcode],self,community))
+  #     end
+  #   end
+    
+  #   if(!options[:no_list_update])
+  #     operation = options[:operation]
+  #     connectiontype = options[:connectiontype]
+  #     community.touch_lists
+  #   end
+  #  end
+  # end
+
+  def create_admin_account
+    admin_account = Person.new
+    admin_account.attributes = self.attributes
+    admin_account.last_name = "#{self.last_name} Admin Account"
+    admin_account.login = "#{self.login}-admin"
+    admin_account.is_admin = true
+    admin_account.email = "#{admin_user.login}@extension.org"
+    admin_account.primary_account_id = self.id
+    admin_account.password = ''
+    admin_account.save
+    admin_account
+  end
+
+  private
+
+  def check_account_status
+    if (!self.retired? and self.account_status != STATUS_SIGNUP)
+      if (!self.emailconfirmed?)
+        self.account_status = STATUS_CONFIRMEMAIL if (account_status != STATUS_INVALIDEMAIL and account_status != STATUS_INVALIDEMAIL_FROM_SIGNUP)
+      elsif (!self.vouched?)
+        self.account_status = STATUS_REVIEW
+      elsif self.contributor_agreement.nil?
+        self.account_status = STATUS_REVIEWAGREEMENT
+      elsif not self.contributor_agreement
+        self.account_status = STATUS_PARTICIPANT
+      else
+        self.account_status = STATUS_CONTRIBUTOR
+      end
+    end  
+  end
 
 end

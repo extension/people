@@ -9,7 +9,7 @@ class AccountMailer < ActionMailer::Base
   default_url_options[:host] = Settings.urlwriter_host
   default from: Settings.email_from_address
   default bcc: Settings.email_bcc_address
-  helper_method :ssl_root_url, :ssl_webmail_logo
+  helper_method :ssl_root_url, :ssl_webmail_logo, :is_demo?
   
 
   def signup(options = {})
@@ -52,6 +52,10 @@ class AccountMailer < ActionMailer::Base
     else
       webmail_logo_url(parameters)
     end
+  end
+
+  def is_demo?
+    Settings.app_location != 'production'
   end
 
 end
