@@ -51,9 +51,9 @@ end
 
 class DarmokAdminEvent< ActiveRecord::Base
   base_config = ActiveRecord::Base.connection.instance_variable_get("@config").dup
-  base_config[:database] = 'admin_events'
+  base_config[:database] = 'prod_darmok'
   establish_connection(base_config)
-  self.set_table_name 'activities'
+  self.set_table_name 'admin_events'
   serialize :data
 end
 
@@ -294,7 +294,7 @@ def dump_never_completed_signups
 end
 
 def transfer_user_authentication_events_to_activities
-  print "Transferring authentication events to auth log"
+  print "Transferring authentication events to activity log..."
   benchmark = Benchmark.measure do
     DarmokUserEvent.where("etype IN (200,201,202,300,302)").find_in_batches do |group|
       insert_values = []
@@ -356,6 +356,68 @@ def transfer_user_authentication_events_to_activities
   print "\t\tfinished in #{benchmark.real.round(1)}s\n"
 end
 
+
+def transfer_user_profile_events_to_activities
+  print "Transferring profile events to activity log..."
+  benchmark = Benchmark.measure do
+    DarmokUserEvent.where("etype = 3").find_in_batches do |group|
+      insert_values = []
+      group.each do |user_event|
+        next if(user_event.description =~ %r{vouched}) 
+        next if(user_event.description =~ %r{retired}) 
+        insert_list = []
+        insert_list << (user_event.user_id.nil? ? 'NULL' : user_event.user_id)
+        insert_list << Activity::PEOPLE
+        insert_list << Activity::UPDATE_PROFILE
+        insert_list << ActiveRecord::Base.quote_value(user_event.description)
+        insert_list << ActiveRecord::Base.quote_value(user_event.appname)
+        insert_list << ActiveRecord::Base.quote_value(user_event.ip)
+        insert_list << ActiveRecord::Base.quote_value(user_event.created_at.to_s(:db))
+        insert_list << ActiveRecord::Base.quote_value(user_event.read_attribute(:additionaldata))      
+        insert_values << "(#{insert_list.join(',')})"
+      end
+      insert_sql = "INSERT INTO #{Activity.table_name} (person_id,activityclass,activitycode,additionalinfo,site,ip_address,created_at,additionaldata) VALUES #{insert_values.join(',')};"
+      ActiveRecord::Base.connection.execute(insert_sql)        
+    end
+  end
+  print "\t\tfinished in #{benchmark.real.round(1)}s\n"
+end
+
+def transfer_admin_events_to_activities
+  print "Transferring admin events to activity log..."
+  benchmark = Benchmark.measure do
+    DarmokAdminEvent.where("event IN (3,4)").find_in_batches do |group|
+      insert_values = []
+      group.each do |admin_event|
+        next if admin_event.data.nil?
+        if(admin_event.data.is_a?(String))
+          extensionid = admin_event.data
+        else
+          next if admin_event.data[:extensionid].nil?
+          extensionid = admin_event.data[:extensionid]
+          reason = admin_event.data[:reason]
+        end
+        next if(!(person = Person.where('idstring = ?',extensionid).first))
+        insert_list = []
+        insert_list << (person.id)
+        insert_list << Activity::ADMIN
+        insert_list << (admin_event.event == 3) ? Activity::ENABLE_ACCOUNT : Activity::RETIRE_ACCOUNT
+        insert_list << (reason.nil? ? 'NULL' : ActiveRecord::Base.quote_value(reason))
+        insert_list << ActiveRecord::Base.quote_value('local')
+        insert_list << ActiveRecord::Base.quote_value(admin_event.ip)
+        insert_list << ActiveRecord::Base.quote_value(admin_event.created_at.to_s(:db))
+        insert_list << ActiveRecord::Base.quote_value(admin_event.read_attribute(:data))      
+        insert_values << "(#{insert_list.join(',')})"
+      end
+      insert_sql = "INSERT INTO #{Activity.table_name} (person_id,activityclass,activitycode,additionalinfo,site,ip_address,created_at,additionaldata) VALUES #{insert_values.join(',')};"
+      ActiveRecord::Base.connection.execute(insert_sql)        
+    end
+  end
+  print "\t\tfinished in #{benchmark.real.round(1)}s\n"
+end
+
+
+
 # seed queries
 announce_and_run_query('Transferring accounts',account_transfer_query)
 announce_and_run_query('Transferring google accounts',google_account_transfer_query)
@@ -378,5 +440,5 @@ create_milfam_wordpress_list_email_alias
 set_person_institution_column
 transform_person_additionaldata_data
 transfer_user_authentication_events_to_activities
-
-
+transfer_user_profile_events_to_activities
+transfer_admin_events_to_activities
