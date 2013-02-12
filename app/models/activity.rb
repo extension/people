@@ -10,6 +10,7 @@ class Activity < ActiveRecord::Base
 
   ## attributes
   serialize :additionaldata
+  attr_accessible :person, :person_id, :site, :activityclass, :activitycode, :reasoncode,  :additionalinfo, :additionaldata, :ip_address, :community, :community_id
 
   ## validations
 
@@ -24,25 +25,34 @@ class Activity < ActiveRecord::Base
 
   #scope :community, where("activitycode BETWEEN #{Activity::COMMUNITY_ACTIVITY_START} AND #{Activity::COMMUNITY_ACTIVITY_END}")
 
+
+  ## constants
   #### activity types
-  ADMIN = 1
+  AUTHENTICATION = 1
   PEOPLE = 2
   COMMUNITY = 3
+  ADMIN = 4
 
   ## activity codes
 
-  # ADMIN
-  ENABLE_ACCOUNT  = 3
-  RETIRE_ACCOUNT  = 4
-  
   # PEOPLE
+  AUTH_LOCAL_SUCCESS = 1
+  AUTH_LOCAL_FAILURE = 2
+
+  AUTH_REMOTE_SUCCESS = 11
+  AUTH_REMOTE_FAILURE = 12
+
+    # reason codes for failure conditions
+    AUTH_UNKNOWN = 0
+    AUTH_INVALID_ID = 1
+    AUTH_PASSWORD_EXPIRED = 2
+    AUTH_INVALID_PASSWORD = 3
+    AUTH_ACCOUNT_RETIRED = 4
+
   SIGNUP = 101
   INVITATION = 102
-  VOUCHED_BY = 103
   VOUCHED_FOR = 104
   UPDATE_PROFILE = 105
-  LOGIN_PASSWORD = 106
-  LOGIN_OPENID = 107
   INVITATION_ACCEPTED = 109
 
   # COMMUNITY
@@ -68,6 +78,52 @@ class Activity < ActiveRecord::Base
   COMMUNITY_CREATED_LIST = 402
 
 
+  # ADMIN
+  ENABLE_ACCOUNT  = 1003
+  RETIRE_ACCOUNT  = 1004
+  
+
+
+  def self.log_local_auth_success(options = {})
+    required = [:person_id,:authname]
+    required.each do |required_option|
+      if(!options[required_option])
+        return nil
+      end
+    end
+
+    create_parameters = {}
+    create_parameters[:site] = 'local'
+    create_parameters[:person_id] = options[:person_id]
+    create_parameters[:activityclass] = AUTHENTICATION
+    create_parameters[:activitycode] = AUTH_LOCAL_SUCCESS
+    create_parameters[:additionalinfo] = options[:authname]
+    create_parameters[:ip_address] = options[:ip_address] || 'unknown'
+
+    self.create(create_parameters)
+
+  end
+
+  def self.log_local_auth_failure(options = {})
+    required = [:authname]
+    required.each do |required_option|
+      if(options[required_option].nil?)
+        return false
+      end
+    end
+
+    create_parameters = {}
+    create_parameters[:site] = 'local'
+    create_parameters[:person_id] = options[:person_id]
+    create_parameters[:activityclass] = AUTHENTICATION
+    create_parameters[:activitycode] = AUTH_LOCAL_FAILURE
+    create_parameters[:additionalinfo] = options[:authname]
+    create_parameters[:ip_address] = options[:ip_address] || 'unknown'
+    create_parameters[:reasoncode] = options[:fail_code] || AUTH_UNKNOWN
+
+    self.create(create_parameters)
+
+  end
 
 
 end

@@ -17,34 +17,23 @@ ActiveRecord::Schema.define(:version => 20130211155737) do
     t.integer  "person_id",      :default => 0
     t.integer  "activityclass",  :default => 0
     t.integer  "activitycode",   :default => 0
+    t.integer  "reasoncode",     :default => 0
     t.integer  "community_id",   :default => 0
     t.string   "ip_address"
     t.integer  "colleague_id",   :default => 0
     t.string   "site"
-    t.text     "description"
+    t.string   "additionalinfo"
     t.text     "additionaldata"
     t.datetime "created_at"
   end
 
-  add_index "activities", ["created_at", "person_id", "activityclass", "activitycode", "community_id"], :name => "recordsignature", :unique => true
+  add_index "activities", ["created_at", "person_id", "activityclass", "activitycode", "reasoncode", "community_id"], :name => "recordsignature"
 
   create_table "auth_approvals", :force => true do |t|
     t.integer  "person_id",  :default => 0, :null => false
     t.string   "trust_root",                :null => false
     t.datetime "created_at",                :null => false
   end
-
-  create_table "auth_logs", :force => true do |t|
-    t.integer  "person_id"
-    t.integer  "auth_code",  :null => false
-    t.integer  "fail_code"
-    t.string   "authname"
-    t.string   "site"
-    t.string   "ip_address"
-    t.datetime "created_at"
-  end
-
-  add_index "auth_logs", ["person_id"], :name => "person_ndx"
 
   create_table "communities", :force => true do |t|
     t.integer  "entrytype",                            :default => 0,     :null => false

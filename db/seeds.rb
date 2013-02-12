@@ -3,6 +3,27 @@
 @my_database = ActiveRecord::Base.connection.instance_variable_get("@config")[:database]
 @darmok_database = 'prod_darmok'
 
+
+## utility methods
+
+def benchmark_queries(queries)
+  benchmark = Benchmark.measure do
+    queries.each do |query|
+     ActiveRecord::Base.connection.execute(query)
+    end
+  end
+  benchmark
+end
+
+def announce_and_run_query(label,query)
+  print "#{label}..."
+  benchmark = benchmark_queries([query])
+  print "\t\tfinished in #{benchmark.real.round(1)}s\n"
+end
+
+
+## class definitions for data transformations
+
 class DarmokAccount < ActiveRecord::Base
   base_config = ActiveRecord::Base.connection.instance_variable_get("@config").dup
   base_config[:database] = 'prod_darmok'
@@ -26,23 +47,27 @@ class DarmokUserEvent < ActiveRecord::Base
   
   LOGIN_API_FAILED = 300
   LOGIN_LOCAL_FAILED = 302 
-
 end
 
-def benchmark_queries(queries)
-  benchmark = Benchmark.measure do
-    queries.each do |query|
-     ActiveRecord::Base.connection.execute(query)
-    end
-  end
-  benchmark
+class DarmokAdminEvent< ActiveRecord::Base
+  base_config = ActiveRecord::Base.connection.instance_variable_get("@config").dup
+  base_config[:database] = 'admin_events'
+  establish_connection(base_config)
+  self.set_table_name 'activities'
+  serialize :data
 end
 
-def announce_and_run_query(label,query)
-  print "#{label}..."
-  benchmark = benchmark_queries([query])
-  print "\t\tfinished in #{benchmark.real.round(1)}s\n"
+class DarmokActivity < ActiveRecord::Base
+  base_config = ActiveRecord::Base.connection.instance_variable_get("@config").dup
+  base_config[:database] = 'prod_darmok'
+  establish_connection(base_config)
+  self.set_table_name 'activities'
+  serialize :additionaldata
 end
+
+
+
+
 
 
 
@@ -268,7 +293,7 @@ def dump_never_completed_signups
   print "\t\tfinished in #{benchmark.real.round(1)}s\n" 
 end
 
-def transfer_user_events_to_auth_log
+def transfer_user_authentication_events_to_activities
   print "Transferring authentication events to auth log"
   benchmark = Benchmark.measure do
     DarmokUserEvent.where("etype IN (200,201,202,300,302)").find_in_batches do |group|
@@ -276,41 +301,42 @@ def transfer_user_events_to_auth_log
       group.each do |user_event|
         insert_list = []
         insert_list << (user_event.user_id.nil? ? 'NULL' : user_event.user_id)
+        insert_list << Activity::AUTHENTICATION
         case user_event.etype
         when DarmokUserEvent::LOGIN_LOCAL_SUCCESS
-          insert_list << AuthLog::LOCAL_SUCCESS
+          insert_list << Activity::AUTH_LOCAL_SUCCESS
           insert_list << 'NULL'
         when DarmokUserEvent::LOGIN_API_SUCCESS
-          insert_list << AuthLog::REMOTE_SUCCESS
+          insert_list << Activity::AUTH_REMOTE_SUCCESS
           insert_list << 'NULL'          
         when DarmokUserEvent::LOGIN_OPENID_SUCCESS
-          insert_list << AuthLog::REMOTE_SUCCESS
+          insert_list << Activity::AUTH_REMOTE_SUCCESS
           insert_list << 'NULL'
         when DarmokUserEvent::LOGIN_LOCAL_FAILED
-          insert_list << AuthLog::LOCAL_FAILURE
+          insert_list << Activity::AUTH_LOCAL_FAILURE
           if(user_event.description =~ %r{incorrect password})
-            insert_list << AuthLog::AUTH_INVALID_PASSWORD
+            insert_list << Activity::AUTH_INVALID_PASSWORD
           elsif(user_event.description =~ %r{invalid eXtensionID})
-            insert_list << AuthLog::AUTH_INVALID_ID
+            insert_list << Activity::AUTH_INVALID_ID
           elsif(user_event.description =~ %r{expired password})
-            insert_list << AuthLog::AUTH_PASSWORD_EXPIRED
+            insert_list << Activity::AUTH_PASSWORD_EXPIRED
           elsif(user_event.description =~ %r{account})
-            insert_list << AuthLog::AUTH_ACCOUNT_RETIRED
+            insert_list << Activity::AUTH_ACCOUNT_RETIRED
           else
-            insert_list << AuthLog::AUTH_UNKNOWN
+            insert_list << Activity::AUTH_UNKNOWN
           end
         when DarmokUserEvent::LOGIN_API_FAILED
-          insert_list << AuthLog::LOCAL_FAILURE
+          insert_list << Activity::AUTH_LOCAL_FAILURE
           if(user_event.description =~ %r{incorrect password})
-            insert_list << AuthLog::AUTH_INVALID_PASSWORD
+            insert_list << Activity::AUTH_INVALID_PASSWORD
           elsif(user_event.description =~ %r{invalid eXtensionID})
-            insert_list << AuthLog::AUTH_INVALID_ID
+            insert_list << Activity::AUTH_INVALID_ID
           elsif(user_event.description =~ %r{expired password})
-            insert_list << AuthLog::AUTH_PASSWORD_EXPIRED
+            insert_list << Activity::AUTH_PASSWORD_EXPIRED
           elsif(user_event.description =~ %r{account})
-            insert_list << AuthLog::AUTH_ACCOUNT_RETIRED
+            insert_list << Activity::AUTH_ACCOUNT_RETIRED
           else
-            insert_list << AuthLog::AUTH_UNKNOWN
+            insert_list << Activity::AUTH_UNKNOWN
           end
         else
           # uh-oh what happened?
@@ -323,7 +349,7 @@ def transfer_user_events_to_auth_log
         insert_list << ActiveRecord::Base.quote_value(user_event.created_at.to_s(:db))
         insert_values << "(#{insert_list.join(',')})"
       end
-      insert_sql = "INSERT INTO #{AuthLog.table_name} (person_id,auth_code,fail_code,authname,site,ip_address,created_at) VALUES #{insert_values.join(',')};"
+      insert_sql = "INSERT INTO #{Activity.table_name} (person_id,activityclass,activitycode,reasoncode,additionalinfo,site,ip_address,created_at) VALUES #{insert_values.join(',')};"
       ActiveRecord::Base.connection.execute(insert_sql)        
     end
   end
@@ -351,6 +377,6 @@ dump_never_completed_signups
 create_milfam_wordpress_list_email_alias
 set_person_institution_column
 transform_person_additionaldata_data
-transfer_user_events_to_auth_log
+transfer_user_authentication_events_to_activities
 
 

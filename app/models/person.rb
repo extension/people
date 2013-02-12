@@ -122,13 +122,13 @@ class Person < ActiveRecord::Base
     end
 
     if(check_person.nil?)
-      raise AuthenticationError.new(error_code: AuthLog::AUTH_INVALID_ID)
+      raise AuthenticationError.new(error_code: Activity::AUTH_INVALID_ID)
     elsif check_person.retired?
-      raise AuthenticationError.new(error_code: AuthLog::AUTH_ACCOUNT_RETIRED, person_id: check_person.id)
+      raise AuthenticationError.new(error_code: Activity::AUTH_ACCOUNT_RETIRED, person_id: check_person.id)
     elsif(check_person.password_hash.blank? and check_person.legacy_password.blank?)
-      raise AuthenticationError.new(error_code: AuthLog::AUTH_PASSWORD_EXPIRED, person_id: check_person.id)
+      raise AuthenticationError.new(error_code: Activity::AUTH_PASSWORD_EXPIRED, person_id: check_person.id)
     elsif(!check_person.check_password(password))
-      raise AuthenticationError.new(error_code: AuthLog::AUTH_INVALID_PASSWORD, person_id: check_person.id)
+      raise AuthenticationError.new(error_code: Activity::AUTH_INVALID_PASSWORD, person_id: check_person.id)
     end
     check_person
   end
