@@ -406,7 +406,12 @@ def transfer_admin_events_to_activities
         insert_list << ActiveRecord::Base.quote_value('local')
         insert_list << ActiveRecord::Base.quote_value(admin_event.ip)
         insert_list << ActiveRecord::Base.quote_value(admin_event.created_at.to_s(:db))
-        insert_list << ActiveRecord::Base.quote_value(admin_event.read_attribute(:data))      
+        if(admin_event.data.is_a?(String))
+          additionaldata = {extra: admin_event.data}.to_yaml
+        else
+          additionaldata = admin_event.read_attribute(:data)
+        end
+        insert_list << ActiveRecord::Base.quote_value(additionaldata)      
         insert_values << "(#{insert_list.join(',')})"
       end
       insert_sql = "INSERT INTO #{Activity.table_name} (person_id,activityclass,activitycode,additionalinfo,site,ip_address,created_at,additionaldata) VALUES #{insert_values.join(',')};"
@@ -415,6 +420,71 @@ def transfer_admin_events_to_activities
   end
   print "\t\tfinished in #{benchmark.real.round(1)}s\n"
 end
+
+def transfer_activities_to_activities
+  print "Transferring activities to activity log..."
+  benchmark = Benchmark.measure do
+    DarmokActivity.where("activitycode NOT IN (105,103,106,107)").find_in_batches do |group|
+      insert_values = []
+      group.each do |activity|
+        insert_list = []
+        if(activity.activitycode.between?(200,500))
+          # community activity
+          insert_list << (activity.created_by)
+          if(activity.activitycode.between?(210,216))
+            insert_list << (activity.user_id.nil? ? 'NULL' : activity.user_id)
+          else
+            insert_list << (activity.colleague_id.nil? ? 'NULL' : activity.colleague_id)
+          end
+          insert_list << (activity.community_id.nil? ? 'NULL' : activity.community_id)
+          insert_list << Activity::COMMUNITY
+          insert_list << activity.activitycode
+          insert_list << 'NULL'
+        elsif(activity.activitycode == 110)
+          insert_list << (activity.created_by)
+          insert_list << 'NULL'          
+          insert_list << (activity.community_id.nil? ? 'NULL' : activity.community_id)
+          insert_list << Activity::COMMUNITY
+          insert_list << Activity::COMMUNITY_CREATE
+          insert_list << 'NULL'
+        elsif(activity.activitycode == 104)
+          insert_list << (activity.created_by)
+          insert_list << (activity.colleague_id.nil? ? 'NULL' : activity.colleague_id)
+          insert_list << 'NULL'
+          insert_list << Activity::PEOPLE
+          insert_list << Activity::VOUCHED_FOR
+          if(activity.additionaldata.is_a?(String))
+            explanation = activity.additionaldata
+          elsif activity.additionaldata[:explanation].nil?
+            explanation = activity.additionaldata[:explanation]
+          end
+          insert_list << ActiveRecord::Base.quote_value(explanation)
+        else
+          insert_list << (activity.user_id.nil? ? 'NULL' : activity.user_id)
+          insert_list << (activity.colleague_id.nil? ? 'NULL' : activity.colleague_id)
+          insert_list << (activity.community_id.nil? ? 'NULL' : activity.community_id)
+          insert_list << Activity::PEOPLE
+          insert_list << activity.activitycode
+          insert_list << 'NULL'
+        end          
+        insert_list << ActiveRecord::Base.quote_value('local')
+        insert_list << ActiveRecord::Base.quote_value(activity.ipaddr)
+        insert_list << ActiveRecord::Base.quote_value(activity.created_at.to_s(:db))
+        if(activity.additionaldata.is_a?(String))
+          additionaldata = {extra: activity.additionaldata}.to_yaml
+        else
+          additionaldata = activity.read_attribute(:additionaldata)
+        end
+        insert_list << ActiveRecord::Base.quote_value(additionaldata)   
+        insert_values << "(#{insert_list.join(',')})"
+      end
+      insert_sql = "INSERT INTO #{Activity.table_name} (person_id,colleague_id,community_id,activityclass,activitycode,additionalinfo,site,ip_address,created_at,additionaldata) VALUES #{insert_values.join(',')};"
+      ActiveRecord::Base.connection.execute(insert_sql)        
+    end
+  end
+  print "\t\tfinished in #{benchmark.real.round(1)}s\n"
+end
+
 
 
 
@@ -442,3 +512,4 @@ transform_person_additionaldata_data
 transfer_user_authentication_events_to_activities
 transfer_user_profile_events_to_activities
 transfer_admin_events_to_activities
+transfer_activities_to_activities
