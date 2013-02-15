@@ -20,7 +20,7 @@ group :assets do
   gem 'uglifier', '>= 1.0.3'
   # files for bootstrap-in-asset-pipeline integration
   gem 'anjlab-bootstrap-rails', '>= 2.0', :require => 'bootstrap-rails'
-  gem 'jquery-ui-rails', '~> 2.0.2'
+  gem 'jquery-ui-rails'
   gem 'jquery-tablesorter'
 end
 
@@ -31,7 +31,7 @@ gem 'mobile-fu'
 gem "rails_config"
 
 # jquery magick
-gem 'jquery-rails', '~> 2.1.4'
+gem 'jquery-rails'
 
 # pagination
 gem 'kaminari'
