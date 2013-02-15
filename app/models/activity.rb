@@ -54,6 +54,7 @@ class Activity < ActiveRecord::Base
   VOUCHED_FOR = 104
   UPDATE_PROFILE = 105
   INVITATION_ACCEPTED = 109
+  REVIEW_REQUEST = 110
 
   # COMMUNITY
   COMMUNITY_CREATE = 200
@@ -124,6 +125,5 @@ class Activity < ActiveRecord::Base
     self.create(create_parameters)
 
   end
-
 
 end

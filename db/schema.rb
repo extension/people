@@ -21,7 +21,7 @@ ActiveRecord::Schema.define(:version => 20130211155737) do
     t.integer  "community_id",   :default => 0
     t.string   "ip_address"
     t.integer  "colleague_id",   :default => 0
-    t.string   "site"
+    t.string   "site",           :default => "local"
     t.string   "additionalinfo"
     t.text     "additionaldata"
     t.datetime "created_at"

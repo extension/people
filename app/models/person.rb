@@ -48,6 +48,7 @@ class Person < ActiveRecord::Base
   has_one :google_account, dependent: :destroy
 
   belongs_to :invitation
+  has_many :activities
   ## scopes  
   scope :validaccounts, where("retired = #{false} and vouched = #{true}")
 
@@ -332,7 +333,7 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def confirm_signup
+  def confirm_signup(options = {})
     now = Time.now.utc
    
     if(self.has_whitelisted_email?)
@@ -349,7 +350,7 @@ class Person < ActiveRecord::Base
        self.vouched_by = invitation.person.id
        self.vouched_at = now
       else
-       # TODO:   what we really should do here is send an email to the person that made the invitation
+       # what we really should do here is send an email to the person that made the invitation
        # and ask them to vouch for the person with the different email that used the right invitation code
        # but a different, non-whitelisted email.
        invitation.status = Invitation::INVALID_DIFFERENTEMAIL
@@ -375,9 +376,10 @@ class Person < ActiveRecord::Base
     if(self.save)
       self.clear_token
 
-      # TODO logging
-      #UserEvent.log_event(:etype => UserEvent::PROFILE,:user => self,:description => "signup")
-      #Activity.log_activity(:user => self, :creator => self, :activitycode => Activity::SIGNUP, :appname => 'local')
+      # log signup
+      if(options[:nolog].nil? or !options[:nolog])
+        self.activities.create(activitycode: Activity::SIGNUP, ip_address: options[:ip_address])
+      end
 
       if(self.vouched?)
         # add to institution based on signup.
@@ -388,7 +390,7 @@ class Person < ActiveRecord::Base
 
         Notification.create(:notifytype => Notification::WELCOME, :account => @currentuser, :send_on_create => true)
       else
-        self.post_account_review_request
+        self.post_account_review_request(options)
       end
 
       return true
@@ -397,8 +399,7 @@ class Person < ActiveRecord::Base
     end
   end
 
-
-  def post_account_review_request
+  def post_account_review_request(options = {})
     if(self.vouched?)
       return true
     end
@@ -421,22 +422,18 @@ class Person < ActiveRecord::Base
     end
     result = ActiveSupport::JSON.decode(raw_result.gsub(/'/,"\""))
     if(result['success'])
-      #TODO log
-      # if(!self.additionaldata.blank?)
-      #   self.additionaldata = self.additionaldata.merge({:vouch_results => {:success => true, :request_id => result['question_id']}})
-      # else
-      #   self.additionaldata = {:vouch_results => {:success => true, :request_id => result['question_id']}}
-      # end
-      return true
+      postresults = {:success => true, :request_id => result['question_id']}
+      loginfo = "SUCCESS: #{result['question_id']}"
     else
-      #TODO log
-      # if(!self.additionaldata.blank?)
-      #   self.additionaldata = self.additionaldata.merge({:vouch_results => {:success => false, :error => result['message']}})
-      # else
-      #   self.additionaldata = {:vouch_results => {:success => false, :error => result['message']}}
-      # end
-      return false
+      postresults = {:success => false, :error => result['message']}
+      loginfo = "FAILURE: #{result['message']}"
     end
+
+    if(options[:nolog].nil? or !options[:nolog])
+      self.activities.create(activitycode: Activity::REVIEW_REQUEST, ip_address: options[:ip_address], additionalinfo: loginfo, additionaldata: postresults)
+    end
+
+    result['success']
   end
 
   def clear_token

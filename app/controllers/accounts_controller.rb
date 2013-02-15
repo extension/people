@@ -58,7 +58,7 @@ class AccountsController < ApplicationController
       return render(:template => 'account/invalid_token')
     end
 
-    current_person.confirm_signup
+    current_person.confirm_signup({ip_address: request.remote_ip})
     if(current_person.vouched?)
       return redirect_to(root_url)
     else
