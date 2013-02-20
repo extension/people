@@ -1,7 +1,7 @@
 <% @page_title = "Profile for #{@person.fullname}" %>
 
 <div class="row">
-  <div class="span8">
+  <div class="span7">
     <div class="row">
       <p>#TODO Avatar <%= @person.fullname %></p>
     </div>
@@ -12,13 +12,20 @@
       <%= render(:partial => 'profile_information', locals: {person: @person}) %>
     </div>
   </div>
-  <div class="span4">
+  <div class="span5">
     <div class="well">
       <p>#TODO edit</p>
     </div>
     <div class="well">
       <h4>Communities</h4>
-      <p>#TODO communities</p>
+      <%- if(@person.communities.count > 0) %>
+      <ul class="unstyled">
+        <%- @person.communities.each do |community| -%>
+          <li><%= link_to(community.name, community) %> <small><%= community_connection_for_person(community, @person)%></small></li>
+        <%- end -%>
+      <%- else -%>
+      <p>No community connections.</p>
+      <%- end -%>
     </div>
     <div class="well">
       <h4>Social Network Connections</h4>
