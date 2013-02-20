@@ -49,8 +49,16 @@ class Person < ActiveRecord::Base
 
   belongs_to :invitation
   has_many :activities
+
+  has_many :social_network_connections, dependent: :destroy
+  has_many :social_networks, through: :social_network_connections, 
+                         select:  "social_network_connections.accountid as accountid, 
+                                   social_network_connections.accounturl as accounturl,
+                                   social_network_connections.is_public as is_public, 
+                                   social_networks.*"  
   ## scopes  
   scope :validaccounts, where("retired = #{false} and vouched = #{true}")
+  
 
 
   

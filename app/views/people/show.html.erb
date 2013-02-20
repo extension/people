@@ -17,10 +17,19 @@
       <p>#TODO edit</p>
     </div>
     <div class="well">
+      <h4>Communities</h4>
       <p>#TODO communities</p>
     </div>
     <div class="well">
-      <p>#TODO social networks</p>
+      <h4>Social Network Connections</h4>
+      <%- if(@person.social_networks.count > 0) %>
+      <ul class="unstyled">
+        <%- @person.social_networks.each do |network| -%>
+          <li><%= social_network_link(network) %></li>
+        <%- end -%>
+      <%- else -%>
+      <p>No social networking connections listed.</p>
+      <%- end -%>
     </div>
   </div>
     
