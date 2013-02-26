@@ -13,4 +13,5 @@
  *= require bootstrap_overrides
  *= require twitter/bootstrap-responsive
  *= require navbar
+ *= require global
  */

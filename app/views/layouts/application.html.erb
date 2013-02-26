@@ -6,28 +6,29 @@
     <%= javascript_include_tag "application" %>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <%= csrf_meta_tags %>
-    <%= render(:partial => 'shared/google_tracking') %>
+    <%= render(partial: 'shared/google_tracking') %>
   </head>
   <body>
 
     <div class="navbar navbar-fixed-top">
       <div id="eXtensionNavBar">
-        <%= render(:partial => 'shared/extension_navbar') %>
-      </div>
-      <div class="navbar-inner">
-        <div class="container">
-          <div class="nav-collapse">
-            <%= render(:partial => 'shared/navbar') %>
-          </div>
-        </div>
+        <%= render(partial: 'shared/extension_navbar') %>
       </div>
     </div>
 
-    <div class="container">
+    <div class="container" id="main">
       <div id="flash">
-        <%= render(:partial => 'shared/flashmessages') %>
-
+        <%= render(partial: 'shared/flashmessages') %>
       </div>
+
+      <div class="row">
+        <%= render(partial: 'shared/masthead') %>
+      </div>
+
+      <div class="row">
+        <%= render(partial: 'shared/navtabs') %>
+      </div>
+
       <%= yield %>
     </div>
   </body>
