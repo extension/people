@@ -13,6 +13,7 @@ class CommunitiesController < ApplicationController
   def show
     # will raise ActiveRecord::RecordNotFound on not found 
     @community = Community.find_by_shortname_or_id(params[:id])
+    @current_person_community_connection = current_person.connection_with_community(@community)
   end
 
   def newest

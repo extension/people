@@ -193,8 +193,8 @@ class Person < ActiveRecord::Base
   end
   
   def connection_with_community(community)
-     if(connection = self.community_connections.where(community_id: community.id).first)
-      case connection.connectiontype
+     if(community = self.communities.where(id: community.id).first)
+      case community.connectiontype
       when 'invited'
         case connection.connectioncode
         when CommunityConnection::INVITEDLEADER
@@ -205,7 +205,7 @@ class Person < ActiveRecord::Base
           'invited'
         end
       else
-        connection.connectiontype
+        community.connectiontype
       end
     else
       'none'

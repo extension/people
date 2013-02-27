@@ -1,0 +1,14 @@
+<%- case @current_person_community_connection -%>
+<%- when 'none' -%>
+  <p>#TODO no connection</p>
+<%- when 'member' -%>
+  <p>#TODO member connection</p>
+<%- when 'leader' -%>
+  <p>#TODO leader connection</p>
+<%- when 'pending' -%>
+  <p>#TODO pending connection</p>
+<%- when 'invitedleader' -%>
+  <p>#TODO invited as leader connection</p>
+<%- when 'invitedmember' -%>
+  <p>#TODO invited as member connection</p>
+<%- end #case -%>
