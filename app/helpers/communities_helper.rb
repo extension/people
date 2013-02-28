@@ -73,4 +73,11 @@ module CommunitiesHelper
   end
 
 
+  def join_community_text(community)
+    community.is_institution? ? 'Join Institution' : 'Join Community'
+  end
+
+  def leave_community_text(community)
+    community.is_institution? ? 'Leave Institution' : 'Leave Community'
+  end
 end

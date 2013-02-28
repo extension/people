@@ -1,14 +1,86 @@
 <%- case @current_person_community_connection -%>
 <%- when 'none' -%>
-  <p>#TODO no connection</p>
+  <strong>Make a connection:</strong>
+  <%- case @community.memberfilter -%>
+  <%- when Community::OPEN -%>
+    <p>
+      <%= link_to join_community_text(@community),'#', :class => "btn", :remote => true %>
+    </p>
+  <%- when Community::MODERATED -%>
+    <p>
+      <%= link_to join_community_text(@community),'#', :class => "btn", :remote => true %>
+      <%- if @community.is_institution? -%>
+        <small>Membership in this institution is moderated, an institutional team member will review your request</small>
+      <%- else -%>
+        <small>Membership in this community is moderated, a community leader will review your request</small>
+      <%- end -%>
+    </p>
+  <%- when Community::INVITATIONONLY -%>
+     <p>Contact a <%= link_to('community leader', connections_community_path(@community, :connection => 'leaders')) %> to find out more about how to make a connection with this community</p>
+  <%- end -%>
+<%- when 'interest' -%>
+  <strong>Make a connection:</strong>
+  <%- case @community.memberfilter -%>
+  <%- when Community::OPEN -%>
+    <p>
+      <%= link_to join_community_text(@community),'#', :class => "btn", :remote => true %>
+    </p>
+  <%- when Community::MODERATED -%>
+    <p>
+      <%= link_to join_community_text(@community),'#', :class => "btn", :remote => true %>
+      <%- if @community.is_institution? -%>
+        <small>Membership in this institution is moderated, an institutional team member will review your request</small>
+      <%- else -%>
+        <small>Membership in this community is moderated, a community leader will review your request</small>
+      <%- end -%>
+    </p>
+  <%- when Community::INVITATIONONLY -%>
+     <p>Contact a <%= link_to('community leader', connections_community_path(@community, :connection => 'leaders')) %> to find out more about how to make a connection with this community</p>
+  <%- end -%>
 <%- when 'member' -%>
-  <p>#TODO member connection</p>
+  <%- if @community.is_institution? -%>
+    <strong>You are a member of this institution.</strong>
+  <%- else -%>
+    <strong>You are a member of this community</strong>
+  <%- end -%>
+    <p>
+      <%= link_to leave_community_text(@community),'#', :class => "btn", :remote => true %>
+    </p>
 <%- when 'leader' -%>
-  <p>#TODO leader connection</p>
+  <%- if @community.is_institution? -%>
+    <strong>You are a member of the institutional team at this institution.</strong>
+  <%- else -%>
+    <strong>You are a leader of this community</strong>
+  <%- end -%>
+      <p>
+      <%= link_to leave_community_text(@community),'#', :class => "btn", :remote => true %>
+    </p>
 <%- when 'pending' -%>
-  <p>#TODO pending connection</p>
+  <%- if @community.is_institution? -%>
+    <strong>Your membership in this institution is pending review</strong>
+  <%- else -%>
+    <strong>Your membership in this community is pending review</strong>
+  <%- end -%>
+    <p>
+      <%= link_to leave_community_text(@community),'#', :class => "btn", :remote => true %>
+    </p>
 <%- when 'invitedleader' -%>
-  <p>#TODO invited as leader connection</p>
+  <%- if @community.is_institution? -%>
+    <strong>You have been invited to join the institutional team</strong>
+  <%- else -%>
+    <strong>You have been invited to join the leadership of this community</strong>
+  <%- end -%>
+    <p>
+      <%= link_to join_community_text(@community),'#', :class => "btn", :remote => true %>
+    </p>  
 <%- when 'invitedmember' -%>
-  <p>#TODO invited as member connection</p>
+  <%- if @community.is_institution? -%>
+
+    <strong>You have been invited to join this institution</strong>
+  <%- else -%>
+    <strong>You have been invited to join this community</strong>
+  <%- end -%>
+    <p>
+      <%= link_to join_community_text(@community),'#', :class => "btn", :remote => true %>
+    </p>
 <%- end #case -%>
