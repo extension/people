@@ -5,6 +5,7 @@
 #  see LICENSE file
 
 class PeopleController < ApplicationController
+  before_filter :set_tab
 
   def show
     @person = Person.find(params[:id])
@@ -12,7 +13,6 @@ class PeopleController < ApplicationController
 
 
   def index
-    #TODO
   end
 
   # def public
@@ -34,6 +34,12 @@ class PeopleController < ApplicationController
   # def password
   #   #TODO
   # end
+
+  private
+
+  def set_tab
+    @selected_tab = 'colleagues'
+  end
 
 
 end

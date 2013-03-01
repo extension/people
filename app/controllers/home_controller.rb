@@ -7,11 +7,19 @@
 
 class HomeController < ApplicationController
   skip_before_filter :signin_required, only: [:index]
+  before_filter :set_tab
 
   def index
   end
 
   def help
+  end
+
+
+  private
+
+  def set_tab
+    @selected_tab = 'home'
   end
   
 end

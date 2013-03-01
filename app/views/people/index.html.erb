@@ -1,19 +1,17 @@
 <%- @page_title = "People" -%>
 
-<p>#TODO navtabs</p>
-
 <div class="row">
   <div class="span8">
     <h1>Find Colleagues</h1>
 
-    <% if(@vouchwaiting >= 1) %>
+    <% if(Person.pendingreview.count >= 1) %>
     <h2>Colleague waiting on review?</h2>
-    <p><%= link_to("Browse the list of colleagues pending review.", :action => :vouchlist)%> If you know that a colleague has signed up for an eXtensionID and is waiting for review, you can vouch for them.</p>
+    <p><%= link_to("Browse the list of colleagues pending review.", '#')%> If you know that a colleague has signed up for an eXtensionID and is waiting for review, you can vouch for them.</p>
     <% end %>
 
     <h2>Colleague not found?</h2>
 
-    <p><%= link_to("Invite your colleague to get an eXtensionID", :action => :invite)%>. You just need to know your colleague's email address.  You can also <%= link_to("browse existing invitations", people_invitations_url)%>.</p>
+    <p><%= link_to("Invite your colleague to get an eXtensionID", '#')%>. You just need to know your colleague's email address.  You can also <%= link_to("browse existing invitations", '#')%>.</p>
   </div>
 </div>
 

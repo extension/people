@@ -60,4 +60,15 @@ module ApplicationHelper
     end
   end
 
+  def navtab(tabtext,whereto)
+    if(@selected_tab and @selected_tab == tabtext.downcase)
+      "<li class='active'>#{link_to(tabtext,whereto)}</li>".html_safe
+    else
+      "<li>#{link_to(tabtext,whereto)}</li>".html_safe
+    end
+  end
+
+
+
+
 end

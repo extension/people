@@ -57,9 +57,8 @@ class Person < ActiveRecord::Base
                                    social_network_connections.is_public as is_public, 
                                    social_networks.*"  
   ## scopes  
-  scope :validaccounts, where("retired = #{false} and vouched = #{true}")
-  
-
+  scope :validaccounts, where("retired = #{false} and vouched = #{true}") 
+  scope :pendingreview, where("retired = #{false} and vouched = #{false}")
 
   
 

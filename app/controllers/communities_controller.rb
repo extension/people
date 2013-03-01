@@ -5,6 +5,7 @@
 #  see LICENSE file
 
 class CommunitiesController < ApplicationController
+  before_filter :set_tab
 
   def index
     @approved_joined_counts = Community.approved.connected_counts('joined')
@@ -38,5 +39,10 @@ class CommunitiesController < ApplicationController
     #TODO
   end
 
+  private
+
+  def set_tab
+    @selected_tab = 'communities'
+  end
 
 end
