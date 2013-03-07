@@ -41,8 +41,7 @@ gem 'capistrano'
 gem 'capatross'
 
 # background jobs
-gem 'delayed_job_active_record'
-gem 'daemons'
+gem 'sidekiq'
 
 # command line tools
 gem 'thor'
@@ -56,8 +55,8 @@ gem 'bcrypt-ruby', '~> 3.0.0'
 # exception handling
 gem 'airbrake'
 
-# memcached
-gem 'dalli'
+# caching
+gem 'redis-rails'
 
 # forms
 gem 'simple_form'

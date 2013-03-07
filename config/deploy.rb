@@ -5,6 +5,8 @@ require 'capatross'
 require "bundler/capistrano"
 require './config/boot'
 require 'airbrake/capistrano'
+require 'sidekiq/capistrano'
+
  
 set :application, "aae"
 set :repository,  "git@github.com:extension/people.git"
