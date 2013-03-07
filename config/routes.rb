@@ -56,12 +56,8 @@ People::Application.routes.draw do
   end
 
 
-  # webmail example routing
-  namespace "webmail" do
-    namespace 'examples' do
-      match "/:action"
-    end
-  end
+  # email example routing
+  match "/email_examples/:action", to: "email_examples", via: [:get]
 
 
 end
