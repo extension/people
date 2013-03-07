@@ -215,20 +215,13 @@ class Person < ActiveRecord::Base
     self.communities.institutions.where(id: self.institution_id).first
   end
 
-  def set_token(options = {})
-    if(self.token.blank?)
-      randval = rand
-      now = Time.now.to_s
-      self.token = Digest::SHA1.hexdigest(Settings.session_token+self.email+now+randval.to_s)
-      if(options[:save])
-        self.save!
-      end
-    end
+  def send_signup_confirmation
+   Notification.create(notifiable: self, notification_type: Notification::CONFIRM_SIGNUP)
   end
 
-  def send_signup_confirmation
-   self.set_token(save: true)  
-   Notification.create(notifiable: self, notification_type: Notification::CONFIRM_SIGNUP)
+  def signup_token
+    hashids = Hashids.new("#{Settings.token_salt}::#{self.email}")
+    hashids.encrypt(self.id,STATUS_SIGNUP)
   end
 
 
@@ -381,7 +374,6 @@ class Person < ActiveRecord::Base
     self.account_status = STATUS_OK # will get reset before_save via :check_account_status if not valid
 
     if(self.save)
-      self.clear_token
 
       # log signup
       if(options[:nolog].nil? or !options[:nolog])
@@ -395,7 +387,7 @@ class Person < ActiveRecord::Base
           # self.join_community(self.institution)
         end
 
-        Notification.create(:notifytype => Notification::WELCOME, :account => @currentuser, :send_on_create => true)
+        Notification.create(:notification_type => Notification::WELCOME, :notifiable => @currentuser)
       else
         self.post_account_review_request(options)
       end
@@ -441,10 +433,6 @@ class Person < ActiveRecord::Base
     end
 
     result['success']
-  end
-
-  def clear_token
-    self.update_column(:token,nil)
   end
 
 

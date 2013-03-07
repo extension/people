@@ -15,6 +15,7 @@ class Activity < ActiveRecord::Base
   ## validations
 
   ## filters
+  before_save :set_activity_class
 
   ## associations
   belongs_to :person
@@ -32,6 +33,11 @@ class Activity < ActiveRecord::Base
   PEOPLE = 2
   COMMUNITY = 3
   ADMIN = 4
+
+  AUTHENTICATION_RANGE = (1..99)
+  PEOPLE_RANGE = (100..199)
+  COMMUNITY_RANGE = (200..499)
+  ADMIN_RANGE = (1000...1099)
 
   ## activity codes
 
@@ -82,7 +88,38 @@ class Activity < ActiveRecord::Base
   # ADMIN
   ENABLE_ACCOUNT  = 1003
   RETIRE_ACCOUNT  = 1004
-  
+
+
+  def set_activity_class
+    if AUTHENTICATION_RANGE.include?(self.activitycode)
+      self.activityclass = AUTHENTICATION
+    elsif PEOPLE_RANGE.include?(self.activitycode)
+      self.activityclass = PEOPLE
+    elsif COMMUNITY_RANGE.include?(self.activitycode)
+      self.activityclass = COMMUNITY
+    elsif ADMIN_RANGE.include?(self.activitycode)
+      self.activityclass = ADMIN
+    end
+  end
+
+  def self.log_activity(options = {})
+    required = [:person_id,:activitycode]
+    required.each do |required_option|
+      if(!options[required_option])
+        return nil
+      end
+    end
+
+    create_parameters = {}
+    create_parameters[:person_id] = options[:person_id]
+    create_parameters[:site] = options[:site] || 'local'
+    create_parameters[:activitycode] = AUTH_LOCAL_SUCCESS
+    create_parameters[:additionalinfo] = options[:additionalinfo]
+    create_parameters[:ip_address] = options[:ip_address] || 'unknown'
+
+    self.create(create_parameters)
+
+  end
 
 
   def self.log_local_auth_success(options = {})

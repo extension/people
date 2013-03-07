@@ -5,10 +5,10 @@ Thank you for signing up for your eXtensionID! We are sending this confirmation 
 
 To confirm your email address, please click the following link:
 
-  <%= 'confirm link' %>
+<%= confirm_signup_url(token: @person.signup_token) %>
 
 If you have any questions or need assistance please contact us at:
  
-  <%= 'contact us link' %>
+<%= help_url %>
 
 

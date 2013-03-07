@@ -78,6 +78,7 @@ GEM
       diff-lcs (~> 1.1)
       mime-types (~> 1.15)
       posix-spawn (~> 0.3.6)
+    hashids (0.0.3)
     highline (1.6.15)
     hike (1.2.1)
     i18n (0.6.4)
@@ -237,6 +238,7 @@ DEPENDENCIES
   capistrano
   coffee-rails (~> 3.2.1)
   csspool
+  hashids
   inline-style (= 0.5.2ex)
   jbuilder
   jquery-rails

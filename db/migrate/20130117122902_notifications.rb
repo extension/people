@@ -5,7 +5,6 @@ class Notifications < ActiveRecord::Migration
       t.string   "notifiable_type",   :limit => 30
       t.integer  "notification_type",                                  :null => false
       t.datetime "delivery_time",                                      :null => false
-      t.integer  "delayed_job_id"
       t.boolean  "processed",                       :default => false, :null => false
       t.text     "additionaldata"
       t.timestamps

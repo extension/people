@@ -5,7 +5,7 @@
 #  see LICENSE file
 
 class AccountsController < ApplicationController
-  skip_before_filter :signin_required, except: [:post_signup]
+  skip_before_filter :signin_required, except: [:post_signup, :confirm_signup]
   before_filter :signin_optional
 
   def signout
@@ -54,7 +54,7 @@ class AccountsController < ApplicationController
       return render(:template => 'account/missing_token')
     end
 
-    if(current_person.token != params[:token])
+    if(current_person.signup_token != params[:token])
       return render(:template => 'account/invalid_token')
     end
 
@@ -114,8 +114,7 @@ class AccountsController < ApplicationController
       # automatically log them in
       set_current_person(@person)
       current_person.send_signup_confirmation
-      # TODO log something
-      #UserEvent.log_event(:etype => UserEvent::PROFILE,:user => @currentuser,:description => "initialsignup")
+      Activity.log_activity(person_id: person.id, activitycode: Activity::SIGNUP, ip_address: request.remote_ip)
       render(template: 'accounts/post_signup')
     else
       render(:action => "signup")

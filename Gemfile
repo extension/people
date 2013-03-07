@@ -75,6 +75,9 @@ gem 'valid_email'
 gem "csspool"
 gem "inline-style", "0.5.2ex"
 
+# tokens and such
+gem 'hashids'
+
 group :development do
   # require the powder gem
   gem 'powder'

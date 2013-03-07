@@ -204,7 +204,6 @@ ActiveRecord::Schema.define(:version => 20130211155737) do
     t.string   "notifiable_type",   :limit => 30
     t.integer  "notification_type",                                  :null => false
     t.datetime "delivery_time",                                      :null => false
-    t.integer  "delayed_job_id"
     t.boolean  "processed",                       :default => false, :null => false
     t.text     "additionaldata"
     t.datetime "created_at",                                         :null => false
@@ -243,7 +242,6 @@ ActiveRecord::Schema.define(:version => 20130211155737) do
     t.integer  "primary_account_id"
     t.string   "affiliation"
     t.text     "involvement"
-    t.string   "token"
     t.integer  "invitation_id"
     t.datetime "created_at",                                                :null => false
     t.datetime "updated_at",                                                :null => false
