@@ -115,6 +115,7 @@ class Activity < ActiveRecord::Base
     create_parameters[:site] = options[:site] || 'local'
     create_parameters[:activitycode] = AUTH_LOCAL_SUCCESS
     create_parameters[:additionalinfo] = options[:additionalinfo]
+    create_parameters[:additionaldata] = options[:additionaldata]
     create_parameters[:ip_address] = options[:ip_address] || 'unknown'
 
     self.create(create_parameters)

@@ -24,7 +24,7 @@ People::Application.routes.draw do
     simple_named_route 'review'
   end    
 
-  resources :people, only: [:index, :show]
+  resources :people, only: [:index, :show, :edit, :update]
 
   resources :communities do 
     collection do

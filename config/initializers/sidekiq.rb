@@ -1,7 +1,3 @@
-Sidekiq.configure_server do |config|
-  config.redis = { :url => 'redis://localhost:6379/0', :namespace => 'people_queue' }
-end
-
-Sidekiq.configure_client do |config|
-  config.redis = { :url => 'redis://localhost:6379/0', :namespace => 'people_queue' }
-end
+sidekiq_redis = { :url => 'redis://localhost:6379/0'}
+Sidekiq.configure_server { |config| config.redis = sidekiq_redis }
+Sidekiq.configure_client { |config| config.redis = sidekiq_redis }

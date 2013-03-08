@@ -405,7 +405,7 @@ class Person < ActiveRecord::Base
 
     request_options = {}
     request_options['account_review_key'] = Settings.account_review_key
-    request_options['idstring'] = self.login
+    request_options['idstring'] = self.idstring
     request_options['email'] = self.email
     request_options['fullname'] = self.fullname
     if (!self.affiliation.blank?)
@@ -413,7 +413,7 @@ class Person < ActiveRecord::Base
     end
 
     begin
-    raw_result = RestClient.post(AppConfig.configtable['account_review_url'],
+    raw_result = RestClient.post(Settings.account_review_url,
                              request_options.to_json,
                              :content_type => :json, :accept => :json)
     rescue StandardError => e
@@ -429,7 +429,7 @@ class Person < ActiveRecord::Base
     end
 
     if(options[:nolog].nil? or !options[:nolog])
-      self.activities.create(activitycode: Activity::REVIEW_REQUEST, ip_address: options[:ip_address], additionalinfo: loginfo, additionaldata: postresults)
+      Activity.log_activity(person_id: self.id, activitycode: Activity::REVIEW_REQUEST, ip_address: options[:ip_address], additionalinfo: loginfo, additionaldata: postresults)
     end
 
     result['success']
@@ -491,6 +491,10 @@ class Person < ActiveRecord::Base
     admin_account.password = ''
     admin_account.save
     admin_account
+  end
+
+  def has_whitelisted_email?
+    (self.email =~ /edu$|gov$|mil$/i) ? true : false
   end
 
   private

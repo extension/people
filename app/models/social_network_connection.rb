@@ -21,7 +21,7 @@ class SocialNetworkConnection < ActiveRecord::Base
   belongs_to :social_network
 
   ## scopes
-  scope :public, where(is_public: true)
+  scope :is_public, where(is_public: true)
 
   ## constants
 
