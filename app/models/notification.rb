@@ -61,7 +61,7 @@ class Notification < ActiveRecord::Base
 
   def set_delivery_time
     if(self.delivery_time.blank?)
-      self.delivery_time = 1.minute.from_now
+      self.delivery_time = Time.now
     end
   end
 
@@ -82,6 +82,10 @@ class Notification < ActiveRecord::Base
   def confirm_signup
     AccountMailer.signup({person: self.notifiable}).deliver
   end
+
+  def welcome
+     AccountMailer.welcome({person: self.notifiable}).deliver
+  end   
 
   def self.code_to_constant_string(code)
     constantslist = self.constants

@@ -49,7 +49,7 @@ class Person < ActiveRecord::Base
   belongs_to :county
   belongs_to :location
   belongs_to :position
-  belongs_to :institution # primary institution
+  belongs_to :institution, class_name: 'Community'
 
   has_many :community_connections, dependent: :destroy
   has_many :communities, through: :community_connections, 
@@ -373,7 +373,7 @@ class Person < ActiveRecord::Base
 
       # log signup
       if(options[:nolog].nil? or !options[:nolog])
-        self.activities.create(activitycode: Activity::SIGNUP, ip_address: options[:ip_address])
+        Activity.log_activity(person_id: self.id, activitycode: Activity::SIGNUP, ip_address: options[:ip_address])
       end
 
       if(self.vouched?)
@@ -382,12 +382,10 @@ class Person < ActiveRecord::Base
           # TODO community joining routines
           # self.join_community(self.institution)
         end
-
-        Notification.create(:notification_type => Notification::WELCOME, :notifiable => @currentuser)
+        Notification.create(:notification_type => Notification::WELCOME, :notifiable => self)
       else
         self.post_account_review_request(options)
       end
-
       return true
     else
       return false

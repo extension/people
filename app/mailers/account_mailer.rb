@@ -36,6 +36,30 @@ class AccountMailer < ActionMailer::Base
     return_email
   end
 
+  def welcome(options={})
+    @person = options[:person]
+    @subject = "Welcome!"
+    @will_cache_email = options[:cache_email].nil? ? true : options[:cache_email]
+    
+    if(!@person.email.blank?)
+      if(@will_cache_email)
+        # create a cached mail object that can be used for "view this in a browser" within
+        # the rendered email.
+        @mailer_cache = MailerCache.create(person: @person, cacheable: @person)
+      end
+      
+      return_email = mail(to: @person.email, subject: @subject)
+      
+      if(@mailer_cache)
+        # now that we have the rendered email - update the cached mail object
+        @mailer_cache.update_attribute(:markup, return_email.body.to_s)
+      end
+    end
+    
+    # the email if we got it
+    return_email    
+  end
+
 
   def ssl_root_url
     if(Settings.app_location != 'localdev')

@@ -11,6 +11,11 @@ class EmailExamplesController < ApplicationController
     return render_mail(mail_message)
   end
 
+  def welcome
+    mail_message = AccountMailer.welcome(person: Person.find(1), cache_email: false)
+    return render_mail(mail_message)
+  end
+  
   private
   
   def render_mail(mail_message)
