@@ -15,13 +15,15 @@ People::Application.routes.draw do
     match "signin", action: "signin", via: [:get,:post]
     match "signout", action: "signout", via: [:get]
     match "signup", action: "signup", via: [:get,:post]
-    match "cs/:token", action: "confirm_signup", via: [:get,:post], as: "confirm_signup"
+    match "confirm/:token", action: "confirm", via: [:get,:post], as: "confirm_account"
     # everything else
     simple_named_route 'create', via: [:post]
     simple_named_route 'send_confirmation'
     simple_named_route 'reset_password'
     simple_named_route 'missing_token'
     simple_named_route 'review'
+    simple_named_route 'contributor_agreement'
+    simple_named_route 'post_signup'
   end    
 
   resources :people, only: [:index, :show, :edit, :update]

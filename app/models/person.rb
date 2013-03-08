@@ -14,6 +14,20 @@ class Person < ActiveRecord::Base
   attr_accessible :password
   attr_accessible :position_id, :position, :location_id, :location, :county_id, :county, :institution_id, :institution 
 
+  ## constants
+  # account status
+  STATUS_CONTRIBUTOR = 0
+  STATUS_REVIEW = 1
+  STATUS_CONFIRMEMAIL = 2
+  STATUS_REVIEWAGREEMENT = 3
+  STATUS_PARTICIPANT = 4
+  STATUS_RETIRED = 5
+  STATUS_INVALIDEMAIL = 6
+  STATUS_SIGNUP = 7
+  STATUS_INVALIDEMAIL_FROM_SIGNUP = 8
+
+  STATUS_OK = 100
+
   ## validations
   validates :first_name, :presence => true
   validates :last_name, :presence => true
@@ -62,19 +76,7 @@ class Person < ActiveRecord::Base
 
   
 
-  ## constants
-  # account status
-  STATUS_CONTRIBUTOR = 0
-  STATUS_REVIEW = 1
-  STATUS_CONFIRMEMAIL = 2
-  STATUS_REVIEWAGREEMENT = 3
-  STATUS_PARTICIPANT = 4
-  STATUS_RETIRED = 5
-  STATUS_INVALIDEMAIL = 6
-  STATUS_SIGNUP = 7
-  STATUS_INVALIDEMAIL_FROM_SIGNUP = 8
 
-  STATUS_OK = 100
 
   def validaccount?
     if(self.retired? or !self.vouched? or self.account_status == STATUS_SIGNUP)
@@ -218,12 +220,6 @@ class Person < ActiveRecord::Base
   def send_signup_confirmation
    Notification.create(notifiable: self, notification_type: Notification::CONFIRM_SIGNUP)
   end
-
-  def signup_token
-    hashids = Hashids.new("#{Settings.token_salt}::#{self.email}")
-    hashids.encrypt(self.id,STATUS_SIGNUP)
-  end
-
 
   def email_forward
     self.email_aliases.where(mail_alias: self.idstring).first
@@ -495,6 +491,22 @@ class Person < ActiveRecord::Base
 
   def has_whitelisted_email?
     (self.email =~ /edu$|gov$|mil$/i) ? true : false
+  end
+
+
+  def status_token
+    hashids = Hashids.new("#{Settings.token_salt}::#{self.email}")
+    hashids.encrypt(self.id,self.account_status)
+  end
+
+  def check_token(token)
+    hashids = Hashids.new("#{Settings.token_salt}::#{self.email}")
+    (token_id,statuscode) = hashids.decrypt(token)
+    if(token_id != self.id)
+      nil
+    else
+      statuscode
+    end
   end
 
   private

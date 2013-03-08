@@ -6,7 +6,7 @@
 #  see LICENSE file
 
 class HomeController < ApplicationController
-  skip_before_filter :signin_required, only: [:index]
+  #skip_before_filter :signin_required, only: [:index]
   before_filter :set_tab
 
   def index

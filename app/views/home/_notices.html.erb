@@ -1,0 +1,34 @@
+<div class="row">
+  <div class="span12">
+
+    <%- if current_person.account_status == Person::STATUS_INVALIDEMAIL -%>
+      <div class='alert'>
+        <a class='close' data-dismiss="alert" href='#'>×</a>
+        <h4>Your email address is invalid.</h4>
+        <p>Your email address likely contains a typo or has been retired by your service provider.<br/>
+          You will need to <%= link_to("edit your profile", edit_person_path(current_person)) %> and enter a valid email address to access eXtension services</p>
+      </div>
+    <%- elsif current_person.account_status == Person::STATUS_REVIEW -%>
+      <div class='alert'>
+        <a class='close' data-dismiss="alert" href='#'>×</a>
+       <h4>Your account is currently waiting for an account review.</h4>
+       <p>Learn more about <%= link_to("account reviews", accounts_review_path)%>, including how you can speed up the process.</p>
+      </div>
+    <%- elsif current_person.account_status == Person::STATUS_REVIEWAGREEMENT -%>
+      <div class='alert'>
+        <a class='close' data-dismiss="alert" href='#'>×</a>
+        <h4>You have not reviewed the eXtension Contributor Agreement.</h4>
+        <p>You need to do so in order to contribute or edit content in the eXtension collaborative publishing tools. <%= link_to("Review the Contributor Agreement", accounts_contributor_agreement_path) %></p>
+      </div>
+    <%- end -%>
+
+    <%- if((current_person.communities.institutions.nil?) or (current_person.position.nil?) or (current_person.location.nil?)) -%>
+      <div class='alert'>
+        <a class='close' data-dismiss="alert" href='#'>×</a>
+         <h4>You haven't told us about your institution, location, and position.</h4>
+         <p>Help us to serve you better and <%= link_to("edit your profile", edit_person_path(current_person)) %> with this additional information.</p>
+      </div>
+    <%- end -%>
+  </div>
+</div>
+

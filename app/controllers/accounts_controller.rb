@@ -5,7 +5,7 @@
 #  see LICENSE file
 
 class AccountsController < ApplicationController
-  skip_before_filter :signin_required, except: [:post_signup, :confirm_signup]
+  skip_before_filter :signin_required, except: [:post_signup, :confirm]
   before_filter :signin_optional
 
   def signout
@@ -43,28 +43,27 @@ class AccountsController < ApplicationController
   def reset_password
   end
 
-  def confirm_signup
-    # signup status check
-    if(current_person.account_status != Person::STATUS_SIGNUP)
-      flash[:notice] = "You have already confirmed your email address"
-      return redirect_to(root_url)
-    end
-    
+  def confirm
     if(params[:token].nil?)
       return render(:template => 'account/invalid_token')
     end
 
-    if(current_person.signup_token != params[:token])
+    if(!(status_code = current_person.check_token(params[:token])))
       return render(:template => 'account/invalid_token')
     end
 
-    current_person.confirm_signup({ip_address: request.remote_ip})
-    if(current_person.vouched?)
-      return redirect_to(root_url)
+    case status_code
+    when Person::STATUS_SIGNUP
+      confirm_signup
     else
-      return redirect_to(accounts_review_url)
+      return render(:template => 'account/invalid_token')
     end
-  end
+  end    
+
+  def post_signup
+  end  
+
+
 
   def confirm_reset
   end
@@ -124,8 +123,26 @@ class AccountsController < ApplicationController
   def review
   end
 
+  def contributor_agreement
+  end
+
 
   private
+
+  def confirm_signup
+    # signup status check
+    if(current_person.account_status != Person::STATUS_SIGNUP)
+      flash[:notice] = "You have already confirmed your email address"
+      return redirect_to(root_url)
+    end
+    
+    current_person.confirm_signup({ip_address: request.remote_ip})
+    if(current_person.vouched?)
+      return redirect_to(root_url)
+    else
+      return redirect_to(accounts_review_url)
+    end
+  end 
 
   def explain_auth_result(resultcode)
     case resultcode
