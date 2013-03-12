@@ -4,11 +4,11 @@
 # see LICENSE file
 module CommunitiesHelper
 
-  def display_invited_as(connectioncode)
-    case connectioncode
-    when CommunityConnect::INVITED_LEADER
+  def display_invited_as(connectiontype)
+    case connectiontype
+    when 'invitedleader'
       'Leader'
-    when CommunityConnect::INVITED_MEMBER
+    when 'invitedmember'
       'Member'
     else
       ''

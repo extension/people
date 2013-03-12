@@ -14,7 +14,7 @@
     <dl class="dl-horizontal">
       <% current_person.community_invitations.each do |community|%>
         <dt><%= link_to(community.name,community_url(community)) %></dt>
-        <dd><%= display_invited_as(community.connectioncode) %></dd>
+        <dd><%= display_invited_as(community.connectiontype) %></dd>
       <% end %>
     </dl>
     <%- end -%>
