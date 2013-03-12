@@ -34,7 +34,6 @@ class Communities < ActiveRecord::Migration
       t.integer  "community_id"
       t.string   "connectiontype"
       t.boolean  "sendnotifications"
-      t.integer  "connected_by"
       t.datetime "created_at"
       t.datetime "updated_at"
     end
