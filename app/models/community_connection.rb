@@ -6,14 +6,11 @@
 #  see LICENSE file
 
 class CommunityConnection < ActiveRecord::Base
+  attr_accessible :person,:person_id,:community,:community_id,:connector,:connected_by,:connectiontype,:sendnotifications
+
   belongs_to :community
   belongs_to :person
-
-  # connectioncodes
-  PRIMARY_INSTITUTION = 101
-  INVITEDLEADER = 201
-  INVITEDMEMBER = 202
-  
+ 
   scope :approved_community, joins(:community).where("communities.entrytype = #{Community::APPROVED}")
 
 end
