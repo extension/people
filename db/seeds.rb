@@ -145,6 +145,8 @@ def transfer_community_connections
     DarmokCommunityConnection.find_in_batches do |group|
       insert_values = []
       group.each do |connection|
+        # don't port interest
+        next if connection.connectiontype == 'interest'
         insert_list = []
         insert_list << connection.user_id
         insert_list << connection.community_id
@@ -459,7 +461,7 @@ def transfer_activities_to_activities
       insert_values = []
       group.each do |activity|
         insert_list = []
-        if(activity.activitycode.between?(200,500))
+        if(activity.activitycode.between?(200,500) and ![208,209].include?(activity.activitycode))
           # community activity
           insert_list << (activity.created_by)
           if(activity.activitycode.between?(210,216))
