@@ -7,7 +7,7 @@ People::Application.configure do
   config.cache_classes = false
 
   # cache
-  config.cache_store = :redis_store, "redis://localhost:6379/1"
+  #config.cache_store = :redis_store, "redis://localhost:6379/1"
 
   # Log error messages when you accidentally call methods on nil.
   config.whiny_nils = true
