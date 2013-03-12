@@ -145,8 +145,8 @@ def transfer_community_connections
     DarmokCommunityConnection.find_in_batches do |group|
       insert_values = []
       group.each do |connection|
-        # don't port interest
-        next if connection.connectiontype == 'interest'
+        # don't port interest or nointerest
+        next if !['leader','member','wantstojoin','invitedleader','invitedmember'].include?(connection.connectiontype)
         insert_list = []
         insert_list << connection.user_id
         insert_list << connection.community_id
