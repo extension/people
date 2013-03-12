@@ -65,6 +65,18 @@ class DarmokActivity < ActiveRecord::Base
   serialize :additionaldata
 end
 
+class DarmokCommunityConnection < ActiveRecord::Base
+  base_config = ActiveRecord::Base.connection.instance_variable_get("@config").dup
+  base_config[:database] = 'prod_darmok'
+  establish_connection(base_config)
+  self.set_table_name 'communityconnections'
+
+  # codes
+  INVITEDLEADER = 201
+  INVITEDMEMBER = 202
+  
+end
+
 
 def account_transfer_query
   reject_columns = ['password_hash','involvement','institution_id','invitation_id']
@@ -127,19 +139,39 @@ def community_transfer_query
   transfer_query
 end
 
-def community_connections_transfer_query
-  query = <<-END_SQL.gsub(/\s+/, " ").strip
-    INSERT INTO #{@my_database}.#{CommunityConnection.table_name} SELECT * FROM #{@darmok_database}.communityconnections WHERE connectiontype != 'nointerest'
-  END_SQL
-  query
+def transfer_community_connections
+  print "Transferring community connections..."
+  benchmark = Benchmark.measure do
+    DarmokCommunityConnection.find_in_batches do |group|
+      insert_values = []
+      group.each do |connection|
+        insert_list = []
+        insert_list << connection.user_id
+        insert_list << connection.community_id
+        if(connection.connectiontype == 'wantstojoin')
+          insert_list << ActiveRecord::Base.quote_value('pending')
+        elsif(connection.connectiontype == 'invited')
+          if(connection.connectioncode == DarmokCommunityConnection::INVITEDLEADER)
+            insert_list << ActiveRecord::Base.quote_value('invitedleader')
+          else
+            insert_list << ActiveRecord::Base.quote_value('invitedmember')
+          end
+        else
+          insert_list << ActiveRecord::Base.quote_value(connection.connectiontype)
+        end
+        insert_list << (connection.sendnotifications ? 1 : 0 )
+        insert_list << connection.connected_by
+        insert_list << ActiveRecord::Base.quote_value(connection.created_at.to_s(:db))
+        insert_list << ActiveRecord::Base.quote_value(connection.updated_at.to_s(:db))
+        insert_values << "(#{insert_list.join(',')})"
+      end
+      insert_sql = "INSERT INTO #{CommunityConnection.table_name} (person_id,community_id,connectiontype,sendnotifications,connected_by,created_at,updated_at) VALUES #{insert_values.join(',')};"
+      ActiveRecord::Base.connection.execute(insert_sql)        
+    end
+  end
+  print "\t\tfinished in #{benchmark.real.round(1)}s\n"
 end
 
-def community_connections_change_wantstojoin_to_pending
-  query = <<-END_SQL.gsub(/\s+/, " ").strip
-    UPDATE #{@my_database}.#{CommunityConnection.table_name} SET connectiontype = 'pending' WHERE connectiontype = 'wantstojoin'
-  END_SQL
-  query
-end
 
 def google_groups_transfer_query
   query = <<-END_SQL.gsub(/\s+/, " ").strip
@@ -232,10 +264,10 @@ def set_person_institution_column
   benchmark = Benchmark.measure do
     # get the primaries
     query = <<-END_SQL.gsub(/\s+/, " ").strip
-      UPDATE #{@my_database}.#{Person.table_name}, #{@my_database}.#{CommunityConnection.table_name} 
-      SET #{@my_database}.#{Person.table_name}.institution_id = #{@my_database}.#{CommunityConnection.table_name}.community_id
-      WHERE #{@my_database}.#{CommunityConnection.table_name}.person_id = #{@my_database}.#{Person.table_name}.id
-      AND #{@my_database}.#{CommunityConnection.table_name}.connectioncode = #{CommunityConnection::PRIMARY_INSTITUTION}
+      UPDATE #{@my_database}.#{Person.table_name}, #{@darmok_database}.#{DarmokCommunityConnection.table_name} 
+      SET #{@my_database}.#{Person.table_name}.institution_id = #{@darmok_database}.#{DarmokCommunityConnection.table_name}.community_id
+      WHERE #{@darmok_database}.#{DarmokCommunityConnection.table_name}.user_id = #{@my_database}.#{Person.table_name}.id
+      AND #{@darmok_database}.#{DarmokCommunityConnection.table_name}.connectioncode = 101
     END_SQL
     ActiveRecord::Base.connection.execute(query)
 
@@ -537,8 +569,6 @@ announce_and_run_query('Transferring counties',county_transfer_query)
 announce_and_run_query('Transferring locations',location_transfer_query)
 announce_and_run_query('Transferring positions',position_transfer_query)
 announce_and_run_query('Transferring communities',community_transfer_query)
-announce_and_run_query('Transferring community connections',community_connections_transfer_query)
-announce_and_run_query('Changing wantstojoin to pending',community_connections_change_wantstojoin_to_pending)
 announce_and_run_query('Transferring google groups',google_groups_transfer_query)
 announce_and_run_query('Transferring lists',lists_transfer_query)
 announce_and_run_query('Transferring social network connections',social_network_transfer_query)
@@ -549,6 +579,7 @@ announce_and_run_query('Transferring invitations',invitations_transfer_query)
 # data manipulation
 dump_never_completed_signups
 create_milfam_wordpress_list_email_alias
+transfer_community_connections
 set_person_institution_column
 transform_person_additionaldata_data
 transfer_user_authentication_events_to_activities
