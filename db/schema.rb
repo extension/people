@@ -69,7 +69,6 @@ ActiveRecord::Schema.define(:version => 20130211155737) do
     t.integer  "community_id"
     t.string   "connectiontype"
     t.boolean  "sendnotifications"
-    t.integer  "connected_by"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

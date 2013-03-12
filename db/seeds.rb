@@ -160,12 +160,11 @@ def transfer_community_connections
           insert_list << ActiveRecord::Base.quote_value(connection.connectiontype)
         end
         insert_list << (connection.sendnotifications ? 1 : 0 )
-        insert_list << connection.connected_by
         insert_list << ActiveRecord::Base.quote_value(connection.created_at.to_s(:db))
         insert_list << ActiveRecord::Base.quote_value(connection.updated_at.to_s(:db))
         insert_values << "(#{insert_list.join(',')})"
       end
-      insert_sql = "INSERT INTO #{CommunityConnection.table_name} (person_id,community_id,connectiontype,sendnotifications,connected_by,created_at,updated_at) VALUES #{insert_values.join(',')};"
+      insert_sql = "INSERT INTO #{CommunityConnection.table_name} (person_id,community_id,connectiontype,sendnotifications,created_at,updated_at) VALUES #{insert_values.join(',')};"
       ActiveRecord::Base.connection.execute(insert_sql)        
     end
   end
