@@ -33,18 +33,16 @@ class Community < ActiveRecord::Base
     'joined'  => "connectiontype IN ('member','leader')",
     'members' => "connectiontype = 'member'",
     'leaders' => "connectiontype = 'leader'",
-    'invited' => "connectiontype = 'invited'",
-    'pending' => "connectiontype = 'pending'",
-    'interested' => "connectiontype = 'interest'",
-    'interested_list' => "connectiontype IN ('pending',interest','leader')"
+    'invited' => "connectiontype = IN ('invitedleader','invitedmember')",
+    'pending' => "connectiontype = 'pending'"
   }
 
            
   CONNECTIONS = {'member' => 'Community Member',
     'leader' => 'Community Leader',
-    'wantstojoin' => 'Wants to Join Community',
-    'interest' => 'Interested in Community',
-    'invited' => 'Community Invitation'}
+    'pending' => 'Pending Community Review',
+    'invitedleader' => 'Community Invitation (Leader)',
+    'invitedleader' => 'Community Invitation (Member)'}
 
   belongs_to :creator, :class_name => "Person", :foreign_key => "created_by"
   has_many :community_connections, :dependent => :destroy
@@ -80,10 +78,6 @@ class Community < ActiveRecord::Base
 
   def members
     connected('members')
-  end
-
-  def interested
-    connected('interested')
   end
 
   def pending

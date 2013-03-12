@@ -194,20 +194,8 @@ class Person < ActiveRecord::Base
   end
   
   def connection_with_community(community)
-     if(community = self.communities.where(id: community.id).first)
-      case community.connectiontype
-      when 'invited'
-        case connection.connectioncode
-        when CommunityConnection::INVITEDLEADER
-          'invitedleader'
-        when CommunityConnection::INVITEDMEMBER
-          'invitedmember'
-        else
-          'invited'
-        end
-      else
-        community.connectiontype
-      end
+    if(community = self.communities.where(id: community.id).first)
+      community.connectiontype
     else
       'none'
     end
@@ -447,32 +435,133 @@ class Person < ActiveRecord::Base
   #  self.modify_or_create_communityconnection(community,{:activitycode => activitycode, :notificationcode => notificationcode, :operation => 'add', :connectiontype => 'wantstojoin'})
   # end
 
-  #   def modify_or_create_communityconnection(community,options)
-  #  connector = options[:connector].nil? ? self : options[:connector]
-  #  success = modify_or_create_connection_to_community(community,options)
-  #  if(success)
-  #   if(options[:activitycode])
-  #     Activity.log_activity(:user => self,:creator => connector, :community => community, :activitycode => options[:activitycode], :appname => 'local')
-  #   end
+  # meant as an api call, sets or modifies the connection without
+  # check, but handles setting primary institution
+  def connect_to_community(community,connectiontype,options = {})
+    if(community.is_institution?)
+      # do I have a primary institution connection?  if not, make this primary
+      if(self.institution_id.blank?)
+        self.update_column(:instution_id,community.id)
+      end
+
+      # is this a leadership connection?  if so, add them to the institutional teams community
+      if(connectiontype == 'leader')
+        self.add_to_community(Community.find(Community::INSTITUTIONAL_TEAMS_COMMUNITY_ID),'member')
+      end
+    end
+
+    # existing connection? update, else create
+    if(connection = self.community_connections.where(community_id: community.id).first)
+      connection.update_attribute(connectiontype: connectiontype)
+    else
+      self.community_connections.create(community_id: community.id, sendnotifications: (connectiontype == 'leader'))
+    end
     
-  #   if(options[:notificationcode] and options[:notificationcode] != Notification::NONE)
-  #     Notification.create(:notifytype => options[:notificationcode], :account => self, :creator => connector, :community => community)
-  #     # FIXME: user events really shouldn't be based on notificationcodes, but such is life
+    # TODO Log
+    # TODO Notifications
+  end
+
+  def remove_from_community(community,options={})
+    if(connection = self.community_connections.where(community_id: community.id).first)
+      if(community.is_institution?)
+        # do I have a primary institution connection?  if so, and it matches, clear it.
+        if(!self.institution_id.blank? and self.institution_id == community.id)
+          self.update_column(:instution_id,nil)
+        end
+
+        # is this a leadership connection?  if so, add them to the institutional teams community
+        if(connection.connectiontype == 'leader')
+          self.remove_from_community(Community.find(Community::INSTITUTIONAL_TEAMS_COMMUNITY_ID))
+        end
+      end
+
+      connection.destroy
+      # TODO Log
+      # TODO Notifications
+    end    
+  end
+
+
+  def join_community(community)
+    # existing connection? 
+    if(connection = self.community_connections.where(community_id: community.id).first)
+      case connection.connectiontype
+      when 'invitedleader'
+        self.connect_to_community(community,'leader')
+      when 'invitedmember'
+        self.connect_to_community(community,'member')
+      else
+        # no-op
+      end
+    else
+      # moderation check
+      case community.memberfilter
+      when Community::MODERATED
+        self.connect_to_community(community,'pending')
+      when Community::INVITATIONONLY
+        # no-op
+      else
+        self.connect_to_community(community,'member')
+      end        
+    end
+  end
+
+  def leave_community(community)
+    self.remove_from_community(community)
+  end
+
+
+
+  # def modify_or_create_connection_to_community(community,options = {})
+  #  operation = options[:operation]
+  #  connectiontype = options[:connectiontype]
+   
+  #  if(operation.nil? or connectiontype.nil?)
+  #   return false
+  #  end
+   
+  #  connector = options[:connector].nil? ? self : options[:connector]
+  #  connectioncode = options[:connectioncode].nil? ? 0 : options[:connectioncode]
+  #  connection = Communityconnection.find_by_user_id_and_community_id(self.id,community.id)
+
+  #  case operation
+  #  when 'add'
+
+  #  when 'remove'
+  #   if(!connection.nil?)
   #     if(connector != self)
-  #      UserEvent.log_event(:etype => UserEvent::COMMUNITY,:user => connector,:description => Notification.userevent(options[:notificationcode],self,community))
-  #      UserEvent.log_event(:etype => UserEvent::COMMUNITY,:user => self,:description => Notification.showuserevent(options[:notificationcode],self,connector,community))
+  #      if(connectiontype == 'leader')
+  #       # is this an institution - remove from institutional teams community
+  #       if(community.is_institution?)
+  #         Community.find(Community::INSTITUTIONAL_TEAMS_COMMUNITY_ID).remove_user_from_membership(self,User.systemuser)
+  #       end
+  #       # make them a member
+  #       connection.update_attributes({:connectiontype => 'member', :connector => connector, :connectioncode => connectioncode})
+  #      else  # TODO:   deal with interest change/wants to join removal
+  #       connection.destroy
+  #       # question wrangler community?
+  #       if(community.id == Community::QUESTION_WRANGLERS_COMMUNITY_ID)
+  #         self.update_attribute(:is_question_wrangler, false)
+  #       end
+  #       community.touch
+  #      end
   #     else
-  #      UserEvent.log_event(:etype => UserEvent::COMMUNITY,:user => self,:description => Notification.userevent(options[:notificationcode],self,community))
+  #      if(community.is_institution?)
+  #       Community.find(Community::INSTITUTIONAL_TEAMS_COMMUNITY_ID).remove_user_from_membership(self,User.systemuser)
+  #      end
+  #      connection.destroy
+  #      # question wrangler community?
+  #      if(community.id == Community::QUESTION_WRANGLERS_COMMUNITY_ID)
+  #        self.update_attribute(:is_question_wrangler, false)
+  #      end
   #     end
   #   end
-    
-  #   if(!options[:no_list_update])
-  #     operation = options[:operation]
-  #     connectiontype = options[:connectiontype]
-  #     community.touch_lists
-  #   end
-  #  end
+  #   return true
+  #  else
+  #   return false
+  #  end  
   # end
+
 
   def create_admin_account
     admin_account = Person.new

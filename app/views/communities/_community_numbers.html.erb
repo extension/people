@@ -20,8 +20,5 @@
       <span><%= link_to('Invite people to join', invitations_community_path(@community), class: 'btn') %></span>
       <%- end -%>
   </li>
-    <li>
-        <span><%= (@community.interested.count) %></span>
-        <%= link_if_not_zero(@community.interested.count,'Interest', connections_community_path(@community.id, :connection => 'interested')) %>
-    </li>
+
 </ul>
