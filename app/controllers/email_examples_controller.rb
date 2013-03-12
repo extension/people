@@ -7,12 +7,12 @@
 class EmailExamplesController < ApplicationController
 
   def signup
-    mail_message = AccountMailer.signup(person: Person.find(1), cache_email: false)
+    mail_message = AccountMailer.signup(person: Person.system_account, cache_email: false)
     return render_mail(mail_message)
   end
 
   def welcome
-    mail_message = AccountMailer.welcome(person: Person.find(1), cache_email: false)
+    mail_message = AccountMailer.welcome(person: Person.system_account, cache_email: false)
     return render_mail(mail_message)
   end
   
