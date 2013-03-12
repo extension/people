@@ -10,7 +10,7 @@ class Activity < ActiveRecord::Base
 
   ## attributes
   serialize :additionaldata
-  attr_accessible :person, :person_id, :site, :activityclass, :activitycode, :reasoncode,  :additionalinfo, :additionaldata, :ip_address, :community, :community_id
+  attr_accessible :person, :person_id, :site, :activityclass, :activitycode, :reasoncode,  :additionalinfo, :additionaldata, :ip_address, :community, :community_id, :colleague_id, :colleague
 
   ## validations
 
@@ -69,9 +69,7 @@ class Activity < ActiveRecord::Base
   COMMUNITY_LEFT= 203
   COMMUNITY_ACCEPT_INVITATION= 205
   COMMUNITY_DECLINE_INVITATION= 206
-  COMMUNITY_NOWANTSTOJOIN = 207
-  COMMUNITY_INTEREST = 208
-  COMMUNITY_NOINTEREST = 209
+  COMMUNITY_NO_PENDING = 207
 
   COMMUNITY_INVITEDASLEADER = 210
   COMMUNITY_INVITEDASMEMBER = 211
@@ -79,7 +77,6 @@ class Activity < ActiveRecord::Base
   COMMUNITY_ADDEDASMEMBER = 213
   COMMUNITY_REMOVEDASLEADER = 214
   COMMUNITY_REMOVEDASMEMBER = 215
-  COMMUNITY_INVITATIONRESCINDED = 216
 
   COMMUNITY_UPDATE_INFORMATION = 401
   COMMUNITY_CREATED_LIST = 402
@@ -119,7 +116,136 @@ class Activity < ActiveRecord::Base
     create_parameters[:ip_address] = options[:ip_address] || 'unknown'
 
     self.create(create_parameters)
+  end
 
+  def self.log_community_removal(options = {})
+    required = [:person_id,:community_id,:oldconnectiontype]
+    required.each do |required_option|
+      if(!options[required_option])
+        return nil
+      end
+    end
+
+    connector_id = options[:connector_id] || Person.system_id
+
+    create_parameters = {}
+    create_parameters[:person_id] = options[:person_id]
+    create_parameters[:site] = 'local'
+    case options[:oldconnectiontype]
+    when 'leader'
+      create_parameters[:activitycode] = ( (options[:person_id] == connector_id) ? COMMUNITY_LEFT : COMMUNITY_REMOVEDASLEADER )
+    when 'member'
+      create_parameters[:activitycode] = ( (options[:person_id] == connector_id) ? COMMUNITY_LEFT : COMMUNITY_REMOVEDASMEMBER )
+    when 'invitedleader'
+      if((options[:person_id] == connector_id))
+        create_parameters[:activitycode] = COMMUNITY_DECLINE_INVITATION      
+      else
+        return nil
+      end
+    when 'invitedmember'
+      if((options[:person_id] == connector_id))
+        create_parameters[:activitycode] = COMMUNITY_DECLINE_INVITATION      
+      else
+        return nil
+      end
+    when 'pending'
+      create_parameters[:activitycode] = COMMUNITY_NO_PENDING      
+    else
+      return nil
+    end
+
+    create_parameters[:community_id] = options[:community_id]       
+    create_parameters[:colleague_id] = connector_id  
+    create_parameters[:additionalinfo] = options[:additionalinfo]
+    create_parameters[:additionaldata] = options[:additionaldata]
+    create_parameters[:ip_address] = options[:ip_address] || 'unknown'
+
+    self.create(create_parameters)
+  end
+
+  def self.log_community_connection_change(options = {})
+    required = [:person_id,:community_id,:connectiontype,:oldconnectiontype]
+    required.each do |required_option|
+      if(!options[required_option])
+        return nil
+      end
+    end
+
+    connector_id = options[:connector_id] || Person.system_id
+
+    create_parameters = {}
+    create_parameters[:person_id] = options[:person_id]
+    create_parameters[:site] = 'local'
+    case options[:connectiontype]
+    when 'leader'
+      case options[:oldconnectiontype]
+      when 'invitedleader'
+        create_parameters[:activitycode] = ( (options[:person_id] == connector_id) ? COMMUNITY_ACCEPT_INVITATION : COMMUNITY_ADDEDASLEADER )
+      else
+        create_parameters[:activitycode] = COMMUNITY_ADDEDASLEADER
+      end
+    when 'member'
+      case options[:oldconnectiontype]
+      when 'invitedmember'
+        create_parameters[:activitycode] = ( (options[:person_id] == connector_id) ? COMMUNITY_ACCEPT_INVITATION : COMMUNITY_ADDEDASMEMBER )
+      when 'leader'
+        create_parameters[:activitycode] = COMMUNITY_REMOVEDASLEADER        
+      else
+        create_parameters[:activitycode] = COMMUNITY_ADDEDASMEMBER
+      end
+    when 'invitedleader'
+      create_parameters[:activitycode] = COMMUNITY_INVITEDASLEADER
+    when 'invitedmember'
+      create_parameters[:activitycode] = COMMUNITY_INVITEDASMEMBER
+    else
+      return nil
+    end
+
+    create_parameters[:community_id] = options[:community_id]       
+    create_parameters[:colleague_id] = connector_id  
+    create_parameters[:additionalinfo] = options[:additionalinfo]
+    create_parameters[:additionaldata] = options[:additionaldata]
+    create_parameters[:ip_address] = options[:ip_address] || 'unknown'
+
+    self.create(create_parameters)
+  end
+
+
+  def self.log_community_connection(options = {})
+    required = [:person_id,:community_id,:connectiontype]
+    required.each do |required_option|
+      if(!options[required_option])
+        return nil
+      end
+    end
+
+    connector_id = options[:connector_id] || Person.system_id
+
+    create_parameters = {}
+    create_parameters[:person_id] = options[:person_id]
+    create_parameters[:site] = 'local'
+    case options[:connectiontype]
+    when 'leader'
+      create_parameters[:activitycode] = ( (options[:person_id] == connector_id) ? COMMUNITY_JOIN : COMMUNITY_ADDEDASLEADER )
+    when 'member'
+      create_parameters[:activitycode] = ( (options[:person_id] == connector_id) ? COMMUNITY_JOIN : COMMUNITY_ADDEDASMEMBER )
+    when 'pending'
+      create_parameters[:activitycode] = COMMUNITY_PENDING
+    when 'invitedleader'
+      create_parameters[:activitycode] = COMMUNITY_INVITEDASLEADER
+    when 'invitedmember'
+      create_parameters[:activitycode] = COMMUNITY_INVITEDASMEMBER
+    else
+      return nil
+    end
+     
+    create_parameters[:colleague_id] = connector_id
+    create_parameters[:community_id] = options[:community_id]           
+    create_parameters[:additionalinfo] = options[:additionalinfo]
+    create_parameters[:additionaldata] = options[:additionaldata]
+    create_parameters[:ip_address] = options[:ip_address] || 'unknown'
+
+    self.create(create_parameters)
   end
 
 
