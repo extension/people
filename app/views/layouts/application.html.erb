@@ -11,9 +11,7 @@
   <body>
 
     <div class="navbar navbar-fixed-top">
-      <div id="eXtensionNavBar">
-        <%= render(partial: 'shared/extension_navbar') %>
-      </div>
+      <%= javascript_include_tag "https://www.extension.org/javascripts/global_nav_internal.js" %>
     </div>
 
     <div class="container" id="main">
