@@ -169,21 +169,6 @@ ActiveRecord::Schema.define(:version => 20130211155737) do
   add_index "locations", ["fipsid"], :name => "fipsid_ndx", :unique => true
   add_index "locations", ["name"], :name => "name_ndx", :unique => true
 
-  create_table "mailer_caches", :force => true do |t|
-    t.string   "hashvalue",       :limit => 40,                      :null => false
-    t.integer  "person_id"
-    t.integer  "notification_id"
-    t.integer  "cacheable_id"
-    t.string   "cacheable_type",  :limit => 30
-    t.integer  "open_count",                          :default => 0
-    t.text     "markup",          :limit => 16777215
-    t.datetime "created_at",                                         :null => false
-    t.datetime "updated_at",                                         :null => false
-  end
-
-  add_index "mailer_caches", ["hashvalue"], :name => "hashvalue_ndx"
-  add_index "mailer_caches", ["person_id", "open_count"], :name => "person_view_ndx"
-
   create_table "mailman_lists", :force => true do |t|
     t.integer  "community_id"
     t.string   "name",                :limit => 50
@@ -257,6 +242,19 @@ ActiveRecord::Schema.define(:version => 20130211155737) do
   end
 
   add_index "positions", ["name"], :name => "name_ndx", :unique => true
+
+  create_table "sent_emails", :force => true do |t|
+    t.string   "hashvalue",       :limit => 40,                      :null => false
+    t.integer  "person_id"
+    t.integer  "notification_id"
+    t.integer  "open_count",                          :default => 0
+    t.text     "markup",          :limit => 16777215
+    t.datetime "created_at",                                         :null => false
+    t.datetime "updated_at",                                         :null => false
+  end
+
+  add_index "sent_emails", ["hashvalue"], :name => "hashvalue_ndx"
+  add_index "sent_emails", ["person_id", "open_count"], :name => "person_view_ndx"
 
   create_table "social_network_connections", :force => true do |t|
     t.integer  "person_id"

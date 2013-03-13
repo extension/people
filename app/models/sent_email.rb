@@ -4,13 +4,13 @@
 # === LICENSE:
 # see LICENSE file
 
-class MailerCache < ActiveRecord::Base
-  attr_accessible :person, :person_id, :notification_id, :cacheable, :cacheable_id, :cacheable_type, :open_count, :markup
+class SentEmail < ActiveRecord::Base
+  attr_accessible :person, :person_id, :notification_id, :open_count, :markup
+
+  before_create :generate_hashvalue
 
   belongs_to :person
-  belongs_to :cacheable, :polymorphic => true
   
-  before_create :generate_hashvalue
   
   def generate_hashvalue
     randval = rand
