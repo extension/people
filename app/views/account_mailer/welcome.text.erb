@@ -1,4 +1,4 @@
-<%= render(:partial => 'shared_mailer/demo_notice') if Settings.app_location != 'production' -%>
+<%= render(:partial => 'shared_mailer/demo_notice') if is_demo? -%>
 Hi <%= @person.first_name %>,
 
 Thank you for signing up for your eXtensionID! 
@@ -19,6 +19,6 @@ http://about.extension.org
 
 Welcome to eXtension!
 
-If you have any questions or need assistance, please contact us at:
+<%= render(:partial => 'shared_mailer/help_footer') %>
 
-<%= help_url %>
+

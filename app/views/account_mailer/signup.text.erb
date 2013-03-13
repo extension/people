@@ -1,4 +1,4 @@
-<%= render(:partial => 'shared_mailer/demo_notice') if Settings.app_location != 'production' -%>
+<%= render(:partial => 'shared_mailer/demo_notice') if is_demo? -%>
 Hi <%= @person.first_name %>,
 
 Thank you for signing up for your eXtensionID! We are sending this confirmation email to verify that your email address is correct.
@@ -7,8 +7,8 @@ To confirm your email address, please click the following link:
 
 <%= confirm_account_url(token: @person.status_token) %>
 
-If you have any questions or need assistance please contact us at:
- 
+Replies to this email address are not monitored. If you have questions or need assistance please contact us at: 
+
 <%= help_url %>
 
 
