@@ -7,6 +7,7 @@ class Notifications < ActiveRecord::Migration
       t.datetime "delivery_time",                                      :null => false
       t.boolean  "processed",                       :default => false, :null => false
       t.text     "additionaldata"
+      t.text     "results"
       t.timestamps
     end
   end

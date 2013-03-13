@@ -63,6 +63,7 @@ class Activity < ActiveRecord::Base
   REVIEW_REQUEST                      = 110
 
   # COMMUNITY
+  COMMUNITY_CREATE                    = 200
   COMMUNITY_JOIN                      = 201
   COMMUNITY_PENDING                   = 202
   COMMUNITY_LEFT                      = 203

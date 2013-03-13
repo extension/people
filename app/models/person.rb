@@ -426,7 +426,7 @@ class Person < ActiveRecord::Base
     if(community.is_institution?)
       # do I have a primary institution connection?  if not, make this primary
       if(self.institution_id.blank?)
-        self.update_column(:instution_id,community.id)
+        self.update_column(:institution_id,community.id)
       end
 
       # is this a leadership connection?  if so, add them to the institutional teams community
@@ -440,13 +440,13 @@ class Person < ActiveRecord::Base
       oldconnectiontype = connection.connectiontype
       connection.update_attribute(connectiontype: connectiontype)
       Activity.log_community_connection_change(options.merge({person_id: self.id, community_id: community.id, connectiontype: connectiontype, oldconnectiontype: oldconnectiontype}))
+      Notification.create_community_connection_change(options.merge({person_id: self.id, community_id: community.id, connectiontype: connectiontype, oldconnectiontype: oldconnectiontype}))
     else
       self.community_connections.create(community_id: community.id, sendnotifications: (connectiontype == 'leader'), connectiontype: connectiontype)
       Activity.log_community_connection(options.merge({person_id: self.id, community_id: community.id, connectiontype: connectiontype}))
+      Notification.create_community_connection(options.merge({person_id: self.id, community_id: community.id, connectiontype: connectiontype}))
     end
-
     true
-    # TODO Notifications
   end
 
   def remove_from_community(community,options={})
@@ -456,7 +456,7 @@ class Person < ActiveRecord::Base
       if(community.is_institution?)
         # do I have a primary institution connection?  if so, and it matches, clear it.
         if(!self.institution_id.blank? and self.institution_id == community.id)
-          self.update_column(:instution_id,nil)
+          self.update_column(:institution_id,nil)
         end
 
         # is this a leadership connection?  if so, add them to the institutional teams community
@@ -467,8 +467,8 @@ class Person < ActiveRecord::Base
 
       connection.destroy
       Activity.log_community_removal(options.merge({person_id: self.id, community_id: community.id, oldconnectiontype: oldconnectiontype}))
+      Notification.create_community_removal(options.merge({person_id: self.id, community_id: community.id, oldconnectiontype: oldconnectiontype}))
       true
-      # TODO Notifications
     end    
   end
 

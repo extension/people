@@ -5,11 +5,12 @@
 # see LICENSE file
 
 class SentEmail < ActiveRecord::Base
-  attr_accessible :person, :person_id, :notification_id, :open_count, :markup
+  attr_accessible :person, :person_id, :notification, :notification_id, :open_count, :markup
 
   before_create :generate_hashvalue
 
   belongs_to :person
+  belongs_to :notification
   
   
   def generate_hashvalue

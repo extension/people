@@ -189,6 +189,7 @@ ActiveRecord::Schema.define(:version => 20130211155737) do
     t.datetime "delivery_time",                                      :null => false
     t.boolean  "processed",                       :default => false, :null => false
     t.text     "additionaldata"
+    t.text     "results"
     t.datetime "created_at",                                         :null => false
     t.datetime "updated_at",                                         :null => false
   end

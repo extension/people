@@ -133,11 +133,11 @@ class Community < ActiveRecord::Base
   end
 
   def leader_notificaton_pool
-    self.notification_pool.where(connectiontype: 'leader')
+    self.notification_pool.where("community_connections.sendnotifications = ?",true)
   end
   
   def notification_pool
-    self.people.validaccounts.where(sendnotifications: true)
+    self.people.validaccounts.where("community_connections.sendnotifications = ?",true)
   end
 
 end

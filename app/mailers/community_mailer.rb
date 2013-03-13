@@ -4,32 +4,42 @@
 # === LICENSE:
 # see LICENSE file
 
-class AccountMailer < BaseMailer
-
-  def signup(options = {})
+class CommunityMailer < BaseMailer
+  
+  def join(options = {})
+    @community = options[:community]
+    @person = options[:person]
     @recipient = options[:recipient]
-    @subject = "eXtension: Please confirm your email address"
+    @subject = "eXtension: A colleague has joined the #{@community.name} community"
     @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
-    
+   
     if(!@recipient.email.blank?)
       return_email = mail(to: @recipient.email, subject: @subject)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
     
-    return_email   
+    return_email  
   end
 
-  def welcome(options={})
+  def pending
+  end
+
+  def leave(options = {})
+    @community = options[:community]
+    @person = options[:person]
     @recipient = options[:recipient]
-    @subject = "eXtension: Welcome!"
+    @subject = "eXtension: A colleague has left the #{@community.name} community"
     @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
-    
+
     if(!@recipient.email.blank?)
       return_email = mail(to: @recipient.email, subject: @subject)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
     
-    return_email    
+    return_email      
+  end
+
+  def not_pending
   end
 
 end
