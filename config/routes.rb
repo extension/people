@@ -36,6 +36,8 @@ People::Application.routes.draw do
     member do
       get :connections
       get :invitations
+      post :join
+      post :leave
     end
   end
 

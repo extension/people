@@ -33,7 +33,7 @@ class Community < ActiveRecord::Base
     'joined'  => "connectiontype IN ('member','leader')",
     'members' => "connectiontype = 'member'",
     'leaders' => "connectiontype = 'leader'",
-    'invited' => "connectiontype = IN ('invitedleader','invitedmember')",
+    'invited' => "connectiontype IN ('invitedleader','invitedmember')",
     'pending' => "connectiontype = 'pending'"
   }
 

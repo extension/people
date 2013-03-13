@@ -80,4 +80,13 @@ module CommunitiesHelper
   def leave_community_text(community)
     community.is_institution? ? 'Leave Institution' : 'Leave Community'
   end
+
+  def join_community_link(community)
+    link_to(join_community_text(@community),join_community_path, :class => "btn", :remote => true, :method => :post).html_safe
+  end
+
+  def leave_community_link(community)
+    link_to(leave_community_text(@community),leave_community_path, :class => "btn", :remote => true, :method => :post).html_safe
+  end
+
 end

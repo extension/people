@@ -39,6 +39,21 @@ class CommunitiesController < ApplicationController
     #TODO
   end
 
+  def join
+    @community = Community.find_by_shortname_or_id(params[:id])
+    current_person.join_community(@community,{ip_address: request.remote_ip})
+    @current_person_community_connection = current_person.connection_with_community(@community)
+    render(template: 'communities/connect')
+  end
+
+  def leave
+    @community = Community.find_by_shortname_or_id(params[:id])
+    current_person.leave_community(@community,{ip_address: request.remote_ip})
+    @current_person_community_connection = current_person.connection_with_community(@community)
+    render(template: 'communities/connect')   
+  end
+
+
   private
 
   def set_tab

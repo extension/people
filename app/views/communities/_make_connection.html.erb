@@ -4,30 +4,13 @@
   <%- case @community.memberfilter -%>
   <%- when Community::OPEN -%>
     <p>
-      <%= link_to join_community_text(@community),'#', :class => "btn", :remote => true %>
+      <%= join_community_link(@community) %>
     </p>
   <%- when Community::MODERATED -%>
     <p>
-      <%= link_to join_community_text(@community),'#', :class => "btn", :remote => true %>
-      <%- if @community.is_institution? -%>
-        <small>Membership in this institution is moderated, an institutional team member will review your request</small>
-      <%- else -%>
-        <small>Membership in this community is moderated, a community leader will review your request</small>
-      <%- end -%>
+      <%= join_community_link(@community) %>
     </p>
-  <%- when Community::INVITATIONONLY -%>
-     <p>Contact a <%= link_to('community leader', connections_community_path(@community, :connection => 'leaders')) %> to find out more about how to make a connection with this community</p>
-  <%- end -%>
-<%- when 'interest' -%>
-  <strong>Make a connection:</strong>
-  <%- case @community.memberfilter -%>
-  <%- when Community::OPEN -%>
     <p>
-      <%= link_to join_community_text(@community),'#', :class => "btn", :remote => true %>
-    </p>
-  <%- when Community::MODERATED -%>
-    <p>
-      <%= link_to join_community_text(@community),'#', :class => "btn", :remote => true %>
       <%- if @community.is_institution? -%>
         <small>Membership in this institution is moderated, an institutional team member will review your request</small>
       <%- else -%>
@@ -44,7 +27,7 @@
     <strong>You are a member of this community</strong>
   <%- end -%>
     <p>
-      <%= link_to leave_community_text(@community),'#', :class => "btn", :remote => true %>
+      <%= leave_community_link(@community) %>
     </p>
 <%- when 'leader' -%>
   <%- if @community.is_institution? -%>
@@ -53,7 +36,7 @@
     <strong>You are a leader of this community</strong>
   <%- end -%>
       <p>
-      <%= link_to leave_community_text(@community),'#', :class => "btn", :remote => true %>
+      <%= leave_community_link(@community) %>
     </p>
 <%- when 'pending' -%>
   <%- if @community.is_institution? -%>
@@ -62,7 +45,7 @@
     <strong>Your membership in this community is pending review</strong>
   <%- end -%>
     <p>
-      <%= link_to leave_community_text(@community),'#', :class => "btn", :remote => true %>
+      <%= leave_community_link(@community) %>
     </p>
 <%- when 'invitedleader' -%>
   <%- if @community.is_institution? -%>
@@ -71,7 +54,7 @@
     <strong>You have been invited to join the leadership of this community</strong>
   <%- end -%>
     <p>
-      <%= link_to join_community_text(@community),'#', :class => "btn", :remote => true %>
+      <%= join_community_link(@community) %>
     </p>  
 <%- when 'invitedmember' -%>
   <%- if @community.is_institution? -%>
@@ -81,6 +64,6 @@
     <strong>You have been invited to join this community</strong>
   <%- end -%>
     <p>
-      <%= link_to join_community_text(@community),'#', :class => "btn", :remote => true %>
+      <%= join_community_link(@community) %>
     </p>
 <%- end #case -%>
