@@ -132,8 +132,12 @@ class Community < ActiveRecord::Base
     end
   end
 
-
-
-
+  def leader_notificaton_pool
+    self.notification_pool.where(connectiontype: 'leader')
+  end
+  
+  def notification_pool
+    self.people.validaccounts.where(sendnotifications: true)
+  end
 
 end
