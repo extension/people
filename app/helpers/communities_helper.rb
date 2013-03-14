@@ -89,4 +89,25 @@ module CommunitiesHelper
     link_to(leave_community_text(@community),leave_community_path, :class => "btn", :remote => true, :method => :post).html_safe
   end
 
+  def change_connection_link(community,person,connectiontype)
+    case connectiontype
+    when 'leader'
+      label = 'make&nbsp;leader'.html_safe
+    when 'member'
+      label = 'make&nbsp;member'.html_safe
+    when 'invitedleader'
+      label = 'invite&nbsp;as&nbsp;leader'.html_safe
+    when 'invitedmember'
+      label = 'invite&nbsp;as&nbsp;member'.html_safe
+    else
+      return ''
+    end
+    link_to(label,change_connection_community_path(id: community.id, person_id: person.id, connectiontype: connectiontype), class: 'btn btn-small').html_safe   
+  end
+
+  def remove_connection_link(community,person)
+    link_to('remove',remove_connection_community_path(id: community.id, person_id: person.id), class: 'btn btn-small').html_safe   
+  end
+
+
 end

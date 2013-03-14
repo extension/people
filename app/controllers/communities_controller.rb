@@ -53,6 +53,16 @@ class CommunitiesController < ApplicationController
     render(template: 'communities/connect')   
   end
 
+  def change_connection
+  end
+
+  def add_connection
+  end
+
+  def remove_connection
+  end
+
+
 
   private
 

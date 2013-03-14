@@ -38,6 +38,8 @@ People::Application.routes.draw do
       get :invitations
       post :join
       post :leave
+      post :change_connection
+      post :remove_connection
     end
   end
 

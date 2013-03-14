@@ -1,0 +1,23 @@
+<ul class='unstyled'>
+<%- case person.connection_with_community(community) -%>
+<%- when 'leader' -%>
+<li><%= change_connection_link(community,person,'member') %></li>
+<li><%= remove_connection_link(community,person) %></li>
+<%- when 'member' -%>
+<li><%= change_connection_link(community,person,'leader') %></li>
+<li><%= remove_connection_link(community,person) %></li>
+<%- when 'pending' -%>
+<li><%= change_connection_link(community,person,'member') %></li>
+<li><%= change_connection_link(community,person,'leader') %></li>
+<li><%= remove_connection_link(community,person) %></li>
+<%- when 'invitedleader' -%>
+<li><%= change_connection_link(community,person,'leader') %></li>
+<li><%= remove_connection_link(community,person) %></li>
+<%- when 'invitedmember' -%>
+<li><%= change_connection_link(community,person,'member') %></li>
+<li><%= remove_connection_link(community,person) %></li>
+<%- else -%>
+<li><%= change_connection_link(community,person,'invitedmember') %></li>
+<li><%= change_connection_link(community,person,'invitedleader') %></li>
+<%- end -%>
+</ul>
