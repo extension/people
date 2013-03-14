@@ -9,7 +9,7 @@ class Notification < ActiveRecord::Base
   ## attributes
   serialize :additionaldata
   serialize :results
-  attr_accessible :notifiable, :notifiable_type, :notifiable_id, :notification_type, :delivery_time, :additionaldata, :processed
+  attr_accessible :notifiable, :notifiable_type, :notifiable_id, :notification_type, :delivery_time, :additionaldata, :processed, :results
 
   ## validations
 

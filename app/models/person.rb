@@ -431,14 +431,14 @@ class Person < ActiveRecord::Base
 
       # is this a leadership connection?  if so, add them to the institutional teams community
       if(connectiontype == 'leader')
-        self.add_to_community(Community.find(Community::INSTITUTIONAL_TEAMS_COMMUNITY_ID),'member')
+        self.connect_to_community(Community.find(Community::INSTITUTIONAL_TEAMS_COMMUNITY_ID),'member')
       end
     end
 
     # existing connection? update, else create
     if(connection = self.community_connections.where(community_id: community.id).first)
       oldconnectiontype = connection.connectiontype
-      connection.update_attribute(connectiontype: connectiontype)
+      connection.update_attributes({connectiontype: connectiontype})
       Activity.log_community_connection_change(options.merge({person_id: self.id, community_id: community.id, connectiontype: connectiontype, oldconnectiontype: oldconnectiontype}))
       Notification.create_community_connection_change(options.merge({person_id: self.id, community_id: community.id, connectiontype: connectiontype, oldconnectiontype: oldconnectiontype}))
     else

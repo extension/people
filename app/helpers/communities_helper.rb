@@ -102,11 +102,11 @@ module CommunitiesHelper
     else
       return ''
     end
-    link_to(label,change_connection_community_path(id: community.id, person_id: person.id, connectiontype: connectiontype), class: 'btn btn-small').html_safe   
+    link_to(label,change_connection_community_path(id: community.id, person_id: person.id, connectiontype: connectiontype), class: 'btn btn-small', remote: true, method: :post).html_safe   
   end
 
   def remove_connection_link(community,person)
-    link_to('remove',remove_connection_community_path(id: community.id, person_id: person.id), class: 'btn btn-small').html_safe   
+    link_to('remove',remove_connection_community_path(id: community.id, person_id: person.id), class: 'btn btn-small', remote: true, method: :post).html_safe   
   end
 
 

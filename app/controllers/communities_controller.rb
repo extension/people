@@ -54,12 +54,17 @@ class CommunitiesController < ApplicationController
   end
 
   def change_connection
-  end
-
-  def add_connection
+    @community = Community.find_by_shortname_or_id(params[:id])
+    @person = Person.find(params[:person_id])
+    @person.connect_to_community(@community,params[:connectiontype],{connector: current_person, ip_address: request.remote_ip})
+    render(template: 'communities/connection_table_change')    
   end
 
   def remove_connection
+    @community = Community.find_by_shortname_or_id(params[:id])
+    @person = Person.find(params[:person_id])
+    @person.remove_from_community(@community,{connector: current_person, ip_address: request.remote_ip})
+    render(template: 'communities/connection_table_change')       
   end
 
 

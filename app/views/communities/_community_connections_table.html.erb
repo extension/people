@@ -18,7 +18,7 @@
   <tbody>
   <%- for person in @connections -%>
     <tr id="connection_row_<%= person.id %>">
-      <%= render(:partial => 'community_connections_table_row', :locals => { community: @community, person: person, showactions: showactions, actionsclass: 'none' }) %>
+      <%= render(:partial => 'community_connections_table_row', :locals => { community: @community, person: person, showactions: showactions}) %>
     </tr>
   <%- end -%>
   </tbody>
