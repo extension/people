@@ -69,7 +69,7 @@ class Activity < ActiveRecord::Base
   COMMUNITY_LEFT                      = 203
   COMMUNITY_ACCEPT_INVITATION         = 205
   COMMUNITY_DECLINE_INVITATION        = 206
-  COMMUNITY_NO_PENDING                = 207
+  COMMUNITY_REMOVE_PENDING            = 207
 
   COMMUNITY_INVITEDASLEADER           = 210
   COMMUNITY_INVITEDASMEMBER           = 211
@@ -150,7 +150,7 @@ class Activity < ActiveRecord::Base
         return nil
       end
     when 'pending'
-      create_parameters[:activitycode] = COMMUNITY_NO_PENDING      
+      create_parameters[:activitycode] = COMMUNITY_REMOVE_PENDING      
     else
       return nil
     end

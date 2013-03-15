@@ -42,7 +42,7 @@ class Notification < ActiveRecord::Base
   COMMUNITY_LEFT                      = 203
   COMMUNITY_ACCEPT_INVITATION         = 205
   COMMUNITY_DECLINE_INVITATION        = 206
-  COMMUNITY_NO_PENDING                = 207
+  COMMUNITY_REMOVE_PENDING                = 207
 
   COMMUNITY_INVITEDASLEADER           = 210
   COMMUNITY_INVITEDASMEMBER           = 211
@@ -111,6 +111,37 @@ class Notification < ActiveRecord::Base
     end  
   end
 
+  def community_accept_invitation
+  end
+
+  def community_decline_invitation
+  end
+
+  def community_remove_pending
+  end
+
+  def community_invitedasleader
+  end
+
+  def community_invitedasmember
+  end
+
+  def community_addedasleader
+  end
+
+  def community_addedasmember
+  end
+
+  def community_removedasleader
+  end
+
+  def community_removedasmember
+  end
+
+  def community_rescindinvitation
+  end
+
+
   def validate_community_notification_data
     if(self.additionaldata.blank? or self.additionaldata[:person_id].blank? or self.additionaldata[:connector_id].blank?)
       raise NotificationError, 'Missing additionaldata'
@@ -174,7 +205,7 @@ class Notification < ActiveRecord::Base
         return nil
       end
     when 'pending'
-      create_parameters[:notification_type] = COMMUNITY_NO_PENDING      
+      create_parameters[:notification_type] = COMMUNITY_REMOVE_PENDING      
     else
       return nil
     end
