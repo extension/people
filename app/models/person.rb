@@ -370,8 +370,7 @@ class Person < ActiveRecord::Base
       if(self.vouched?)
         # add to institution based on signup.
         if(!self.institution.nil?)
-          # TODO community joining routines
-          # self.join_community(self.institution)
+          self.join_community(self.institution, {ip_address: options[:ip_address]})
         end
         Notification.create(:notification_type => Notification::WELCOME, :notifiable => self)
       else
