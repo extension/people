@@ -197,6 +197,8 @@ class Notification < ActiveRecord::Base
   end
 
   def community_rescindinvitation
+    # no-op because I'm not sure this should
+    # trigger a notification
   end
 
 

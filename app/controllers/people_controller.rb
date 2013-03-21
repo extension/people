@@ -15,6 +15,16 @@ class PeopleController < ApplicationController
   def index
   end
 
+  def find
+    if (!params[:q].blank?) 
+      @colleagues = Person.patternsearch(params[:q]).order('last_name,first_name').page(params[:page])
+      if @colleagues.blank?
+        flash[:warning] = "No colleagues were found that matched your search term"
+      end
+    end
+    
+  end    
+
   # def public
   #   #TODO
   # end

@@ -1,15 +1,28 @@
 <%- @page_title = "People" -%>
 
 <div class="row">
-  <div class="span8">
-    <h1>Find Colleagues</h1>
+  <div class="span12">
+    <h3>Find Colleagues</h3>
+    <%= form_tag(:action=> "find") do -%>
+        <fieldset class="search">
+            <p>
+                <label for="searchterm">search by eXtensionID, email address, first name, or last name:</label>
+                <%= text_field_tag("q","",:size => 25)%>
+                <%= submit_tag 'Find Colleagues' %>
+            </p>
+        </fieldset>
+    <%- end -%>
+  </div>
+</div>
 
+<div class="row">
+  <div class="span8">
     <% if(Person.pendingreview.count >= 1) %>
-    <h2>Colleague waiting on review?</h2>
+    <h3>Colleague waiting on review?</h3>
     <p><%= link_to("Browse the list of colleagues pending review.", '#')%> If you know that a colleague has signed up for an eXtensionID and is waiting for review, you can vouch for them.</p>
     <% end %>
 
-    <h2>Colleague not found?</h2>
+    <h3>Colleague not found?</h3>
 
     <p><%= link_to("Invite your colleague to get an eXtensionID", '#')%>. You just need to know your colleague's email address.  You can also <%= link_to("browse existing invitations", '#')%>.</p>
   </div>

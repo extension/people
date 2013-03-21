@@ -1,0 +1,53 @@
+<%- @page_title = "Find Colleagues" -%>
+
+<div class="page-header">
+  <h2><%= @page_title %></h2>
+</div>
+
+<div class="row">
+  <div class="span12">
+    <%= form_tag(:action=> "find") do -%>
+        <fieldset class="search">
+            <p>
+                <label for="searchterm">search by eXtensionID, email address, first name, or last name:</label>
+                <%= text_field_tag("q","",:size => 25)%>
+                <%= submit_tag 'Find Colleagues' %>
+            </p>
+        </fieldset>
+    <%- end -%>
+  </div>
+</div>
+
+<%- if !@colleagues.blank? -%>
+<div class="row">
+  <div class="span12">
+    <%= page_entries_info @colleagues %>
+    <%= paginate(@colleagues) %>
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+        <th>Name</th>
+        <th>ID string</th>
+        <th>Email</th>
+        <th>Institution</th>
+        <th>Other Affiliation</th>
+        <th>Location</th>
+        </tr>
+      </thead>
+
+      <tbody>
+      <%- for person in @colleagues -%>
+        <tr id="person_row_<%= person.id %>">
+          <td><%= link_to("#{person.fullname}", person_path(person)) %></td>
+          <td><%= person.idstring %></td>
+          <td><%= person.email %></td>            
+          <td><%= primary_institution_name_for_person(person,'<span class="na">not specified</span>') %></td>
+          <td><%= (person.affiliation.blank?) ? '<span class="na">&nbsp;</span>'.html_safe : person.affiliation %></td>        
+          <td><%= (person.location.nil?) ? '<span class="na">n/a</span>'.html_safe : person.location.abbreviation %></td>        
+        </tr>
+      <%- end -%>
+      </tbody>
+    </table>
+  </div>
+</div>
+<%- end -%>

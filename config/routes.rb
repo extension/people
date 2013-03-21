@@ -26,7 +26,12 @@ People::Application.routes.draw do
     simple_named_route 'post_signup'
   end    
 
-  resources :people, only: [:index, :show, :edit, :update]
+  resources :people, only: [:index, :show, :edit, :update] do
+    collection do
+      get :find
+      post :find
+    end
+  end
 
   resources :communities do 
     collection do
