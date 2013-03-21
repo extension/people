@@ -17,7 +17,7 @@
       <span><%=  @community.invited.count %></span>
       <%= link_if_not_zero(@community.invited.count,'Invitations', connections_community_path(@community, :connection => 'invited')) %>
       <%- if (current_person.can_invite_others_to_community?(@community))  -%>
-      <span><%= link_to('Invite people to join', invitations_community_path(@community), class: 'btn') %></span>
+      <span><%= link_to('Invite people to join', invite_community_path(@community), class: 'btn') %></span>
       <%- end -%>
   </li>
 

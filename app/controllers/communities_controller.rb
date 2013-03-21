@@ -35,9 +35,18 @@ class CommunitiesController < ApplicationController
     @connections = @community.connected(connection).page(params[:page])
   end
 
-  def invitations
-    #TODO
+  def invite
+    @community = Community.find_by_shortname_or_id(params[:id])
+
+    if (!params[:q].blank?) 
+      @connections = Person.patternsearch(params[:q]).order('last_name,first_name').page(params[:page])
+      if @connections.blank?
+        flash[:warning] = "No colleagues were found that matched your search term"
+      end
+    end
+    
   end
+
 
   def join
     @community = Community.find_by_shortname_or_id(params[:id])

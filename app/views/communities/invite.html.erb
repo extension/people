@@ -1,0 +1,34 @@
+<%- @page_title = "Find and Invite Colleagues: #{@community.name}" -%>
+
+<div class="page-header">
+  <h2><%= @page_title %></h2>
+</div>
+
+<div class="row">
+  <div class="span12">
+    <h3>Find Colleagues</h3>
+    <%= form_tag(:action=> "invite") do -%>
+        <fieldset class="search">
+            <p>
+                <label for="searchterm">search by eXtensionID, email address, first name, or last name:</label>
+                <%= text_field_tag("q","",:size => 25)%>
+                <%= submit_tag 'Find Colleague' %>
+            </p>
+        </fieldset>
+    <%- end -%>
+  </div>
+</div>
+
+<%- if !@connections.blank? -%>
+<div class="row">
+  <div class="span12">
+    <%= page_entries_info @connections %>
+    <%= paginate(@connections) %>
+    <%- if @community.is_institution? %>
+      <%= render(:partial => 'institution_connections_table') %>
+    <%- else -%>
+      <%= render(:partial => 'community_connections_table') %>
+    <%- end -%>    
+  </div>
+</div>
+<%- end -%>
