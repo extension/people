@@ -7,11 +7,7 @@ We wanted to let you know that:
 <%= @person.email %>
 <%= person_url(@person) %>
 
-has indicated that they want to join the <%= @community.name %> community
-
-You or another community leader can add <%= @person.first_name %> to the community by reviewing the list of pending members at:
-
-<%= connections_community_url(id: @community.id, connect: 'pending')
+has declined the invitation to join the <%= @community.name %> community
 
 You can see more information about the <%= @community.name %> community and edit your email notification settings at:
 

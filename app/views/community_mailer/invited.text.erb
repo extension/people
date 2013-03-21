@@ -1,0 +1,27 @@
+<%= render(:partial => 'shared_mailer/demo_notice') if is_demo? -%>
+Hi <%= @recipient.first_name %>,
+
+We wanted to let you know that:
+
+<%= @person.fullname %>
+<%= @person.email %>
+<%= person_url(@person) %>
+
+has been invited to join the <%= @community.name %> community as a <%= @invited_text %>
+
+<% if !@bycolleague.is_system_account? %>
+The colleague that performed this action is:
+
+ <%= @bycolleague.fullname %>
+ <%= @bycolleague.email %>
+ <%= person_url(@bycolleague) %>
+
+<%else%>
+This action was performed by an automated script.
+<%end%>
+
+You can see more information about the <%= @community.name %> community and edit your email notification settings at:
+
+<%= community_url(@community) %>
+
+<%= render(:partial => 'shared_mailer/help_footer') %>

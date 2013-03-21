@@ -22,7 +22,20 @@ class CommunityMailer < BaseMailer
   end
 
   def pending
+    @community = options[:community]
+    @person = options[:person]
+    @recipient = options[:recipient]
+    @subject = "eXtension: A colleague wants to join the #{@community.name} community"
+    @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
+   
+    if(!@recipient.email.blank?)
+      return_email = mail(to: @recipient.email, subject: @subject)
+      save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
+    end
+    
+    return_email     
   end
+
 
   def leave(options = {})
     @community = options[:community]
@@ -38,6 +51,183 @@ class CommunityMailer < BaseMailer
     
     return_email      
   end
+
+  def accept_invitation(options = {})
+    @community = options[:community]
+    @person = options[:person]
+    @recipient = options[:recipient]
+    @subject = "eXtension: A colleague has accepted an invitation to join the #{@community.name} community"
+    @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
+   
+    if(!@recipient.email.blank?)
+      return_email = mail(to: @recipient.email, subject: @subject)
+      save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
+    end
+    
+    return_email  
+  end
+
+  def decline_invitation(options = {})
+    @community = options[:community]
+    @person = options[:person]
+    @recipient = options[:recipient]
+    @subject = "eXtension: A colleague has accepted an invitation to join the #{@community.name} community"
+    @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
+   
+    if(!@recipient.email.blank?)
+      return_email = mail(to: @recipient.email, subject: @subject)
+      save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
+    end
+    
+    return_email  
+  end  
+
+  def invited(options = {})
+    @community = options[:community]
+    @bycolleague = options[:connector]
+    @person = options[:person]
+    @recipient = options[:recipient]
+    @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
+    connectiontype = options[:connectiontype]
+    if(connectiontype == 'leader')
+      @invited_text = @community.is_institution? ? 'member of the insititutional team' : 'leader'
+    else
+      @invited_text = 'member'
+    end
+
+    @subject = "eXtension: A colleague is invited to the #{@community.name} community"
+
+    if(!@recipient.email.blank?)
+      return_email = mail(to: @recipient.email, subject: @subject)
+      save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
+    end
+    
+    return_email      
+  end
+
+  def invited_person(options = {})
+    @community = options[:community]
+    @bycolleague = options[:connector]
+    @recipient = options[:recipient]
+    @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
+    connectiontype = options[:connectiontype]
+    if(connectiontype == 'leader')
+      @invited_text = @community.is_institution? ? 'member of the insititutional team' : 'leader'
+    else
+      @invited_text = 'member'
+    end
+
+    @subject = "eXtension: You have been invited to the #{@community.name} community"
+
+    if(!@recipient.email.blank?)
+      send_to = [@recipient.email]
+      send_to << @bycolleague.email if !@bycolleague.email.blank?     
+      return_email = mail(to: send_to, subject: @subject)
+      save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
+    end
+    
+    return_email      
+  end 
+
+  def added(options = {})
+    @community = options[:community]
+    @bycolleague = options[:connector]
+    @person = options[:person]
+    @recipient = options[:recipient]
+    @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
+    connectiontype = options[:connectiontype]
+    if(connectiontype == 'leader')
+      @added_text = @community.is_institution? ? 'member of the insititutional team' : 'leader'
+    else
+      @added_text = 'member'
+    end
+
+    @subject = "eXtension: A colleague was added to the #{@community.name} community"
+
+    if(!@recipient.email.blank?)
+      return_email = mail(to: @recipient.email, subject: @subject)
+      save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
+    end
+    
+    return_email      
+  end
+
+  def added_person(options = {})
+    @community = options[:community]
+    @bycolleague = options[:connector]
+    @recipient = options[:recipient]
+    @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
+    connectiontype = options[:connectiontype]
+    if(connectiontype == 'leader')
+      @added_text = @community.is_institution? ? 'member of the insititutional team' : 'leader'
+    else
+      @added_text = 'member'
+    end
+
+    @subject = "eXtension: You have been added to the #{@community.name} community"
+
+    if(!@recipient.email.blank?)
+      send_to = [@recipient.email]
+      send_to << @bycolleague.email if !@bycolleague.email.blank?     
+      return_email = mail(to: send_to, subject: @subject)
+      save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
+    end
+    
+    return_email      
+  end    
+
+
+  def removed(options = {})
+    @community = options[:community]
+    @bycolleague = options[:connector]
+    @person = options[:person]
+    @recipient = options[:recipient]
+    @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
+    connectiontype = options[:connectiontype]
+    if(connectiontype == 'leader')
+      @removed_text = @community.is_institution? ? 'member of the insititutional team' : 'leader'
+    elsif(connectiontype == 'pending')
+      @removed_text = 'pending member'      
+    else
+      @removed_text = 'member'
+    end
+
+    @subject = "eXtension: A colleague was removed from the #{@community.name} community"
+
+    if(!@recipient.email.blank?)
+      return_email = mail(to: @recipient.email, subject: @subject)
+      save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
+    end
+    
+    return_email      
+  end
+
+  def removed_person(options = {})
+    @community = options[:community]
+    @bycolleague = options[:connector]
+    @recipient = options[:recipient]
+    @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
+    connectiontype = options[:connectiontype]
+    if(connectiontype == 'leader')
+      @removed_text = @community.is_institution? ? 'member of the insititutional team' : 'leader'
+      @subject = "eXtension: You have been removed as a leader of the #{@community.name} community"
+    elsif(connectiontype == 'pending')
+      @removed_text = 'pending member'      
+      @subject = "eXtension: You have been removed from the #{@community.name} community"
+    else
+      @removed_text = 'member'
+      @subject = "eXtension: You have been removed from the #{@community.name} community"
+    end
+
+    if(!@recipient.email.blank?)
+      send_to = [@recipient.email]
+      send_to << @bycolleague.email if !@bycolleague.email.blank?     
+      return_email = mail(to: send_to, subject: @subject)
+      save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
+    end
+    
+    return_email      
+  end  
 
   def not_pending
   end

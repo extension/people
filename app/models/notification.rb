@@ -42,7 +42,7 @@ class Notification < ActiveRecord::Base
   COMMUNITY_LEFT                      = 203
   COMMUNITY_ACCEPT_INVITATION         = 205
   COMMUNITY_DECLINE_INVITATION        = 206
-  COMMUNITY_REMOVE_PENDING                = 207
+  COMMUNITY_REMOVE_PENDING            = 207
 
   COMMUNITY_INVITEDASLEADER           = 210
   COMMUNITY_INVITEDASMEMBER           = 211
@@ -112,30 +112,88 @@ class Notification < ActiveRecord::Base
   end
 
   def community_accept_invitation
+    validate_community_notification_data    
+    self.notifiable.notification_pool.each do |recipient|
+      CommunityMailer.accept_invitation({recipient: recipient, person: @person, community: self.notifiable, notification: self}).deliver
+    end      
   end
 
   def community_decline_invitation
+    validate_community_notification_data    
+    self.notifiable.notification_pool.each do |recipient|
+      CommunityMailer.decline_invitation({recipient: recipient, person: @person, community: self.notifiable, notification: self}).deliver
+    end     
   end
 
   def community_remove_pending
+    validate_community_notification_data    
+    self.notifiable.notification_pool.each do |recipient|
+      CommunityMailer.removed({recipient: recipient, person: @person, community: self.notifiable, notification: self, connector: @connector, connectiontype: 'pending'}).deliver
+    end
+
+    # person
+    CommunityMailer.removed_person({recipient: @person, community: self.notifiable, notification: self, connector: @connector, connectiontype: 'pending'}).deliver
+
   end
 
   def community_invitedasleader
+    validate_community_notification_data    
+    # group
+    self.notifiable.notification_pool.each do |recipient|
+      CommunityMailer.invited({recipient: recipient, person: @person, community: self.notifiable, notification: self, connector: @connector, connectiontype: 'leader'}).deliver
+    end
+    # person
+    CommunityMailer.invited_person({recipient: @person, community: self.notifiable, notification: self, connector: @connector, connectiontype: 'leader'}).deliver
   end
 
   def community_invitedasmember
+    validate_community_notification_data    
+    self.notifiable.notification_pool.each do |recipient|
+      CommunityMailer.invited({recipient: recipient, person: @person, community: self.notifiable, notification: self, connector: @connector, connectiontype: 'member'}).deliver
+    end
+    # person
+    CommunityMailer.invited_person({recipient: @person, community: self.notifiable, notification: self, connector: @connector, connectiontype: 'member'}).deliver
   end
 
   def community_addedasleader
+    validate_community_notification_data    
+    self.notifiable.notification_pool.each do |recipient|
+      CommunityMailer.added({recipient: recipient, person: @person, community: self.notifiable, notification: self, connector: @connector, connectiontype: 'leader'}).deliver
+    end
+    # person
+    CommunityMailer.added_person({recipient: @person, community: self.notifiable, notification: self, connector: @connector, connectiontype: 'leader'}).deliver
+
   end
 
   def community_addedasmember
+    validate_community_notification_data    
+    self.notifiable.notification_pool.each do |recipient|
+      CommunityMailer.added({recipient: recipient, person: @person, community: self.notifiable, notification: self, connector: @connector, connectiontype: 'member'}).deliver
+    end
+    # person
+    CommunityMailer.added_person({recipient: @person, community: self.notifiable, notification: self, connector: @connector, connectiontype: 'member'}).deliver
+
   end
 
   def community_removedasleader
+    validate_community_notification_data    
+    self.notifiable.notification_pool.each do |recipient|
+      CommunityMailer.removed({recipient: recipient, person: @person, community: self.notifiable, notification: self, connector: @connector, connectiontype: 'leader'}).deliver
+    end
+    # person
+    CommunityMailer.removed_person({recipient: @person, community: self.notifiable, notification: self, connector: @connector, connectiontype: 'leader'}).deliver
+
   end
 
   def community_removedasmember
+    validate_community_notification_data    
+    self.notifiable.notification_pool.each do |recipient|
+      CommunityMailer.removed({recipient: recipient, person: @person, community: self.notifiable, notification: self, connector: @connector, connectiontype: 'member'}).deliver
+    end  
+
+    # person
+    CommunityMailer.removed_person({recipient: @person, community: self.notifiable, notification: self, connector: @connector, connectiontype: 'member'}).deliver
+
   end
 
   def community_rescindinvitation
