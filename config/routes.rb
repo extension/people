@@ -36,6 +36,8 @@ People::Application.routes.draw do
   resources :communities do 
     collection do
       get :newest
+      get :find
+      post :find
     end
 
     member do

@@ -76,6 +76,17 @@ class CommunitiesController < ApplicationController
     render(template: 'communities/connection_table_change')       
   end
 
+  def find
+    if (!params[:q].blank?)
+      @current_person_communities = current_person.connected_communities
+      @found_communities = Community.findcommunity(params[:q])
+      if(@found_communities.blank?)
+        flash[:warning] = "No community was found that matches your search term"
+      elsif(@found_communities.length == 1)
+        return redirect_to(community_url(@found_communities[0]))
+      end
+    end
+  end
 
 
   private

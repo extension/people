@@ -140,4 +140,22 @@ class Community < ActiveRecord::Base
     self.people.validaccounts.where("community_connections.sendnotifications = ?",true)
   end
 
+
+  def self.findcommunity(searchterm)
+    sanitizedsearchterm = searchterm.gsub(/\\/,'').gsub(/^\*/,'$').gsub(/\+/,'').gsub(/\(/,'').gsub(/\)/,'').strip
+    return nil if sanitizedsearchterm == ''
+
+    # exact match?
+    if(community = Community.where(name: sanitizedsearchterm).first)
+      return [community]
+    end
+
+    # query twice, first by name, and then by description
+    namelist = Community.where("name like ?","%#{sanitizedsearchterm}%").order(:name).all
+    descriptionlist = Community.where("description like ?","%#{sanitizedsearchterm}%").order(:name).all
+    returnlist = namelist | descriptionlist
+    returnlist
+  end
+
+
 end

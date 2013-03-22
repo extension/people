@@ -1,0 +1,5 @@
+<%= form_tag(find_people_path, class: 'form-inline') do -%>
+  <fieldset>
+    <%= text_field_tag("q","", class: 'span3', :placeholder => 'name, email, or eXtensionID', )%> <%= submit_tag('Search', class: 'btn') %>
+  </fieldset>
+<%- end -%>
