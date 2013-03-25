@@ -65,7 +65,7 @@ GEM
     coffee-script (2.2.0)
       coffee-script-source
       execjs
-    coffee-script-source (1.6.1)
+    coffee-script-source (1.6.2)
     connection_pool (1.0.0)
     csspool (3.0.2)
     debug_inspector (0.0.2)
@@ -85,7 +85,7 @@ GEM
     inline-style (0.5.2ex)
       csspool
       nokogiri
-    jbuilder (1.0.2)
+    jbuilder (1.2.0)
       activesupport (>= 3.0.0)
     journey (1.0.4)
     jquery-rails (2.2.1)
@@ -112,7 +112,7 @@ GEM
     mobile-fu (1.1.1)
       rack-mobile-detect
       rails
-    multi_json (1.7.1)
+    multi_json (1.7.2)
     mysql2 (0.3.11)
     net-http-spy (0.2.1)
     net-scp (1.1.0)
@@ -122,7 +122,7 @@ GEM
     net-ssh (2.6.6)
     net-ssh-gateway (1.2.0)
       net-ssh (>= 2.6.5)
-    nokogiri (1.5.6)
+    nokogiri (1.5.9)
     polyglot (0.3.3)
     posix-spawn (0.3.6)
     powder (0.2.0)
