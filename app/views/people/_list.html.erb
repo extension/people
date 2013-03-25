@@ -14,7 +14,7 @@
   <%- for person in list_of_people -%>
     <tr id="person_row_<%= person.id %>">
       <td><%= link_to("#{person.fullname}", person_path(person)) %></td>
-      <td><%= persion.idstring %></td>
+      <td><%= person.idstring %></td>
       <td><%= person.email %></td>            
       <td><%= primary_institution_name_for_person(person,'<span class="na">not specified</span>') %></td>
       <td><%= (person.affiliation.blank?) ? '<span class="na">&nbsp;</span>'.html_safe : person.affiliation %></td>        

@@ -1,0 +1,11 @@
+<h4>Can you vouch for <%= person.fullname%>?</h4>
+
+<p>If you know <%= person.first_name%> and can verify that <%= person.first_name%> is affiliated with Cooperative Extension or working with you and others in your Communities of Practice or in Cooperative Extension in general, you can vouch for <%= person.first_name%>'s eXtension account.</p>
+
+<%= form_tag(vouch_person_path(person), class: 'form-inline') do -%>
+  <fieldset>
+    <span class="help-block">Please briefly describe how you know <%= person.first_name%></span>
+    <%= text_field_tag("explanation","", class: 'span4' )%> <%= submit_tag('Vouch', class: 'btn') %>
+  </fieldset>
+<%- end -%>
+

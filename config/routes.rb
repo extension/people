@@ -27,9 +27,14 @@ People::Application.routes.draw do
   end    
 
   resources :people, only: [:index, :show, :edit, :update] do
+    member do
+      post :vouch
+    end
+    
     collection do
       get :find
       post :find
+      get :pendingreview
     end
   end
 

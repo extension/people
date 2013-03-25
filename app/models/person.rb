@@ -71,7 +71,7 @@ class Person < ActiveRecord::Base
                                    social_networks.*"  
   ## scopes  
   scope :validaccounts, where("retired = #{false} and vouched = #{true}") 
-  scope :pendingreview, where("retired = #{false} and vouched = #{false}")
+  scope :pendingreview, where("retired = #{false} and vouched = #{false} and account_status != #{STATUS_SIGNUP} && emailconfirmed = #{true}")
 
   
   # duplicated from darmok
@@ -110,6 +110,10 @@ class Person < ActiveRecord::Base
     {:conditions => conditions}
   }
 
+
+  def pendingreview?
+    (!self.vouched? && !self.retired? && self.account_status != STATUS_SIGNUP && self.emailconfirmed?)
+  end
 
   def validaccount?
     if(self.retired? or !self.vouched? or self.account_status == STATUS_SIGNUP)
@@ -419,6 +423,30 @@ class Person < ActiveRecord::Base
       return false
     end
   end
+
+  def vouch(options = {})
+    voucher = options[:voucher] 
+    self.vouched = true
+    self.vouched_by = voucher.id
+    self.vouched_at = Time.now.utc
+
+
+    if(self.save)
+      # log vouching
+      if(options[:nolog].nil? or !options[:nolog])
+        Activity.log_activity(person_id: voucher.id, activitycode: Activity::VOUCHED_FOR, colleague_id: self.id, additionalinfo: options[:explanation], ip_address: options[:ip_address])
+      end
+
+      # add to institution based on signup.
+      if(!self.institution.nil?)
+        self.join_community(self.institution, {ip_address: options[:ip_address]})
+      end
+      Notification.create(:notification_type => Notification::WELCOME, :notifiable => self)
+      return true
+    else
+      return false
+    end
+  end  
 
   def post_account_review_request(options = {})
     if(self.vouched?)

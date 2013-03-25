@@ -1,15 +1,33 @@
 <% @page_title = "Profile for #{@person.fullname}" %>
 
+
+<%- if @person.pendingreview? -%>
+<div class='row'>
+  <div class='span12'>
+    <div class='well'>
+      <%= render(partial: 'review_form', locals: {person: @person}) -%>
+    </div>
+  </div>
+</div>
+<%- end -%>
+
 <div class="row">
   <div class="span7">
     <div class="row">
+      <div class="span12">
       <p>#TODO Avatar <%= @person.fullname %></p>
+      </div>
     </div>
     <div class="row">
+      <div class="span12">
       <p>#TODO bio</p>
+      </div>
     </div>
     <div class="row">
+      <div class="span12">
       <%= render(:partial => 'profile_information', locals: {person: @person}) %>
+      </div>
+
     </div>
   </div>
   <div class="span5">
