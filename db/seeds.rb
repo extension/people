@@ -326,6 +326,14 @@ def dump_never_completed_signups
   print "\t\tfinished in #{benchmark.real.round(1)}s\n" 
 end
 
+def dump_expired_invitations
+  print "Deleting invitations older than 14 days..."
+  benchmark = Benchmark.measure do
+    Invitation.remove_expired_invitations
+  end
+  print "\t\tfinished in #{benchmark.real.round(1)}s\n" 
+end
+
 def transfer_user_authentication_events_to_activities
   print "Transferring authentication events to activity log..."
   benchmark = Benchmark.measure do
@@ -579,6 +587,7 @@ announce_and_run_query('Transferring invitations',invitations_transfer_query)
 
 # data manipulation
 dump_never_completed_signups
+dump_expired_invitations
 create_milfam_wordpress_list_email_alias
 transfer_community_connections
 set_person_institution_column

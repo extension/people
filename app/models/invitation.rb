@@ -45,6 +45,11 @@ class Invitation < ActiveRecord::Base
   CLOSED = 5
   
 
+  def self.remove_expired_invitations
+    self.where("created_at < ?",Time.now - 14.day).each do |invitation|
+      invitation.destroy
+    end
+  end
 
   
 
