@@ -42,7 +42,12 @@ class PeopleController < ApplicationController
         return redirect_to(person_url(@person))
       end
     end
-  end    
+  end
+
+  def invitations
+    @invitations = Invitation.includes(:person).pending.order('created_at DESC').page(params[:page])
+  end
+
 
   # def public
   #   #TODO

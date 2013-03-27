@@ -32,6 +32,7 @@ People::Application.routes.draw do
     end
     
     collection do
+      get :invitations
       get :find
       post :find
       get :pendingreview

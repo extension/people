@@ -1,0 +1,35 @@
+<%- @page_title = "Pending eXtension Account Invitations" -%>
+
+<div class="page-header">
+  <h2><%= @page_title %></h2>
+</div>
+
+<div class="row">
+  <div class="span12">
+  <%- if !@invitations.blank? -%>
+
+      <%= page_entries_info @invitations %>
+      <%= paginate(@invitations) %>
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr>
+              <th>Email Address</th>
+              <th>Invited By</th>
+              <th>Invited On</th>
+          </tr>
+        </thead>
+        <tbody>
+          <%- for invitation in @invitations -%>
+              <tr>
+                  <td><%= invitation.email %></td>
+                  <td><%= link_to_person(invitation.person) %></td>
+                  <td><%= display_time(invitation.created_at) %></td>
+              </tr>
+          <%- end -%>
+        </tbody>
+      </table>
+  <%- else -%>
+  <p>There are no open invitations to get an eXtension account.</p>
+  <%- end -%>
+  </div>
+</div>

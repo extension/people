@@ -20,9 +20,10 @@ class Invitation < ActiveRecord::Base
 
   ## associations
   belongs_to :person
-  belongs_to :creator, :class_name => "Person", :foreign_key => "created_by"
   
   ## scopes
+  scope :pending, where(accepted: false)
+  
 
   # named_scope :pending, :include => [:user], :conditions => ["status = #{PENDING}"]
   # named_scope :accepted, :include => [:user,:colleague], :conditions => ["status = #{ACCEPTED}"]
