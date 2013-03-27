@@ -2,26 +2,20 @@ class Invitations < ActiveRecord::Migration
   def change
 
     create_table "invitations", :force => true do |t|
-      t.integer  "created_by",                      :default => 0, :null => false
-      t.string   "token",          :limit => 40,                :null => false
-      t.string   "email",                                       :null => false
-      t.datetime "created_at",                                  :null => false
-      t.datetime "accepted_at"
-      t.integer  "person_id",                 :default => 0
-      t.datetime "reminder_at"
-      t.integer  "reminder_count",               :default => 0
-      t.text     "additionaldata"
-      t.integer  "resent_count",                 :default => 0
-      t.datetime "resent_at"
+      t.integer  "person_id",      :null => false
+      t.string   "email",          :null => false
+      t.text     "invitedcommunities"
       t.text     "message"
-      t.text     "resendmessage"
-      t.integer  "status",                       :default => 0
+      t.boolean  "accepted",  :default => false
+      t.integer  "accepted_by"
+      t.datetime "accepted_at"
+      t.boolean  "reminder_sent",  :default => false
+      t.timestamps
     end
 
     add_index "invitations", ["person_id"], :name => "person_ndx"
     add_index "invitations", ["email"], :name => "email_ndx"
-    add_index "invitations", ["token"], :name => "token_ndx"
-    add_index "invitations", ["created_by"], :name => "creator_ndx"
+    add_index "invitations", ["created_at"], :name => "created_ndx"
 
   end
 

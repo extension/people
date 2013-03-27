@@ -74,7 +74,17 @@ class DarmokCommunityConnection < ActiveRecord::Base
   # codes
   INVITEDLEADER = 201
   INVITEDMEMBER = 202
-  
+end
+
+class DarmokInvitation < ActiveRecord::Base
+  base_config = ActiveRecord::Base.connection.instance_variable_get("@config").dup
+  base_config[:database] = 'prod_darmok'
+  establish_connection(base_config)
+  self.set_table_name 'invitations'
+  serialize :additionaldata
+
+  # codes
+  PENDING = 0  
 end
 
 
@@ -253,13 +263,6 @@ def community_email_alias_query
   transfer_query
 end
 
-def invitations_transfer_query
-  query = <<-END_SQL.gsub(/\s+/, " ").strip
-    INSERT INTO #{@my_database}.#{Invitation.table_name} SELECT * FROM #{@darmok_database}.invitations
-  END_SQL
-  query
-end
-
 def set_person_institution_column
   print "Setting person's institution column..."
   benchmark = Benchmark.measure do
@@ -326,13 +329,6 @@ def dump_never_completed_signups
   print "\t\tfinished in #{benchmark.real.round(1)}s\n" 
 end
 
-def dump_expired_invitations
-  print "Deleting invitations older than 14 days..."
-  benchmark = Benchmark.measure do
-    Invitation.remove_expired_invitations
-  end
-  print "\t\tfinished in #{benchmark.real.round(1)}s\n" 
-end
 
 def transfer_user_authentication_events_to_activities
   print "Transferring authentication events to activity log..."
@@ -568,7 +564,29 @@ def associate_social_networks
   print "\t\tfinished in #{benchmark.real.round(1)}s\n"
 end
 
-
+def transfer_invitations
+  print "Transferring invitations..."
+  benchmark = Benchmark.measure do
+    insert_values = []
+    DarmokInvitation.where(status: DarmokInvitation::PENDING).where('created_at >= ?',Time.now.utc - 14.day).all.each do |invitation|
+      insert_list = []
+      insert_list << invitation.user_id
+      insert_list << ActiveRecord::Base.quote_value(invitation.email)
+      if(invitation.additionaldata and invitation.additionaldata[:invitecommunities])
+        insert_list << ActiveRecord::Base.quote_value(invitation.additionaldata[:invitecommunities].to_yaml)
+      else
+        insert_list << 'NULL'
+      end
+      insert_list << ActiveRecord::Base.quote_value(invitation.message)
+      insert_list << ActiveRecord::Base.quote_value(invitation.created_at.to_s(:db))
+      insert_list << ActiveRecord::Base.quote_value(invitation.created_at.to_s(:db))
+      insert_values << "(#{insert_list.join(',')})"     
+    end
+    insert_sql = "INSERT INTO #{Invitation.table_name} (person_id,email,invitedcommunities,message,created_at,updated_at) VALUES #{insert_values.join(',')};"
+    ActiveRecord::Base.connection.execute(insert_sql)   
+  end
+  print "\t\tfinished in #{benchmark.real.round(1)}s\n"
+end
 
 
 # seed queries
@@ -583,13 +601,12 @@ announce_and_run_query('Transferring lists',lists_transfer_query)
 announce_and_run_query('Transferring social network connections',social_network_transfer_query)
 announce_and_run_query('Transferring individual email aliases',individual_email_alias_query)
 announce_and_run_query('Transferring community email aliases',community_email_alias_query)
-announce_and_run_query('Transferring invitations',invitations_transfer_query)
 
 # data manipulation
 dump_never_completed_signups
-dump_expired_invitations
 create_milfam_wordpress_list_email_alias
 transfer_community_connections
+transfer_invitations
 set_person_institution_column
 transform_person_additionaldata_data
 transfer_user_authentication_events_to_activities

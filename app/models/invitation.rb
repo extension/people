@@ -7,7 +7,7 @@
 
 class Invitation < ActiveRecord::Base
   ## attributes
-  serialize :additionaldata
+  serialize :invitedcommunities
 
   ## validations
   # validates_presence_of :email
@@ -34,15 +34,7 @@ class Invitation < ActiveRecord::Base
   # }
 
 
-  ## constants
 
-  # status codes
-  PENDING = 0
-  ACCEPTED = 1
-  INVALID_EMAIL = 2
-  HASACCOUNT = 3
-  INVALID_DIFFERENTEMAIL = 4
-  CLOSED = 5
   
 
   def self.remove_expired_invitations
