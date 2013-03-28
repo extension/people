@@ -48,6 +48,26 @@ class PeopleController < ApplicationController
     @invitations = Invitation.includes(:person).pending.order('created_at DESC').page(params[:page])
   end
 
+  def invite
+    @invite_communities = current_person.invite_communities
+    if(request.post?)
+      @invitation = Invitation.new(params[:invitation])
+
+      # check for existing person with same email
+      if(person = Person.find_by_email(@invitation.email))
+        @invitation.errors.add(:base, "#{view_context.link_to(person.fullname, person_path(person))} already has an eXtensionID".html_safe)
+        return render
+      end
+
+      @invitation.person = current_person
+      if(@invitation.save)
+        return render(template: 'people/sentinvite')
+      end
+    else
+      @invitation = Invitation.new()
+    end
+  end
+
 
   # def public
   #   #TODO

@@ -1,0 +1,56 @@
+<%- @page_title = "Invite a colleague to eXtension" -%>
+
+<div class="page-header">
+  <h2><%= @page_title %></h2>
+</div>
+
+<div class="row">
+  <div class="span8">
+
+    <%= simple_form_for(@invitation, url: invite_people_path, :html => { :class => 'form-horizontal' }) do |f| -%>
+
+      <%- if notification = f.error_notification -%>
+        <div class="alert alert-error fade in">
+          <a class="close" data-dismiss="alert" href="#">&times;</a>
+          <%= notification %>
+          <%= f.error :base %>
+
+        </div>
+      <%- end -%>
+
+    
+      <fieldset>
+       <%= f.input :email, :input_html => {:class => 'span4' },
+        :label => "Your colleague's email address:",
+        :hint =>  "Double-check that you have the correct address. We don't have an automated means of detecting invalid email addresses for invitations." %>
+ 
+       <%= f.input :message, :input_html => {rows: 4, :class => 'span4' },
+        :label => "Message for your colleague:",
+        :hint =>  "You can include a personal message in the invitation (text only, html will be removed)." %>
+      </fieldset>
+
+      <%- if !@invite_communities.blank? -%>
+      <fieldset>
+        <legend>Communities</legend>
+        <p><span class="help-block">Invite your colleague to join one or more of the following communities after they've accepted your invitation</p>
+        <%= f.input :invitedcommunities, :collection => @invite_communities, :value_method => :id, :label_method => :name, :as => :check_boxes, 
+        :label => ''
+        %>
+      </fieldset>
+      <%- end -%>
+
+      <p><%= submit_tag "Invite Colleague", :class => "btn btn-primary" %> <%= link_to "Cancel", people_path, :class => "btn" %></p>
+
+    <%- end # end form -%> 
+  </div>
+
+      <div class="span4">
+        <div class="well">
+        <h4>About Invitations</h4>
+        <p>Please enter the email address of a colleague that you would like to invite to have an eXtensionID.  They'll be sent an email inviting them to sign up for an eXtensionID and their account will be automatically vouched after signup and email confirmation if they do not have a .edu or .gov email address.</p>
+        </div>
+    </div>
+  </div>
+
+
+

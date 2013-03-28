@@ -32,6 +32,8 @@ People::Application.routes.draw do
     end
     
     collection do
+      get :invite
+      post :invite
       get :invitations
       get :find
       post :find

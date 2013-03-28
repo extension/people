@@ -8,39 +8,35 @@
 class Invitation < ActiveRecord::Base
   ## attributes
   serialize :invitedcommunities
+  attr_accessible :email, :invitedcommunities, :message
 
   ## validations
-  # validates_presence_of :email
-  # validates_format_of :email, :with => /^([^@\s]+)@((?:[-a-zA-Z0-9]+\.)+[a-zA-Z]{2,})$/
-  # validates_uniqueness_of :email
-
-  ## filters
-  # before_create :generate_token
-  # after_create :sendinvitation
+  validates :email, :presence => true, :email => true, :uniqueness => {:message => "has already been invited" }
 
   ## associations
   belongs_to :person
   
   ## scopes
   scope :pending, where(accepted: false)
-  
-
-  # named_scope :pending, :include => [:user], :conditions => ["status = #{PENDING}"]
-  # named_scope :accepted, :include => [:user,:colleague], :conditions => ["status = #{ACCEPTED}"]
-  # named_scope :invalidemail, :include => [:user], :conditions => ["status = #{INVALID_EMAIL}"]
-  # named_scope :completed, :include => [:user,:colleague], :conditions => ["status = #{ACCEPTED} or status = #{HASACCOUNT}"]
-  
-  # named_scope :byuser, lambda{|user|
-  #   {:conditions => ["user_id = #{user.id}"]}
-  # }
-
-
-
-  
 
   def self.remove_expired_invitations
     self.where("created_at < ?",Time.now - 14.day).each do |invitation|
       invitation.destroy
+    end
+  end
+
+  # override invitedcommunities= to remove blanks
+  def invitedcommunities=(list)
+    return if(!list.is_a?(Array))
+    write_attribute(:invitedcommunities, list.reject(&:blank?))
+  end
+
+  def invitedcommunities
+    list = read_attribute(:invitedcommunities)
+    if(list)
+      list.map{|id| Community.find_by_id(id)}.compact.uniq
+    else
+      nil
     end
   end
 

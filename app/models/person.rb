@@ -208,8 +208,20 @@ class Person < ActiveRecord::Base
   end
 
   def connected_communities
-    self.communities.where("connectiontype IN ('member','leader','interest')")
+    self.communities.where("connectiontype IN ('member','leader')")
   end
+
+  def invite_communities
+    invite_communities = []
+    self.connected_communities.each do |c|
+      if(c.connectiontype == 'member')
+        invite_communities << c if c.memberfilter == Community::OPEN
+      elsif(c.connectiontype == 'leader')
+        invite_communities << c
+      end
+    end
+    invite_communities
+  end    
 
   def is_community_leader?(community)
     self.connection_with_community(community) == 'leader'
