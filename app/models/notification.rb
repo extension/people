@@ -87,7 +87,7 @@ class Notification < ActiveRecord::Base
   end
 
   def welcome
-     AccountMailer.welcome({recipient: self.notifiable, notification: self}).deliver
+    AccountMailer.welcome({recipient: self.notifiable, notification: self}).deliver
   end
 
   def community_join
@@ -216,6 +216,9 @@ class Notification < ActiveRecord::Base
     end
   end    
 
+  def invitation_to_extensionid
+    AccountMailer.invitation({invitation: self.notifiable, notification: self}).deliver
+  end
 
 
   def self.code_to_constant_string(code)

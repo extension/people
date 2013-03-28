@@ -1,0 +1,32 @@
+<%= render(:partial => 'shared_mailer/demo_notice') if is_demo? -%>
+Hello!
+
+You have been invited by a colleague to sign up for an eXtensionID.
+
+Your colleague:
+
+ <%= @invitation.person.fullname %>
+ <%= @invitation.person.email %>
+
+<%- if @invitation.message -%>
+Message from Colleague:
+
+<%= @invitation.message.html_safe -%>
+
+=====
+<%- end -%>
+
+Signing up is easy - just visit:
+
+<%= invited_signup_url(invite: @invitation.token) %>
+
+to start the process today.   
+
+You can learn more about eXtension via our blog:
+http://about.extension.org
+
+or eXtension Create:
+http://create.extension.org/
+
+
+

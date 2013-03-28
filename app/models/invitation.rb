@@ -15,6 +15,10 @@ class Invitation < ActiveRecord::Base
   ## validations
   validates :email, :presence => true, :email => true, :uniqueness => {:message => "has already been invited" }
 
+  ## filters
+  before_create :generate_token
+  after_create :create_invitation_notification
+
   ## associations
   belongs_to :person
   
@@ -45,9 +49,7 @@ class Invitation < ActiveRecord::Base
     else
       nil
     end
-  end
-
-  
+  end 
 
     
   # def accept(acceptingcolleague,accepted_at=Time.now.utc)
@@ -104,22 +106,16 @@ class Invitation < ActiveRecord::Base
     
   # end
 
-  # def sendinvitation
-  #   notificationdata = {:invitation_email => self.email, :invitation_token => self.token }
-  #   if(!self.message.blank?)
-  #     notificationdata[:invitation_message] = Hpricot(self.message).to_plain_text
-  #   end
-  #   Notification.create(:notifytype => Notification::INVITATION_TO_EXTENSIONID, :account => self.user, :additionaldata => notificationdata)
-  #   UserEvent.log_event(:etype => UserEvent::INVITATION,:user => self.user,:description => "sent invitation to #{self.email}")
-  #   Activity.log_activity(:user => self.user,:activitycode => Activity::INVITATION, :appname => 'local',:additionaldata => {:invitedemail => self.email, :invitation_id => self.id})                  
-  # end
+  def create_invitation_notification
+    Notification.create(:notification_type => Notification::INVITATION_TO_EXTENSIONID, :notifiable => self)
+  end
     
-  # protected
+  protected
   
-  # def generate_token
-  #   randval = rand
-  #   self.token = Digest::SHA1.hexdigest(AppConfig.configtable['sessionsecret']+self.email+randval.to_s)
-  # end
+  def generate_token
+    randval = rand
+    self.token = Digest::SHA1.hexdigest(Settings.session_token+self.email+randval.to_s)
+  end
   
 
 

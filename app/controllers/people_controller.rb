@@ -61,6 +61,7 @@ class PeopleController < ApplicationController
 
       @invitation.person = current_person
       if(@invitation.save)
+        Activity.log_activity(person_id: current_person.id, activitycode: Activity::INVITATION, additionalinfo: @invitation.email, additionaldata: {'invitation_id' => @invitation.id}, ip_address: request.remote_ip)
         return render(template: 'people/sentinvite')
       end
     else

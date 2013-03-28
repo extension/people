@@ -15,7 +15,8 @@ People::Application.routes.draw do
     match "signin", action: "signin", via: [:get,:post]
     match "signout", action: "signout", via: [:get]
     match "signup", action: "signup", via: [:get,:post]
-    match "confirm/:token", action: "confirm", via: [:get,:post], as: "confirm_account"
+    match "signup/:invite", action: "signup", via: [:get], as: "invited_signup"
+
     # everything else
     simple_named_route 'create', via: [:post]
     simple_named_route 'send_confirmation'
