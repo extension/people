@@ -35,7 +35,7 @@ class Invitation < ActiveRecord::Base
 
   # override message= to scrub
   def message=(text)
-    write_attribute(:message, self.html_to_pretty_text(text))
+    write_attribute(:message, self.html_to_pretty_text(text,{encode_special_chars: false}))
   end
 
   def invitedcommunities

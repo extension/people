@@ -18,14 +18,14 @@ module MarkupScrubber
     Loofah.scrub_fragment(html_string, :prune).to_s
   end
 
-  def html_to_text(html_string)
-    Loofah.fragment(html_string).text
+  def html_to_text(html_string,options={})
+    Loofah.fragment(html_string).text(options)
   end
 
   # adds some cleverness with regard to whitespace and block elements
   # http://rubydoc.info/github/flavorjones/loofah/master/Loofah/TextBehavior#to_text-instance_method
-  def html_to_pretty_text(html_string)
-    Loofah.fragment(html_string).to_text
+  def html_to_pretty_text(html_string,options={})
+    Loofah.fragment(html_string).to_text(options)
   end
 
 
