@@ -243,6 +243,7 @@ ActiveRecord::Schema.define(:version => 20130211155737) do
   create_table "sent_emails", :force => true do |t|
     t.string   "hashvalue",       :limit => 40,                      :null => false
     t.integer  "person_id"
+    t.string   "email"
     t.integer  "notification_id"
     t.integer  "open_count",                          :default => 0
     t.text     "markup",          :limit => 16777215
