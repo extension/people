@@ -137,16 +137,17 @@ ActiveRecord::Schema.define(:version => 20130211155737) do
   add_index "google_groups", ["community_id"], :name => "community_ndx", :unique => true
 
   create_table "invitations", :force => true do |t|
-    t.integer  "person_id",                             :null => false
-    t.string   "email",                                 :null => false
+    t.string   "token",              :limit => 40,                    :null => false
+    t.integer  "person_id",                                           :null => false
+    t.string   "email",                                               :null => false
     t.text     "invitedcommunities"
     t.text     "message"
-    t.boolean  "accepted",           :default => false
+    t.boolean  "accepted",                         :default => false
     t.integer  "accepted_by"
     t.datetime "accepted_at"
-    t.boolean  "reminder_sent",      :default => false
-    t.datetime "created_at",                            :null => false
-    t.datetime "updated_at",                            :null => false
+    t.boolean  "reminder_sent",                    :default => false
+    t.datetime "created_at",                                          :null => false
+    t.datetime "updated_at",                                          :null => false
   end
 
   add_index "invitations", ["created_at"], :name => "created_ndx"

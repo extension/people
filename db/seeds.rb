@@ -570,6 +570,7 @@ def transfer_invitations
     insert_values = []
     DarmokInvitation.where(status: DarmokInvitation::PENDING).where('created_at >= ?',Time.now.utc - 14.day).all.each do |invitation|
       insert_list = []
+      insert_list << ActiveRecord::Base.quote_value(invitation.token)
       insert_list << invitation.user_id
       insert_list << ActiveRecord::Base.quote_value(invitation.email)
       if(invitation.additionaldata and invitation.additionaldata[:invitecommunities])
@@ -582,7 +583,7 @@ def transfer_invitations
       insert_list << ActiveRecord::Base.quote_value(invitation.created_at.to_s(:db))
       insert_values << "(#{insert_list.join(',')})"     
     end
-    insert_sql = "INSERT INTO #{Invitation.table_name} (person_id,email,invitedcommunities,message,created_at,updated_at) VALUES #{insert_values.join(',')};"
+    insert_sql = "INSERT INTO #{Invitation.table_name} (token,person_id,email,invitedcommunities,message,created_at,updated_at) VALUES #{insert_values.join(',')};"
     ActiveRecord::Base.connection.execute(insert_sql)   
   end
   print "\t\tfinished in #{benchmark.real.round(1)}s\n"

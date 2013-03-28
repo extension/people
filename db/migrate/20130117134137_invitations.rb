@@ -2,6 +2,7 @@ class Invitations < ActiveRecord::Migration
   def change
 
     create_table "invitations", :force => true do |t|
+      t.string   "token",          :limit => 40, :null => false
       t.integer  "person_id",      :null => false
       t.string   "email",          :null => false
       t.text     "invitedcommunities"
