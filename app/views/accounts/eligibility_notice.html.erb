@@ -2,7 +2,7 @@
 
 <div class="well">
 <%= form_tag(signup_path) do -%>
-  <%=  hidden_field_tag(:invite, @invitation.token) if(!@invitation.nil?) -%>
+  <%=  hidden_field_tag(:invite, params[:invite]) if(!params[:invite].nil?) -%>
   <fieldset>
     <h3>Am I eligible for an eXtensionID?</h3>
     <p>eXtensionID’s are currently limited to individuals closely associated with the U.S. Cooperative Extension system (either those working at a Land-Grant Institution, State college or U.S. Government personnel affiliated with Cooperative Extension), or individuals in Extension-related organizations working on projects with Cooperative Extension staff.</p>

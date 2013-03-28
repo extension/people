@@ -20,7 +20,7 @@
     
       <p><span class="help-block">Fields marked with an asterisk (<em class="required">*</em>) are required</span></p>
 
-      <%- if(!@invitation.nil?) -%>
+      <%- if(@invitation) -%>
         <%= hidden_field_tag('invite',@invitation.token) %>
       <%- end -%>
 

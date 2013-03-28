@@ -84,8 +84,8 @@ class AccountsController < ApplicationController
       @person = Person.new
     end
 
-    if(!params[:invite].nil? and invitation = Invitation.find_by_token(params[:invite]))
-      @person.invitation_id = invitation.id
+    if(!params[:invite].nil?)
+      @invitation = Invitation.find_by_token(params[:invite])
     end
     
     @locations = Location.order('entrytype,name')
@@ -100,9 +100,12 @@ class AccountsController < ApplicationController
   end
 
   def create
-    
     @person = Person.new(params[:person])
-        
+ 
+    if(!params[:invite].nil? and @invitation = Invitation.find_by_token(params[:invite]))
+      @person.invitation = @invitation
+    end
+
     # STATUS_SIGNUP
     @person.account_status = Person::STATUS_SIGNUP
     

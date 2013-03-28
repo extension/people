@@ -12,7 +12,8 @@ class Person < ActiveRecord::Base
 
   attr_accessible :first_name, :last_name, :email, :title, :phonenumber, :time_zone, :affiliation, :involvement
   attr_accessible :password
-  attr_accessible :position_id, :position, :location_id, :location, :county_id, :county, :institution_id, :institution 
+  attr_accessible :position_id, :position, :location_id, :location, :county_id, :county, :institution_id, :institution
+  attr_accessible :invitation, :invitation_id 
 
   ## constants
   # account status
@@ -385,24 +386,12 @@ class Person < ActiveRecord::Base
 
     # was this person invited? - even if can self-vouch, this will overwrite vouched_by
     if(invitation = self.invitation)
-      if(self.has_whitelisted_email? or (invitation.email.downcase == self.email.downcase))
-       invitation.accept(self,now)
-       self.vouched = true 
-       self.vouched_by = invitation.person.id
-       self.vouched_at = now
-      else
-       # what we really should do here is send an email to the person that made the invitation
-       # and ask them to vouch for the person with the different email that used the right invitation code
-       # but a different, non-whitelisted email.
-       invitation.status = Invitation::INVALID_DIFFERENTEMAIL
-       invitation.additionaldata = {:invalid_reason => 'invitation email does not match signup email', :signup_email => self.email}
-       invitation.save
-      end
-    end
-
-    # is there an unaccepted invitation with this email address in it? - then let's call it an accepted invitation
-    invitation = Invitation.where(email: self.email).where(status: Invitation::PENDING).first
-    if(!invitation.nil?)
+      invitation.accept(self,now)
+      self.vouched = true 
+      self.vouched_by = invitation.person.id
+      self.vouched_at = now
+    elsif(invitation = Invitation.where(email: self.email).where(status: Invitation::PENDING).first)
+      # is there an unaccepted invitation with this email address in it? - then let's call it an accepted invitation
       invitation.accept(self,now)
       self.vouched = true 
       self.vouched_by = invitation.person.id
