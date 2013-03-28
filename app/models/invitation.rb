@@ -6,6 +6,8 @@
 #  see LICENSE file
 
 class Invitation < ActiveRecord::Base
+  include MarkupScrubber
+
   ## attributes
   serialize :invitedcommunities
   attr_accessible :email, :invitedcommunities, :message
@@ -29,6 +31,11 @@ class Invitation < ActiveRecord::Base
   def invitedcommunities=(list)
     return if(!list.is_a?(Array))
     write_attribute(:invitedcommunities, list.reject(&:blank?))
+  end
+
+  # override message= to scrub
+  def message=(text)
+    write_attribute(:message, self.html_to_pretty_text(text))
   end
 
   def invitedcommunities

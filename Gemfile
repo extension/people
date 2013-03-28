@@ -78,6 +78,10 @@ gem "inline-style", "0.5.2ex"
 # tokens and such
 gem 'hashids'
 
+# html scrubbing
+gem "loofah"
+
+
 group :development do
   # require the powder gem
   gem 'powder'
