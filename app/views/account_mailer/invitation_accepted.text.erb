@@ -1,0 +1,12 @@
+<%= render(:partial => 'shared_mailer/demo_notice') if is_demo? -%>
+Hello <%= @invitation.person.first_name %>,
+
+We wanted to let you know that your colleague has accepted your invitation to join eXtension.
+
+Your Colleague:
+
+<%= @invitation.colleague.fullname %>
+<%= @invitation.colleague.email %>
+<%= person_url(@invitation.colleague) %>
+
+<%= render(:partial => 'shared_mailer/help_footer') %>

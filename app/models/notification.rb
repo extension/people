@@ -220,6 +220,10 @@ class Notification < ActiveRecord::Base
     AccountMailer.invitation({invitation: self.notifiable, notification: self}).deliver
   end
 
+  def invitation_accepted
+    AccountMailer.invitation_accepted({invitation: self.notifiable, notification: self}).deliver
+  end
+
 
   def self.code_to_constant_string(code)
     constantslist = self.constants

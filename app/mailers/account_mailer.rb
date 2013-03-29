@@ -38,12 +38,29 @@ class AccountMailer < BaseMailer
     @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
     
     if(!@invitation.email.blank?)
-      return_email = mail(to: @invitation.email, subject: @subject)
+      mail_options = {to: @invitation.email, subject: @subject}
+      mail_options[:cc] = @invitation.person.email if !@invitation.person.email.blank?     
+      return_email = mail(mail_options)
       save_sent_email_for_recipient(return_email,@invitation.email,options) if @save_sent_email
     end
     
     return_email    
   end
+
+  def invitation_accepted(options={})
+    @invitation = options[:invitation]
+    @subject = "eXtension: Your invitation to eXtension has been accepted"
+    @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
+    
+    if(!@invitation.person.email.blank?)
+      mail_options = {to: @invitation.person.email, subject: @subject}
+      mail_options[:cc] = @invitation.colleague.email if (@invitation.colleague && !@invitation.colleague.email.blank?)
+      return_email = mail(mail_options)
+      save_sent_email_for_recipient(return_email,@invitation.email,options) if @save_sent_email
+    end
+    
+    return_email    
+  end  
 
 
 end

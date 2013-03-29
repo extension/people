@@ -21,7 +21,8 @@ class Invitation < ActiveRecord::Base
 
   ## associations
   belongs_to :person
-  
+  belongs_to :colleague, :class_name => "Person", :foreign_key => "accepted_by"
+
   ## scopes
   scope :pending, where(accepted: false)
 
@@ -47,28 +48,27 @@ class Invitation < ActiveRecord::Base
     if(list)
       list.map{|id| Community.find_by_id(id)}.compact.uniq
     else
-      nil
+      []
     end
   end 
 
-  def accept(acceptingcolleague,accepted_at=Time.now.utc)
+  def accept(acceptingcolleague,accepted_at=Time.now.utc,options = {})
     self.accepted_by = acceptingcolleague.id
     self.accepted = true
     self.accepted_at = accepted_at
     if(self.save)
-      # Activity.log_activity(:user => acceptingcolleague,:colleague => self.user, :activitycode => Activity::INVITATION_ACCEPTED, :appname => 'local')
-      # Notification.create(:notifytype => Notification::INVITATION_ACCEPTED, :account => self.user, :creator => acceptingcolleague, :additionaldata => {:invitation_id => self.id})
+      Notification.create(:notification_type => Notification::INVITATION_ACCEPTED, :notifiable => self)
+      Activity.log_activity(person_id: acceptingcolleague.id, 
+                            activitycode: Activity::INVITATION_ACCEPTED, 
+                            additionalinfo: self.email, 
+                            additionaldata: {'invitation_id' => self.id}, 
+                            ip_address: options[:ip_address])
+
+      # check for community invitations
+      self.invitedcommunities.each do |community|
+        acceptingcolleague.connect_to_community(community,'invitedmember',{connector_id: self.person_id, ip_address: options[:ip_address]})
+      end
     end
-    
-    # # check for community invitations
-    # if(!self.additionaldata.nil? and !self.additionaldata[:invitecommunities].nil?)
-    #   communityids = self.additionaldata[:invitecommunities]
-    #   communityids.each do |invitedcommunity_id|
-    #     if(community = Community.find(invitedcommunity_id.to_i))
-    #       community.invite_user(self.colleague,false,self.user)
-    #     end
-    #   end
-    # end
   end
   
   def create_invitation_notification

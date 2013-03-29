@@ -386,13 +386,13 @@ class Person < ActiveRecord::Base
 
     # was this person invited? - even if can self-vouch, this will overwrite vouched_by
     if(invitation = self.invitation)
-      invitation.accept(self,now)
+      invitation.accept(self,now,options)
       self.vouched = true 
       self.vouched_by = invitation.person.id
       self.vouched_at = now
     elsif(invitation = Invitation.where(email: self.email).where(status: Invitation::PENDING).first)
       # is there an unaccepted invitation with this email address in it? - then let's call it an accepted invitation
-      invitation.accept(self,now)
+      invitation.accept(self,now,options)
       self.vouched = true 
       self.vouched_by = invitation.person.id
       self.vouched_at = now
