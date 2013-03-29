@@ -120,9 +120,9 @@ class CommunityMailer < BaseMailer
     @subject = "eXtension: You have been invited to the #{@community.name} community"
 
     if(!@recipient.email.blank?)
-      send_to = [@recipient.email]
-      send_to << @bycolleague.email if !@bycolleague.email.blank?     
-      return_email = mail(to: send_to, subject: @subject)
+      mail_options = {to: @recipient.email, subject: @subject}
+      mail_options[:cc] = @bycolleague.email if !@bycolleague.email.blank?     
+      return_email = mail(mail_options)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
     
@@ -167,9 +167,9 @@ class CommunityMailer < BaseMailer
     @subject = "eXtension: You have been added to the #{@community.name} community"
 
     if(!@recipient.email.blank?)
-      send_to = [@recipient.email]
-      send_to << @bycolleague.email if !@bycolleague.email.blank?     
-      return_email = mail(to: send_to, subject: @subject)
+      mail_options = {to: @recipient.email, subject: @subject}
+      mail_options[:cc] = @bycolleague.email if !@bycolleague.email.blank?     
+      return_email = mail(mail_options)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
     
@@ -220,9 +220,9 @@ class CommunityMailer < BaseMailer
     end
 
     if(!@recipient.email.blank?)
-      send_to = [@recipient.email]
-      send_to << @bycolleague.email if !@bycolleague.email.blank?     
-      return_email = mail(to: send_to, subject: @subject)
+      mail_options = {to: @recipient.email, subject: @subject}
+      mail_options[:cc] = @bycolleague.email if !@bycolleague.email.blank?     
+      return_email = mail(mail_options)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
     
@@ -230,6 +230,7 @@ class CommunityMailer < BaseMailer
   end  
 
   def not_pending
+    #TODO ?
   end
 
 end
