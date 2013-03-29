@@ -73,6 +73,7 @@ GEM
     erubis (2.7.0)
     execjs (1.4.0)
       multi_json (~> 1.0)
+    extension-html5shiv-rails (3.6.2)
     facter (1.6.18)
     grit (2.5.0)
       diff-lcs (~> 1.1)
@@ -240,6 +241,7 @@ DEPENDENCIES
   capistrano
   coffee-rails (~> 3.2.1)
   csspool
+  extension-html5shiv-rails
   hashids (= 0.0.4ex)
   inline-style (= 0.5.2ex)
   jbuilder

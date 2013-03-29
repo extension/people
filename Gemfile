@@ -22,6 +22,7 @@ group :assets do
   gem 'anjlab-bootstrap-rails', '>= 2.0', :require => 'bootstrap-rails'
   gem 'jquery-ui-rails'
   gem 'jquery-tablesorter'
+  gem 'extension-html5shiv-rails', :require => 'html5shiv-rails'
 end
 
 # mobile device detection
