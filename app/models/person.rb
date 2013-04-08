@@ -122,7 +122,44 @@ class Person < ActiveRecord::Base
     else
       return true
     end
-  end  
+  end
+
+  def signin_allowed?
+    if self.retired?
+      return false
+    elsif Settings.reserved_uids.include?(self.id)
+      return false
+    elsif(!self.last_activity_at.blank?)
+      if(self.last_activity_at < Time.now.utc - 4.days)
+        return false
+      else
+        return true
+      end
+    else
+      return true
+    end
+  end
+
+  def is_sudoer?
+    (self.signin_allowed? && Settings.sudoers.include?(self.login))
+  end
+
+  def activity_allowed?
+    if(!self.vouched?)
+      return false
+    else # status checks
+      case self.account_status
+      when STATUS_CONTRIBUTOR
+        return true
+      when STATUS_PARTICIPANT
+        return true
+      when STATUS_REVIEWAGREEMENT
+        return true
+      else
+        return false
+      end
+    end
+  end 
 
   def set_hashed_password(options = {})
     self.password_hash = Password.create(@password)

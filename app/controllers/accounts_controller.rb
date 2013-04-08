@@ -5,6 +5,7 @@
 #  see LICENSE file
 
 class AccountsController < ApplicationController
+  skip_before_filter :check_hold_status
   skip_before_filter :signin_required, except: [:post_signup, :confirm]
   before_filter :signin_optional
 
@@ -61,6 +62,9 @@ class AccountsController < ApplicationController
   end    
 
   def post_signup
+  end
+
+  def pending_confirmation
   end  
 
 

@@ -6,7 +6,7 @@
 #  see LICENSE file
 
 class HomeController < ApplicationController
-  #skip_before_filter :signin_required, only: [:index]
+  skip_before_filter :check_hold_status, only: [:pending]
   before_filter :set_tab
 
   def index
@@ -15,11 +15,26 @@ class HomeController < ApplicationController
   def help
   end
 
+  def pending
+  end
+
+
+  # def notice
+  #   result = statuscheck(@currentuser)
+  #   if(AUTH_SUCCESS == result[:code])
+  #     redirect_to(people_welcome_url)
+  #   else
+  #     @notice = explainauthresult(result[:code])
+  #   end
+  # end
 
   private
 
   def set_tab
     @selected_tab = 'home'
   end
+
+
+
   
 end

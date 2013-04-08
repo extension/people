@@ -26,6 +26,7 @@ People::Application.routes.draw do
     simple_named_route 'review'
     simple_named_route 'contributor_agreement'
     simple_named_route 'post_signup'
+    simple_named_route 'pending_confirmation'
   end    
 
   resources :people, only: [:index, :show, :edit, :update] do
@@ -72,6 +73,7 @@ People::Application.routes.draw do
   end
 
   controller :home do
+    simple_named_route 'pending'
     match "help", action: 'help', via: [:get,:post]
   end
 

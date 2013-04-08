@@ -1,0 +1,16 @@
+<%- @page_title = "eXtension - Pending Email Confirmation" -%>
+
+<div class="row">
+  <div class="span12">
+    <h2>Pending Email Confirmation</h2>
+    <p>In order to confirm your email address, we have sent an email to: <code class="email"><%= current_person.email %></code></p>
+    <p><span class="help">(Incorrect address? Please <%= link_to('fix it in your profile', edit_person_path(current_person))%>)</span></p>
+    <p>This email contains a link with a special "code" to validate the email address on your account.  </p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+  <%= render(:partial => 'email_help_notice') %>
+  </div>
+</div>

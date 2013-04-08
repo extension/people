@@ -5,6 +5,7 @@
 #  see LICENSE file
 
 class PeopleController < ApplicationController
+  #   skip_before_filter :check_hold_status , personal profile/edit
   before_filter :set_tab
 
   def show

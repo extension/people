@@ -25,52 +25,11 @@ module AuthLib
     end
   end
   
-  # TODO: review this, not sure the last_login_at is working 
-  def is_authorized?(person)
-    if !person
-      return false
-    elsif person.retired?
-      return false
-    elsif Settings.reserved_uids.include?(person.id)
-      return false
-    elsif(!person.last_login_at.blank?)
-      if(person.last_login_at < Time.now.utc - 4.days)
-        return false
-      else
-        return true
-      end
-    elsif(person.created_at < Time.now.utc - 1.days)
-      return false
-    else
-      return true
-    end
-  end
-
-  def is_sudoer?(person)
-    (is_authorized?(person) && Settings.sudoers.include?(person.login))
-  end
-
-  def in_purgatory?(person)
-    if(!person.vouched?)
-      return true
-    else # status checks
-      case person.account_status
-      when Person::STATUS_CONTRIBUTOR
-        return false
-      when Person::STATUS_PARTICIPANT
-        return false
-      when Person::STATUS_REVIEWAGREEMENT
-        return false
-      else
-        return true
-      end
-    end
-  end 
     
   def signin_required
     if session[:person_id]      
       person = Person.find_by_id(session[:person_id])
-      if (is_authorized?(person))
+      if (person.signin_allowed?)
         @current_person = person
       end
       return true
@@ -86,15 +45,15 @@ module AuthLib
   def signin_optional
     if session[:person_id]      
       person = Person.find_by_id(session[:person_id])
-      if (is_authorized?(person))
+      if (person.signin_allowed?)
         @current_person = person
       end
     end
     return true
   end
 
-  def not_in_purgatory_required
-    if !in_purgatory?(current_person)
+  def check_hold_status
+    if current_person.activity_allowed?
       return true
     else
       clear_location
@@ -106,7 +65,7 @@ module AuthLib
   def admin_required
     if session[:person_id]      
       person = Person.find_by_id(session[:person_id])
-      if (is_authorized?(person) and person.is_admin?)
+      if (person.signin_allowed? and person.is_admin?)
         @current_person = person
       end
       return true
@@ -125,7 +84,7 @@ module AuthLib
   def sudo_required
     if session[:person_id]      
       person = Person.find_by_id(session[:person_id])
-      if (is_authorized?(person) and is_sudoer?(person))
+      if (person.is_sudoer?)
         @current_person = person
       end
       return true
@@ -145,8 +104,7 @@ module AuthLib
   end
 
   def access_notice
-    redirect_to root_url
-    #redirect_to people_notice_url
+    redirect_to home_pending_url
   end  
   
 
