@@ -5,13 +5,25 @@
 #  see LICENSE file
 
 class PeopleController < ApplicationController
-  #   skip_before_filter :check_hold_status , personal profile/edit
+  skip_before_filter :check_hold_status, only: [:edit, :update]
   before_filter :set_tab
 
   def show
     @person = Person.find(params[:id])
   end
 
+  def update
+    #TODO
+  end
+
+  def edit
+    @person = Person.find(params[:id])
+    # if @person != current_person
+    if(@person != current_person)
+      # manual check_hold_status
+      return redirect_to home_pending_url if (!current_person.activity_allowed?)
+    end
+  end
 
   def index
   end

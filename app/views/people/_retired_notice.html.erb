@@ -1,0 +1,7 @@
+<div class='alert alert-warning'>
+ <h4>This account is currently retired.</h4>
+ <p>The account for <%= person.fullname %> was retired on <%= display_time(retired_account.created_at) %> by <%= link_to_person(retired_account.retiring_colleague) %>.</p>
+ <%- if(!retired_account.explanation.blank? ) -%>
+ <p>Reason: <%= retired_account.explanation -%></p>
+ <%- end -%>
+</div>

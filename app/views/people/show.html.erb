@@ -9,20 +9,16 @@
     </div>
   </div>
 </div>
+<%- elsif(@person.retired?) -%>
+<div class="row">
+  <div class="span12">
+    <%= render(partial: 'retired_notice', locals: {person: @person, retired_account: @person.retired_account}) %>
+  </div>
+</div>
 <%- end -%>
 
 <div class="row">
   <div class="span7">
-    <div class="row">
-      <div class="span12">
-      <p>#TODO Avatar <%= @person.fullname %></p>
-      </div>
-    </div>
-    <div class="row">
-      <div class="span12">
-      <p>#TODO bio</p>
-      </div>
-    </div>
     <div class="row">
       <div class="span12">
       <%= render(:partial => 'profile_information', locals: {person: @person}) %>

@@ -1,15 +1,13 @@
-<%- @page_title = "Sign up - eXtension" -%>
+<%- @page_title = "Profile Edit - #{@person.fullname}" -%>
 
 <div class="page-header">
-  <h2>eXension Sign Up <a name="signup_top"></a></h2>
+  <h2><%= @page_title %> <a name="signup_top"></a></h2>
 </div>
-
-
 
 <div class="row">
   <div class="span8">
 
-    <%= simple_form_for(@person, url: accounts_create_path, :html => { :class => 'form-horizontal' }) do |f| -%>
+    <%= simple_form_for(@person, :html => { :class => 'form-horizontal' }) do |f| -%>
 
       <%- if notification = f.error_notification -%>
         <div class="alert alert-error fade in">
@@ -27,13 +25,7 @@
       <fieldset>
         <%= f.input :first_name %>
         <%= f.input :last_name %>
-        <%= f.input :email, :input_html => { :class => 'span4' }, :hint =>  "Using a .edu or .gov email address if you have one will speed up account review." %>
-        <%= f.input :password, :hint =>  "Minimum 8 characters." %>
-
-       <%= f.input :involvement, :input_html => { :rows => 3, :class => 'span4' },
-        :label => 'Connection with Extension',
-        :hint =>  "Please list someone in Extension with whom you have a connection, and tell us how you would like to be involved with eXtension." %>
- 
+        <%= f.input :email, :input_html => { :class => 'span4' } %>
         <%= f.input :phone, :label => 'Phone number' %>
         <%= f.input :title %>
         <%= f.association :position, collection: Position.order('name'), :as => :radio_buttons %>
@@ -53,18 +45,31 @@
       </fieldset>
 
 
-      <p><%= submit_tag "Sign up", :class => "btn btn-primary" %> <%= link_to "Cancel", root_path, :class => "btn" %></p>
+      <p><%= submit_tag "Update", :class => "btn btn-primary" %> <%= link_to "Cancel", person_path(@person), :class => "btn" %></p>
 
 
     <%- end # end form -%> 
   </div>
 
       <div class="span4">
+        <%- if(@person.retired?) -%>
+          <%= render(partial: 'retired_notice', locals: {person: @person, retired_account: @person.retired_account}) %>
+          <div class="well">
+            <p><%= link_to('Restore this account','#', :class => "btn", :remote => true, :method => :post) %></p>
+          </div>
+        <%- else -%>
         <div class="well">
-        <h4>Registration Help</h4>
-        <p><%= link_to('I forgot my password', '#') %></p>
-        <p>Already registered? <%= link_to('Sign-in', signin_path) %></p>
+        <%- if current_person == @person -%>
+          <h4>Retired?</h4>
+          <p>If you are no longer working or associated with Extension, you can retire your account.</p>
+          <p><%= link_to('Retire my account','#', :class => "btn", :remote => true, :method => :post) %></p>
+          <%- else -%>
+          <h4>Retire this account?</h4>
+          <p>If <%= @person.fullname %> is no longer working or associated with Extension, you can retire their account.</p>
+          <p><%= link_to('Retire this account','#', :class => "btn", :remote => true, :method => :post) %></p>
+        <%- end -%>
         </div>
+        <%- end -%>
     </div>
   </div>
 
