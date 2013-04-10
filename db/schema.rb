@@ -209,14 +209,13 @@ ActiveRecord::Schema.define(:version => 20130211155737) do
     t.integer  "location_id",                            :default => 0
     t.integer  "county_id",                              :default => 0
     t.integer  "institution_id",                         :default => 0
-    t.boolean  "retired",                                :default => false
     t.boolean  "vouched",                                :default => false
     t.integer  "vouched_by",                             :default => 0
     t.datetime "vouched_at"
     t.boolean  "emailconfirmed",                         :default => false
     t.boolean  "is_admin",                               :default => false
     t.boolean  "announcements",                          :default => true
-    t.datetime "retired_at"
+    t.boolean  "retired",                                :default => false
     t.string   "base_login_string"
     t.integer  "login_increment"
     t.integer  "primary_account_id"
@@ -239,6 +238,17 @@ ActiveRecord::Schema.define(:version => 20130211155737) do
   end
 
   add_index "positions", ["name"], :name => "name_ndx", :unique => true
+
+  create_table "retired_accounts", :force => true do |t|
+    t.integer  "person_id",             :null => false
+    t.integer  "retiring_colleague_id"
+    t.text     "explanation"
+    t.text     "communities"
+    t.datetime "created_at",            :null => false
+    t.datetime "updated_at",            :null => false
+  end
+
+  add_index "retired_accounts", ["person_id"], :name => "person_ndx", :unique => true
 
   create_table "sent_emails", :force => true do |t|
     t.string   "hashvalue",       :limit => 40,                      :null => false

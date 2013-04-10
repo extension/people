@@ -316,6 +316,61 @@ def transform_person_additionaldata_data
   print "\t\tfinished in #{benchmark.real.round(1)}s\n"  
 end
 
+
+def transfer_retired_account_data
+  print "Transferring retired account data..."
+  benchmark = Benchmark.measure do
+    DarmokAccount.where("retired = 1").find_in_batches do |group|
+      insert_values = []
+      group.each do |account|
+        insert_list = []
+        insert_list << account.id
+        if(account.additionaldata and account.additionaldata[:retired_by])
+          insert_list << account.additionaldata[:retired_by]
+        else
+          insert_list << 'NULL'
+        end
+        if(account.additionaldata and account.additionaldata[:retired_reason])
+          insert_list << ActiveRecord::Base.quote_value(account.additionaldata[:retired_reason])
+        else
+          insert_list << 'NULL'
+        end
+        if(account.retired_at)
+          insert_list << ActiveRecord::Base.quote_value(account.retired_at.to_s(:db))
+          insert_list << ActiveRecord::Base.quote_value(account.retired_at.to_s(:db))
+        else
+          insert_list << ActiveRecord::Base.quote_value(account.updated_at.to_s(:db))
+          insert_list << ActiveRecord::Base.quote_value(account.updated_at.to_s(:db))
+        end                           
+        insert_values << "(#{insert_list.join(',')})"
+      end
+      insert_sql = "INSERT INTO #{RetiredAccount.table_name} (person_id,retiring_colleague_id,explanation,created_at,updated_at) VALUES #{insert_values.join(',')};"
+      ActiveRecord::Base.connection.execute(insert_sql)        
+    end
+  end
+  print "\t\tfinished in #{benchmark.real.round(1)}s\n"
+
+  print "Transferring communities from admin events..."
+  benchmark = Benchmark.measure do
+    DarmokAdminEvent.where("event = 300").all.each do |admin_event|
+      next if admin_event.data.nil?
+      next if admin_event.data[:userlogin].nil?
+      next if admin_event.data[:communities].nil?
+      extensionid = admin_event.data[:userlogin]
+      communityarray = admin_event.data[:communities].values
+      next if(!(person = Person.where('idstring = ?',extensionid).first))
+      query = <<-END_SQL.gsub(/\s+/, " ").strip
+        UPDATE #{@my_database}.#{RetiredAccount.table_name} SET communities = #{ActiveRecord::Base.quote_value(communityarray.to_yaml)} WHERE id = #{person.id}
+      END_SQL
+      ActiveRecord::Base.connection.execute(query)
+    end
+  end   
+  print "\t\tfinished in #{benchmark.real.round(1)}s\n"
+end
+
+
+
+
 def create_milfam_wordpress_list_email_alias
   print "Created military-families wordpress alias..."
   benchmark = Benchmark.measure do
@@ -608,6 +663,7 @@ announce_and_run_query('Transferring individual email aliases',individual_email_
 announce_and_run_query('Transferring community email aliases',community_email_alias_query)
 
 # data manipulation
+transfer_retired_account_data
 dump_never_completed_signups
 create_milfam_wordpress_list_email_alias
 transfer_community_connections

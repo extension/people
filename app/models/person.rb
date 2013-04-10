@@ -51,6 +51,8 @@ class Person < ActiveRecord::Base
   belongs_to :location
   belongs_to :position
   belongs_to :institution, class_name: 'Community'
+  belongs_to :vouching_colleague, class_name: 'Person', foreign_key: 'vouched_by'
+  has_one :retired_account
 
   has_many :community_connections, dependent: :destroy
   has_many :communities, through: :community_connections, 

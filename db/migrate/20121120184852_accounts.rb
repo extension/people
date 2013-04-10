@@ -20,14 +20,13 @@ class Accounts < ActiveRecord::Migration
       t.integer  "location_id", :default => 0
       t.integer  "county_id", :default => 0
       t.integer  "institution_id", :default => 0
-      t.boolean  "retired", :default => false
       t.boolean  "vouched", :default => false
       t.integer  "vouched_by", :default => 0
       t.datetime "vouched_at"
       t.boolean  "emailconfirmed", :default => false
       t.boolean  "is_admin", :default => false
       t.boolean  "announcements", :default => true
-      t.datetime "retired_at"
+      t.boolean  "retired", :default => false
       t.string   "base_login_string"
       t.integer  "login_increment"
       t.integer  "primary_account_id"
@@ -40,6 +39,16 @@ class Accounts < ActiveRecord::Migration
     add_index "people", ["email"], :name => "email_ndx", :unique => true
     add_index "people", ["idstring"], :name => "idstring_ndx", :unique => true
     add_index "people", ["vouched", "retired"], :name => "validity_ndx"
+
+    create_table "retired_accounts", :force => true do |t|
+      t.integer  "person_id",      :null => false
+      t.integer  "retiring_colleague_id"
+      t.text     "explanation"
+      t.text     "communities"
+      t.timestamps
+    end
+
+    add_index "retired_accounts", ["person_id"], :name => "person_ndx", :unique => true
 
 
     create_table "google_accounts", :force => true do |t|
