@@ -9,7 +9,7 @@ class PeopleController < ApplicationController
   before_filter :set_tab
 
   def show
-    @person = Person.find(params[:id])
+    @person = Person.find_by_id_or_idstring(params[:id])
   end
 
   def update

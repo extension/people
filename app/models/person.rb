@@ -114,6 +114,27 @@ class Person < ActiveRecord::Base
   }
 
 
+  def self.find_by_id_or_idstring(id,raise_not_found = true)
+    # does the id contain a least one alpha? let's search by idstring
+    if(id =~ %r{[[:alpha:]]?})
+      person = self.find_by_idstring(id)
+    end
+
+    if(!person)
+      person = self.find_by_id(id)
+    end
+
+    if(!person)
+      if(raise_not_found)
+        raise ActiveRecord::RecordNotFound
+      else
+        return nil
+      end
+    end
+
+    person
+  end
+
   def pendingreview?
     (!self.vouched? && !self.retired? && self.account_status != STATUS_SIGNUP && self.emailconfirmed?)
   end
