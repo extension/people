@@ -100,6 +100,8 @@ def account_transfer_query
       select_columns << "#{from_clause}.login"
     when 'legacy_password'
       select_columns << "#{from_clause}.password"
+    when 'phone'
+      select_columns << "#{from_clause}.phonenumber"      
     when 'last_activity_at'
       select_columns << "#{from_clause}.last_login_at"      
     else

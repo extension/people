@@ -9,7 +9,7 @@ class Accounts < ActiveRecord::Migration
       t.string   "last_name"
       t.string   "email", :limit => 96
       t.string   "title"
-      t.string   "phonenumber"
+      t.string   "phone"
       t.string   "time_zone"
       t.datetime "email_event_at"
       t.boolean  "contributor_agreement"

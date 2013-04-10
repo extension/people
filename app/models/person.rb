@@ -10,7 +10,7 @@ class Person < ActiveRecord::Base
   include BCrypt
   attr_accessor :password
 
-  attr_accessible :first_name, :last_name, :email, :title, :phonenumber, :time_zone, :affiliation, :involvement
+  attr_accessible :first_name, :last_name, :email, :title, :phone, :time_zone, :affiliation, :involvement
   attr_accessible :password
   attr_accessible :position_id, :position, :location_id, :location, :county_id, :county, :institution_id, :institution
   attr_accessible :invitation, :invitation_id 
@@ -402,6 +402,14 @@ class Person < ActiveRecord::Base
       write_attribute(:time_zone, mappings[time_zone_string])
     else
       write_attribute(:time_zone, nil)
+    end
+  end
+
+  def phone=(phone_number_string)
+    if(!phone_number_string.blank?)
+      write_attribute(:phone, phone_number_string.to_s.gsub(/[^0-9]/, ''))
+    else
+      write_attribute(:phone, nil)
     end
   end
 

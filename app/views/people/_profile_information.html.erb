@@ -32,7 +32,7 @@
   
   <p class="item">
     <span class="vcardLabel">Preferred Phone:</span>
-    <span class="tel"><%= (person.phonenumber.nil? or person.phonenumber == '') ? space_the_final_frontier  : number_to_phone(person.phonenumber, :area_code => true)%></span>
+    <span class="tel"><%= (person.phone.nil? or person.phone == '') ? space_the_final_frontier  : number_to_phone(person.phone, :area_code => true)%></span>
   </p>
   <p class="item">
     <span class="vcardLabel">Title:</span>

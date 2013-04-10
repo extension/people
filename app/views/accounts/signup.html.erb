@@ -34,7 +34,7 @@
         :label => 'Connection with Extension',
         :hint =>  "Please list someone in Extension with whom you have a connection, and tell us how you would like to be involved with eXtension." %>
  
-        <%= f.input :phonenumber, :label => 'Phone number' %>
+        <%= f.input :phone, :label => 'Phone number' %>
         <%= f.input :title %>
         <%= f.association :position, collection: Position.order('name'), :as => :radio_buttons %>
         <%= f.association :location, collection: Location.order('entrytype,name'), include_blank: true %>
