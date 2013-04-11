@@ -27,9 +27,14 @@
     </div>
   </div>
   <div class="span5">
-    <ul class="nav nav-tabs">
-      <%= link_to('Edit settings',edit_person_path(@person)) %>
-    </ul>
+    <div>
+      <ul class="nav nav-pills">
+        <li><%= link_to('Edit settings',edit_person_path(@person)) %></li>
+        <%- if current_person == @person -%>
+          <li><%= link_to('Change password',password_person_path(@person)) %></li>
+        <%- end -%>
+      </ul>
+    </div>
     <div class="well">
       <h4>Communities</h4>
       <%- if(@person.communities.count > 0) %>

@@ -8,7 +8,7 @@
 require 'bcrypt'
 class Person < ActiveRecord::Base
   include BCrypt
-  attr_accessor :password
+  attr_accessor :password, :current_password
 
   attr_accessible :first_name, :last_name, :email, :title, :phone, :time_zone, :affiliation, :involvement
   attr_accessible :password

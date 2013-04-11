@@ -131,9 +131,27 @@ class PeopleController < ApplicationController
   #   #TODO
   # end
 
-  # def password
-  #   #TODO
-  # end
+  def password
+    @person = Person.find_by_id_or_idstring(params[:id])
+    return redirect_to(person_url(current_person)) if(@person != current_person)
+    if(request.post?)
+      if(!params[:person])
+        @person.errors.add(:base, "Missing parameters".html_safe)
+      elsif(!params[:person][:current_password])
+        @person.errors.add(:current_password, "You must include your current password".html_safe)
+      elsif(!@person.check_password(params[:person][:current_password]))
+        @person.errors.add(:current_password, "Your current password is not correct".html_safe)
+      elsif(!params[:person][:password] or params[:person][:password].length < 8)
+        @person.errors.add(:password, "Your new password must be a minimum of 8 characters".html_safe)
+      else
+        @person.password = params[:person][:password]
+        if(@person.set_hashed_password(save: true))
+          flash[:notice] = 'Your password has been changed'
+          return redirect_to(person_url(current_person))
+        end
+      end
+    end
+  end
 
   private
 
