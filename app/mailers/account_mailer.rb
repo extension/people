@@ -62,5 +62,21 @@ class AccountMailer < BaseMailer
     return_email    
   end  
 
+  def profile_update(options={})
+    @bycolleague = options[:colleague]
+    @recipient = options[:recipient]
+    @what_changed = options[:what_changed]
+    @subject = "eXtension: Your profile was updated by a colleague"
+    @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
+    
+    if(!@recipient.email.blank?)
+      mail_options = {to: @recipient.email, subject: @subject}
+      mail_options[:cc] = @bycolleague.email if !@bycolleague.email.blank?     
+      return_email = mail(mail_options)
+      save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
+    end
+    
+    return_email    
+  end
 
 end

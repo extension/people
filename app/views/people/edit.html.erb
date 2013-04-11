@@ -25,22 +25,27 @@
       <fieldset>
         <%= f.input :first_name %>
         <%= f.input :last_name %>
-        <%= f.input :email, :input_html => { :class => 'span4' } %>
+        <%- if(current_person == @person or current_person.is_admin? ) -%>
+          <%= f.input :email, :input_html => { :class => 'span4' } %>
+        <%- end -%>
+        <!-- TODO number_to_phone -->
         <%= f.input :phone, :label => 'Phone number' %>
         <%= f.input :title %>
         <%= f.association :position, collection: Position.order('name'), :as => :radio_buttons %>
         <%= f.association :location, collection: Location.order('entrytype,name'), include_blank: true %>
-        <%= f.association :county, collection: (@person.location.blank? ? [] : @person.location.counties.order("name")), include_blank: true, wrapper_html: { id: 'county_select', style: @person.location.blank? ? 'display:none;' : '' } %>
+        <%= f.association :county, 
+                          collection: (@person.location.blank? ? [] : @person.location.counties.order("name")), 
+                          include_blank: true, 
+                          wrapper_html: { id: 'county_select', style: @person.location.blank? ? 'display:none;' : '' } %>
+        <!-- TODO: display only their own institutions -->
         <%= f.association :institution, 
-                  collection: (@person.location.blank? ? Community.institutions.order("name") : @person.location.communities.institutions.order("name")), 
-                  include_blank: true, 
-                  wrapper_html: { id: 'institution_select'},
-                  input_html: {class: 'span4'} %>
-
-
-<%= f.input :affiliation, 
-            :input_html => { :class => 'span4' }, 
-            :hint =>  "Department or other affiliation at your institution or another institution if yours was not listed." %>
+                          collection: (@person.location.blank? ? Community.institutions.order("name") : @person.location.communities.institutions.order("name")), 
+                          include_blank: true, 
+                          wrapper_html: { id: 'institution_select'},
+                          input_html: {class: 'span4'} %>
+        <%= f.input :affiliation, 
+                    :input_html => { :class => 'span4' }, 
+                    :hint =>  "Department or other affiliation at your institution or another institution if yours was not listed." %>
 
       </fieldset>
 

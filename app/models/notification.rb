@@ -36,6 +36,9 @@ class Notification < ActiveRecord::Base
   CONFIRM_EMAIL_CHANGE                = 106  
   CONFIRM_PASSWORD                    = 107
 
+  # colleague profile
+  UPDATE_COLLEAGUE_PROFILE            = 111
+
   # community
   COMMUNITY_JOIN                      = 201
   COMMUNITY_PENDING                   = 202
@@ -55,6 +58,8 @@ class Notification < ActiveRecord::Base
   # eXtensionID Invitation
   INVITATION_TO_EXTENSIONID           = 400
   INVITATION_ACCEPTED                 = 401
+
+
   
 
   def set_delivery_time
@@ -88,6 +93,17 @@ class Notification < ActiveRecord::Base
 
   def welcome
     AccountMailer.welcome({recipient: self.notifiable, notification: self}).deliver
+  end
+
+  def update_colleague_profile
+    if(self.additionaldata.blank? or self.additionaldata[:what_changed].blank? or self.additionaldata[:colleague_id].blank?)
+      raise NotificationError, 'Missing additionaldata'
+    end
+
+    if(!(colleague = Person.find(self.additionaldata[:colleague_id])))
+      raise NotificationError, 'Invalid connector_id in additionaldata'
+    end
+    AccountMailer.profile_update({recipient: self.notifiable, colleague: colleague, notification: self, what_changed: self.additionaldata[:what_changed]}).deliver
   end
 
   def community_join

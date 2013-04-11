@@ -669,6 +669,7 @@ class Person < ActiveRecord::Base
     end
   end
 
+
   private
 
   def check_account_status

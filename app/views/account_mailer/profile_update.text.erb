@@ -1,0 +1,27 @@
+<%= render(:partial => 'shared_mailer/demo_notice') if is_demo? -%>
+Hi <%= @recipient.first_name %>,
+
+Your profile has been updated by a colleague.
+
+<% if !@bycolleague.is_system_account? %>
+The colleague that performed this action is:
+
+ <%= @bycolleague.fullname %>
+ <%= @bycolleague.email %>
+ <%= person_url(@bycolleague) %>
+
+<%else%>
+This action was performed by an automated script.
+<%end%>
+
+<%- if !@what_changed.blank? -%>
+These are the items that were changed:
+
+<%= profile_changes_text(@what_changed) -%>
+
+<%- end -%>
+
+
+<%= render(:partial => 'shared_mailer/help_footer') %>
+
+

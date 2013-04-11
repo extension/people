@@ -3,7 +3,6 @@
 #  Developed with funding for the National eXtension Initiative.
 # === LICENSE:
 #  see LICENSE file
-
 class PeopleController < ApplicationController
   skip_before_filter :check_hold_status, only: [:edit, :update]
   before_filter :set_tab
@@ -12,16 +11,49 @@ class PeopleController < ApplicationController
     @person = Person.find_by_id_or_idstring(params[:id])
   end
 
-  def update
-    #TODO
-  end
-
   def edit
     @person = Person.find(params[:id])
     # if @person != current_person
     if(@person != current_person)
       # manual check_hold_status
       return redirect_to home_pending_url if (!current_person.activity_allowed?)
+    end
+  end
+
+  def update
+    @person = Person.find(params[:id])
+    if(current_person != @person and !current_person.is_admin? )
+      update_params = params[:person].reject{|attribute,value| attribute == 'email'}
+    else
+      update_params = params[:person]
+    end
+
+    if @person.update_attributes(params[:person])
+      what_changed = @person.previous_changes.reject{|attribute,value| ['updated_at'].include?(attribute)}
+      # todo check email change or do it in the model
+
+      if(current_person == @person)
+        Activity.log_activity(person_id: @person.id, 
+                              activitycode: Activity::UPDATE_PROFILE, 
+                              ip_address: request.remote_ip, 
+                              additionaldata: {what_changed: what_changed})  
+      else
+        # notification
+        Notification.create(notifiable: @person, 
+                            notification_type: Notification::UPDATE_COLLEAGUE_PROFILE, 
+                            additionaldata: {what_changed: what_changed, colleague_id: current_person.id})
+
+        # activity log
+        Activity.log_activity(person_id: @person.id, 
+                              activitycode: Activity::UPDATE_COLLEAGUE_PROFILE, 
+                              ip_address: request.remote_ip,
+                              colleague_id: current_person.id, 
+                              additionaldata: {what_changed: what_changed})
+      end          
+
+      return redirect_to(@person, :notice => 'Profile was updated.')
+    else
+      render :action => 'edit'
     end
   end
 

@@ -27,9 +27,9 @@
     </div>
   </div>
   <div class="span5">
-    <div class="well">
-      <p>#TODO edit</p>
-    </div>
+    <ul class="nav nav-tabs">
+      <%= link_to('Edit settings',edit_person_path(@person)) %>
+    </ul>
     <div class="well">
       <h4>Communities</h4>
       <%- if(@person.communities.count > 0) %>

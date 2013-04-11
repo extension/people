@@ -61,6 +61,7 @@ class Activity < ActiveRecord::Base
   UPDATE_PROFILE                      = 105
   INVITATION_ACCEPTED                 = 109
   REVIEW_REQUEST                      = 110
+  UPDATE_COLLEAGUE_PROFILE            = 111
 
   # COMMUNITY
   COMMUNITY_CREATE                    = 200
@@ -111,7 +112,7 @@ class Activity < ActiveRecord::Base
     create_parameters = {}
     create_parameters[:person_id] = options[:person_id]
     create_parameters[:site] = options[:site] || 'local'
-    create_parameters[:activitycode] = AUTH_LOCAL_SUCCESS
+    create_parameters[:activitycode] = options[:activitycode]
     create_parameters[:additionalinfo] = options[:additionalinfo]
     create_parameters[:additionaldata] = options[:additionaldata]
     create_parameters[:ip_address] = options[:ip_address] || 'unknown'
