@@ -90,6 +90,10 @@ class Notification < ActiveRecord::Base
     AccountMailer.signup({recipient: self.notifiable, notification: self}).deliver
   end
 
+  def confirm_email
+    AccountMailer.confirm({recipient: self.notifiable, notification: self}).deliver
+  end
+
   def welcome
     AccountMailer.welcome({recipient: self.notifiable, notification: self}).deliver
   end

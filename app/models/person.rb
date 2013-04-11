@@ -21,7 +21,7 @@ class Person < ActiveRecord::Base
   # account status
   STATUS_CONTRIBUTOR = 0
   STATUS_REVIEW = 1
-  STATUS_CONFIRMEMAIL = 2
+  STATUS_CONFIRM_EMAIL = 2
   STATUS_REVIEWAGREEMENT = 3
   STATUS_PARTICIPANT = 4
   STATUS_RETIRED = 5
@@ -331,7 +331,7 @@ class Person < ActiveRecord::Base
       self.previous_email = self.previous_changes['email'][0]
       self.email_confirmed = false
       self.email_confirmed_at = nil
-      self.account_status = CONFIRM_EMAIL
+      self.account_status = STATUS_CONFIRM_EMAIL
       if(self.save)
         Activity.log_activity(options.merge({person_id: self.id,
                                             activitycode: Activity::EMAIL_CHANGE, 
@@ -720,7 +720,7 @@ class Person < ActiveRecord::Base
   def check_account_status
     if (!self.retired? and self.account_status != STATUS_SIGNUP)
       if (!self.email_confirmed?)
-        self.account_status = STATUS_CONFIRMEMAIL if (account_status != STATUS_INVALIDEMAIL and account_status != STATUS_INVALIDEMAIL_FROM_SIGNUP)
+        self.account_status = STATUS_CONFIRM_EMAIL if (account_status != STATUS_INVALIDEMAIL and account_status != STATUS_INVALIDEMAIL_FROM_SIGNUP)
       elsif (!self.vouched?)
         self.account_status = STATUS_REVIEW
       elsif self.contributor_agreement.nil?

@@ -39,7 +39,7 @@ module AccountsHelper
       explanation = "<p>Your account is pending review. #{link_to('Learn more about account reviews',accounts_review_path)}</p>"
     when Person::STATUS_SIGNUP
       explanation = "<p>You need to confirm your email address. #{link_to('Learn more about email confirmation',accounts_pending_confirmation_path)}</p>"
-    when Person::STATUS_CONFIRMEMAIL
+    when Person::STATUS_CONFIRM_EMAIL
       explanation = "<p>You need to confirm your email address. #{link_to('Learn more about email confirmation',accounts_pending_confirmation_path)}</p>"
     when Person::STATUS_RETIRED
       explanation = "<p>Your account has been retired. #{link_to('Contact us for more information.',help_path)}</p>"

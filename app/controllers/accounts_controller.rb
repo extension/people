@@ -56,8 +56,8 @@ class AccountsController < ApplicationController
     case status_code
     when Person::STATUS_SIGNUP
       confirm_signup
-    when Person::STATUS_CONFIRMEMAIL
-
+    when Person::STATUS_CONFIRM_EMAIL
+      confirm_email
     else
       return render(:template => 'account/invalid_token')
     end
@@ -145,6 +145,7 @@ class AccountsController < ApplicationController
       return redirect_to(root_url)
     end
     
+    flash[:notice] = "Thank you for confirming your email address"
     current_person.confirm_signup({ip_address: request.remote_ip})
     if(current_person.vouched?)
       return redirect_to(root_url)
@@ -154,12 +155,12 @@ class AccountsController < ApplicationController
   end
 
   def confirm_email
-    # signup status check
-    if(current_person.account_status != Person::CONFIRM_EMAIL)
+    if(current_person.account_status != Person::STATUS_CONFIRM_EMAIL and current_person.email_confirmed?)
       flash[:notice] = "You have already confirmed your email address"
       return redirect_to(root_url)
     end
     
+    flash[:notice] = "Thank you for confirming your email address"
     current_person.confirm_email({ip_address: request.remote_ip})
     return redirect_to(root_url)
   end 
