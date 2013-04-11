@@ -325,6 +325,10 @@ class Person < ActiveRecord::Base
     self.email_aliases.where(mail_alias: self.idstring).first
   end
 
+  def resend_confirmation
+    Notification.create(:notification_type => Notification::CONFIRM_EMAIL, :notifiable => self)
+  end
+
 
   def check_email_change(options = {})
     if(self.previous_changes.keys.include?('email'))

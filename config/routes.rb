@@ -27,6 +27,7 @@ People::Application.routes.draw do
     simple_named_route 'contributor_agreement'
     simple_named_route 'post_signup'
     simple_named_route 'pending_confirmation'
+    simple_named_route 'resend_confirmation'
   end    
 
   resources :people, only: [:index, :show, :edit, :update] do

@@ -6,7 +6,7 @@
 
 class AccountsController < ApplicationController
   skip_before_filter :check_hold_status
-  skip_before_filter :signin_required, except: [:post_signup, :confirm]
+  skip_before_filter :signin_required, except: [:post_signup, :confirm, :resend_confirmation, :pending_confirmation]
   before_filter :signin_optional
 
   def signout
@@ -42,6 +42,17 @@ class AccountsController < ApplicationController
   end
 
   def reset_password
+  end
+
+  def resend_confirmation
+    if([Person::STATUS_SIGNUP,Person::STATUS_CONFIRM_EMAIL].include?(current_person.account_status) and !current_person.emailconfirmed?)
+      current_person.resend_confirmation
+      flash[:notice] = 'Confirmation email resent.'
+      return redirect_to(accounts_pending_confirmation_url)
+    else
+      flash[:notice] = 'No need to resend confirmation, your email address is confirmed.'
+      return redirect_to(root_url)     
+    end
   end
 
   def confirm
