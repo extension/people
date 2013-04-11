@@ -59,6 +59,9 @@ class Activity < ActiveRecord::Base
   INVITATION                          = 102
   VOUCHED_FOR                         = 104
   UPDATE_PROFILE                      = 105
+  EMAIL_CHANGE                        = 106
+  PASSWORD_CHANGE                     = 107
+  CONFIRMED_EMAIL                     = 108
   INVITATION_ACCEPTED                 = 109
   REVIEW_REQUEST                      = 110
   UPDATE_COLLEAGUE_PROFILE            = 111

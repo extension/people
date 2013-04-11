@@ -197,10 +197,11 @@ ActiveRecord::Schema.define(:version => 20130211155737) do
     t.string   "first_name"
     t.string   "last_name"
     t.string   "email",                    :limit => 96
+    t.string   "previous_email",           :limit => 96
     t.string   "title"
     t.string   "phone"
     t.string   "time_zone"
-    t.datetime "email_event_at"
+    t.datetime "email_confirmed_at"
     t.boolean  "contributor_agreement"
     t.datetime "contributor_agreement_at"
     t.integer  "account_status"
@@ -212,7 +213,7 @@ ActiveRecord::Schema.define(:version => 20130211155737) do
     t.boolean  "vouched",                                :default => false
     t.integer  "vouched_by",                             :default => 0
     t.datetime "vouched_at"
-    t.boolean  "emailconfirmed",                         :default => false
+    t.boolean  "email_confirmed",                        :default => false
     t.boolean  "is_admin",                               :default => false
     t.boolean  "announcements",                          :default => true
     t.boolean  "retired",                                :default => false

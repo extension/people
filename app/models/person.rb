@@ -15,6 +15,8 @@ class Person < ActiveRecord::Base
   attr_accessible :position_id, :position, :location_id, :location, :county_id, :county, :institution_id, :institution
   attr_accessible :invitation, :invitation_id 
 
+
+
   ## constants
   # account status
   STATUS_CONTRIBUTOR = 0
@@ -74,7 +76,7 @@ class Person < ActiveRecord::Base
                                    social_networks.*"  
   ## scopes  
   scope :validaccounts, where("retired = #{false} and vouched = #{true}") 
-  scope :pendingreview, where("retired = #{false} and vouched = #{false} and account_status != #{STATUS_SIGNUP} && emailconfirmed = #{true}")
+  scope :pendingreview, where("retired = #{false} and vouched = #{false} and account_status != #{STATUS_SIGNUP} && email_confirmed = #{true}")
 
   
   # duplicated from darmok
@@ -136,7 +138,7 @@ class Person < ActiveRecord::Base
   end
 
   def pendingreview?
-    (!self.vouched? && !self.retired? && self.account_status != STATUS_SIGNUP && self.emailconfirmed?)
+    (!self.vouched? && !self.retired? && self.account_status != STATUS_SIGNUP && self.email_confirmed?)
   end
 
   def validaccount?
@@ -323,11 +325,50 @@ class Person < ActiveRecord::Base
     self.email_aliases.where(mail_alias: self.idstring).first
   end
 
+
+  def check_email_change(options = {})
+    if(self.previous_changes.keys.include?('email'))
+      self.previous_email = self.previous_changes['email'][0]
+      self.email_confirmed = false
+      self.email_confirmed_at = nil
+      self.account_status = CONFIRM_EMAIL
+      if(self.save)
+        Activity.log_activity(options.merge({person_id: self.id,
+                                            activitycode: Activity::EMAIL_CHANGE, 
+                                            additionalinfo: "changed to #{self.email} from #{self.previous_email}",
+                                            additionaldata: {from: self.previous_email, to: self.email}}))
+        Notification.create(:notification_type => Notification::CONFIRM_EMAIL, :notifiable => self)
+        return true
+      else
+        return false
+      end      
+    else
+      return false
+    end
+  end
+
+  def confirm_email(options = {})
+    self.email_confirmed = true
+    self.email_confirmed_at = Time.zone.now
+    self.account_status = STATUS_OK
+    if(self.save)
+      Activity.log_activity(person_id: self.id, activitycode: Activity::CONFIRMED_EMAIL, additionalinfo: self.email, ip_address: options[:ip_address])
+      return true
+    else
+      return false
+    end
+  end
+
   def create_email_forward
     self.set_email_forward(googleapps: false)
   end
 
   def update_email_forward
+
+    # do nothing if the email isn't confirmed
+    # "true" because this runs as a callback
+    return true if(!self.email_confirmed?)
+
     current_forward = self.email_forward
     if(current_forward and current_forward.alias_type == EmailAlias::FORWARD)
       current_forward.update_attributes({destination: self.email})
@@ -338,6 +379,10 @@ class Person < ActiveRecord::Base
 
   def set_email_forward(options = {})
     return nil if(options[:destination].blank? and options[:googleapps].blank?)
+
+    # do nothing if the email isn't confirmed
+    # "true" because this runs as a callback
+    return true if(!self.email_confirmed?)
   
     current_forward = self.email_forward
     if(self.email =~ /extension\.org$/i)
@@ -467,15 +512,15 @@ class Person < ActiveRecord::Base
     end  
 
     # email settings
-    self.emailconfirmed = true
-    self.email_event_at = now
+    self.email_confirmed = true
+    self.email_confirmed_at = now
     self.account_status = STATUS_OK # will get reset before_save via :check_account_status if not valid
 
     if(self.save)
 
       # log signup
       if(options[:nolog].nil? or !options[:nolog])
-        Activity.log_activity(person_id: self.id, activitycode: Activity::SIGNUP, ip_address: options[:ip_address])
+        Activity.log_activity(person_id: self.id, activitycode: Activity::CONFIRMED_EMAIL, ip_address: options[:ip_address])
       end
 
       if(self.vouched?)
@@ -674,7 +719,7 @@ class Person < ActiveRecord::Base
 
   def check_account_status
     if (!self.retired? and self.account_status != STATUS_SIGNUP)
-      if (!self.emailconfirmed?)
+      if (!self.email_confirmed?)
         self.account_status = STATUS_CONFIRMEMAIL if (account_status != STATUS_INVALIDEMAIL and account_status != STATUS_INVALIDEMAIL_FROM_SIGNUP)
       elsif (!self.vouched?)
         self.account_status = STATUS_REVIEW

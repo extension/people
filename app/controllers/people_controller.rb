@@ -30,7 +30,7 @@ class PeopleController < ApplicationController
 
     if @person.update_attributes(params[:person])
       what_changed = @person.previous_changes.reject{|attribute,value| ['updated_at'].include?(attribute)}
-      # todo check email change or do it in the model
+      @person.check_email_change({colleague_id: current_person.id, ip_address: request.remote_ip})
 
       if(current_person == @person)
         Activity.log_activity(person_id: @person.id, 

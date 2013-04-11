@@ -129,9 +129,9 @@ class AdminController < ApplicationController
     @recent_users = User.notsystem_or_admin.validusers.count(:conditions => "created_at > date_sub(curdate(), interval #{AppConfig.configtable['recent_account_delta']} day)")
     @recent_logins = User.notsystem_or_admin.validusers.count(:conditions => "last_login_at > date_sub(curdate(), interval #{AppConfig.configtable['recent_login_delta']} day)")
 
-    @review_users = User.count(:conditions => ["vouched = 0 AND retired = 0 AND emailconfirmed = 1"])
+    @review_users = User.count(:conditions => ["vouched = 0 AND retired = 0 AND email_confirmed = 1"])
     @retired_accounts = User.count(:conditions => ["retired = 1"])
-    @confirmemail_users = User.count(:conditions => ["emailconfirmed = 0 and retired = 0 and account_status != #{User::STATUS_SIGNUP}"])
+    @confirmemail_users = User.count(:conditions => ["email_confirmed = 0 and retired = 0 and account_status != #{User::STATUS_SIGNUP}"])
     @confirmaccount_users = User.count(:conditions => ["account_status = #{User::STATUS_SIGNUP} and retired = 0"])
     @invalidemail_users = User.count(:conditions => ["(account_status = #{User::STATUS_INVALIDEMAIL} or account_status = #{User::STATUS_INVALIDEMAIL_FROM_SIGNUP}) AND retired = 0"])
     
@@ -228,7 +228,7 @@ class AdminController < ApplicationController
     
     labels[:page_title] = "Users pending review"
     findopts[:order] = 'updated_at desc'
-    findopts[:conditions] = "vouched = 0 AND retired = 0 AND emailconfirmed = 1"
+    findopts[:conditions] = "vouched = 0 AND retired = 0 AND email_confirmed = 1"
     userlist(false,'review_users',labels,findopts)
   end
 
@@ -288,7 +288,7 @@ class AdminController < ApplicationController
     
     labels[:page_title] = "Users that have not confirmed their email address"
     findopts[:order] = 'updated_at desc'
-    findopts[:conditions] = "emailconfirmed = 0 and retired = 0 and account_status != #{User::STATUS_SIGNUP}"
+    findopts[:conditions] = "email_confirmed = 0 and retired = 0 and account_status != #{User::STATUS_SIGNUP}"
     userlist(false,'confirmemail_users',labels,findopts)
   end  
   

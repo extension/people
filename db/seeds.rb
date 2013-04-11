@@ -89,7 +89,7 @@ end
 
 
 def account_transfer_query
-  reject_columns = ['password_hash','involvement','institution_id','invitation_id']
+  reject_columns = ['password_hash','involvement','institution_id','invitation_id','previous_email']
   columns = Person.column_names.reject{|n| reject_columns.include?(n)}
   insert_clause = "#{@my_database}.#{Person.table_name} (#{columns.join(',')})"
   from_clause = "#{@darmok_database}.accounts"
@@ -100,6 +100,10 @@ def account_transfer_query
       select_columns << "#{from_clause}.login"
     when 'legacy_password'
       select_columns << "#{from_clause}.password"
+    when 'email_confirmed'
+      select_columns << "#{from_clause}.emailconfirmed"      
+    when 'email_confirmed_at'
+      select_columns << "#{from_clause}.email_event_at"
     when 'phone'
       select_columns << "#{from_clause}.phonenumber"      
     when 'last_activity_at'

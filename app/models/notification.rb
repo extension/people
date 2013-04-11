@@ -33,7 +33,6 @@ class Notification < ActiveRecord::Base
   RECONFIRM_SIGNUP                    = 103
   CONFIRM_EMAIL                       = 104
   RECONFIRM_EMAIL                     = 105
-  CONFIRM_EMAIL_CHANGE                = 106  
   CONFIRM_PASSWORD                    = 107
 
   # colleague profile
