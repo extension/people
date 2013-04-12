@@ -361,10 +361,11 @@ def transfer_retired_account_data
       next if admin_event.data[:userlogin].nil?
       next if admin_event.data[:communities].nil?
       extensionid = admin_event.data[:userlogin]
-      communityarray = admin_event.data[:communities].values
+      communityhash = {}
+      admin_event.data[:communities].values.map{|id| communityhash[id] = 'member'}
       next if(!(person = Person.where('idstring = ?',extensionid).first))
       query = <<-END_SQL.gsub(/\s+/, " ").strip
-        UPDATE #{@my_database}.#{RetiredAccount.table_name} SET communities = #{ActiveRecord::Base.quote_value(communityarray.to_yaml)} WHERE id = #{person.id}
+        UPDATE #{@my_database}.#{RetiredAccount.table_name} SET communities = #{ActiveRecord::Base.quote_value(communityhash.to_yaml)} WHERE id = #{person.id}
       END_SQL
       ActiveRecord::Base.connection.execute(query)
     end

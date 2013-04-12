@@ -75,7 +75,7 @@ class PeopleController < ApplicationController
 
   def vouch
     @person = Person.find(params[:id])
-    if params[:explanation].nil? or params[:explanation].empty?
+    if params[:explanation].blank?
       flash[:failure] = 'An explanation for vouching for this eXtensionID is required'
       return redirect_to(person_url(@person))
     else
@@ -83,7 +83,7 @@ class PeopleController < ApplicationController
         flash[:success] = "Vouched for #{@person.fullname}"
         return redirect_to(person_url(@person))
       else
-        flash[:failure] = 'Failed to vouch for user, reported status may not be correct'
+        flash[:failure] = "Failed to vouch for #{@person.first_name}, reported status may not be correct"
         return redirect_to(person_url(@person))
       end
     end
@@ -111,6 +111,34 @@ class PeopleController < ApplicationController
       end
     else
       @invitation = Invitation.new()
+    end
+  end
+
+  def retire
+    @person = Person.find(params[:id])
+    if(request.post?)
+      if((current_person != @person) and (params[:explanation].blank?))
+        flash[:failure] = 'An explanation for retiring this account is required'
+      else
+        if(@person.retire({colleague: current_person, explanation: params[:explanation], ip_address: request.remote_ip}))
+          flash[:success] = "Retired the account for #{@person.fullname}"
+          return redirect_to(person_url(@person))
+        else
+          flash[:failure] = 'Failed to retire the account, reported status may not be correct'
+          return redirect_to(person_url(@person))
+        end
+      end
+    end
+  end
+
+  def restore
+    @person = Person.find(params[:id])
+    if(@person.restore({colleague: current_person, ip_address: request.remote_ip}))
+      flash[:success] = "Restored the account for #{@person.fullname}"
+      return redirect_to(person_url(@person))
+    else
+      flash[:failure] = 'Failed to restore the account, reported status may not be correct'
+      return redirect_to(person_url(@person))
     end
   end
 

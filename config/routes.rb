@@ -32,6 +32,9 @@ People::Application.routes.draw do
 
   resources :people, only: [:index, :show, :edit, :update] do
     member do
+      get :retire
+      post :retire
+      post :restore
       post :vouch
       get  :password
       post :password

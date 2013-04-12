@@ -118,6 +118,7 @@ class Activity < ActiveRecord::Base
     create_parameters[:activitycode] = options[:activitycode]
     create_parameters[:additionalinfo] = options[:additionalinfo]
     create_parameters[:additionaldata] = options[:additionaldata]
+    create_parameters[:colleague_id] = options[:colleague_id]  
     create_parameters[:ip_address] = options[:ip_address] || 'unknown'
 
     self.create(create_parameters)

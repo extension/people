@@ -44,7 +44,7 @@ class Accounts < ActiveRecord::Migration
     create_table "retired_accounts", :force => true do |t|
       t.integer  "person_id",      :null => false
       t.integer  "retiring_colleague_id"
-      t.text     "explanation"
+      t.string   "explanation"
       t.text     "communities"
       t.timestamps
     end

@@ -243,7 +243,7 @@ ActiveRecord::Schema.define(:version => 20130211155737) do
   create_table "retired_accounts", :force => true do |t|
     t.integer  "person_id",             :null => false
     t.integer  "retiring_colleague_id"
-    t.text     "explanation"
+    t.string   "explanation"
     t.text     "communities"
     t.datetime "created_at",            :null => false
     t.datetime "updated_at",            :null => false

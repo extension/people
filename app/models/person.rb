@@ -623,11 +623,15 @@ class Person < ActiveRecord::Base
       oldconnectiontype = connection.connectiontype
       connection.update_attributes({connectiontype: connectiontype})
       Activity.log_community_connection_change(options.merge({person_id: self.id, community_id: community.id, connectiontype: connectiontype, oldconnectiontype: oldconnectiontype}))
-      Notification.create_community_connection_change(options.merge({person_id: self.id, community_id: community.id, connectiontype: connectiontype, oldconnectiontype: oldconnectiontype}))
+      if(options[:nonotify].nil? or !options[:nonotify])
+        Notification.create_community_connection_change(options.merge({person_id: self.id, community_id: community.id, connectiontype: connectiontype, oldconnectiontype: oldconnectiontype}))
+      end
     else
       self.community_connections.create(community_id: community.id, sendnotifications: (connectiontype == 'leader'), connectiontype: connectiontype)
       Activity.log_community_connection(options.merge({person_id: self.id, community_id: community.id, connectiontype: connectiontype}))
-      Notification.create_community_connection(options.merge({person_id: self.id, community_id: community.id, connectiontype: connectiontype}))
+      if(options[:nonotify].nil? or !options[:nonotify])
+        Notification.create_community_connection(options.merge({person_id: self.id, community_id: community.id, connectiontype: connectiontype}))
+      end
     end
     true
   end
@@ -650,7 +654,9 @@ class Person < ActiveRecord::Base
 
       connection.destroy
       Activity.log_community_removal(options.merge({person_id: self.id, community_id: community.id, oldconnectiontype: oldconnectiontype}))
-      Notification.create_community_removal(options.merge({person_id: self.id, community_id: community.id, oldconnectiontype: oldconnectiontype}))
+      if(options[:nonotify].nil? or !options[:nonotify])
+        Notification.create_community_removal(options.merge({person_id: self.id, community_id: community.id, oldconnectiontype: oldconnectiontype}))
+      end
       true
     end    
   end
@@ -702,7 +708,6 @@ class Person < ActiveRecord::Base
     (self.email =~ /edu$|gov$|mil$/i) ? true : false
   end
 
-
   def status_token
     hashids = Hashids.new("#{Settings.token_salt}::#{self.email}")
     hashids.encrypt(self.id,self.account_status)
@@ -716,6 +721,61 @@ class Person < ActiveRecord::Base
     else
       statuscode
     end
+  end
+
+
+  def retire(options = {})
+    return false if self.retired?
+    colleague = options[:colleague]
+    self.retired = true
+    self.save
+
+    communities = {}
+    self.communities.map{|c| communities[c.id] = c.connectiontype}
+    self.create_retired_account(retiring_colleague_id: colleague.id, explanation: options[:explanation], communities: communities)
+
+
+    # drop community connections
+    self.communities.each do |c|
+      self.remove_from_community(c,{:nonotify => true, :connector_id => colleague.id, :ip_address => options[:ip_address]})
+    end
+
+    # log it
+    if(options[:nolog].nil? or !options[:nolog])
+      Activity.log_activity(person_id: colleague.id, 
+                            activitycode: Activity::RETIRE_ACCOUNT, 
+                            colleague_id: self.id, 
+                            additionalinfo: options[:explanation], 
+                            ip_address: options[:ip_address])
+    end
+    true
+  end  
+
+  def restore(options={})
+    return false if !self.retired?
+    colleague = options[:colleague]
+    self.retired = false
+    self.save
+
+    if(self.retired_account)
+      self.retired_account.communities.each do |community_id,connectiontype|
+        if(community = Community.find_by_id(community_id))
+          self.connect_to_community(community,connectiontype,{:connector_id => colleague.id, :nonotify => true, :ip_address => options[:ip_address]})
+        end
+      end
+      self.retired_account.destroy
+    end
+
+    # log it
+    if(options[:nolog].nil? or !options[:nolog])
+      Activity.log_activity(person_id: colleague.id, 
+                            activitycode: Activity::ENABLE_ACCOUNT, 
+                            colleague_id: self.id, 
+                            additionalinfo: options[:explanation], 
+                            ip_address: options[:ip_address])
+    end
+
+    true
   end
 
 

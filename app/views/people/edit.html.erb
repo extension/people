@@ -60,18 +60,18 @@
         <%- if(@person.retired?) -%>
           <%= render(partial: 'retired_notice', locals: {person: @person, retired_account: @person.retired_account}) %>
           <div class="well">
-            <p><%= link_to('Restore this account','#', :class => "btn", :remote => true, :method => :post) %></p>
+            <p><%= link_to('Restore this account',restore_person_path(@person), :class => "btn", :method => :post) %></p>
           </div>
         <%- else -%>
         <div class="well">
         <%- if current_person == @person -%>
           <h4>Retired?</h4>
           <p>If you are no longer working or associated with Extension, you can retire your account.</p>
-          <p><%= link_to('Retire my account','#', :class => "btn", :remote => true, :method => :post) %></p>
+          <p><%= link_to('Retire my account',retire_person_path(@person), :class => "btn") %></p>
           <%- else -%>
           <h4>Retire this account?</h4>
           <p>If <%= @person.fullname %> is no longer working or associated with Extension, you can retire their account.</p>
-          <p><%= link_to('Retire this account','#', :class => "btn", :remote => true, :method => :post) %></p>
+          <p><%= link_to('Retire this account',retire_person_path(@person), :class => "btn") %></p>
         <%- end -%>
         </div>
         <%- end -%>
