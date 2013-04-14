@@ -1,0 +1,27 @@
+<%- @page_title = "eXtension - Password Reset Confirmation" -%>
+
+<div class="row">
+  <div class="span12">
+    <h2>Password Reset Confirmation</h2>
+    <p>In order to reset your password, we have sent a reset link to: <code class="email"><%= @person.email %></code></p>
+    <p>This link includes a special "code" to validate the email address on your account and to allow you to set a new password f</p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+    <div class="well">
+      <h2>If you didn't receive the email yet...</h2>
+
+      <p>Sometimes emails can get delayed up to a few hours. It's also possible for email to be mistakenly flagged as spam by your email provider. You may want to check your Spam or Junk folders to see if it's there.</p>
+
+      <p>This email will be from: <code><%= Settings.email_from_name %> &lt;<%= Settings.email_from_address %>&gt;</code></p>
+
+      <p>with the subject: <code><%= I18n.translate("email.subjects.email_confirmation") %></code></p>
+
+      <p>If you don't receive the email within the next 24 hours,  
+        please try <%= link_to("sending another confirmation email", accounts_reset_password_path) %> or 
+        <%= link_to("contact us", help_path) %> for more information.</p>
+    </div>
+  </div>
+</div>

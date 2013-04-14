@@ -42,6 +42,60 @@ class AccountsController < ApplicationController
   end
 
   def reset_password
+    if(request.post?)
+      if(!params[:email])
+        flash.now[:error] = 'You must provide your email address'
+      else
+        @person = Person.find_by_email(params[:email])
+        if(@person.nil?)
+          @person = Person.find_by_login(params[:email])
+        end
+
+        if(@person.nil?)
+          flash.now[:warning] = "We are not able to find an account registered with that email address"
+        elsif(Settings.reserved_uids.include?(@person.id))
+          flash.now[:warning] = "The password for that account can't be reset"
+        elsif(@person.retired?)
+          flash.now[:warning] = "Your account has been retired. #{link_to('Contact us for more information.',help_path)}".html_safe
+        else
+          Activity.log_activity(person_id: @person.id, activitycode: Activity::PASSWORD_RESET_REQUEST, ip_address: request.remote_ip)
+          Notification.create(:notification_type => Notification::PASSWORD_RESET_REQUEST, :notifiable => @person)
+          return render(template: 'accounts/pending_reset_confirmation')
+        end
+      end
+    end
+  end
+
+  def set_password
+    #TODO investigate mechanisms to slow this down if we get a lot of requests from the same ip
+    if(params[:token].blank?)
+      return render(template: 'accounts/invalid_token_set_password')
+    end
+
+    if(!(@person = Person.find_by_reset_token(params[:token])))
+      return render(template: 'accounts/invalid_token_set_password')
+    end
+
+    if(request.post?)
+      if(!params[:person])
+        @person.errors.add(:base, "Missing parameters".html_safe)
+      elsif(!params[:person][:password] or params[:person][:password].length < 8)
+        @person.errors.add(:password, "Your new password must be a minimum of 8 characters".html_safe)
+      elsif(!params[:person][:password_confirmation] or (params[:person][:password_confirmation] != params[:person][:password]))
+        @person.errors.add(:password, "Your password confirmation did not match the new password.".html_safe)        
+      else
+        @person.password = params[:person][:password]
+        if(@person.set_hashed_password(save: true))
+          @person.clear_reset_token
+          Notification.create(:notification_type => Notification::PASSWORD_RESET, :notifiable => @person)
+          Activity.log_activity(person_id: @person.id, 
+                                activitycode: Activity::PASSWORD_RESET, 
+                                ip_address: request.remote_ip)            
+          flash[:notice] = 'Your password has been changed. Please sign-in with your new password.'
+          return redirect_to(signin_url)
+        end
+      end
+    end
   end
 
   def resend_confirmation
@@ -79,14 +133,6 @@ class AccountsController < ApplicationController
 
   def pending_confirmation
   end  
-
-
-
-  def confirm_reset
-  end
-
-  def confirm_change
-  end
 
 
   def signup

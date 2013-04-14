@@ -223,12 +223,14 @@ ActiveRecord::Schema.define(:version => 20130211155737) do
     t.string   "affiliation"
     t.text     "involvement"
     t.integer  "invitation_id"
+    t.string   "reset_token"
     t.datetime "created_at",                                                :null => false
     t.datetime "updated_at",                                                :null => false
   end
 
   add_index "people", ["email"], :name => "email_ndx", :unique => true
   add_index "people", ["idstring"], :name => "idstring_ndx", :unique => true
+  add_index "people", ["reset_token"], :name => "token_ndx"
   add_index "people", ["vouched", "retired"], :name => "validity_ndx"
 
   create_table "positions", :force => true do |t|

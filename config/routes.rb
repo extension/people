@@ -18,16 +18,19 @@ People::Application.routes.draw do
     match "signup/:invite", action: "signup", via: [:get], as: "invited_signup"
     match "confirm/:token", action: "confirm", via: [:get,:post], as: "confirm_account"
 
+    match "sp/:token", action: "set_password", via: [:get], as: "set_password"
+
     # everything else
     simple_named_route 'create', via: [:post]
     simple_named_route 'send_confirmation'
-    simple_named_route 'reset_password'
+    simple_named_route 'reset_password', via: [:get,:post]
     simple_named_route 'missing_token'
     simple_named_route 'review'
     simple_named_route 'contributor_agreement'
     simple_named_route 'post_signup'
     simple_named_route 'pending_confirmation'
     simple_named_route 'resend_confirmation'
+    simple_named_route 'set_password', via: [:post]
   end    
 
   resources :people, only: [:index, :show, :edit, :update] do

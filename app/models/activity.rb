@@ -66,6 +66,9 @@ class Activity < ActiveRecord::Base
   REVIEW_REQUEST                      = 110
   UPDATE_COLLEAGUE_PROFILE            = 111
 
+  PASSWORD_RESET_REQUEST              = 120
+  PASSWORD_RESET                      = 121
+  
   # COMMUNITY
   COMMUNITY_CREATE                    = 200
   COMMUNITY_JOIN                      = 201

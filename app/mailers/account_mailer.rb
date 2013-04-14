@@ -93,4 +93,30 @@ class AccountMailer < BaseMailer
     return_email    
   end
 
+  def password_reset_request(options = {})
+    @recipient = options[:recipient]
+    @subject = "eXtension: Please confirm your email address"
+    @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
+    
+    if(!@recipient.email.blank?)
+      return_email = mail(to: @recipient.email, subject: @subject)
+      save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
+    end
+    
+    return_email   
+  end
+
+  def password_reset(options = {})
+    @recipient = options[:recipient]
+    @subject = "eXtension: Your password has been reset"
+    @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
+    
+    if(!@recipient.email.blank?)
+      return_email = mail(to: @recipient.email, subject: @subject)
+      save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
+    end
+    
+    return_email   
+  end
+
 end

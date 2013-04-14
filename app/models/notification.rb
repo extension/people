@@ -33,10 +33,14 @@ class Notification < ActiveRecord::Base
   RECONFIRM_SIGNUP                    = 103
   CONFIRM_EMAIL                       = 104
   RECONFIRM_EMAIL                     = 105
-  CONFIRM_PASSWORD                    = 107
 
   # colleague profile
   UPDATE_COLLEAGUE_PROFILE            = 111
+
+  # passwords
+  PASSWORD_RESET_REQUEST              = 120
+  PASSWORD_RESET                      = 121
+
 
   # community
   COMMUNITY_JOIN                      = 201
@@ -92,6 +96,14 @@ class Notification < ActiveRecord::Base
 
   def confirm_email
     AccountMailer.confirm({recipient: self.notifiable, notification: self}).deliver
+  end
+
+  def password_reset_request
+    AccountMailer.password_reset_request({recipient: self.notifiable, notification: self}).deliver
+  end
+
+  def password_reset
+    AccountMailer.password_reset({recipient: self.notifiable, notification: self}).deliver
   end
 
   def welcome

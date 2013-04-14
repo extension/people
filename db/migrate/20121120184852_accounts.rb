@@ -34,12 +34,14 @@ class Accounts < ActiveRecord::Migration
       t.string   "affiliation"
       t.text     "involvement"
       t.integer  "invitation_id"
+      t.string   "reset_token"
       t.timestamps
     end
 
     add_index "people", ["email"], :name => "email_ndx", :unique => true
     add_index "people", ["idstring"], :name => "idstring_ndx", :unique => true
     add_index "people", ["vouched", "retired"], :name => "validity_ndx"
+    add_index "people", ["reset_token"], :name => "token_ndx"
 
     create_table "retired_accounts", :force => true do |t|
       t.integer  "person_id",      :null => false

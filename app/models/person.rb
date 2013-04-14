@@ -8,7 +8,7 @@
 require 'bcrypt'
 class Person < ActiveRecord::Base
   include BCrypt
-  attr_accessor :password, :current_password
+  attr_accessor :password, :current_password, :password_confirmation
 
   attr_accessible :first_name, :last_name, :email, :title, :phone, :time_zone, :affiliation, :involvement
   attr_accessible :password
@@ -778,6 +778,24 @@ class Person < ActiveRecord::Base
     true
   end
 
+
+  def reset_token
+    randval = rand
+    if(!(token = read_attribute(:reset_token)))
+      basetoken = Digest::SHA1.hexdigest(Settings.session_token+self.email+Time.now.to_s+randval.to_s)
+      token = basetoken[0..6]
+      if(someone_else = self.class.where(reset_token: token).first)
+        # goes to 11! that should do it, if not, well it'll be the best collision ever.
+        token = basetoken[0..10]
+      end
+      self.update_column(:reset_token,token)
+    end
+    token
+  end
+
+  def clear_reset_token
+    self.update_column(:reset_token,nil)
+  end  
 
   private
 
