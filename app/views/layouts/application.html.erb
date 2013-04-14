@@ -18,16 +18,20 @@
     </div>
 
     <div class="container" id="main">
-      <div id="flash">
-        <%= render(partial: 'shared/flashmessages') %>
-      </div>
-
       <div class="row">
         <%= render(partial: 'shared/masthead') %>
       </div>
 
       <div class="row">
         <%= render(partial: 'shared/navtabs') %>
+      </div>
+
+      <div class="row">
+        <div class='span12'>
+        <div id="flash">
+          <%= render(partial: 'shared/flashmessages') %>
+        </div>
+        </div>
       </div>
 
       <%= yield %>
