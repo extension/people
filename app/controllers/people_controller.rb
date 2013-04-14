@@ -174,6 +174,9 @@ class PeopleController < ApplicationController
       else
         @person.password = params[:person][:password]
         if(@person.set_hashed_password(save: true))
+        Activity.log_activity(person_id: @person.id, 
+                              activitycode: Activity::PASSWORD_CHANGE, 
+                              ip_address: request.remote_ip)            
           flash[:notice] = 'Your password has been changed'
           return redirect_to(person_url(current_person))
         end
