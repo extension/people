@@ -148,9 +148,18 @@ def position_transfer_query
 end
 
 def community_transfer_query
-  select_columns = Community.column_names
-  insert_clause = "#{@my_database}.#{Community.table_name} (#{select_columns.join(',')})"
+  columns = Community.column_names
+  insert_clause = "#{@my_database}.#{Community.table_name} (#{columns.join(',')})"
   from_clause = "#{@darmok_database}.communities"
+  select_columns = []
+  columns.each do |c|
+    case c
+    when 'publishing_community'
+      select_columns << "#{from_clause}.show_in_public_list"
+    else
+      select_columns << "#{from_clause}.#{c}"
+    end
+  end
   select_clause = "#{select_columns.join(',')}"
   where_clause = "#{from_clause}.entrytype IN (1,2,3)"
   transfer_query = "INSERT INTO #{insert_clause} SELECT #{select_clause} FROM #{from_clause} WHERE #{where_clause}"

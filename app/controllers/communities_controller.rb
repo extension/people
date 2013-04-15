@@ -17,6 +17,74 @@ class CommunitiesController < ApplicationController
     @current_person_community_connection = current_person.connection_with_community(@community)
   end
 
+  def edit
+    @community = Community.find(params[:id])
+    if(!current_person.can_edit_community?(@community))
+      flash[:warning] = "You do not have permission to edit the settings for this community."
+      return redirect_to(community_url(@community))
+    end
+  end
+
+  def update
+    @community = Community.find(params[:id])
+    if(!current_person.can_edit_community?(@community))
+      flash[:warning] = "You do not have permission to edit the settings for this community."
+      return redirect_to(community_url(@community))
+    end
+
+    # shortname check
+    if(!params[:community][:shortname].blank?)
+      shortname = params[:community][:shortname]
+      if(community = Community.find_by_shortname(shortname) and community.id != @community.id)
+        @community.errors.add(:shortname, "That community shortname is already in use.".html_safe)
+        return render(:action => "edit")
+      elsif(ea = EmailAlias.find_by_mail_alias(shortname) and ea.aliasable != @community)
+        @community.errors.add(:shortname, "That shortname is reserved.".html_safe)
+        return render(:action => "edit")
+      end
+    end
+
+    if(@community.update_attributes(params[:community]))
+      flash[:notice] = 'Community was successfully updated.'
+      Activity.log_activity(person_id: current_person.id, activitycode: Activity::COMMUNITY_UPDATE_INFORMATION, :community => @community, ip_address: request.remote_ip)
+      return redirect_to(community_url(@community))
+    else
+      return render(:action => "edit")
+    end
+  end
+
+  def new
+    @community = Community.new
+  end
+
+  def create
+    @community = Community.new(params[:community])
+    @community.entrytype = Community::USERCONTRIBUTED if(!current_person.is_admin?)
+    @community.creator = current_person
+
+
+    # shortname check
+    if(!params[:community][:shortname].blank?)
+      shortname = params[:community][:shortname]
+      if(community = Community.find_by_shortname(shortname))
+        @community.errors.add(:shortname, "That community shortname is already in use.".html_safe)
+        return render(:action => "new")
+      elsif(ea = EmailAlias.find_by_mail_alias(shortname))
+        @community.errors.add(:shortname, "That shortname is reserved.".html_safe)
+        return render(:action => "new")
+      end
+    end
+
+    if(@community.save)
+      current_person.connect_to_community(@community,'leader',{ip_address: request.remote_ip, nonotify: true}) if(!current_person.is_admin?)
+      flash[:notice] = 'Community was successfully created.'
+      Activity.log_activity(person_id: current_person.id, activitycode: Activity::COMMUNITY_CREATE, :community => @community, ip_address: request.remote_ip)
+      return redirect_to(community_url(@community))
+    else
+      return render(:action => "new")
+    end
+  end  
+
   def newest
     @communities = Community.order('created_at DESC').page(params[:page])
   end

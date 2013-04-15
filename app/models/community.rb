@@ -6,6 +6,11 @@
 #  see LICENSE file
 
 class Community < ActiveRecord::Base
+  include MarkupScrubber
+  attr_accessible :creator, :created_by
+  attr_accessible :name, :description, :location, :location_id, :memberfilter, :connect_to_drupal
+  attr_accessible :connect_to_google_apps, :entrytype, :shortname, :publishing_community
+
   # community types
   APPROVED = 1
   USERCONTRIBUTED = 2
@@ -44,7 +49,15 @@ class Community < ActiveRecord::Base
     'invitedleader' => 'Community Invitation (Leader)',
     'invitedleader' => 'Community Invitation (Member)'}
 
+  validates :name, :presence => true, :uniqueness => true 
+  validates :entrytype, :presence => true
+
+  before_save :set_shortname, :flag_attributes_for_approved
+  after_save :update_email_alias
+  after_save :update_google_group
+
   belongs_to :creator, :class_name => "Person", :foreign_key => "created_by"
+  belongs_to :location
   has_many :community_connections, :dependent => :destroy
   has_many :people, through: :community_connections, 
                     select:  "community_connections.connectiontype as connectiontype, 
@@ -52,9 +65,69 @@ class Community < ActiveRecord::Base
                               people.*"
 
   has_many :mailman_lists
+  has_one :email_alias, :as => :aliasable, :dependent => :destroy
+  has_one  :google_group
 
   scope :approved, where(entrytype: APPROVED)
   scope :institutions, where(entrytype: INSTITUTION)
+
+  # attr_writer override for response to scrub html
+  def description=(description)
+    write_attribute(:description, self.cleanup_html(description))
+  end
+
+  def flag_attributes_for_approved
+    if(self.entrytype == APPROVED)
+      self.publishing_community = true
+      self.connect_to_drupal = true
+    end
+  end
+
+  def set_shortname
+    if(self.shortname.blank?)
+      tmpshortname = self.name.gsub(/\W/,'').downcase
+    else
+      tmpshortname = self.shortname.gsub(/[^\w-]/,'').downcase
+    end
+    
+    increment = 0
+    checkname = tmpshortname
+    
+    while(EmailAlias.mail_alias_in_use?(checkname,self.new_record? ? nil : self) or self.class.shortname_in_use?(checkname,self.new_record? ? nil : self))
+      increment += 1
+      checkname = "#{tmpshortname}_#{increment}"
+    end
+    self.shortname = checkname
+  end
+  
+  def self.shortname_in_use?(shortname,checkcommunity = nil)
+    count_scope = self.where(shortname: shortname)
+    if(checkcommunity)
+      count_scope = count_scope.where("id <> #{checkcommunity.id}")
+    end
+    count_scope.count > 0
+  end
+
+  def update_email_alias
+    if(!self.email_alias.blank?)
+      self.email_alias.update_attribute(:alias_type, (self.connect_to_google_apps? ? EmailAlias::COMMUNITY_GOOGLEAPPS : EmailAlias::COMMUNITY_NOWHERE))
+    else
+      self.create_email_alias(:alias_type => (self.connect_to_google_apps? ? EmailAlias::COMMUNITY_GOOGLEAPPS : EmailAlias::COMMUNITY_NOWHERE))            
+    end
+  end  
+
+  def update_google_group
+    if(self.connect_to_google_apps?)
+      if(!self.google_group.blank?)
+        self.google_group.touch
+      else
+        self.create_google_group
+      end
+    else
+      # do nothing
+    end
+    return true
+  end
 
   def is_institution?
     (self.entrytype == INSTITUTION)
@@ -156,6 +229,8 @@ class Community < ActiveRecord::Base
     returnlist = namelist | descriptionlist
     returnlist
   end
+
+
 
 
 end

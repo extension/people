@@ -1,0 +1,11 @@
+<%- @page_title = "Community Edit - #{@community.name}" -%>
+
+<div class="page-header">
+  <h2><%= @page_title %></h2>
+</div>
+
+<div class="row">
+  <div class="span8">
+    <%= render(partial: 'edit_form') %>
+  </div>
+</div>

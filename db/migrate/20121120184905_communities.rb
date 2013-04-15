@@ -12,7 +12,7 @@ class Communities < ActiveRecord::Migration
       t.text     "public_description"
       t.boolean  "is_launched",                           :default => false
       t.integer  "public_topic_id"
-      t.boolean  "show_in_public_list",                   :default => false
+      t.boolean  "publishing_community",                   :default => false
       t.integer  "location_id",                           :default => 0
       t.string   "public_uri"
       t.string   "referer_domain"

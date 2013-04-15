@@ -109,5 +109,12 @@ module CommunitiesHelper
     link_to('remove',remove_connection_community_path(id: community.id, person_id: person.id), class: 'btn btn-small', remote: true, method: :post).html_safe   
   end
 
+  def get_communitytypes_for_select
+    returnarray = []
+    Community::ENTRYTYPE_LABELS.keys.sort.each do |key|
+      returnarray << [I18n.translate("communities.entrytypes.#{Community::ENTRYTYPE_LABELS[key]}"),key]
+    end
+    returnarray
+  end
 
 end
