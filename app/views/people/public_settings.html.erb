@@ -1,0 +1,54 @@
+<%- @page_title = "Public profile settings for #{@person.fullname}" -%>
+
+<div class="page-header">
+  <h2><%= @page_title %></h2>
+</div>
+
+<div class="row">
+  <div class="span12">
+
+    <p class="introtext">Your <%= link_to("Personal Profile", person_path(current_person)) %> is viewable by anyone logged into this application. If you would like to make your information more accessible, you may choose to enable the settings below and create a Public Profile that is viewable by anyone.</p>
+    <p class="introtext pubprofile"><%= link_to("View your Public Profile", "#") %></p>
+
+  </div>
+</div>
+
+
+
+<div class="row">
+  <div class="span8">
+    <h3>Profile Information</h3>
+    <table class="table">
+      <tbody>
+        <%- @publicsettings.each do |setting| -%>
+          <tr id="public_setting_row_<%= setting.id %>">
+            <%= render(partial: 'public_setting_row', locals: {setting: setting}) -%>
+          </tr>
+        <%- end -%>
+
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="span8">
+    <h3>Social Networks</h3>
+    <%- if current_person.social_networks.count > 0 -%>
+    <table class="table">
+      <tbody>
+        <%- current_person.social_networks.each do |social_network| -%>
+          <tr id="social_network_publicity_row_<%= social_network.connection_id %>">
+            <%= render(partial: 'social_network_publicity_row', locals: {social_network: social_network}) -%>
+          </tr>
+        <%- end -%>
+      </tbody>
+    </table>
+    <%- else -%>
+    <p>You haven't yet listed your social network connections.</p>
+    <%- end -%>
+
+  </div>
+</div>

@@ -1,0 +1,1 @@
+$("#social_network_publicity_row_<%= @social_network_connection.id %>").html("<%= escape_javascript(render(:partial => 'social_network_publicity_row', :locals => { social_network: @social_network})) %>")

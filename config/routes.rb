@@ -41,6 +41,7 @@ People::Application.routes.draw do
       post :vouch
       get  :password
       post :password
+      get :public_settings
     end
     
     collection do
@@ -50,6 +51,8 @@ People::Application.routes.draw do
       get :find
       post :find
       get :pendingreview
+      post :change_public_setting
+      post :change_social_network_publicity
     end
   end
 

@@ -184,6 +184,44 @@ class PeopleController < ApplicationController
     end
   end
 
+
+  def change_public_setting
+    @public_setting = ProfilePublicSetting.find(params[:id])
+    if (@public_setting.person == current_person)
+      if(!params[:is_public].nil? and params[:is_public] == 'yes')
+        @public_setting.update_attributes({:is_public => true})
+      else
+        @public_setting.update_attributes({:is_public => false})
+      end
+    end
+  end
+  
+  def change_social_network_publicity
+    @social_network_connection = SocialNetworkConnection.find(params[:id])
+    if (@social_network_connection.person == current_person)
+      if(!params[:is_public].nil? and params[:is_public] == 'yes')
+        @social_network_connection.update_attributes({:is_public => true})
+      else
+        @social_network_connection.update_attributes({:is_public => false})
+      end
+    end
+    @social_network = current_person.social_networks.where("social_network_connections.id = #{@social_network_connection.id}").first
+  end
+  
+  def public_settings
+    @person = Person.find_by_id_or_idstring(params[:id])
+    return redirect_to(person_url(current_person)) if(@person != current_person)
+
+    # this is a bit of an odd way of doing this, but this guarrantees 
+    # we have a db entry for all the settings for the person.
+    @publicsettings = []
+    ProfilePublicSetting::KNOWN_ITEMS.each do |item|
+      @publicsettings << ProfilePublicSetting.find_or_create_by_person_and_item(current_person,item)
+    end
+
+
+  end  
+
   private
 
   def set_tab

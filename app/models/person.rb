@@ -70,7 +70,8 @@ class Person < ActiveRecord::Base
 
   has_many :social_network_connections, dependent: :destroy
   has_many :social_networks, through: :social_network_connections, 
-                         select:  "social_network_connections.accountid as accountid, 
+                         select:  "social_network_connections.id as connection_id,
+                                   social_network_connections.accountid as accountid, 
                                    social_network_connections.accounturl as accounturl,
                                    social_network_connections.is_public as is_public, 
                                    social_networks.*"  
@@ -795,7 +796,69 @@ class Person < ActiveRecord::Base
 
   def clear_reset_token
     self.update_column(:reset_token,nil)
-  end  
+  end
+
+  # # returns a hash of public attributes
+  # def public_attributes  
+  #   returnhash = {}
+  #   publicsettings = self.pro.showpublicly.all
+  #   socialnetworks = self.social_networks.showpublicly.all
+   
+  #   if(publicsettings.empty? and socialnetworks.empty?)
+  #     # cache the blank value
+  #     if(directory_item_cache)
+  #       directory_item_cache.update_attributes({:public_attributes => nil})      
+  #     else
+  #       DirectoryItemCache.create({:user => self, :public_attributes => nil})      
+  #     end
+  #     return nil
+  #   else
+  #     returnhash.merge!({:fullname => self.fullname, :last_name => self.last_name, :first_name => self.first_name})
+  #   end
+   
+  #  if(!publicsettings.empty?)
+  #   publicsettings.each do |setting|
+  #     case setting.item
+  #     when 'email'
+  #      returnhash.merge!({:email => self.email})
+  #     when 'phone'
+  #      returnhash.merge!({:phone => self.phonenumber.nil? ? '' : self.phonenumber})
+  #     when 'time_zone'
+  #      returnhash.merge!({:phone => self.has_time_zone? ? '' : self.time_zone})
+  #     when 'title'
+  #      returnhash.merge!({:title => self.title.nil? ? '' : self.title})
+  #     when 'position'
+  #      returnhash.merge!({:position => self.position.nil? ? '' : self.position.name})
+  #     when 'institution'
+  #      returnhash.merge!({:institution => self.primary_institution_name('')})
+  #     when 'location'
+  #      returnhash.merge!({:location => (self.location.nil? ? '' : self.location.name)})
+  #     when 'county'
+  #      returnhash.merge!({:county => (self.county.nil? ? '' : self.county.name)})
+  #     when 'interests'
+  #      returnhash.merge!({:interests => self.tag_displaylist_by_ownerid_and_kind(self.id,Tagging::ALL,true)})
+  #     end
+  #   end  
+  #  end
+   
+  #  if(!socialnetworks.empty?)
+  #   returnnetworks = []
+  #   socialnetworks.each do |sn|
+  #     returnnetworks << {:accountid => sn.accountid, :network => sn.network, :displayname => sn.displayname, :accounturl => sn.accounturl}
+  #   end
+  #   returnhash.merge!({:socialnetworks => returnnetworks})
+  #  end
+   
+  #  # cache it
+  #  if(directory_item_cache)
+  #    directory_item_cache.update_attributes({:public_attributes => returnhash})      
+  #  else
+  #    DirectoryItemCache.create({:user => self, :public_attributes => returnhash})
+  #  end 
+  #  return returnhash
+  # end
+
+
 
   private
 

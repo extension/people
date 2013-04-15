@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130211155737) do
+ActiveRecord::Schema.define(:version => 20130415142314) do
 
   create_table "activities", :force => true do |t|
     t.integer  "person_id",      :default => 0
@@ -241,6 +241,16 @@ ActiveRecord::Schema.define(:version => 20130211155737) do
   end
 
   add_index "positions", ["name"], :name => "name_ndx", :unique => true
+
+  create_table "profile_public_settings", :force => true do |t|
+    t.integer  "person_id"
+    t.string   "item"
+    t.boolean  "is_public",  :default => false
+    t.datetime "created_at",                    :null => false
+    t.datetime "updated_at",                    :null => false
+  end
+
+  add_index "profile_public_settings", ["person_id"], :name => "person_ndx"
 
   create_table "retired_accounts", :force => true do |t|
     t.integer  "person_id",             :null => false

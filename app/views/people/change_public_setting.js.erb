@@ -1,0 +1,1 @@
+$("#public_setting_row_<%= @public_setting.id %>").html("<%= escape_javascript(render(:partial => 'public_setting_row', :locals => { setting: @public_setting})) %>")
