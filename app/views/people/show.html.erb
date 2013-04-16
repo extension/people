@@ -42,6 +42,7 @@
         <%- @person.communities.each do |community| -%>
           <li><%= link_to(community.name, community) %> <small><%= community_connection_for_person(community, @person)%></small></li>
         <%- end -%>
+      </ul>
       <%- else -%>
       <p>No community connections.</p>
       <%- end -%>
