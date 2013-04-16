@@ -218,9 +218,27 @@ class PeopleController < ApplicationController
     ProfilePublicSetting::KNOWN_ITEMS.each do |item|
       @publicsettings << ProfilePublicSetting.find_or_create_by_person_and_item(current_person,item)
     end
+  end
 
+  def manage_social_networks
+    @socialnetworks = SocialNetwork.active.where("id <> ?",SocialNetwork::OTHER_NETWORK).order(:display_name).all
+    @socialnetworks << SocialNetwork.find_by_id(SocialNetwork::OTHER_NETWORK)
+  end
 
-  end  
+  def edit_social_network
+    if(request.get?)
+      if(params[:network_connection])
+        @social_network_connection = SocialNetworkConnection.find(params[:network_connection])
+      elsif(params[:network])
+        @social_network = SocialNetwork.find(params[:network])
+        @social_network_connection = SocialNetworkConnection.new(social_network: @social_network)
+      else
+        flash[:warning] = 'Missing parameters'
+        return redirect_to(manage_social_networks_people_url)
+      end
+    end 
+
+  end
 
   private
 

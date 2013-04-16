@@ -28,4 +28,8 @@ module ProfileHelper
     image_tag("/assets/socialnetworks/#{network_name}.png").html_safe
   end
 
+  def add_social_network_link(network)
+    link_to("add",'#', :onclick => "$('#rankingattributes').append('#{escape_javascript(render(:partial => 'ranking_attribute',:locals => {:attributename => attributename}))}')").html_safe
+  end
+
 end

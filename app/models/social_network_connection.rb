@@ -10,7 +10,7 @@ class SocialNetworkConnection < ActiveRecord::Base
 
   ## attributes
   attr_accessor :fieldid
-  attr_accessible :person, :person_id, :social_network, :social_network_id, :network_name, :url_format, :custom_network_name, :accountid, :accounturl, :privacy, :is_public
+  attr_accessible :person, :person_id, :social_network, :social_network_id, :network_name, :url_format, :custom_network_name, :accountid, :accounturl, :is_public
 
   ## validations
 

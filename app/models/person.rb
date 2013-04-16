@@ -71,6 +71,7 @@ class Person < ActiveRecord::Base
   has_many :social_network_connections, dependent: :destroy
   has_many :social_networks, through: :social_network_connections, 
                          select:  "social_network_connections.id as connection_id,
+                                   social_network_connections.custom_network_name as custom_network_name, 
                                    social_network_connections.accountid as accountid, 
                                    social_network_connections.accounturl as accounturl,
                                    social_network_connections.is_public as is_public, 
