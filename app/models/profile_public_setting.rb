@@ -13,19 +13,16 @@ class ProfilePublicSetting < ActiveRecord::Base
   
   KNOWN_ITEMS = ['email','phone','title','position','institution','location','county','time_zone']
   
-  ITEM_LABELS = {'email' => 'Email Address',
-                      'phone' => 'Phone Number',
-                      'title' => 'Title',
-                      'position' => 'Position',
-                      'institution' => 'Institution',
-                      'location' => 'Location',
-                      'county' => 'County',
-                      'interests' => 'Interests',
-                      'time_zone' => 'Time zone'}
-                      
-                      
-  scope :public_list, where(is_public: true)
-  
+  ITEM_LABELS =  {'email' => 'Email Address',
+                  'phone' => 'Phone Number',
+                  'title' => 'Title',
+                  'position' => 'Position',
+                  'institution' => 'Institution',
+                  'location' => 'Location',
+                  'county' => 'County',
+                  'interests' => 'Interests',
+                  'time_zone' => 'Time zone'}
+                        
   def self.find_or_create_by_person_and_item(person,item,is_public = false)  
     if(setting = self.where(person_id: person.id).where(item: item).first)
       return setting
