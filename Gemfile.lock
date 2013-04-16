@@ -75,6 +75,9 @@ GEM
       multi_json (~> 1.0)
     extension-html5shiv-rails (3.6.2)
     facter (1.6.18)
+    font-awesome-sass-rails (3.0.2.2)
+      railties (>= 3.1.1)
+      sass-rails (>= 3.1.1)
     grit (2.5.0)
       diff-lcs (~> 1.1)
       mime-types (~> 1.15)
@@ -256,6 +259,7 @@ DEPENDENCIES
   coffee-rails (~> 3.2.1)
   csspool
   extension-html5shiv-rails
+  font-awesome-sass-rails
   hashids (= 0.0.4ex)
   inline-style (= 0.5.2ex)
   jbuilder
