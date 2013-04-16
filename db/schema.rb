@@ -284,14 +284,12 @@ ActiveRecord::Schema.define(:version => 20130415142314) do
     t.string   "custom_network_name"
     t.string   "accountid",           :limit => 96
     t.string   "accounturl"
-    t.integer  "privacy"
     t.boolean  "is_public",                         :default => false
     t.datetime "created_at",                                           :null => false
     t.datetime "updated_at",                                           :null => false
   end
 
-  add_index "social_network_connections", ["person_id", "social_network_id", "accountid"], :name => "person_network_account_ndx"
-  add_index "social_network_connections", ["privacy"], :name => "privacy_ndx"
+  add_index "social_network_connections", ["person_id", "social_network_id", "accountid", "is_public"], :name => "person_network_account_ndx"
 
   create_table "social_networks", :force => true do |t|
     t.string   "name",              :limit => 96

@@ -605,29 +605,31 @@ def associate_social_networks
   print "Associating social network connections to social networks..."
   benchmark = Benchmark.measure do
     networks = {
-      'google' => {:display_name => 'Google', :editable_url => false, :autocomplete => false},
-      'twitter' => {:display_name => 'Twitter', :url_format => 'http://twitter.com/%s', :editable_url => false, :autocomplete => true},
-      'friendfeed' => {:display_name => 'FriendFeed', :url_format => 'http://friendfeed.com/%s', :editable_url => false, :autocomplete => true},
-      'flickr' => {:display_name => 'Flickr', :url_format => 'http://flickr.com/photos/%s', :editable_url => true, :autocomplete => true, :url_format_notice => 'Your URL will not include your account name unless you have customized the settings in your Flickr account. Please confirm the link to your page.'},
-      'facebook' => {:display_name => 'Facebook', :editable_url => true, :autocomplete => false},
-      'magnolia' => {:display_name => 'Ma.gnolia', :url_format => 'http://ma.gnolia.com/people/%s', :editable_url => false, :autocomplete => true},
-      'delicious' => {:display_name => 'Delicious', :url_format => 'http://delicious.com/%s', :editable_url => false, :autocomplete => true},
-      'linkedin' => {:display_name => 'LinkedIn', :url_format => 'http://www.linkedin.com/in/%s', :editable_url => true, :autocomplete => true, :url_format_notice => '<span>http://www.linkedin.com/in/<strong>your-name</strong></span>You will need to create a custom LinkedIn Public Profile URL for the automatic linking to work.'},
-      'slideshare' => {:display_name => 'SlideShare', :url_format => 'http://slideshare.net/%s', :editable_url => false, :autocomplete => true},
-      'youtube' => {:display_name => 'YouTube', :url_format => 'http://www.youtube.com/user/%s', :editable_url => false, :autocomplete => true},
-      'identica' => {:display_name => 'Identi.ca', :url_format => 'http://identi.ca/%s', :editable_url => false, :autocomplete => true},
-      'aim' => {:display_name => 'AOL Instant Messenger', :url_format => 'aim:goim?%s', :editable_url => false, :autocomplete => true},
-      'msnim' => {:display_name => 'MSN Instant Messenger', :editable_url => false, :autocomplete => true},
-      'yahooim' => {:display_name => 'Yahoo Instant Messenger', :url_format => 'ymsgr:sendim?%s', :editable_url => false, :autocomplete => true},
-      'gtalk' => {:display_name => 'Google Talk', :url_format => 'xmpp:%s', :editable_url => false, :autocomplete => true},
-      'jabber' => {:display_name => 'Jabber/XMPP', :url_format => 'xmpp:%s', :editable_url => false, :autocomplete => true}, 
-      'skype' => {:display_name => 'Skype', :url_format => 'skype:%s', :editable_url => false, :autocomplete => true},
-      'gizmo' => {:display_name => 'Gizmo5', :url_format => 'gizmo:%s', :editable_url => false, :autocomplete => true},
-      'wave' => {:display_name => 'Google Wave', :editable_url => false, :autocomplete => false, :active => false},
-      'blog' => {:display_name => 'Blog/Website', :editable_url => true, :autocomplete => false},
-      'secondlife' => {:display_name => 'Second Life', :editable_url => false, :autocomplete => false},
-      'other' => {:display_name => 'Other', :editable_url => false, :autocomplete => false}
+      'google' => {:display_name => 'Google'},
+      'twitter' => {:display_name => 'Twitter', :url_format => 'http://twitter.com/%s'},
+      'friendfeed' => {:display_name => 'FriendFeed', :url_format => 'http://friendfeed.com/%s'},
+      'flickr' => {:display_name => 'Flickr', :url_format => 'http://flickr.com/photos/%s', :url_format_notice => 'Your URL will not include your account name unless you have customized the settings in your Flickr account. Please confirm the link to your page.'},
+      'facebook' => {:display_name => 'Facebook'},
+      'magnolia' => {:display_name => 'Ma.gnolia', :url_format => 'http://ma.gnolia.com/people/%s'},
+      'delicious' => {:display_name => 'Delicious', :url_format => 'http://delicious.com/%s'},
+      'linkedin' => {:display_name => 'LinkedIn', :url_format => 'http://www.linkedin.com/in/%s', :url_format_notice => '<span>http://www.linkedin.com/in/<strong>your-name</strong></span>You will need to create a custom LinkedIn Public Profile URL for the automatic linking to work.'},
+      'slideshare' => {:display_name => 'SlideShare', :url_format => 'http://slideshare.net/%s'},
+      'youtube' => {:display_name => 'YouTube', :url_format => 'http://www.youtube.com/user/%s'},
+      'identica' => {:display_name => 'Identi.ca', :url_format => 'http://identi.ca/%s'},
+      'aim' => {:display_name => 'AOL Instant Messenger', :url_format => 'aim:goim?%s'},
+      'msnim' => {:display_name => 'MSN Instant Messenger'},
+      'yahooim' => {:display_name => 'Yahoo Instant Messenger', :url_format => 'ymsgr:sendim?%s'},
+      'gtalk' => {:display_name => 'Google Talk', :url_format => 'xmpp:%s'},
+      'jabber' => {:display_name => 'Jabber/XMPP', :url_format => 'xmpp:%s'}, 
+      'skype' => {:display_name => 'Skype', :url_format => 'skype:%s'},
+      'gizmo' => {:display_name => 'Gizmo5', :url_format => 'gizmo:%s'},
+      'wave' => {:display_name => 'Google Wave', :active => false},
+      'blog' => {:display_name => 'Blog/Website'},
+      'secondlife' => {:display_name => 'Second Life'}
     }
+
+    # make 'other' social network #1
+    SocialNetwork.create({name: 'other', :display_name => 'Other'})
 
     networks.each do |network,attributes|
       SocialNetwork.create(attributes.merge({name: network}))
