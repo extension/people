@@ -117,4 +117,13 @@ module CommunitiesHelper
     returnarray
   end
 
+  def community_icon(community)
+    if(community.is_institution?)
+      "<i class='icon-building'></i>".html_safe
+    else
+      "<i class='icon-group'></i>".html_safe
+    end
+  end
+
+
 end

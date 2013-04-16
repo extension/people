@@ -11,42 +11,51 @@
 
     <%- if current_person.invited_communities.count > 0 -%>
     <h3>Pending Invitations</h3>
-    <dl class="dl-horizontal">
+    <ul class="unstyled">
       <% current_person.community_invitations.each do |community|%>
-        <dt><%= link_to(community.name,community_url(community)) %></dt>
-        <dd><%= display_invited_as(community.connectiontype) %></dd>
+        <li>
+          <%= community_icon(community) %>
+          <%= link_to(community.name,community_url(community)) %> 
+          <small><%= display_invited_as(community.connectiontype) %></small>
+        </li>
       <% end %>
-    </dl>
+    </ul>
     <%- end -%>
 
     <%- if current_person.pending_communities.count > 0 -%>
     <h3>Pending Approvals</h3>
-    <dl class="dl-horizontal">
-      <% current_person.community_invitations.each do |community|%>
-        <dt><%= link_to(community.name,community_url(community)) %></dt>
+     <ul class="unstyled">
+      <% current_person.pending_communities.each do |community|%>
+        <li>
+          <%= link_to(community.name,community_url(community)) %> 
+        </li>
       <% end %>
-    </dl>
+    </ul>   
     <%- end -%>
 
 
     <h3>Your Communities and Institutions</h3>
     <%- if current_person.connected_communities.count > 0 -%>
-    <dl class="dl-horizontal">
-      <% current_person.connected_communities.each do |community|%>
-        <dt><%= link_to(community.name,community_url(community)) %></dt>
-        <dd><%= community.connectiontype.capitalize %></dd>
-      <% end %>
-    </dl>
+
+      <ul class="unstyled">
+        <%- current_person.connected_communities.each do |community| -%>
+          <li>
+            <%= community_icon(community) %>
+            <%= link_to(community.name, community) %> 
+            <small><%= community_connection_for_person(community, current_person)%></small>
+          </li>
+        <%- end -%>
+      </ul>    
     <%- else -%>
       <p>You haven't yet joined or indicated an interest in any communities</p>
     <%- end -%>
 
     <h3>Newest Communities</h3>
-    <dl>
+    <dl class='community'>
       <%- Community.order('created_at DESC').limit(5).each do |community| -%>
       <dt><%= link_to(community.name,community_url(community)) %></dt>
-      <dd><em><%= community.entrytype_to_s %> - <%= community.memberfilter_to_s %></em></dd>
-      <dd><%= community.description %></dd>
+      <dd class='type'><%= community.entrytype_to_s %> - <%= community.memberfilter_to_s %></dd>
+      <dd class='description'><%= community.description %></dd>
       <%- end -%>
     </dl>
     <p><%= link_to("More...",newest_communities_path)%></p>
@@ -54,11 +63,13 @@
 
   <div class="span6">
     <h3>eXtension Communities of Practice</h3>
-    <dl>
+    <ul class='unstyled'>
       <%- Community.approved.order('name ASC').each do |community| -%>
-      <dt><%= link_to(community.name,community_url(community)) %></dt>
-      <dd><%= @approved_joined_counts[community.id] || 0 %> joined</dd>
+      <li class='community'>
+        <span><%= @approved_joined_counts[community.id] || 0 %> joined</span>
+        <%= link_to(community.name,community_url(community)) %>
+      </li>
       <%- end -%>
-    </dl>
+    </ul>
   </div>
 </div>

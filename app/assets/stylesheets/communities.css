@@ -1,0 +1,5 @@
+li.community {margin-bottom: .65em; border-bottom:1px solid #eee;}
+li.community span {color:#999;float:right;font-size:.95em;}
+
+dl.community dd.type {font-style: italic; color: #777; margin-bottom: .25em;}
+dl.community dd.description {margin-bottom: 1em;}
