@@ -28,7 +28,7 @@
   </div>
   <div class="span5">
     <div>
-      <ul class="nav nav-pills">
+      <ul class="nav nav-pills nav-stacked">
         <li><%= link_to('Edit settings',edit_person_path(@person)) %></li>
         <%- if current_person == @person -%>
           <li><%= link_to('Change password',password_person_path(@person)) %></li>
