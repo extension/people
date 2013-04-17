@@ -18,6 +18,13 @@
     </div>
 
     <div class="container" id="main">
+
+      <%- if (Settings.app_location == 'demo') || (Settings.app_location == 'dev') -%>
+        <div id="app_location" class="demo">
+          <p class='text-center'>You are viewing the People development/demonstration site. The data on this site is regularly deleted for development purposes.</p>
+        </div>
+      <% end %>
+
       <div class="row">
         <%= render(partial: 'shared/masthead') %>
       </div>
