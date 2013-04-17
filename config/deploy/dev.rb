@@ -6,6 +6,8 @@ else
 end
 server 'dev.people.extension.org', :app, :web, :db, :primary => true
 
-if(ENV['REBUILD'] == 'true')
+if(TRUE_VALUES.include?(ENV['REBUILD']))
+  before "deploy", "deploy:web:disable"
   after "deploy:update_code", "deploy:db:rebuild"
+  after "deploy", "deploy:web:enable"
 end
