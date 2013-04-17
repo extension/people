@@ -8,7 +8,7 @@ class AddProfilePublicSettings < ActiveRecord::Migration
       t.timestamps
     end
 
-    add_index "profile_public_settings", ["person_id"], :name => "person_ndx"
+    add_index "profile_public_settings", ["person_id","item"], :name => "person_item_ndx"
 
   end
 
