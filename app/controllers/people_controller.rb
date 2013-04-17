@@ -142,23 +142,6 @@ class PeopleController < ApplicationController
     end
   end
 
-
-  # def public
-  #   #TODO
-  # end
-
-  # def account
-  #   #TODO
-  # end
-
-  # def communities
-  #   #TODO
-  # end
-
-  # def recent
-  #   #TODO
-  # end
-
   def password
     @person = Person.find_by_id_or_idstring(params[:id])
     return redirect_to(person_url(current_person)) if(@person != current_person)
@@ -220,7 +203,7 @@ class PeopleController < ApplicationController
     end
   end
 
-  def manage_social_networks
+  def change_social_networks
     @socialnetworks = SocialNetwork.active.where("id <> ?",SocialNetwork::OTHER_NETWORK).order(:display_name).all
     @socialnetworks << SocialNetwork.find_by_id(SocialNetwork::OTHER_NETWORK)
   end
@@ -229,15 +212,86 @@ class PeopleController < ApplicationController
     if(request.get?)
       if(params[:network_connection])
         @social_network_connection = SocialNetworkConnection.find(params[:network_connection])
+
+        # ownership check
+        if(@social_network_connection.person_id != current_person.id)
+          flash[:warning] = 'Unable to edit this social network connection.'
+          return redirect_to(change_social_networks_people_url)
+        end
+
       elsif(params[:network])
         @social_network = SocialNetwork.find(params[:network])
         @social_network_connection = SocialNetworkConnection.new(social_network: @social_network)
       else
         flash[:warning] = 'Missing parameters'
-        return redirect_to(manage_social_networks_people_url)
+        return redirect_to(change_social_networks_people_url)
       end
-    end 
 
+    elsif(request.post?)
+      if(params[:social_network_connection_id])
+        @social_network_connection = SocialNetworkConnection.find(params[:social_network_connection_id])
+
+        # ownership check
+        if(@social_network_connection.person_id != current_person.id)
+          flash[:warning] = 'Unable to edit this social network connection.'
+          return redirect_to(change_social_networks_people_url)
+        end
+
+        update_attributes = params[:social_network_connection].merge({person_id: current_person.id})
+        if(@social_network_connection.update_attributes(update_attributes))
+
+          Activity.log_activity(person_id: current_person.id, 
+                                activitycode: Activity::UPDATE_SOCIAL_NETWORKS, 
+                                ip_address: request.remote_ip, 
+                                additionalinfo: "updated #{@social_network_connection.social_network.name}",  
+                                additionaldata: {updated: @social_network_connection.attributes.to_yaml})   
+
+          flash[:success] = 'Social network updated.'
+          return redirect_to(change_social_networks_people_url)
+        end
+      elsif(params[:social_network_connection] and params[:social_network_connection][:social_network_id])
+        @social_network = SocialNetwork.find(params[:social_network_connection][:social_network_id])
+        save_attributes = params[:social_network_connection].merge({person_id: current_person.id, social_network: @social_network})
+        if(@social_network_connection = SocialNetworkConnection.create(save_attributes))
+          Activity.log_activity(person_id: current_person.id, 
+                                activitycode: Activity::UPDATE_SOCIAL_NETWORKS, 
+                                ip_address: request.remote_ip,
+                                additionalinfo: "added #{@social_network_connection.social_network.name}",  
+                                additionaldata: {added: @social_network_connection.attributes.to_yaml})   
+          flash[:success] = 'Social network added.'
+          return redirect_to(change_social_networks_people_url)
+        end
+      else
+        flash[:warning] = 'Missing parameters'
+      end    
+
+    end
+
+
+  end
+
+  def delete_social_network
+    if(!params[:network_connection])
+      flash[:warning] = 'Missing parameters'
+      return redirect_to(change_social_networks_people_url)
+    elsif(@social_network_connection = SocialNetworkConnection.find_by_id(params[:network_connection]))
+      if(@social_network_connection.person_id != current_person.id)
+        flash[:warning] = 'Unable to remove this social network connection.'
+        return redirect_to(change_social_networks_people_url)
+      else
+        Activity.log_activity(person_id: current_person.id, 
+                              activitycode: Activity::UPDATE_SOCIAL_NETWORKS, 
+                              ip_address: request.remote_ip,
+                              additionalinfo: "deleted #{@social_network_connection.social_network.name}", 
+                              additionaldata: {removed: @social_network_connection.attributes.to_yaml})          
+        @social_network_connection.destroy
+        flash[:success] = 'Social network removed.'
+        return redirect_to(change_social_networks_people_url)
+      end
+    else
+      flash[:warning] = 'Invalid parameters'
+      return redirect_to(change_social_networks_people_url)
+    end
   end
 
   private

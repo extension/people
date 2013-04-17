@@ -53,9 +53,10 @@ People::Application.routes.draw do
       get :pendingreview
       post :change_public_setting
       post :change_social_network_publicity
-      get :manage_social_networks
+      get :change_social_networks
       get :edit_social_network
       post :edit_social_network
+      post :delete_social_network
     end
   end
 

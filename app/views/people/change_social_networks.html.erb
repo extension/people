@@ -26,7 +26,11 @@
             <%- end -%>
           </td>
           <td>
-            <%= link_to('<i class="icon-edit icon-large"></i> Edit'.html_safe,edit_social_network_people_path(network_connection: network.connection_id),class: 'btn') %>
+            <%= link_to('<i class="icon-edit"></i> Edit'.html_safe,edit_social_network_people_path(network_connection: network.connection_id),class: 'btn') %>
+          </td>
+
+          <td>
+            <%= link_to('<i class="icon-trash"></i> Remove'.html_safe,delete_social_network_people_path(network_connection: network.connection_id),confirm: 'Are you sure you want to delete this connection?', class: 'btn', method: 'post') %>
           </td>
         </tr>
         <%- end -%>

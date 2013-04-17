@@ -65,6 +65,8 @@ class Activity < ActiveRecord::Base
   INVITATION_ACCEPTED                 = 109
   REVIEW_REQUEST                      = 110
   UPDATE_COLLEAGUE_PROFILE            = 111
+  UPDATE_SOCIAL_NETWORKS              = 112
+
 
   PASSWORD_RESET_REQUEST              = 120
   PASSWORD_RESET                      = 121

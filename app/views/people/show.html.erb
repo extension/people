@@ -32,6 +32,7 @@
         <li><%= link_to('Edit settings',edit_person_path(@person)) %></li>
         <%- if current_person == @person -%>
           <li><%= link_to('Change password',password_person_path(@person)) %></li>
+          <li><%= link_to('Public profile settings',public_settings_person_path(@person)) %></li>
         <%- end -%>
       </ul>
     </div>
@@ -48,7 +49,12 @@
       <%- end -%>
     </div>
     <div class="well">
-      <h4>Social Network Connections</h4>
+      <h4>
+        Social Network Connections 
+        <%- if @person == current_person -%>            
+          <small><%= link_to('change',change_social_networks_people_path) %></small>
+        <%- end -%>
+      </h4>
       <%- if(@person.social_networks.count > 0) %>
       <ul class="unstyled">
         <%- @person.social_networks.each do |network| -%>
