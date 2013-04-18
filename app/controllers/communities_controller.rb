@@ -100,7 +100,7 @@ class CommunitiesController < ApplicationController
       connection = 'joined'
     end
 
-    @connections = @community.connected(connection).page(params[:page])
+    @connections = @community.connected(connection).order('people.last_name').page(params[:page])
   end
 
   def invite
