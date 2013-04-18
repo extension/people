@@ -70,6 +70,7 @@ class Community < ActiveRecord::Base
 
   scope :approved, where(entrytype: APPROVED)
   scope :institutions, where(entrytype: INSTITUTION)
+  scope :connected_as, lambda{|connectiontype| where(CONNECTION_CONDITIONS[connectiontype])}
 
   # attr_writer override for response to scrub html
   def description=(description)

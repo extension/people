@@ -28,18 +28,17 @@
         <%- if(current_person == @person or current_person.is_admin? ) -%>
           <%= f.input :email, :input_html => { :class => 'span4' } %>
         <%- end -%>
-        <!-- TODO number_to_phone -->
-        <%= f.input :phone, :label => 'Phone number' %>
+        <%= f.input :phone, :label => 'Phone number', input_html: { value: number_to_phone(@person.phone, :area_code => true)} %>
         <%= f.input :title %>
+        <%= f.input :time_zone, priority: /US/, :input_html => { :class => 'span4' } %>
         <%= f.association :position, collection: Position.order('name'), :as => :radio_buttons %>
         <%= f.association :location, collection: Location.order('entrytype,name'), include_blank: true %>
         <%= f.association :county, 
                           collection: (@person.location.blank? ? [] : @person.location.counties.order("name")), 
                           include_blank: true, 
                           wrapper_html: { id: 'county_select', style: @person.location.blank? ? 'display:none;' : '' } %>
-        <!-- TODO: display only their own institutions -->
         <%= f.association :institution, 
-                          collection: (@person.location.blank? ? Community.institutions.order("name") : @person.location.communities.institutions.order("name")), 
+                          collection: institution_collection_for_edit(@person), 
                           include_blank: true, 
                           wrapper_html: { id: 'institution_select'},
                           input_html: {class: 'span4'} %>
