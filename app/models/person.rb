@@ -79,6 +79,10 @@ class Person < ActiveRecord::Base
   ## scopes  
   scope :validaccounts, where("retired = #{false} and vouched = #{true}") 
   scope :pendingreview, where("retired = #{false} and vouched = #{false} and account_status != #{STATUS_SIGNUP} && email_confirmed = #{true}")
+  scope :not_system, where("id NOT IN(#{Settings.reserved_uids.join(',')})")
+  scope :display_accounts, validaccounts.not_system
+
+
 
   
   # duplicated from darmok
@@ -117,6 +121,29 @@ class Person < ActiveRecord::Base
     {:conditions => conditions}
   }
 
+
+  def self.filtered_by(browse_filter)
+    with_scope do
+      base_scope = scoped
+      if(browse_filter and settings = browse_filter.settings)
+        BrowseFilter::KNOWN_KEYS.each do |filter_key|
+          if(settings[filter_key])
+            case filter_key
+            when 'communities'
+              base_scope = base_scope.joins(:communities).where("communities.id IN (#{settings[filter_key].join(',')})").where(Community::CONNECTION_CONDITIONS['joined'])
+            when 'locations'
+              base_scope = base_scope.where("location_id IN (#{settings[filter_key].join(',')})")
+            when 'positions'
+              base_scope = base_scope.where("position_id IN (#{settings[filter_key].join(',')})")
+            when 'social_networks'
+              base_scope = base_scope.joins(:social_networks).where("social_networks.id IN (#{settings[filter_key].join(',')})")
+            end
+          end
+        end
+      end
+      base_scope
+    end
+  end
 
   def self.find_by_id_or_idstring(id,raise_not_found = true)
     # does the id contain a least one alpha? let's search by idstring

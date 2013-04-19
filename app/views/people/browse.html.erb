@@ -4,126 +4,52 @@
   <h2><%= @page_title %></h2>
 </div>  
 
+<div class="row">
+  <div class="span12">
+    <%- if @browse_filter -%>
+      <p>Filtering results by:</p>
+      <p><%= filter_text(@browse_filter.settings_to_objects) %></p>
+    <%- end -%>
+  </div>
+</div>
 
 <div class="row">
   <div class="span12">
-
-    <%= form_tag(filter_people_path, class: 'form-horizontal') do -%>
-
-    <fieldset>
-      <legend>Filter list by:</legend>
-      <div class="control-group">
-        <%= label_tag('communities', 'Communities/Institutions', :class => 'control-label') -%>
-        <div class="controls">
-          <%= text_field_tag("communities","", class: 'span8' ) -%> 
-        </div>
-      </div>
-
-      <div class="control-group">
-        <%= label_tag('locations', 'Locations', :class => 'control-label') -%>
-        <div class="controls">
-          <%= text_field_tag("locations","", class: 'span8' ) -%> 
-        </div>
-      </div>
-
-      <div class="control-group">
-        <%= label_tag('positions', 'Positions', :class => 'control-label') -%>
-        <div class="controls">
-          <%= text_field_tag("positions","", class: 'span8' ) -%> 
-        </div>
-      </div>
-
-      <div class="control-group">
-        <%= label_tag('social_networks', 'Social Networks', :class => 'control-label') -%>
-        <div class="controls">
-          <%= text_field_tag("social_networks","", class: 'span8' ) -%> 
-        </div>
-      </div>            
-
-    </fieldset>
-
-      <p><%= submit_tag "Filter", :class => "btn btn-primary" %> <%= link_to "cancel", '#', :class => "btn" %></p>
-
-    <%- end -%>  
-
+    <%= render(:partial => 'people/browse_filter_form') %>
   </div>
 </div>
 
 
- <script class="code" type="text/javascript"> 
-   $(function () {
-      $('#communities').select2({
-        minimumInputLength: 2,
-        multiple: true,
-        ajax: {
-          url: "<%= selectdata_communities_path -%>",
-          dataType: 'json',
-          data: function(term,page) {
-            return {
-              q: term
-            };
-          },
-          results: function (data, page) {
-            return { results: data };
-          }
-        }
-     });
-   });
+<%- if !@colleagues.blank? -%>
+<div class="row">
+  <div class="span12">
+    <%= page_entries_info @colleagues %>
+    <%= paginate(@colleagues) %>
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+        <th>Name</th>
+        <th>ID string</th>
+        <th>Email</th>
+        <th>Institution</th>
+        <th>Other Affiliation</th>
+        <th>Location</th>
+        </tr>
+      </thead>
 
-    $(function () {
-      $('#locations').select2({
-        minimumInputLength: 2,
-        multiple: true,
-        ajax: {
-          url: "<%= selectdata_locations_path -%>",
-          dataType: 'json',
-          data: function(term,page) {
-            return {
-              q: term
-            };
-          },
-          results: function (data, page) {
-            return { results: data };
-          }
-        }
-     });
-   });
-   
-    $(function () {
-      $('#positions').select2({
-        minimumInputLength: 2,
-        multiple: true,
-        ajax: {
-          url: "<%= selectdata_positions_path -%>",
-          dataType: 'json',
-          data: function(term,page) {
-            return {
-              q: term
-            };
-          },
-          results: function (data, page) {
-            return { results: data };
-          }
-        }
-     });
-   });
-   
-    $(function () {
-      $('#social_networks').select2({
-        minimumInputLength: 2,
-        multiple: true,
-        ajax: {
-          url: "<%= selectdata_social_networks_path -%>",
-          dataType: 'json',
-          data: function(term,page) {
-            return {
-              q: term
-            };
-          },
-          results: function (data, page) {
-            return { results: data };
-          }
-        }
-     });
-   });      
- </script>
+      <tbody>
+      <%- for person in @colleagues -%>
+        <tr id="person_row_<%= person.id %>">
+          <td><%= link_to("#{person.fullname}", person_path(person)) %></td>
+          <td><%= person.idstring %></td>
+          <td><%= person.email %></td>            
+          <td><%= primary_institution_name_for_person(person,'<span class="na">not specified</span>') %></td>
+          <td><%= (person.affiliation.blank?) ? '<span class="na">&nbsp;</span>'.html_safe : person.affiliation %></td>        
+          <td><%= (person.location.nil?) ? '<span class="na">n/a</span>'.html_safe : person.location.abbreviation %></td>        
+        </tr>
+      <%- end -%>
+      </tbody>
+    </table>
+  </div>
+</div>
+<%- end -%>

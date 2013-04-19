@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130415142314) do
+ActiveRecord::Schema.define(:version => 20130419142105) do
 
   create_table "activities", :force => true do |t|
     t.integer  "person_id",      :default => 0
@@ -34,6 +34,16 @@ ActiveRecord::Schema.define(:version => 20130415142314) do
     t.string   "trust_root",                :null => false
     t.datetime "created_at",                :null => false
   end
+
+  create_table "browse_filters", :force => true do |t|
+    t.integer  "created_by"
+    t.text     "settings"
+    t.string   "fingerprint", :limit => 40
+    t.datetime "created_at",                :null => false
+    t.datetime "updated_at",                :null => false
+  end
+
+  add_index "browse_filters", ["fingerprint"], :name => "fingerprint_ndx", :unique => true
 
   create_table "communities", :force => true do |t|
     t.integer  "entrytype",                            :default => 0,     :null => false
@@ -223,7 +233,7 @@ ActiveRecord::Schema.define(:version => 20130415142314) do
     t.string   "affiliation"
     t.text     "involvement"
     t.integer  "invitation_id"
-    t.string   "reset_token"
+    t.string   "reset_token",              :limit => 40
     t.datetime "created_at",                                                :null => false
     t.datetime "updated_at",                                                :null => false
   end
@@ -296,8 +306,6 @@ ActiveRecord::Schema.define(:version => 20130415142314) do
     t.string   "display_name"
     t.string   "url_format"
     t.text     "url_format_notice"
-    t.boolean  "editable_url"
-    t.boolean  "autocomplete"
     t.boolean  "active",                          :default => true
     t.datetime "created_at",                                        :null => false
     t.datetime "updated_at",                                        :null => false

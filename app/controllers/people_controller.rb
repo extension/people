@@ -61,10 +61,20 @@ class PeopleController < ApplicationController
   end
 
   def browse
+    if(params[:filter] and @browse_filter = BrowseFilter.find_by_id(params[:filter]))
+      @colleagues = Person.display_accounts.filtered_by(@browse_filter).page(params[:page]).order('last_activity_at DESC')
+    else
+      @colleagues = Person.display_accounts.page(params[:page]).order('last_activity_at DESC')
+    end
   end
 
   def filter
-    return redirect_to(browse_people_url)
+    if(browse_filter = BrowseFilter.find_or_create_by_settings(params,current_person))
+      return redirect_to(browse_people_url(filter: browse_filter.id))      
+    else
+      flash[:warning] = 'Invalid filter provided.'
+      return redirect_to(browse_people_url)
+    end
   end
 
   def find
