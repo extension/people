@@ -45,6 +45,8 @@ People::Application.routes.draw do
     end
     
     collection do
+      get :browse
+      post :filter
       get :invite
       post :invite
       get :invitations
@@ -83,6 +85,14 @@ People::Application.routes.draw do
     simple_named_route 'counties', via: [:post]
     simple_named_route 'institutions', via: [:post]
   end
+
+  # json data enpoints for tokeninput
+  controller :selectdata do
+    simple_named_route 'communities', via: [:get]
+    simple_named_route 'locations', via: [:get]
+    simple_named_route 'positions', via: [:get]
+    simple_named_route 'social_networks', via: [:get]
+  end  
 
   controller :debug do
     simple_named_route 'session_information', via: [:get,:post]

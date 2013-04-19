@@ -24,6 +24,7 @@ group :assets do
   gem 'jquery-ui-rails'
   gem 'jquery-tablesorter'
   gem 'extension-html5shiv-rails', :require => 'html5shiv-rails'
+  gem "select2-rails"
 end
 
 # mobile device detection

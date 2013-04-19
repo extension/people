@@ -13,6 +13,7 @@
  *= require _font-awesome
  *= require bootstrap_overrides
  *= require twitter/bootstrap-responsive
+ *= require select2
  *= require global
  *= require communities
  */

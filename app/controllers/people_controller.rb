@@ -60,6 +60,12 @@ class PeopleController < ApplicationController
   def index
   end
 
+  def browse
+  end
+
+  def filter
+  end
+
   def find
     if (!params[:q].blank?) 
       @colleagues = Person.patternsearch(params[:q]).order('last_name,first_name').page(params[:page])

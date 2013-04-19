@@ -1,0 +1,129 @@
+<%- @page_title = "Browse colleagues" -%>
+
+<div class="page-header">
+  <h2><%= @page_title %></h2>
+</div>  
+
+
+<div class="row">
+  <div class="span12">
+
+    <%= form_tag(filter_people_path, class: 'form-horizontal') do -%>
+
+    <fieldset>
+      <legend>Filter list by:</legend>
+      <div class="control-group">
+        <%= label_tag('communities', 'Communities/Institutions', :class => 'control-label') -%>
+        <div class="controls">
+          <%= text_field_tag("communities","", class: 'span8' ) -%> 
+        </div>
+      </div>
+
+      <div class="control-group">
+        <%= label_tag('locations', 'Locations', :class => 'control-label') -%>
+        <div class="controls">
+          <%= text_field_tag("locations","", class: 'span8' ) -%> 
+        </div>
+      </div>
+
+      <div class="control-group">
+        <%= label_tag('positions', 'Positions', :class => 'control-label') -%>
+        <div class="controls">
+          <%= text_field_tag("positions","", class: 'span8' ) -%> 
+        </div>
+      </div>
+
+      <div class="control-group">
+        <%= label_tag('social_networks', 'Social Networks', :class => 'control-label') -%>
+        <div class="controls">
+          <%= text_field_tag("social_networks","", class: 'span8' ) -%> 
+        </div>
+      </div>            
+
+    </fieldset>
+
+      <p><%= submit_tag "Filter", :class => "btn btn-primary" %> <%= link_to "cancel", '#', :class => "btn" %></p>
+
+    <%- end -%>  
+
+  </div>
+</div>
+
+
+ <script class="code" type="text/javascript"> 
+   $(function () {
+      $('#communities').select2({
+        minimumInputLength: 2,
+        multiple: true,
+        ajax: {
+          url: "<%= selectdata_communities_path -%>",
+          dataType: 'json',
+          data: function(term,page) {
+            return {
+              q: term
+            };
+          },
+          results: function (data, page) {
+            return { results: data };
+          }
+        }
+     });
+   });
+
+    $(function () {
+      $('#locations').select2({
+        minimumInputLength: 2,
+        multiple: true,
+        ajax: {
+          url: "<%= selectdata_locations_path -%>",
+          dataType: 'json',
+          data: function(term,page) {
+            return {
+              q: term
+            };
+          },
+          results: function (data, page) {
+            return { results: data };
+          }
+        }
+     });
+   });
+   
+    $(function () {
+      $('#positions').select2({
+        minimumInputLength: 2,
+        multiple: true,
+        ajax: {
+          url: "<%= selectdata_positions_path -%>",
+          dataType: 'json',
+          data: function(term,page) {
+            return {
+              q: term
+            };
+          },
+          results: function (data, page) {
+            return { results: data };
+          }
+        }
+     });
+   });
+   
+    $(function () {
+      $('#social_networks').select2({
+        minimumInputLength: 2,
+        multiple: true,
+        ajax: {
+          url: "<%= selectdata_social_networks_path -%>",
+          dataType: 'json',
+          data: function(term,page) {
+            return {
+              q: term
+            };
+          },
+          results: function (data, page) {
+            return { results: data };
+          }
+        }
+     });
+   });      
+ </script>
