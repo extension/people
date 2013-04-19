@@ -64,6 +64,7 @@ class PeopleController < ApplicationController
   end
 
   def filter
+    return redirect_to(browse_people_url)
   end
 
   def find
