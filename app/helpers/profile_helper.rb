@@ -28,10 +28,6 @@ module ProfileHelper
     image_tag("/assets/socialnetworks/#{network_name}.png").html_safe
   end
 
-  def add_social_network_link(network)
-    link_to("add",'#', :onclick => "$('#rankingattributes').append('#{escape_javascript(render(:partial => 'ranking_attribute',:locals => {:attributename => attributename}))}')").html_safe
-  end
-
   def institution_collection_for_edit(person)
     institutions = person.communities.institutions.connected_as('joined').order("name")
     institutions += (@person.location.blank? ? Community.institutions.order("name") : @person.location.communities.institutions.order("name"))

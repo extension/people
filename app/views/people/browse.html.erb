@@ -2,20 +2,24 @@
 
 <div class="page-header">
   <h2><%= @page_title %></h2>
+    <%= link_to("Filter Options <i class='icon-caret-right'></i>".html_safe, 
+                '#',
+                id: 'formtoggler', 
+                data: {toggle: 'collapse', target: '#showform'}) %>
+
+    <div id="showform" class="collapse">
+      <%= render(:partial => 'people/browse_filter_form') %>
+    </div>
 </div>  
 
 <div class="row">
   <div class="span12">
     <%- if @browse_filter -%>
+    <div class='well'>
       <p>Filtering results by:</p>
-      <p><%= filter_text(@browse_filter.settings_to_objects) %></p>
+      <p><%= filter_text(@browse_filter_objects) %></p>
+    </div>
     <%- end -%>
-  </div>
-</div>
-
-<div class="row">
-  <div class="span12">
-    <%= render(:partial => 'people/browse_filter_form') %>
   </div>
 </div>
 
@@ -53,3 +57,17 @@
   </div>
 </div>
 <%- end -%>
+
+
+
+<script type="text/javascript">
+
+$('#showform').on('show', function () {
+  $('#formtoggler').html("Filter Options <i class='icon-caret-down'></i>");
+});
+
+$('#showform').on('hide', function () {
+  $('#formtoggler').html("Filter Options <i class='icon-caret-right'></i>");
+});
+
+</script>

@@ -5,6 +5,8 @@
 
     <fieldset>
       <legend>Filter list by:</legend>
+      <p><em>Searches within a filter typle are 'or' searches. Searches between filter types are an 'and' search. For example, specifying Communities: 'eXtension Staff' 'North Carolina State University' and Positions: 'Master Gardener' will search for ('eXtension Staff' OR 'North Carolina State University') AND ('Master Gardener')</em></p>
+
       <div class="control-group">
         <%= label_tag('communities', 'Communities/Institutions', :class => 'control-label') -%>
         <div class="controls">
@@ -35,7 +37,7 @@
 
     </fieldset>
 
-      <p><%= submit_tag "Filter", :class => "btn btn-primary" %> <%= link_to "cancel", '#', :class => "btn" %></p>
+      <p><%= submit_tag "Filter", :class => "btn btn-primary" %> <%= link_to "cancel", '#', :class => "btn", :id => 'cancel_button' %></p>
 
     <%- end -%>  
 
@@ -43,6 +45,12 @@
 </div>
 
 <script class="code" type="text/javascript">
+
+    $('#cancel_button').on('click', function () {
+      $('#showform').collapse('hide');
+    });
+
+
    $(function () {
       $('#communities').select2({
         minimumInputLength: 2,
@@ -60,6 +68,11 @@
           }
         }
      });
+
+    <%- if (@browse_filter_objects && @browse_filter_objects['communities']) -%>
+      $('#communities').select2('data', <%= @browse_filter_objects['communities'].map{|c|  {id: c.id, text: c.name}}.to_json.html_safe %>);
+    <%- end -%>
+
    });
 
     $(function () {
@@ -79,6 +92,11 @@
           }
         }
      });
+
+     <%- if (@browse_filter_objects && @browse_filter_objects['locations']) -%>
+      $('#locations').select2('data', <%= @browse_filter_objects['locations'].map{|l|  {id: l.id, text: l.name}}.to_json.html_safe %>);
+    <%- end -%>
+
    });
    
     $(function () {
@@ -98,6 +116,10 @@
           }
         }
      });
+
+    <%- if (@browse_filter_objects && @browse_filter_objects['positions']) -%>
+      $('#positions').select2('data', <%= @browse_filter_objects['positions'].map{|p|  {id: p.id, text: p.name}}.to_json.html_safe %>);
+    <%- end -%>     
    });
    
     $(function () {
@@ -117,5 +139,9 @@
           }
         }
      });
+
+    <%- if (@browse_filter_objects && @browse_filter_objects['social_networks']) -%>
+      $('#social_networks').select2('data', <%= @browse_filter_objects['social_networks'].map{|sn|  {id: sn.id, text: sn.display_name}}.to_json.html_safe %>);
+    <%- end -%>          
    });      
  </script>
