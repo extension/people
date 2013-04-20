@@ -63,9 +63,9 @@ class PeopleController < ApplicationController
   def browse
     if(params[:filter] and @browse_filter = BrowseFilter.find_by_id(params[:filter]))
       @browse_filter_objects = @browse_filter.settings_to_objects
-      @colleagues = Person.display_accounts.filtered_by(@browse_filter).page(params[:page]).order('last_activity_at DESC')
+      @colleagues = Person.display_accounts.filtered_by(@browse_filter).page(params[:page]).order('last_name ASC')
     else
-      @colleagues = Person.display_accounts.page(params[:page]).order('last_activity_at DESC')
+      @colleagues = Person.display_accounts.page(params[:page]).order('last_name ASC')
     end
   end
 

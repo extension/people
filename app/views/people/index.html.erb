@@ -2,10 +2,19 @@
 
 <div class="row">
   <div class="span12">
-    <h3>Find Colleagues</h3>
+    <h3>Find colleagues</h3>
     <%= render(:partial => 'people/find_form') %>
   </div>
 </div>
+
+
+<div class="row">
+  <div class="span12">
+    <h3>Browse for colleagues</h3>
+    <p>You can <%= link_to("browse for colleagues", browse_people_path())%> and filter the browse list by communities, locations, positions, and social networks</p>
+  </div>
+</div>
+
 
 <div class="row">
   <div class="span8">
