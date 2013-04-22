@@ -1,0 +1,56 @@
+<% @page_title = "Panda Impact Summary By Tag (#{@panda_comparison_weeks} weeks Before/After)" %>
+<%= render(:partial => 'experiments_breadcrumbs', :locals => {:endpoint => 'Panda Impact Summary'}) %>
+
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title %></h1>
+  <p class="lead">Showing changes for <%= @panda_comparison_weeks %> weeks before/after</p>
+</header>
+
+
+<div class="well">
+  <h3>Experimentation</h3>
+  <p>Add a "weeks" parameter: <code>?weeks=</code> to the url to explore different weeks e.g.:</p>
+  <ul>
+    <% [3,6,12,24].each do |weeks| %>
+    <li><%= link_to("?weeks=#{weeks}".html_safe,{weeks: weeks}) %></li>
+    <%- end -%>
+  </ul>
+</div>
+
+<div class="row">
+  <div class="span12">
+	    <table class="table table-bordered tablesorter tablesorter-blue">
+        <thead>
+          <tr>
+            <th>&nbsp;</th>
+            <%- Page::DATATYPES.each do |datatype| -%>
+              <th colspan='2'><%= datatype.pluralize %></th>
+            <%- end -%>
+          </tr>
+          <tr>
+            <th>Group</th>
+            <%- Page::DATATYPES.each do |datatype| -%>
+              <th>% Change (Post/Pre)</th>
+              <th>% Change (Year)</th>
+            <%- end -%>
+          </tr>
+        </thead>
+        <tbody>
+          <%- Group.launched.each do |group| %>
+          <tr>
+            <td><%= group.name %></td>
+            <%- Page::DATATYPES.each do |datatype| -%>
+              <%- if(@diffs[group.id] and @diffs[group.id][datatype]) -%>
+                <td><%= percentage_if_applicable(@diffs[group.id][datatype][:pct_change]) %></td>
+                <td><%= percentage_if_applicable(@diffs[group.id][datatype][:pct_change_year]) %></td>
+              <%- else -%>
+                <td>n/a</td>
+                <td>n/a</td>
+              <%- end -%>
+            <%- end -%>
+          </tr>
+          <%- end -%>
+        </tbody>
+      </table>
+  </div>
+</div>

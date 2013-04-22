@@ -1,0 +1,177 @@
+<%- @page_title = "Ask an Expert Evaluation Data"-%>
+<%= render(:partial => 'download_breadcrumbs', :locals => {:endpoint => 'AaE Evaluation Data'}) %>
+
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title %></h1>
+</header>
+
+<%- if !@is_staff -%>
+
+<div class="row">
+  <div class="span12">
+    <div class="well">
+      <h3>Restricted download</h3>
+      <p>For submitter privacy reasons, this download is currently restricted to eXtension Staff.</p>
+    </div>
+  </div>
+</div>
+
+<%- else -%>
+
+<div class="row">
+  <div class="span12">
+    <div class="well">
+      <h3>Note! Restricted download!</h3>
+      <p>For submitter privacy reasons, this download is currently restricted to eXtension Staff. Please do not share this raw report with others outside of eXtension staff at this time.</p>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span6">
+    <table class="table table-bordered">
+      <tbody>
+          <tr>
+            <td>Period</td>
+            <td><%= @download.period_to_s %></td>
+          </tr>
+          <tr><td>Format</td><td><%= @download.filetype %></td></tr>
+          <tr><td>Last Export Size</td><td><%= humanize_bytes(@download.last_filesize,'n/a') %></td></tr>
+          <tr><td>Last Export Size</td><td><%= (@download.last_generated_at.blank? ? 'n/a' : @download.last_generated_at.strftime("%Y-%m-%d %H:%M:%S %Z")) %></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class='span6'>
+    <div class="well">
+      <p>
+    <%- if @download.available_for_download? %>
+      <%= link_to("Download",getfile_download_path(@download),class: 'btn') %>
+    <%- elsif(@download.in_progress?) -%>
+      Export in progress. Please check back in a few minutes.
+    <%- elsif(!@download.updated?) -%>
+      <%- @download.delay.dump_to_file -%>
+      Export not up to date. Please check back in a few minutes.
+    <%- end -%>
+      </p>
+    </div>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="span12">
+    <h3>Data Key</h3>
+    <p>Evaluation questions are split into _response (raw response) and _value (numeric value, if applicable) columns</p>
+    <table class="table table-bordered table-striped">
+      <thead>
+        <th>Variable</th>
+        <th>Description</th>
+      </thead>
+      <tbody>
+        <tr>
+          <td>response_time</td>
+          <td>Time of initial response in hours. A question can have multiple responses, this is the created_at time of the first response minus the the created_at time of the question</td>
+        </tr>
+
+        <tr>
+          <td>location</td>
+          <td>The location name attached to the question (if present).</td>
+        </tr>
+
+        <tr>
+          <td>county</td>
+          <td>The county name attached to the question (if present).</td>
+        </tr>
+
+        <tr>
+          <td>group</td>
+          <td>The group name attached to the question (if present).</td>
+        </tr>
+
+        <tr>
+          <td>submitter</td>
+          <td>An anonymized id number for the submitter (this will change every download). Useful for checking for evaluation changes from same submitter for
+            multiple questions</td>
+        </tr>
+
+
+        <tr>
+          <td>has_extension_account</td>
+          <td>Whether the submitter has an eXtensionID.</td>
+        </tr>
+
+        <tr>
+          <td>demographic_eligible</td>
+          <td>This question was eligible to have a demographic response</td>
+        </tr>        
+
+        <tr>
+          <td>demographics_count</td>
+          <td>The number of demographics questions answered by the submitter</td>
+        </tr>
+
+        <%- AaeDemographicQuestion.order(:id).active.each do |adq| -%>
+        <tr>
+          <td>demographic_<%= adq.id %></td>
+          <td>
+            <p><%= adq.prompt %></p>
+            <ul>
+              <%- adq.responses.each do |response| %>
+              <li><%= response %>
+              <%- end -%>
+            </ul>
+          </td>
+        </tr>
+        <%- end -%>
+
+        <tr>
+          <td>evaluation_eligible</td>
+          <td>This question was eligible to have a demographic response</td>
+        </tr>   
+
+        <tr>
+          <td>evaluation_count</td>
+          <td>The number of evaluation questions answered by the submitter</td>
+        </tr>
+
+        <%- AaeEvaluationQuestion.order(:id).active.each do |aeq| -%>
+        <tr>
+          <td>
+            evaluation_<%= aeq.id %>
+          </td>
+          <td>
+            <p>
+              <%- if aeq.responsetype == AaeEvaluationQuestion::SCALE -%>
+                <%= aeq.prompt %> <em>(on a scale from <%= aeq.range_start %> to <%= aeq.range_end %>)</em>
+              <%- else -%>
+                <%= aeq.prompt %>
+              <%- end -%>
+            </p>
+
+
+           <%- if !aeq.responses.blank? -%>
+            <ul>
+              <%- if aeq.responsetype == AaeEvaluationQuestion::SCALE -%>
+                <li><span class="badge"><%= aeq.range_start %></span> : <%= aeq.responses[0] %></li>
+                <li><span class="badge"><%= aeq.range_end %></span> : <%= aeq.responses[1] %></li>
+              <%- elsif aeq.responsetype == AaeEvaluationQuestion::MULTIPLE_CHOICE -%>
+                <%- aeq.responses.each_with_index do |response_text,index| %>                
+                  <li><span class="badge"><%= aeq.reporting_response_value(response_text) %></span> : <%= response_text %></li>              
+                <%- end -%>
+              <%- else -%>
+                <%- aeq.responses.each_with_index do |response_text,index| %>
+                <li><%= response_text %></li>
+                <%- end -%>
+              <%- end -%>
+            </ul>
+            <%- end -%>
+          </td>
+        </tr>
+        <%- end -%>     
+                        
+      </tbody>
+    </table>
+  </div>
+</div>
+<%- end -%>

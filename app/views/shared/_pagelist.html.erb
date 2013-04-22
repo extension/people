@@ -1,0 +1,34 @@
+<table class="table table-bordered table-striped">
+  <thead>
+    <tr>
+        <th>Page</th>
+        <th>Weeks Published</th>
+        <th>Total Views</th>
+        <th>Average Views</th>
+        <th>This Week</th>
+        <th>% Change Week</th>
+        <th>% Change Year</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <%- for page in pagelist -%>
+  	<tr>
+      <%- if page.title.blank?
+          title = '(blank)'
+        else
+          title = page.title.truncate(80, :separator => ' ')
+        end -%>
+      <td><%= link_to(title,page_path(page)) %></td>
+      <td><%= page.eligible_weeks %></td>
+      <td><%= page.try(:total) %></td>
+      <td><%= page.try(:mean) %></td>
+      <td><%= page.try(:this_week) %></td>
+      <td><%= pct_change(page.pct_change_week)%></td>
+      <td><%= pct_change(page.pct_change_year)%></td>
+    </tr>
+  <%- end -%>
+  </tbody>
+</table>
+
+

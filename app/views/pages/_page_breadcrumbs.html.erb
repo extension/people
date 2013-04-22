@@ -1,0 +1,18 @@
+<%- # TODO: there have to be better ways of doing this that utilize the action names -%>
+<ul class="breadcrumb">
+  <li>
+    <%- if local_assigns.has_key?(:endpoint) and endpoint == 'Pages' -%>
+      Pages<span class="divider">/</span>
+    <%- else -%>
+      <%= link_to('Pages',pages_path) %><span class="divider">/</span>
+    <%- end -%>
+  </li>
+
+  <%- if @datatype and (!local_assigns.has_key?(:endpoint) or endpoint != @datatype.pluralize) -%>
+  <li><%= link_to(@datatype.pluralize,details_pages_path(datatype: @datatype)) %><span class="divider">/</span></li>
+  <%- end -%>
+  
+  <%- if local_assigns.has_key?(:endpoint) and endpoint != 'Pages'-%>
+  <li class='active'><%= endpoint %></li>
+  <%- end -%>
+</ul>
