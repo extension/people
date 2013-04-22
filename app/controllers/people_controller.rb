@@ -4,16 +4,19 @@
 # === LICENSE:
 #  see LICENSE file
 class PeopleController < ApplicationController
-  skip_before_filter :check_hold_status, only: [:edit, :update]
+  skip_before_filter :check_hold_status, except: [:browse, :index, :vouch, :pendingreview, :invitations, :invite]
   before_filter :set_tab
 
   def show
     @person = Person.find_by_id_or_idstring(params[:id])
+    if(@person != current_person)
+      # manual check_hold_status
+      return redirect_to home_pending_url if (!current_person.activity_allowed?)
+    end    
   end
 
   def edit
     @person = Person.find(params[:id])
-    # if @person != current_person
     if(@person != current_person)
       # manual check_hold_status
       return redirect_to home_pending_url if (!current_person.activity_allowed?)
@@ -142,6 +145,11 @@ class PeopleController < ApplicationController
 
   def retire
     @person = Person.find(params[:id])
+    if(@person != current_person)
+      # manual check_hold_status
+      return redirect_to home_pending_url if (!current_person.activity_allowed?)
+    end
+
     if(request.post?)
       if((current_person != @person) and (params[:explanation].blank?))
         flash[:failure] = 'An explanation for retiring this account is required'
@@ -159,6 +167,12 @@ class PeopleController < ApplicationController
 
   def restore
     @person = Person.find(params[:id])
+
+    if(@person != current_person)
+      # manual check_hold_status
+      return redirect_to home_pending_url if (!current_person.activity_allowed?)
+    end
+
     if(@person.restore({colleague: current_person, ip_address: request.remote_ip}))
       flash[:success] = "Restored the account for #{@person.fullname}"
       return redirect_to(person_url(@person))
