@@ -1,41 +1,6 @@
-class ResetTables < ActiveRecord::Migration
+class DataTables < ActiveRecord::Migration
   def change
  
-  create_table "analytics", :force => true do |t|
-    t.integer  "page_id"
-    t.integer  "yearweek"
-    t.integer  "year"
-    t.integer  "week"
-    t.text     "analytics_url"
-    t.string   "url_type"
-    t.integer  "url_page_id"
-    t.integer  "url_migrated_id"
-    t.string   "url_wiki_title"
-    t.string   "url_widget_id"
-    t.string   "analytics_url_hash"
-    t.integer  "pageviews"
-    t.integer  "unique_pageviews"
-    t.integer  "entrances"
-    t.integer  "time_on_page"
-    t.integer  "exits"
-    t.integer  "visitors"
-    t.integer  "new_visits"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "tag_id"
-  end
- 
-  add_index "analytics", ["analytics_url_hash"], :name => "recordsignature", :unique => true
-  add_index "analytics", ["tag_id"], :name => "tag_id_ndx"
-  add_index "analytics", ["year", "week", "page_id"], :name => "analytic_ndx"
-
-    create_table "aae_nodes", :force => true do |t|
-      t.integer "node_id"
-      t.integer "aae_id"
-    end
-
-    add_index "aae_nodes", ["node_id", "aae_id"], :name => "node_group_ndx"
-
     create_table "collected_page_stats", :force => true do |t|
       t.integer  "statable_id"
       t.string   "statable_type", limit: 25, null: false
@@ -64,62 +29,6 @@ class ResetTables < ActiveRecord::Migration
     end
 
     add_index "collected_page_stats", ["statable_id", "statable_type", "datatype", "metric", "yearweek", "year", "week"], :name => "recordsignature", :unique => true
-
-
-    create_table "contributor_groups", :force => true do |t|
-      t.integer  "contributor_id"
-      t.integer  "group_id"
-      t.datetime "created_at"
-    end
-
-    add_index "contributor_groups", ["group_id", "contributor_id"], :name => "connection_ndx", :unique => true
-
-    create_table "contributors", :force => true do |t|
-      t.string   "idstring",           :limit => 80,                    :null => false
-      t.string   "openid_uid"
-      t.string   "first_name"
-      t.string   "last_name"
-      t.string   "email",              :limit => 96
-      t.string   "title"
-      t.integer  "account_status"
-      t.datetime "last_login_at"
-      t.integer  "position_id"
-      t.integer  "location_id"
-      t.integer  "county_id"
-      t.boolean  "retired",                          :default => false
-      t.boolean  "is_admin",                         :default => false
-      t.integer  "primary_account_id"
-      t.datetime "created_at"
-      t.datetime "updated_at"
-    end
-
-    add_index "contributors", ["openid_uid"], :name => "openid_ndx"
-
-    create_table "delayed_jobs", :force => true do |t|
-      t.integer  "priority"
-      t.integer  "attempts"
-      t.text     "handler"
-      t.text     "last_error"
-      t.datetime "run_at"
-      t.datetime "locked_at"
-      t.datetime "failed_at"
-      t.string   "locked_by"
-      t.string   "queue"
-      t.datetime "created_at", :null => false
-      t.datetime "updated_at", :null => false
-    end
-
-    add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
-
-    create_table "groups", :force => true do |t|
-      t.integer  "create_gid"
-      t.string   "name"
-      t.boolean  "is_launched"
-      t.datetime "created_at",  :null => false
-      t.datetime "updated_at",  :null => false
-    end
-
-    add_index "groups", ["create_gid"], :name => "create_group_ndx"
 
     create_table "landing_stats", :force => true do |t|
       t.integer  "group_id"

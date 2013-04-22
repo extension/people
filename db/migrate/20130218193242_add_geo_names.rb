@@ -26,7 +26,6 @@ class AddGeoNames < ActiveRecord::Migration
 
     add_index "geo_names", ["feature_name", "state_abbreviation", "county"], :name => "name_state_county_ndx"
 
-    execute("INSERT INTO geo_names SELECT * from prod_aae.geo_names")
   end
 
  end

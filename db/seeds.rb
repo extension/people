@@ -685,6 +685,9 @@ announce_and_run_query('Transferring social network connections',social_network_
 announce_and_run_query('Transferring individual email aliases',individual_email_alias_query)
 announce_and_run_query('Transferring community email aliases',community_email_alias_query)
 
+#     execute("INSERT INTO geo_names SELECT * from prod_aae.geo_names")
+
+
 # data manipulation
 transfer_retired_account_data
 dump_never_completed_signups

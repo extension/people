@@ -19,23 +19,6 @@ class AddDownloads < ActiveRecord::Migration
 
     add_index "downloads", ["label","period"], :name => "download_ndx"
 
-    # create initial downloads
-    Download.reset_column_information
-    Download.create(label: 'aae_evaluation', 
-                    display_label: 'Ask an Expert Evaluation',
-                    objectclass: 'AaeQuestion', 
-                    objectmethod: 'evaluation_data_csv', 
-                    filetype: 'csv', 
-                    period: Download::WEEKLY, 
-                    is_private: true)
-
-    Download.create(label: 'aae_questions',
-                    display_label: 'Ask an Expert Question Data',
-                    objectclass: 'AaeQuestion', 
-                    objectmethod: 'questions_csv', 
-                    filetype: 'csv', 
-                    period: Download::WEEKLY, 
-                    method_writes_file: true)
   end
 
 end
