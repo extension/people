@@ -17,8 +17,8 @@
     <%- elsif current_person.account_status == Person::STATUS_REVIEWAGREEMENT -%>
       <div class='alert'>
         <a class='close' data-dismiss="alert" href='#'>×</a>
-        <h4>You have not reviewed the eXtension Contributor Agreement.</h4>
-        <p>You need to do so in order to contribute or edit content in the eXtension collaborative publishing tools. <%= link_to("Review the Contributor Agreement", accounts_contributor_agreement_path) %></p>
+        <h4>You have not reviewed the eXtension Person Agreement.</h4>
+        <p>You need to do so in order to contribute or edit content in the eXtension collaborative publishing tools. <%= link_to("Review the Person Agreement", accounts_contributor_agreement_path) %></p>
       </div>
     <%- end -%>
 

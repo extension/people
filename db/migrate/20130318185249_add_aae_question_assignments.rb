@@ -1,7 +1,7 @@
 class AddAaeQuestionAssignments < ActiveRecord::Migration
   def change
     create_table "question_assignments", :force => true do |t|
-      t.integer  :contributor_id
+      t.integer  :person_id
       t.integer  :question_id
       t.integer  :assigned_by
       t.datetime :assigned_at
@@ -14,7 +14,7 @@ class AddAaeQuestionAssignments < ActiveRecord::Migration
       t.boolean  :handled_by_assignee
     end
 
-    add_index "question_assignments", ["contributor_id","assigned_by","next_handled_by"], :name => 'people_nex'
+    add_index "question_assignments", ["person_id","assigned_by","next_handled_by"], :name => 'people_nex'
     add_index "question_assignments", ["question_id"], :name => "question_ndx"
     add_index "question_assignments", ["assigned_at"], :name => "datetime_ndx"
 

@@ -25,14 +25,14 @@ class NodeMetacontribution < ActiveRecord::Base
 
   def associate_with_contributor
     checkstring = self.author.downcase
-    if(contributor = Contributor.where('idstring = ?',checkstring).first)
-      self.update_attribute(:contributor_id, contributor.id)
-    elsif(contributor = Contributor.where('email = ?',checkstring).first)
-      self.update_attribute(:contributor_id, contributor.id)
-    elsif(contributors = Contributor.where("CONCAT(first_name,' ',last_name) = ?",checkstring))
+    if(contributor = Person.where('idstring = ?',checkstring).first)
+      self.update_attribute(:person_id, contributor.id)
+    elsif(contributor = Person.where('email = ?',checkstring).first)
+      self.update_attribute(:person_id, contributor.id)
+    elsif(contributors = Person.where("CONCAT(first_name,' ',last_name) = ?",checkstring))
       if(contributors.size == 1)
         contributor = contributors.first
-        self.update_attribute(:contributor_id, contributor.id)
+        self.update_attribute(:person_id, contributor.id)
       end
     end
   end
@@ -40,7 +40,7 @@ class NodeMetacontribution < ActiveRecord::Base
   def self.rebuild
     self.connection.execute("truncate table #{self.table_name};")
     insert_values = []
-    CreateContributor.where('entity_type = ?','node').where('deleted = 0').each do |contribution|
+    CreatePerson.where('entity_type = ?','node').where('deleted = 0').each do |contribution|
       next if contribution.field_contributors_contribution_author.nil?
       insert_list = []
       insert_list << contribution.entity_id

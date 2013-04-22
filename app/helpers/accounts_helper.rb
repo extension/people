@@ -47,7 +47,7 @@ module AccountsHelper
       explanation = "<p>Your email is invalid. #{link_to('Learn more about email confirmation',accounts_pending_confirmation_path)}</p>"
     when Person::STATUS_CONTRIBUTOR 
       # just for debugging - should never see in normal operation
-      explanation = "<p>Your current account status is: <span class='label label-info'>Contributor</span></p>"     
+      explanation = "<p>Your current account status is: <span class='label label-info'>Person</span></p>"     
     when Person::STATUS_REVIEWAGREEMENT
       # just for debugging - should never see in normal operation 
       explanation = "<p>Your current account status is: <span class='label label-info'>Pending Agreement Review</span></p>"     

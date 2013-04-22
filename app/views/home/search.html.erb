@@ -8,7 +8,7 @@
 <%- end -%>
 
 <div class="page-header">
-  <h2>Pages, Nodes, or Contributors matching <%= params[:q]%></h2>
+  <h2>Pages, Nodes, or Persons matching <%= params[:q]%></h2>
 </div>
 <div class="row">
   <%- if @search_results_count > 0 -%>
@@ -22,7 +22,7 @@
          <dt>Node #<%= @node.id %></dt><dd><%= link_to(@node.display_title,node_path(@node))%></dd>
         <%- end -%>
         <%- if @contributor -%>
-         <dt>Contributor</dt><dd><%= link_to(@contributor.fullname,contributor_path(@contributor))%></dd>
+         <dt>Person</dt><dd><%= link_to(@contributor.fullname,contributor_path(@contributor))%></dd>
         <%- end -%>
         </dl>
     <%- else -%>
@@ -49,7 +49,7 @@
         <%- if @contributorlist -%>
           <dl class="dl-horizontal">
           <%- @contributorlist.each do |contributor| -%>
-            <dt>Contributor</dt><dd><%= link_to(contributor.fullname,contributor_path(contributor))%></dd>
+            <dt>Person</dt><dd><%= link_to(contributor.fullname,contributor_path(contributor))%></dd>
           <%- end -%>
           </dl>
         <%- end -%>

@@ -168,7 +168,7 @@ class ExperimentsController < ApplicationController
   end
 
   def contributors_views
-    node_contributors = NodeActivity.joins(:node).where('nodes.has_page = 1').group('node_id').count('contributor_id',:distinct => true)
+    node_contributors = NodeActivity.joins(:node).where('nodes.has_page = 1').group('node_id').count('person_id',:distinct => true)
 
     articles = Page.from_create.articles.with_totals_for_metric('unique_pageviews')
     faqs = Page.from_create.faqs.with_totals_for_metric('unique_pageviews')
@@ -216,8 +216,8 @@ class ExperimentsController < ApplicationController
   end
 
   def check_for_contributor
-    if(params[:contributor_id])
-      @contributor = Contributor.find_by_id(params[:contributor_id])
+    if(params[:person_id])
+      @contributor = Person.find_by_id(params[:person_id])
     end
     true
   end

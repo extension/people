@@ -5,7 +5,7 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
-class Contributor < ActiveRecord::Base
+class Person < ActiveRecord::Base
   has_many :node_activities
   has_many :node_metacontributions
 
@@ -73,7 +73,7 @@ class Contributor < ActiveRecord::Base
   def self.find_by_uid(uid,provider)
     case provider
     when 'extension'
-      Contributor.find_by_openid_uid(uid)
+      Person.find_by_openid_uid(uid)
     else
       nil
     end

@@ -7,7 +7,7 @@
 
 class Question < ActiveRecord::Base
 
-  belongs_to :initial_responder, class_name: 'Contributor'
+  belongs_to :initial_responder, class_name: 'Person'
   belongs_to :detected_location, class_name: 'Location'
   belongs_to :location
   belongs_to :detected_county, class_name: 'County'

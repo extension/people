@@ -1,5 +1,5 @@
-<%- @page_title = "Contributors vs. Views"-%>
-<%= render(:partial => 'experiments_breadcrumbs', :locals => {:endpoint => 'Contributors vs. Views'}) %>
+<%- @page_title = "Persons vs. Views"-%>
+<%= render(:partial => 'experiments_breadcrumbs', :locals => {:endpoint => 'Persons vs. Views'}) %>
 
 <header class="jumbotron subhead" id="overview">
   <h1><%= @page_title %></h1>
@@ -9,13 +9,13 @@
 <div class="row">
   <div class="span12">
     <h3>Articles</h3>
-    <%= render(partial: 'shared/scatter_plot', locals: {:data => [@articles], :datalabel => 'articles', :xlabel => 'Contributors', :ylabel => 'Mean Views', :pointsize => 4})%>
+    <%= render(partial: 'shared/scatter_plot', locals: {:data => [@articles], :datalabel => 'articles', :xlabel => 'Persons', :ylabel => 'Mean Views', :pointsize => 4})%>
   </div>
 </div>
 
 <div class="row">
   <div class="span12">
     <h3>Faqs</h3>
-    <%= render(partial: 'shared/scatter_plot', locals: {:data => [@faqs], :datalabel => 'faqs', :xlabel => 'Contributors', :ylabel => 'Mean Views', :pointsize => 4})%>
+    <%= render(partial: 'shared/scatter_plot', locals: {:data => [@faqs], :datalabel => 'faqs', :xlabel => 'Persons', :ylabel => 'Mean Views', :pointsize => 4})%>
   </div>
 </div>

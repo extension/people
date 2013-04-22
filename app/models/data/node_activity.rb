@@ -90,7 +90,7 @@ class NodeActivity < ActiveRecord::Base
         insert_list << ActiveRecord::Base.quote_value(revision.created_at.to_s(:db))
         insert_values << "(#{insert_list.join(',')})"
       end
-      insert_sql = "INSERT INTO #{self.table_name} (node_id,contributor_id,node_revision_id,event,activity,log,created_at) VALUES #{insert_values.join(',')};"
+      insert_sql = "INSERT INTO #{self.table_name} (node_id,person_id,node_revision_id,event,activity,log,created_at) VALUES #{insert_values.join(',')};"
       self.connection.execute(insert_sql)
     end
 
@@ -114,7 +114,7 @@ class NodeActivity < ActiveRecord::Base
         insert_list << ActiveRecord::Base.quote_value(cwe.created_at.to_s(:db))
         insert_values << "(#{insert_list.join(',')})"
       end
-      insert_sql = "INSERT INTO #{self.table_name} (node_id,contributor_id,node_revision_id,event,activity,log,created_at) VALUES #{insert_values.join(',')};"
+      insert_sql = "INSERT INTO #{self.table_name} (node_id,person_id,node_revision_id,event,activity,log,created_at) VALUES #{insert_values.join(',')};"
       self.connection.execute(insert_sql)
     end
 
@@ -130,7 +130,7 @@ class NodeActivity < ActiveRecord::Base
         insert_list << ActiveRecord::Base.quote_value(comment.created_at.to_s(:db))
         insert_values << "(#{insert_list.join(',')})"
       end
-      insert_sql = "INSERT INTO #{self.table_name} (node_id,contributor_id,event,activity,created_at) VALUES #{insert_values.join(',')};"
+      insert_sql = "INSERT INTO #{self.table_name} (node_id,person_id,event,activity,created_at) VALUES #{insert_values.join(',')};"
       self.connection.execute(insert_sql)
     end
     true
@@ -147,7 +147,7 @@ class NodeActivity < ActiveRecord::Base
     end
     with_scope do
       returnstats['contributions'] = self.send(activity).count
-      returnstats['contributors'] = self.send(activity).count(:contributor_id,:distinct => true)
+      returnstats['contributors'] = self.send(activity).count(:person_id,:distinct => true)
       returnstats['items'] = self.send(activity).count(:node_id,:distinct => true)
     end
     returnstats

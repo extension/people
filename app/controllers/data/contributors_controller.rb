@@ -6,10 +6,10 @@
 #  see LICENSE file
 require 'csv'
 
-class ContributorsController < ApplicationController
+class PersonsController < ApplicationController
 
   def show
-    @contributor = Contributor.find(params[:id])
+    @contributor = Person.find(params[:id])
     @node_contribution_stats = YearWeekStatsComparator.new
     ['all_nodes','publishables','administrative'].each do |node_scope|
       @node_contribution_stats[node_scope] = @contributor.unique_contributed_nodes.send(node_scope).stats_by_yearweek(NodeActivity::ALL_ACTIVITY)
@@ -44,7 +44,7 @@ class ContributorsController < ApplicationController
   end
 
   def contributions
-    @contributor = Contributor.find(params[:id])
+    @contributor = Person.find(params[:id])
 
     if(!params[:download].nil? and params[:download] == 'csv')
     	@contributions = @contributor.contributions_by_node
@@ -58,7 +58,7 @@ class ContributorsController < ApplicationController
 
 
   def metacontributions
-		@contributor = Contributor.find(params[:id])
+		@contributor = Person.find(params[:id])
 
     if(!params[:download].nil? and params[:download] == 'csv')
       @metacontributions = @contributor.meta_contributions_by_node

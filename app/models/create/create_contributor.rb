@@ -5,7 +5,7 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
-class CreateContributor < ActiveRecord::Base
+class CreatePerson < ActiveRecord::Base
   self.establish_connection :create
   self.table_name= 'field_data_field_contributors'
 

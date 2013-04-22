@@ -51,7 +51,7 @@ class DataTables < ActiveRecord::Migration
 
     create_table "node_activities", :force => true do |t|
       t.integer  "node_id"
-      t.integer  "contributor_id"
+      t.integer  "person_id"
       t.integer  "node_revision_id"
       t.integer  "event"
       t.string  "activity", :limit => 25
@@ -59,7 +59,7 @@ class DataTables < ActiveRecord::Migration
       t.datetime "created_at"
     end
 
-    add_index "node_activities", ["contributor_id", "event", "activity", "created_at"], :name => "contributor_activity_ndx"
+    add_index "node_activities", ["person_id", "event", "activity", "created_at"], :name => "contributor_activity_ndx"
     add_index "node_activities", ["event", "activity", "created_at"], :name => "event_activity_ndx"
     add_index "node_activities", ["node_id", "event", "activity","created_at"], :name => "node_activity_ndx"
     add_index "node_activities", ["node_id"], :name => "node_ndx"
@@ -74,7 +74,7 @@ class DataTables < ActiveRecord::Migration
 
     create_table "node_metacontributions", :force => true do |t|
       t.integer  "node_id"
-      t.integer  "contributor_id"
+      t.integer  "person_id"
       t.integer  "node_revision_id"
       t.string   "role"
       t.string   "author"
@@ -82,7 +82,7 @@ class DataTables < ActiveRecord::Migration
       t.datetime "created_at"
     end
 
-    add_index "node_metacontributions", ["contributor_id"], :name => "contributor_ndx"
+    add_index "node_metacontributions", ["person_id"], :name => "contributor_ndx"
     add_index "node_metacontributions", ["node_id"], :name => "node_ndx"
 
     create_table "node_totals", :force => true do |t|
@@ -199,12 +199,12 @@ class DataTables < ActiveRecord::Migration
 
     create_table "revisions", :force => true do |t|
       t.integer  "node_id"
-      t.integer  "contributor_id"
+      t.integer  "person_id"
       t.text     "log"
       t.datetime "created_at"
     end
 
-    add_index "revisions", ["contributor_id"], :name => "contributor_ndx"
+    add_index "revisions", ["person_id"], :name => "contributor_ndx"
     add_index "revisions", ["node_id"], :name => "node_ndx"
 
     create_table "tags", :force => true do |t|

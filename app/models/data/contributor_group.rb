@@ -5,7 +5,7 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
-class ContributorGroup < ActiveRecord::Base
+class PersonGroup < ActiveRecord::Base
   belongs_to :group
   belongs_to :contributor
 
@@ -20,7 +20,7 @@ class ContributorGroup < ActiveRecord::Base
       insert_list << 'NOW()'
       insert_values << "(#{insert_list.join(',')})"
     end
-    insert_sql = "INSERT INTO #{self.table_name} (group_id,contributor_id,created_at) VALUES #{insert_values.join(',')};"
+    insert_sql = "INSERT INTO #{self.table_name} (group_id,person_id,created_at) VALUES #{insert_values.join(',')};"
     self.connection.execute(insert_sql)
   end
 end

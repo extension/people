@@ -18,7 +18,7 @@ class PagesController < ApplicationController
   end
 
   def overview
-    if(params[:contributor_id] and @contributor = Contributor.find_by_id(params[:contributor_id]))
+    if(params[:person_id] and @contributor = Person.find_by_id(params[:person_id]))
       if(params[:contributions] and params[:contributions] == 'meta')
         @contributions_type = 'Listed'
         scope = @contributor.unique_meta_contributed_pages
@@ -73,7 +73,7 @@ class PagesController < ApplicationController
       @datatype = 'Article'
     end
 
-    if(params[:contributor_id] and @contributor = Contributor.find_by_id(params[:contributor_id]))
+    if(params[:person_id] and @contributor = Person.find_by_id(params[:person_id]))
       if(params[:contributions] and params[:contributions] == 'meta')
         @contributions_type = 'Listed'
         scope = @contributor.unique_meta_contributed_pages.by_datatype(@datatype)
@@ -115,7 +115,7 @@ class PagesController < ApplicationController
       @datatype = 'Article'
     end
 
-    if(params[:contributor_id] and @contributor = Contributor.find_by_id(params[:contributor_id]))
+    if(params[:person_id] and @contributor = Person.find_by_id(params[:person_id]))
       if(params[:contributions] and params[:contributions] == 'meta')
         @contributions_type = 'Listed'
         scope = @contributor.unique_meta_contributed_pages.by_datatype(@datatype)
@@ -168,7 +168,7 @@ class PagesController < ApplicationController
 
 
     if(!params[:download].nil? and params[:download] == 'csv')
-      @node_contributors = NodeActivity.joins(:node).where('nodes.has_page = 1').group('node_id').count('contributor_id',:distinct => true)
+      @node_contributors = NodeActivity.joins(:node).where('nodes.has_page = 1').group('node_id').count('person_id',:distinct => true)
       @node_contributions = NodeActivity.joins(:node).where('nodes.has_page = 1').group('node_id').count('node_activities.id')
       @pagelist = @pagelist = scope.totals_list({order_by: @order_by, direction: @direction, metric: @metric})
       send_data(totals_csv(@pagelist,@node_contributors,@node_contributions),

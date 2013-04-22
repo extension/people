@@ -17,19 +17,19 @@
 
   <p>Add a "group_id" parameter: <code>?group_id=</code> to the url to explore groups e.g.:</p>
   <ul>
-    <%- link_params = params.delete_if{|k,v| ['contributor_id','contributions'].include?(k)}.merge({group_id: 25}) -%>
+    <%- link_params = params.delete_if{|k,v| ['person_id','contributions'].include?(k)}.merge({group_id: 25}) -%>
     <li><%= link_to("?group_id=25".html_safe,link_params) %> (Sustainable Ag Energy)</li>
   </ul>
 
-  <p>Add a "contributor_id" parameter: <code>?contributor_id=</code> to the url to explore contributors.
+  <p>Add a "person_id" parameter: <code>?person_id=</code> to the url to explore contributors.
     Add <code>contributions=meta</code> to show Listed instead of Direct contributions e.g.:</p>
   <ul>
-    <%- link_params = params.delete_if{|k,v| ['group_id'].include?(k)}.merge({contributor_id: 11}) -%>
-    <li><%= link_to("?contributor_id=11".html_safe,link_params) %> (Jason Young)</li>
-    <%- link_params = params.delete_if{|k,v| ['group_id'].include?(k)}.merge({contributor_id: 11, contributions: 'meta'}) -%>
-    <li><%= link_to("?contributor_id=11&contributions=meta".html_safe,link_params) %> (Jason Young, meta contributions)</li>
+    <%- link_params = params.delete_if{|k,v| ['group_id'].include?(k)}.merge({person_id: 11}) -%>
+    <li><%= link_to("?person_id=11".html_safe,link_params) %> (Jason Young)</li>
+    <%- link_params = params.delete_if{|k,v| ['group_id'].include?(k)}.merge({person_id: 11, contributions: 'meta'}) -%>
+    <li><%= link_to("?person_id=11&contributions=meta".html_safe,link_params) %> (Jason Young, meta contributions)</li>
   </ul>
-  <p>Note: <code>contributor_id=</code> and <code>group_id=</code> are mutually exclusive, contributor_id takes precedence</p>
+  <p>Note: <code>person_id=</code> and <code>group_id=</code> are mutually exclusive, person_id takes precedence</p>
 </div>
 
 <div class="row">

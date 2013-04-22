@@ -2,6 +2,8 @@
 
 @my_database = ActiveRecord::Base.connection.instance_variable_get("@config")[:database]
 @darmok_database = 'prod_darmok'
+@data_database = 'prod_data'
+
 
 
 ## utility methods
@@ -217,6 +219,13 @@ end
 def geonames_transfer_query
   query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{@my_database}.#{GeoName.table_name} SELECT * FROM #{@darmok_database}.geo_names
+  END_SQL
+  query
+end
+
+def downloads_transfer_query
+  query = <<-END_SQL.gsub(/\s+/, " ").strip
+    INSERT INTO #{@my_database}.#{Download.table_name} SELECT * FROM #{@data_database}.downloads
   END_SQL
   query
 end
@@ -692,6 +701,7 @@ announce_and_run_query('Transferring social network connections',social_network_
 announce_and_run_query('Transferring individual email aliases',individual_email_alias_query)
 announce_and_run_query('Transferring community email aliases',community_email_alias_query)
 announce_and_run_query('Transferring geo name data',geonames_transfer_query)
+announce_and_run_query('Transferring downloads data',downloads_transfer_query)
 
 # data manipulation
 transfer_retired_account_data
@@ -700,6 +710,7 @@ create_milfam_wordpress_list_email_alias
 transfer_community_connections
 transfer_invitations
 set_person_institution_column
+
 transform_person_additionaldata_data
 transfer_user_authentication_events_to_activities
 transfer_user_profile_events_to_activities

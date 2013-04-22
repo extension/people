@@ -84,6 +84,12 @@ gem 'hashids', "0.0.4ex"
 # html scrubbing
 gem "loofah"
 
+# useragent analysis
+gem 'useragent'
+
+# ip to geo mapping
+gem 'geocoder'
+gem 'geoip'
 
 group :development do
   # require the powder gem

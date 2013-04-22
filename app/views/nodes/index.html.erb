@@ -21,7 +21,7 @@
     </div>
 
     <div class="span8">
-      <h3>Contributors per week over time <small><%= link_to('more graphs...',graphs_nodes_path())%></small></h3>
+      <h3>Persons per week over time <small><%= link_to('more graphs...',graphs_nodes_path())%></small></h3>
       <%= render(:partial => 'shared/line_plot', :locals => {:data => @everything_stats_by_week.to_graph_data(:contributors), :datalabel => 'all_contributors' })%>
     </div>
   </div>
@@ -48,7 +48,7 @@
 
   <div class="row">
   <div class="span12">
-    <h3>Contributors By Week</h3>
+    <h3>Persons By Week</h3>
     <%= render(:partial => 'shared/comparison_plot',
                :locals => {data: @publishable_stats_by_week.to_graph_data(:contributors),
                            labels: @publishable_stats_by_week.to_graph_labels.map{|l| l.capitalize},
@@ -78,7 +78,7 @@
 
   <div class="row">
   <div class="span12">
-    <h3>Contributors By Week</h3>
+    <h3>Persons By Week</h3>
     <%= render(:partial => 'shared/comparison_plot',
                :locals => {data: @administrative_stats_by_week.to_graph_data(:contributors),
                            labels: @administrative_stats_by_week.to_graph_labels.map{|l| Node::ADMINISTRATIVE_NODE_SCOPES_LABELS[l]},

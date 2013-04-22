@@ -87,7 +87,7 @@ class Node < ActiveRecord::Base
 
   def contributions_count
     counts = {}
-    counts[:contributors] = self.node_activities.count('contributor_id',:distinct => true)
+    counts[:contributors] = self.node_activities.count('person_id',:distinct => true)
     counts[:actions] = self.node_activities.count
     counts[:byaction] = self.node_activities.group('event').count
     counts
@@ -95,7 +95,7 @@ class Node < ActiveRecord::Base
 
   def metacontributions_count
     counts = {}
-    counts[:contributors] = self.node_metacontributions.count('contributor_id',:distinct => true)
+    counts[:contributors] = self.node_metacontributions.count('person_id',:distinct => true)
     counts[:actions] = self.node_metacontributions.count
     counts[:byaction] = self.node_metacontributions.group('role').count
     counts
@@ -143,7 +143,7 @@ class Node < ActiveRecord::Base
 
   def overall_stats(activity)
     stats = {}
-    contributors_count =  "COUNT(DISTINCT(node_activities.contributor_id)) as contributors"
+    contributors_count =  "COUNT(DISTINCT(node_activities.person_id)) as contributors"
     contributions_count =  "COUNT(DISTINCT(node_activities.id)) as contributions"
 
     scope = self.node_activities
@@ -173,7 +173,7 @@ class Node < ActiveRecord::Base
   def self._overall_stats(activity)
     stats = {}
     with_scope do
-      contributors_count =  "COUNT(DISTINCT(node_activities.contributor_id)) as contributors"
+      contributors_count =  "COUNT(DISTINCT(node_activities.person_id)) as contributors"
       contributions_count =  "COUNT(DISTINCT(node_activities.id)) as contributions"
       items_count = "COUNT(DISTINCT(node_activities.node_id)) as items"
 
@@ -201,7 +201,7 @@ class Node < ActiveRecord::Base
   def _stats_by_yearweek(activity)
     stats = YearWeekStats.new
     yearweek_condition = "YEARWEEK(node_activities.created_at,3)"
-    contributors_count =  "COUNT(DISTINCT(node_activities.contributor_id)) as contributors"
+    contributors_count =  "COUNT(DISTINCT(node_activities.person_id)) as contributors"
     contributions_count =  "COUNT(node_activities.id) as contributions"
 
     scope = self.node_activities.group(yearweek_condition)
@@ -246,7 +246,7 @@ class Node < ActiveRecord::Base
     stats = YearWeekStats.new
     with_scope do
       yearweek_condition = "YEARWEEK(node_activities.created_at,3)"
-      contributors_count =  "COUNT(DISTINCT(node_activities.contributor_id)) as contributors"
+      contributors_count =  "COUNT(DISTINCT(node_activities.person_id)) as contributors"
       contributions_count =  "COUNT(node_activities.id) as contributions"
       items_count = "COUNT(DISTINCT(node_activities.node_id)) as items"
 
