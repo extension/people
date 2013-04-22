@@ -359,8 +359,15 @@ class Person < ActiveRecord::Base
   end
 
 
-  def check_email_change(options = {})
-    if(self.previous_changes.keys.include?('email'))
+  def check_profile_changes(options = {})
+    previous_changes_keys = self.previous_changes.keys.dup
+
+    # institution check
+    if(previous_changes_keys.include?('institution_id'))
+      self.connect_to_community(self.institution,'member',options.merge({connector_id: options[:colleague_id]}))
+    end
+
+    if(previous_changes_keys.include?('email'))
       self.previous_email = self.previous_changes['email'][0]
       self.email_confirmed = false
       self.email_confirmed_at = nil
@@ -369,6 +376,7 @@ class Person < ActiveRecord::Base
         Activity.log_activity(options.merge({person_id: self.id,
                                             activitycode: Activity::EMAIL_CHANGE, 
                                             additionalinfo: "changed to #{self.email} from #{self.previous_email}",
+                                            colleague_id: options[:colleague_id], 
                                             additionaldata: {from: self.previous_email, to: self.email}}))
         Notification.create(:notification_type => Notification::CONFIRM_EMAIL, :notifiable => self)
         return true
@@ -379,6 +387,10 @@ class Person < ActiveRecord::Base
       return false
     end
   end
+
+  def check_institution_change(options = {})
+
+  end  
 
   def confirm_email(options = {})
     self.email_confirmed = true

@@ -30,7 +30,7 @@ class PeopleController < ApplicationController
 
     if @person.update_attributes(params[:person])
       what_changed = @person.previous_changes.reject{|attribute,value| ['updated_at'].include?(attribute)}
-      @person.check_email_change({colleague_id: current_person.id, ip_address: request.remote_ip})
+      @person.check_profile_changes({colleague_id: current_person.id, ip_address: request.remote_ip})
 
       if(current_person == @person)
         Activity.log_activity(person_id: @person.id, 
@@ -63,7 +63,15 @@ class PeopleController < ApplicationController
   def browse
     if(params[:filter] and @browse_filter = BrowseFilter.find_by_id(params[:filter]))
       @browse_filter_objects = @browse_filter.settings_to_objects
-      @colleagues = Person.display_accounts.filtered_by(@browse_filter).page(params[:page]).order('last_name ASC')
+
+      if(!params[:download].nil? and params[:download] == 'csv')
+        @colleagues = Person.display_accounts.filtered_by(@browse_filter).order('last_name ASC')
+        send_data(meta_contributions_csv(@colleagues),
+                  :type => 'text/csv; charset=iso-8859-1; header=present',
+                  :disposition => "attachment; filename=colleagues_filtered_by_filter#{@browse_filter.id}.csv")
+      else
+        @colleagues = Person.display_accounts.filtered_by(@browse_filter).page(params[:page]).order('last_name ASC')
+      end
     else
       @colleagues = Person.display_accounts.page(params[:page]).order('last_name ASC')
     end
@@ -317,6 +325,44 @@ class PeopleController < ApplicationController
   def set_tab
     @selected_tab = 'colleagues'
   end
+
+# # eXtensionID,First Name,Last Name,Email,Phone,Title,Position,Institution,Other Affiliation,Location,County,Agreement Status,Account Created
+# # <% for showuser in @userlist %><%= makeusercsvstring(showuser)+"\n" %><% end %>
+
+#   def colleagues_csv(colleagues)
+#     CSV.generate do |csv|
+#       headers = []
+#       headers << 'First Name'
+#       headers << 'Last Name'
+#       headers << 'idstring'
+#       headers << 'Email'
+#       headers << 'Phone'
+#       headers << 'Title'
+#       headers << 'Position'
+#       headers << 'Institution'
+#       headers << 'Other Affiliation'
+#       headers << 'Location'
+#       headers << 'County'
+#       headers << 'Agreement Status'
+#       headers << 'Account Created'
+#       headers << 'Last Active At'
+#       headers << 'Communities'
+#       csv << headers
+#       colleagues.each do |person|
+#         row = []
+#         row << person.first_name
+#         row << person.last_name
+#         row << person.idstring
+#         row << person.email
+#         row << person.phone
+#         row << person.title
+#         row << (person.position.blank? ? '' : person.position.name)
+#         row << (person.institution.blank? ? '' : person.institution.name)
+#         row << person.affiliation
+#         csv << row
+#       end
+#     end
+#   end  
 
 
 end
