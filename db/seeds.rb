@@ -214,6 +214,13 @@ def google_groups_transfer_query
   query
 end
 
+def geonames_transfer_query
+  query = <<-END_SQL.gsub(/\s+/, " ").strip
+    INSERT INTO #{@my_database}.#{GeoName.table_name} SELECT * FROM #{@darmok_database}.geo_names
+  END_SQL
+  query
+end
+
 def lists_transfer_query
   select_columns = MailmanList.column_names
   insert_clause = "#{@my_database}.#{MailmanList.table_name} (#{select_columns.join(',')})"
@@ -684,9 +691,7 @@ announce_and_run_query('Transferring lists',lists_transfer_query)
 announce_and_run_query('Transferring social network connections',social_network_transfer_query)
 announce_and_run_query('Transferring individual email aliases',individual_email_alias_query)
 announce_and_run_query('Transferring community email aliases',community_email_alias_query)
-
-#     execute("INSERT INTO geo_names SELECT * from prod_aae.geo_names")
-
+announce_and_run_query('Transferring geo name data',geonames_transfer_query)
 
 # data manipulation
 transfer_retired_account_data
