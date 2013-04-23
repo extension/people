@@ -6,6 +6,7 @@
 #  see LICENSE file
 
 class Community < ActiveRecord::Base
+  include CacheTools
   include MarkupScrubber
   attr_accessible :creator, :created_by
   attr_accessible :name, :description, :location, :location_id, :memberfilter, :connect_to_drupal
@@ -230,6 +231,13 @@ class Community < ActiveRecord::Base
     returnlist = namelist | descriptionlist
     returnlist
   end
+
+  def joined_count(cache_options = {})
+    cache_key = self.get_cache_key(__method__)
+    Rails.cache.fetch(cache_key,cache_options) do
+      joined.count
+    end
+  end    
 
 
 

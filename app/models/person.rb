@@ -674,7 +674,9 @@ class Person < ActiveRecord::Base
         Notification.create_community_connection(options.merge({person_id: self.id, community_id: community.id, connectiontype: connectiontype}))
       end
     end
-    true
+
+    # force cache update
+    community.joined_count(force: true)
   end
 
   def remove_from_community(community,options={})
