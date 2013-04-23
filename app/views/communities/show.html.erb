@@ -38,20 +38,7 @@
           <small><%= link_to 'edit (todo)', '#' -%></small>
         <%- end -%>
       </h3>
-      <div id="communitymailinglists" class="dashmodule">
-        <% if @community.mailman_lists.count == 0 %>
-          <p>No lists have been created for this <%= @community.entrytype_display_label %>.</p>
-        <% else %>
-        <ul class="unstyled">
-          <% @community.mailman_lists.each do |mailinglist| %>
-            <li class='community'>
-                <span><%= mailinglist.connectiontype %></span>
-                <%= mail_to("#{mailinglist.name}@lists.extension.org", mailinglist.name) %>
-            </li>
-          <% end %>
-        </ul>
-        <% end %>
-      </div>
+
     </div>
 
 
