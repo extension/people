@@ -206,11 +206,11 @@ class Community < ActiveRecord::Base
     end
   end
 
-  def self.leader_notificaton_pool
+  def leader_notificaton_pool
     self.notification_pool.where("community_connections.sendnotifications = ?",true)
   end
   
-  def self.notification_pool
+  def notification_pool
     self.people.validaccounts.where("community_connections.sendnotifications = ?",true)
   end
 
