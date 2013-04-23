@@ -1,16 +1,23 @@
 <%- @page_title = "#{@community.name} - Community Information" -%>
 
-    <div id="connectiontocommunity" class="dashmodule pull-right text-center">
-        <%= render :partial => 'make_connection' %>
-    </div>
 
-<div class="page-header">
-    <h2><%= community_icon(@community) %> <%= @community.name%> <small><%= @community.entrytype_to_s -%></small></h2>
-    <p id="description">
-      <%= description_for_community(@community) -%>
-      <%- if(current_person.can_edit_community?(@community)) -%>
-      <%- end -%>
-    </p>
+<div class='row'>
+  <div class='span12'>
+  <h2><%= community_icon(@community) %> <%= @community.name%> <small><%= @community.entrytype_to_s -%></small></h2>
+  </div>
+</div>
+
+<div class='row'>
+  <div class="span9">
+        <p>
+          <%= description_for_community(@community) -%>
+        </p>
+  </div>
+  <div class="span3">
+    <div id="connectiontocommunity" class="connections text-center">
+      <%= render :partial => 'make_connection' %>
+    </div>
+  </div>
 </div>
 
 

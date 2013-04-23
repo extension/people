@@ -130,8 +130,9 @@ class Notification < ActiveRecord::Base
 
   def community_pending
     validate_community_notification_data
-    self.notifiable.leader_notification_pool.each do |recipient|
-      CommunityMailer.pending({recipient: recipient, person: @person, community: self.notifiable, notification: self}).deliver
+    community = Community.find(self.notifiable_id)
+    community.leader_notification_pool.each do |recipient|
+      CommunityMailer.pending({recipient: recipient, person: @person, community: community, notification: self}).deliver
     end  
   end
 
