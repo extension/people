@@ -82,11 +82,11 @@ module CommunitiesHelper
   end
 
   def join_community_link(community)
-    link_to(join_community_text(@community),join_community_path, :class => "btn", :remote => true, :method => :post).html_safe
+    link_to(join_community_text(@community),join_community_path, :class => "btn btn-small", :remote => true, :method => :post).html_safe
   end
 
   def leave_community_link(community)
-    link_to(leave_community_text(@community),leave_community_path, :class => "btn", :remote => true, :method => :post).html_safe
+    link_to(leave_community_text(@community),leave_community_path, :class => "btn btn-small", :remote => true, :method => :post).html_safe
   end
 
   def change_connection_link(community,person,connectiontype)

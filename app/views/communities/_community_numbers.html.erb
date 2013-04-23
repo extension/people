@@ -1,24 +1,21 @@
-<ul id="comm_population">
+<ul class="unstyled community_numbers">
     <li>
-        <span><%= @community.leaders.count %></span>
+        <span class='mednumber'><%= @community.leaders.count %></span>
         <%= link_if_not_zero(@community.leaders.count, (@community.is_institution? ? 'Institutional Team' : 'Leaders') , connections_community_path(@community, :connection => 'leaders')) %>
     </li>
     <li>
-        <span><%= (@community.members.count) %></span>
+        <span class='mednumber'><%= (@community.members.count) %></span>
         <%= link_if_not_zero(@community.members.count,'Members', connections_community_path(@community, :connection => 'members')) %>
     </li>
   <% if @community.memberfilter == Community::MODERATED %>
       <li>
-          <span><%= @community.pending.count %></span>
+          <span class='mednumber'><%= @community.pending.count %></span>
           <%= link_if_not_zero(@community.pending.count,'People who want to join', connections_community_path(@community, :connection => 'pending')) %>
       </li>
   <% end %>
   <li>
-      <span><%=  @community.invited.count %></span>
+      <span class='mednumber'><%=  @community.invited.count %></span>
       <%= link_if_not_zero(@community.invited.count,'Invitations', connections_community_path(@community, :connection => 'invited')) %>
-      <%- if (current_person.can_invite_others_to_community?(@community))  -%>
-      <span><%= link_to('Invite people to join', invite_community_path(@community), class: 'btn') %></span>
-      <%- end -%>
   </li>
 
 </ul>

@@ -1,5 +1,17 @@
 li.community {margin-bottom: .65em; border-bottom:1px solid #eee;}
 li.community span {color:#999;float:right;font-size:.95em;}
 
+ul.community_numbers li {margin:0 0 .5em;clear:both;}
+ul.community_numbers li span {text-align:right; width:2em; display:block; float:left; padding-right:.5em;}
+
 dl.community dd.type {font-style: italic; color: #777; margin-bottom: .25em;}
 dl.community dd.description {margin-bottom: 1em;}
+
+.dashmodule {
+  border: 2px solid #ddd;
+  margin-bottom:2.5em;
+  padding:1.5em;
+  -webkit-border-radius: 8px;
+     -moz-border-radius: 8px;
+          border-radius: 8px;
+}
