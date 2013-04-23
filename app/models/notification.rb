@@ -115,7 +115,7 @@ class Notification < ActiveRecord::Base
       raise NotificationError, 'Missing additionaldata'
     end
 
-    if(!(colleague = Person.find(self.colleague_id]))
+    if(!(colleague = Person.find(self.colleague_id])))
       raise NotificationError, 'Invalid colleague_id'
     end
     AccountMailer.profile_update({recipient: self.notifiable, colleague: colleague, notification: self, what_changed: self.additionaldata[:what_changed]}).deliver
