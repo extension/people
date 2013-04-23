@@ -700,8 +700,9 @@ class Person < ActiveRecord::Base
       if(options[:nonotify].nil? or !options[:nonotify])
         Notification.create_community_removal(options.merge({person_id: self.id, community_id: community.id, oldconnectiontype: oldconnectiontype}))
       end
-      true
     end    
+    # force cache update
+    community.joined_count(force: true)
   end
 
 
