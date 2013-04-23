@@ -111,12 +111,12 @@ class Notification < ActiveRecord::Base
   end
 
   def update_colleague_profile
-    if(self.additionaldata.blank? or self.additionaldata[:what_changed].blank? or self.additionaldata[:colleague_id].blank?)
+    if(self.additionaldata.blank? or self.additionaldata[:what_changed].blank?)
       raise NotificationError, 'Missing additionaldata'
     end
 
-    if(!(colleague = Person.find(self.additionaldata[:colleague_id])))
-      raise NotificationError, 'Invalid connector_id in additionaldata'
+    if(!(colleague = Person.find(self.colleague_id]))
+      raise NotificationError, 'Invalid colleague_id'
     end
     AccountMailer.profile_update({recipient: self.notifiable, colleague: colleague, notification: self, what_changed: self.additionaldata[:what_changed]}).deliver
   end
