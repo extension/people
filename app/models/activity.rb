@@ -12,22 +12,7 @@ class Activity < ActiveRecord::Base
   serialize :additionaldata
   attr_accessible :person, :person_id, :site, :activityclass, :activitycode, :reasoncode,  :additionalinfo, :additionaldata, :ip_address, :community, :community_id, :colleague_id, :colleague
 
-  ## validations
-
-  ## filters
-  before_save :set_activity_class
-
-  ## associations
-  belongs_to :person
-  belongs_to :colleague, :class_name => "Person", :foreign_key => "colleague_id"
-  belongs_to :community
-
-  ## scopes
-
-  #scope :community, where("activitycode BETWEEN #{Activity::COMMUNITY_ACTIVITY_START} AND #{Activity::COMMUNITY_ACTIVITY_END}")
-
-
-  ## constants
+ ## constants
   #### activity types
   AUTHENTICATION = 1
   PEOPLE = 2
@@ -96,6 +81,65 @@ class Activity < ActiveRecord::Base
   ENABLE_ACCOUNT                      = 1003
   RETIRE_ACCOUNT                      = 1004
 
+
+  ACTIVITY_STRINGS = {
+  AUTH_LOCAL_SUCCESS                  => 'auth_local_success',          
+  AUTH_LOCAL_FAILURE                  => 'auth_local_failure',
+  AUTH_REMOTE_SUCCESS                 => 'auth_remote_success',
+  AUTH_REMOTE_FAILURE                 => 'auth_remote_failure',
+  SIGNUP                              => 'signup',
+  INVITATION                          => 'invitation',
+  VOUCHED_FOR                         => 'vouched_for',
+  UPDATE_PROFILE                      => 'update_profile',
+  EMAIL_CHANGE                        => 'email_change',
+  PASSWORD_CHANGE                     => 'password_change',
+  CONFIRMED_EMAIL                     => 'confirmed_email',
+  INVITATION_ACCEPTED                 => 'invitation_accepted',
+  REVIEW_REQUEST                      => 'review_request',
+  UPDATE_COLLEAGUE_PROFILE            => 'update_colleague_profile',
+  UPDATE_SOCIAL_NETWORKS              => 'update_social_networks',
+  PASSWORD_RESET_REQUEST              => 'password_reset_request',
+  PASSWORD_RESET                      => 'password_reset',
+  COMMUNITY_CREATE                    => 'community_create',
+  COMMUNITY_JOIN                      => 'community_join',
+  COMMUNITY_PENDING                   => 'community_pending',
+  COMMUNITY_LEFT                      => 'community_left',
+  COMMUNITY_ACCEPT_INVITATION         => 'community_accept_invitation',
+  COMMUNITY_DECLINE_INVITATION        => 'community_decline_invitation',
+  COMMUNITY_REMOVE_PENDING            => 'community_remove_pending',
+  COMMUNITY_INVITEDASLEADER           => 'community_invitedasleader',
+  COMMUNITY_INVITEDASMEMBER           => 'community_invitedasmember',
+  COMMUNITY_ADDEDASLEADER             => 'community_addedasleader',
+  COMMUNITY_ADDEDASMEMBER             => 'community_addedasmember',
+  COMMUNITY_REMOVEDASLEADER           => 'community_removedasleader',
+  COMMUNITY_REMOVEDASMEMBER           => 'community_removedasmember',
+  COMMUNITY_RESCINDINVITATION         => 'community_rescindinvitation',
+  COMMUNITY_UPDATE_INFORMATION        => 'community_update_information',
+  COMMUNITY_CREATED_LIST              => 'community_created_list',
+  ENABLE_ACCOUNT                      => 'enable_account',
+  RETIRE_ACCOUNT                      => 'retire_account'}
+
+  PRIVATE_ACTIVITIES = [AUTH_LOCAL_FAILURE,AUTH_REMOTE_FAILURE,PASSWORD_RESET_REQUEST,PASSWORD_RESET,PASSWORD_CHANGE]
+
+  ## validations
+
+  ## filters
+  before_save :set_activity_class
+
+  ## associations
+  belongs_to :person
+  belongs_to :colleague, :class_name => "Person", :foreign_key => "colleague_id"
+  belongs_to :community
+
+  ## scopes
+  scope :public_activity, where("activitycode NOT IN (#{PRIVATE_ACTIVITIES.join(',')})")
+  #scope :community, where("activitycode BETWEEN #{Activity::COMMUNITY_ACTIVITY_START} AND #{Activity::COMMUNITY_ACTIVITY_END}")
+
+
+ 
+  def activitycode_to_s
+   ACTIVITY_STRINGS[self.activitycode] || 'unknown'
+  end
 
   def set_activity_class
     if AUTHENTICATION_RANGE.include?(self.activitycode)
@@ -300,5 +344,6 @@ class Activity < ActiveRecord::Base
     self.create(create_parameters)
 
   end
+
 
 end

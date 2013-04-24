@@ -334,6 +334,10 @@ class PeopleController < ApplicationController
     end
   end
 
+  def activity
+    @activities = Activity.public_activity.order('created_at DESC').page(params[:page])
+  end
+
   private
 
   def set_tab
