@@ -6,6 +6,8 @@
 #  see LICENSE file
 
 class Analytic < ActiveRecord::Base
+  self.establish_connection :data
+
   extend Garb::Model
   include CacheTools
   extend YearWeek

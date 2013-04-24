@@ -5,7 +5,7 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
-class Group < ActiveRecord::Base
+class Group < Community
   extend YearWeek
 
   EXTENSION_STAFF = 30

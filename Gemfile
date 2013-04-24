@@ -91,6 +91,11 @@ gem 'useragent'
 gem 'geocoder'
 gem 'geoip'
 
+
+# google analytics retrieval
+gem "garb" # garb for now until it breaks 
+
+
 group :development do
   # require the powder gem
   gem 'powder'

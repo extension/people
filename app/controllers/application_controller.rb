@@ -7,12 +7,15 @@
 
 class ApplicationController < ActionController::Base
   include AuthLib
+  require_dependency 'year_week_stats'
+
   protect_from_forgery
   has_mobile_fu false
   before_filter :signin_required
   before_filter :set_time_zone_from_user
   before_filter :update_last_activity
-  before_filter :check_hold_status 
+  before_filter :check_hold_status
+  before_filter :check_for_metric 
   helper_method :current_person
 
 
@@ -28,5 +31,28 @@ class ApplicationController < ActionController::Base
     end
     true
   end
+
+  def set_latest_yearweek
+    @latest_yearweek = Analytic.latest_yearweek
+  end
+
+  def check_for_rebuild
+    if(rebuild = Rebuild.latest)
+      if(rebuild.in_progress?)
+        # probably should return 307 instead of 302
+        return redirect_to(root_path)
+      end
+    end
+    true
+  end
+
+  def check_for_metric
+    @metric = params[:metric]
+    if(!PageStat.column_names.include?(@metric))
+      @metric = 'unique_pageviews'
+    end
+    true
+  end
+
 
 end

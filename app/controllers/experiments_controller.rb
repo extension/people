@@ -5,7 +5,7 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
-class ExperimentsController < ApplicationController
+class PersonExperimentsController < ApplicationController
   before_filter :check_for_contributor, :check_for_group
 
   def index

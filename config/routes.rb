@@ -8,6 +8,83 @@
 # see config/initializers/add_named_route.rb for simple_named_route
 
 People::Application.routes.draw do
+  ### data subdomain support ###
+  constraints(DataSubdomain) do
+    match '/' => 'data_home#index' 
+
+    resources :pages, :only => [:index, :show] do
+      member do
+        get :traffic_chart
+      end
+      collection do
+        get :panda_impact_summary
+        get :totals
+        get :aggregate
+        post :setdate
+        get :comparison_test
+        get :graphs
+        get :details
+        get :overview
+        get :publishedcontent
+      end
+    end
+
+    resources :groups, :only => [:index, :show]
+
+    # data routes
+    scope "data" do
+      match "/groups", to: "data#groups", :as => 'data_groups'
+    end
+
+    resources :contributors, :only => [:show] do
+      member do
+        get :contributions
+        get :metacontributions
+      end
+    end
+
+    resources :nodes, :only => [:index, :show] do
+      collection do
+        get :graphs
+        get :details
+        get :list
+      end
+    end
+
+
+    resources :groups, :only => [:index, :show] do
+      member do
+        get :pagelist
+        get :pages
+        get :pagetags
+      end
+    end
+
+    # downloads routing
+    resources :downloads, :only => [:index] do 
+      collection do
+        get 'aae_evaluation'
+        get 'aae_questions'
+      end
+
+      member do
+        get 'getfile'
+      end
+      
+    end
+
+    # authentication
+    match '/logout', to:'auth#end', :as => 'logout'
+    match '/auth/:provider/callback', to: 'auth#success'
+
+    # home routes
+    match '/search', to:'home#search', :as => 'search'
+
+    # experiments named routes
+    match '/experiments', to: 'experiments#index', :as => 'experiments'
+
+  end
+  
   root :to => 'home#index'
 
   controller :accounts do
@@ -111,6 +188,10 @@ People::Application.routes.draw do
 
   # email example routing
   match "/email_examples/:action", to: "email_examples", via: [:get]
+
+  # wildcard
+  match "debug/:action", to: "debug", :via => [:get]
+
 
 
 end

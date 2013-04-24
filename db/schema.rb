@@ -290,10 +290,10 @@ ActiveRecord::Schema.define(:version => 20130419142105) do
     t.datetime "created_at"
   end
 
-  add_index "node_activities", ["person_id", "event", "activity", "created_at"], :name => "contributor_activity_ndx"
   add_index "node_activities", ["event", "activity", "created_at"], :name => "event_activity_ndx"
   add_index "node_activities", ["node_id", "event", "activity", "created_at"], :name => "node_activity_ndx"
   add_index "node_activities", ["node_id"], :name => "node_ndx"
+  add_index "node_activities", ["person_id", "event", "activity", "created_at"], :name => "contributor_activity_ndx"
 
   create_table "node_groups", :force => true do |t|
     t.integer  "node_id"
@@ -313,8 +313,8 @@ ActiveRecord::Schema.define(:version => 20130419142105) do
     t.datetime "created_at"
   end
 
-  add_index "node_metacontributions", ["person_id"], :name => "contributor_ndx"
   add_index "node_metacontributions", ["node_id"], :name => "node_ndx"
+  add_index "node_metacontributions", ["person_id"], :name => "contributor_ndx"
 
   create_table "node_totals", :force => true do |t|
     t.integer  "node_id"
@@ -471,6 +471,8 @@ ActiveRecord::Schema.define(:version => 20130419142105) do
     t.text     "involvement"
     t.integer  "invitation_id"
     t.string   "reset_token",              :limit => 40
+    t.integer  "aae_id"
+    t.integer  "learn_id"
     t.datetime "created_at",                                                :null => false
     t.datetime "updated_at",                                                :null => false
   end
@@ -597,8 +599,8 @@ ActiveRecord::Schema.define(:version => 20130419142105) do
     t.datetime "created_at"
   end
 
-  add_index "revisions", ["person_id"], :name => "contributor_ndx"
   add_index "revisions", ["node_id"], :name => "node_ndx"
+  add_index "revisions", ["person_id"], :name => "contributor_ndx"
 
   create_table "sent_emails", :force => true do |t|
     t.string   "hashvalue",       :limit => 40,                      :null => false

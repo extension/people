@@ -5,7 +5,7 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
-class Person < ActiveRecord::Base
+class Contributor < Person
   has_many :node_activities
   has_many :node_metacontributions
 

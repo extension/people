@@ -91,7 +91,7 @@ end
 
 
 def account_transfer_query
-  reject_columns = ['password_hash','involvement','institution_id','invitation_id','previous_email','reset_token']
+  reject_columns = ['password_hash','involvement','institution_id','invitation_id','previous_email','reset_token','aae_id','learn_id']
   columns = Person.column_names.reject{|n| reject_columns.include?(n)}
   insert_clause = "#{@my_database}.#{Person.table_name} (#{columns.join(',')})"
   from_clause = "#{@darmok_database}.accounts"
@@ -216,20 +216,6 @@ def google_groups_transfer_query
   query
 end
 
-def geonames_transfer_query
-  query = <<-END_SQL.gsub(/\s+/, " ").strip
-    INSERT INTO #{@my_database}.#{GeoName.table_name} SELECT * FROM #{@darmok_database}.geo_names
-  END_SQL
-  query
-end
-
-def downloads_transfer_query
-  query = <<-END_SQL.gsub(/\s+/, " ").strip
-    INSERT INTO #{@my_database}.#{Download.table_name} SELECT * FROM #{@data_database}.downloads
-  END_SQL
-  query
-end
-
 def lists_transfer_query
   select_columns = MailmanList.column_names
   insert_clause = "#{@my_database}.#{MailmanList.table_name} (#{select_columns.join(',')})"
@@ -300,6 +286,14 @@ def community_email_alias_query
   where_clause = "#{from_clause}.community_id > 0"
   transfer_query = "INSERT INTO #{insert_clause} SELECT #{select_clause} FROM #{from_clause} WHERE #{where_clause}"
   transfer_query
+end
+
+
+def data_transfer_query(table_name)
+  query = <<-END_SQL.gsub(/\s+/, " ").strip
+    INSERT INTO #{@my_database}.#{table_name} SELECT * FROM #{@data_database}.#{table_name}
+  END_SQL
+  query
 end
 
 def set_person_institution_column
@@ -700,8 +694,29 @@ announce_and_run_query('Transferring lists',lists_transfer_query)
 announce_and_run_query('Transferring social network connections',social_network_transfer_query)
 announce_and_run_query('Transferring individual email aliases',individual_email_alias_query)
 announce_and_run_query('Transferring community email aliases',community_email_alias_query)
-announce_and_run_query('Transferring geo name data',geonames_transfer_query)
-announce_and_run_query('Transferring downloads data',downloads_transfer_query)
+
+# data transfers
+['geo_names',
+  'downloads',
+  'rebuilds',
+  'collected_page_stats',
+  'landing_stats',
+  'node_activities',
+  'node_groups',
+  'node_metacontributions',
+  'node_totals',
+  'nodes',
+  'page_stats',
+  'page_taggings',
+  'page_totals',
+  'pages',
+  'question_activities',
+  'questions',
+  'revisions',
+  'tags',
+  'update_times'].each do |table_name|
+  announce_and_run_query("Transferring #{table_name} data",data_transfer_query(table_name))
+end
 
 # data manipulation
 transfer_retired_account_data

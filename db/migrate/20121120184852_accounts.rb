@@ -35,6 +35,8 @@ class Accounts < ActiveRecord::Migration
       t.text     "involvement"
       t.integer  "invitation_id"
       t.string   "reset_token", :limit => 40
+      t.integer  "aae_id"
+      t.integer  "learn_id"
       t.timestamps
     end
 

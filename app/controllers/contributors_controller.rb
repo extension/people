@@ -6,7 +6,8 @@
 #  see LICENSE file
 require 'csv'
 
-class PersonsController < ApplicationController
+class ContributorsController < ApplicationController
+  layout 'data'
 
   def show
     @contributor = Person.find(params[:id])
