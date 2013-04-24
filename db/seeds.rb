@@ -540,13 +540,17 @@ end
 def transfer_activities_to_activities
   print "Transferring activities to activity log..."
   benchmark = Benchmark.measure do
-    DarmokActivity.where("activitycode NOT IN (105,103,106,107)").find_in_batches do |group|
+    DarmokActivity.where("activitycode NOT IN (105,103,106,107,301,302,303,304,305,306,307,308,403)").find_in_batches do |group|
       insert_values = []
       group.each do |activity|
         insert_list = []
         if(activity.activitycode.between?(200,500) and ![208,209].include?(activity.activitycode))
           # community activity
-          insert_list << (activity.created_by)
+          if(activity.activitycode == 102)
+            insert_list << (activity.user_id)
+          else
+            insert_list << (activity.created_by)
+          end
           if(activity.activitycode.between?(210,216))
             insert_list << (activity.user_id.nil? ? 'NULL' : activity.user_id)
           else
@@ -575,6 +579,17 @@ def transfer_activities_to_activities
             explanation = activity.additionaldata[:explanation]
           end
           insert_list << ActiveRecord::Base.quote_value(explanation)
+        elsif(activity.activitycode == 102)
+          insert_list << (activity.created_by)
+          insert_list << 'NULL'
+          insert_list << 'NULL'
+          insert_list << Activity::PEOPLE
+          insert_list << Activity::INVITATION
+          if(activity.additionaldata and activity.additionaldata[:invitedemail])
+            insert_list << ActiveRecord::Base.quote_value(activity.additionaldata[:invitedemail])
+          else
+            insert_list << 'NULL'
+          end
         else
           insert_list << (activity.user_id.nil? ? 'NULL' : activity.user_id)
           insert_list << (activity.colleague_id.nil? ? 'NULL' : activity.colleague_id)
