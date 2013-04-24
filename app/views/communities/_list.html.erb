@@ -1,11 +1,7 @@
-<% communitylist.each do |community| %>
-<div class="community_short">
-  <h2><%= link_to("#{community.name}", community_path(community))%></h2>
-  <p class="description"><%= community.description.blank? ? 'No description' : community.description.html_safe %></p>
-  <p><%= community.entrytype_to_s %></p>
-  <p><%= community.memberfilter_to_s %></p>
-  <p><%= community.joined.count %> Joined</p>
-    
-  <%= community_connection_for_person_for_list(community,current_person) %>
-</div>
-<% end %>
+<dl class='community'>
+  <% communitylist.each do |community| %>
+  <dt><%= link_to(community.name,community_url(community)) %></dt>
+  <dd class='type'><%= community.entrytype_to_s %> - <%= community.memberfilter_to_s %> - <%= link_to("#{community.joined_count} Joined", connections_community_path(community, :connection => 'joined')) %></dd>
+  <dd class='description'><%= community.description.blank? ? 'No description' : community.description.html_safe %></dd>
+  <%- end -%>
+</dl>

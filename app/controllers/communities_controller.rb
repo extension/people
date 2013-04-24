@@ -146,7 +146,6 @@ class CommunitiesController < ApplicationController
 
   def find
     if (!params[:q].blank?)
-      @current_person_communities = current_person.connected_communities
       @found_communities = Community.findcommunity(params[:q])
       if(@found_communities.blank?)
         flash[:warning] = "No community was found that matches your search term"

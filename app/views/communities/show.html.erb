@@ -1,20 +1,22 @@
 <%- @page_title = "#{@community.name} - Community Information" -%>
 
-<div class="page-header">
-    <div id="titleblock" class="<%= @community.entrytype_label -%>">
-      <h2><%= @community.name%></h2>
-      <p><%= @community.entrytype_to_s -%></p>
-    </div>
+
+<div class='row'>
+  <div class='span12'>
+  <h2><%= community_icon(@community) %> <%= @community.name%> <small><%= @community.entrytype_to_s -%></small></h2>
+  </div>
 </div>
 
-<div class="row">
-  <div class="span12">
-    <p id="description">
-      <%= description_for_community(@community) -%>
-      <%- if(current_person.can_edit_community?(@community)) -%>
-        <p><small class="edit"><%= link_to 'edit', edit_community_path(@community) -%></small></p>
-      <%- end -%>
-    </p>
+<div class='row'>
+  <div class="span9">
+        <p>
+          <%= description_for_community(@community) -%>
+        </p>
+  </div>
+  <div class="span3">
+    <div id="connectiontocommunity" class="connections text-center">
+      <%= render :partial => 'make_connection' %>
+    </div>
   </div>
 </div>
 
@@ -22,59 +24,37 @@
 <div class="row">
   <div class="span6">
 
-      <h2>People</h2>
-      <div id="connectiontocommunity" class="well">
-        <%= render :partial => 'make_connection' %>
-      </div>
-
+      <h3>People
+      <%- if (current_person.can_invite_others_to_community?(@community))  -%>
+        <small><%= link_to('Invite people to join this community', invite_community_path(@community), class: '') %></small>
+      <%- end -%>
+      </h3>
       <div id="communitynumbers" class="dashmodule">
       <%= render(:partial => 'community_numbers') -%>
       </div>
 
-      <h2>Community Information</h2>
+      <h3>Community Information</h3>
       <div id="communityreports" class="dashmodule">
       <p><%= link_to("Community Activity (todo)", '#') -%></p>
       <p><%= link_to("Community Membership Statistics (todo)",'#') -%></p>
       </div>
 
-      <h2>
-        <%= @community.entrytype_display_label.capitalize -%> Mailing Lists
-        <%- if(current_person.can_edit_community?(@community)) -%>
-          <small><%= link_to 'edit (todo)', '#' -%></small>
-        <%- end -%>
-      </h2>
-      <div id="communitymailinglists" class="dashmodule">
-        <% if @community.mailman_lists.count == 0 %>
-          <p>No lists have been created for this <%= @community.entrytype_display_label %>.</p>
-        <% else %>
-        <ul class="mailing_lists">
-          <% @community.mailman_lists.each do |mailinglist| %>
-            <li>
-                <span class="mailto"><%= mail_to("#{mailinglist.name}@lists.extension.org", mailinglist.name) %><em></em></span>
-                <%= mailinglist.connectiontype %>
-            </li>
-          <% end %>
-        </ul>
-        <% end %>
-      </div>
     </div>
 
 
     <div class="span6">
-      <h2>
+      <h3>
         <%= @community.entrytype_display_label.capitalize -%> Attributes
         <%- if(current_person.can_edit_community?(@community)) -%>
-          <small><%= link_to 'edit (todo)', '#' -%></small>
+          <small><%= link_to 'edit settings', edit_community_path(@community) -%></small>
         <%- end -%>
-      </h2>
+      </h3>
       
 
       
       <div class="dashmodule">
 
         <dl>
-          <dt>Community Type:</dt>
-          <dd><%= @community.entrytype_to_s -%></dd>
           <dt>Membership:</dt>
           <dd><%= @community.memberfilter_to_s -%></dd>
           <dt>Created by:</dt>
@@ -85,7 +65,7 @@
       </div>
 
       <%- if (@community.connect_to_drupal? and @community.drupal_node_id) or @community.is_launched? -%>
-      <h2>Elsewhere in eXtension</h2>
+      <h3>Elsewhere in eXtension</h3>
       <div class="dashmodule">
         <p><em>Links to information for this community in other eXtension applications</em></p>
         <dl>

@@ -13,20 +13,7 @@
 <%- if !@found_communities.blank? -%>
 <div class="row">
   <div class="span12">
-    <%- @found_communities.each do |community| -%>
-    <div>
-      <h4><%= link_to("#{community.name}", community_path(community))%></h4>
-      <p class="description"><%= community.description.nil? ? 'No description' : community.description %></p>
-      <p><%= community.entrytype_to_s %></p>
-      <p><%= community.memberfilter_to_s %></p>
-      <p><%= community.joined.count %> Joined</p>
-      
-      <%- if @current_person_communities.include?(community) -%>
-        <p><%= community_connection_for_person(community,current_person) %></p>
-      <%- end -%>
-    </div>
-    <%- end -%>
-
+    <%= render(partial: 'list', locals: {communitylist: @found_communities}) %>
   </div>
 </div>
 <%- end -%>
