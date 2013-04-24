@@ -1,0 +1,30 @@
+<%- @page_title = "Colleague Activity" -%>
+
+
+<%- if !@activities.blank? -%>
+<div class="row">
+  <div class="span12">
+    <%= page_entries_info @activities %>
+    <%= paginate(@activities) %>
+    <table class="table">
+      <thead>
+        <tr>
+        <th>Date/Time</th>
+        <th>Description</th>
+        </tr>
+      </thead>
+
+      <tbody>
+      <%- for activity in @activities -%>
+        <tr id="activity_row_<%= activity.id %>">
+          <td><%= display_time(activity.created_at) %></td>
+          <td><%= activity_to_s(activity) %></td>
+        </tr>
+      <%- end -%>
+      </tbody>
+    </table>
+  </div>
+</div>
+<%- end -%>
+
+

@@ -19,4 +19,32 @@ module ColleaguesHelper
     string_array.join(' and ').html_safe
   end
 
+  def activity_to_s(activity,options = {})
+
+    hide_community_text = options[:hide_community_text] || false
+    hide_person_text = options[:hide_person_text] || false
+    nolink = options[:nolink] || false
+
+    text_macro_options = {}
+    text_macro_options[:persontext]  = hide_person_text ? '' : "#{link_to_person(activity.person,{nolink: nolink})}"
+
+    if([Activity::AUTH_REMOTE_SUCCESS,Activity::AUTH_REMOTE_FAILURE].include?(activity.activitycode))
+      text_macro_options[:site] =  activity.site
+    end
+
+
+    text_macro_options[:communitytext]  = hide_person_text ? 'community' : "#{link_to_community(activity.community,{nolink: nolink})}"
+
+    if(!activity.colleague.nil?)
+      text_macro_options[:colleaguetext] =  "#{link_to_person(activity.colleague,{nolink: nolink})}"
+    end
+
+    if(activity.activitycode == Activity::INVITATION)
+      text_macro_options[:emailaddress] =  activity.additionalinfo
+    end
+
+    I18n.translate("activity.#{activity.activitycode_to_s}",text_macro_options).html_safe
+
+  end  
+
 end

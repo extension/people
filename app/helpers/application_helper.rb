@@ -60,6 +60,18 @@ module ApplicationHelper
     end
   end
 
+  def link_to_community(community,options = {})
+    nolink = options[:nolink] || false
+
+    if community.nil?
+      'Unknown'
+    elsif(nolink)
+      "#{community.name}"
+    else
+      link_to(community.name,community_path(community)).html_safe
+    end
+  end
+
   def navtab(tabtext,whereto)
     if(@selected_tab and @selected_tab == tabtext.downcase)
       "<li class='active'>#{link_to(tabtext,whereto)}</li>".html_safe
