@@ -35,6 +35,7 @@ People::Application.routes.draw do
 
   resources :people, only: [:index, :show, :edit, :update] do
     member do
+      get :activity
       get :retire
       post :retire
       post :restore
@@ -65,12 +66,14 @@ People::Application.routes.draw do
 
   resources :communities do 
     collection do
+      get :activity
       get :newest
       get :find
       post :find
     end
 
     member do
+      get :activity
       get :connections
       get :invite
       post :invite

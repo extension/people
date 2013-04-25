@@ -26,14 +26,15 @@ module ColleaguesHelper
     nolink = options[:nolink] || false
 
     text_macro_options = {}
-    text_macro_options[:persontext]  = hide_person_text ? '' : "#{link_to_person(activity.person,{nolink: nolink})}"
+    # note space on the end of link - required in string formatting
+    text_macro_options[:persontext]  = hide_person_text ? '' : "#{link_to_person(activity.person,{nolink: nolink})} "
 
     if([Activity::AUTH_REMOTE_SUCCESS,Activity::AUTH_REMOTE_FAILURE].include?(activity.activitycode))
       text_macro_options[:site] =  activity.site
     end
 
 
-    text_macro_options[:communitytext]  = hide_person_text ? 'community' : "#{link_to_community(activity.community,{nolink: nolink})}"
+    text_macro_options[:communitytext]  = hide_community_text ? 'community' : "#{link_to_community(activity.community,{nolink: nolink})} community"
 
     if(!activity.colleague.nil?)
       text_macro_options[:colleaguetext] =  "#{link_to_person(activity.colleague,{nolink: nolink})}"

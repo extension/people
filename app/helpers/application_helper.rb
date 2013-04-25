@@ -64,7 +64,7 @@ module ApplicationHelper
     nolink = options[:nolink] || false
 
     if community.nil?
-      'Unknown'
+      '[unknown community]'
     elsif(nolink)
       "#{community.name}"
     else

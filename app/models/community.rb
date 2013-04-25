@@ -68,6 +68,7 @@ class Community < ActiveRecord::Base
   has_many :mailman_lists
   has_one :email_alias, :as => :aliasable, :dependent => :destroy
   has_one  :google_group
+  has_many :activities
 
   scope :approved, where(entrytype: APPROVED)
   scope :institutions, where(entrytype: INSTITUTION)

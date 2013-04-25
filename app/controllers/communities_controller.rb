@@ -155,6 +155,15 @@ class CommunitiesController < ApplicationController
     end
   end
 
+  def activity
+    if(params[:id])
+      @community = Community.find_by_shortname_or_id(params[:id])
+      @activities = @community.activities.order('created_at DESC').page(params[:page])
+    else
+      @activities = Activity.community.order('created_at DESC').page(params[:page])
+    end         
+  end    
+
 
   private
 
