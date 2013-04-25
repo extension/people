@@ -6,6 +6,16 @@
 
 module PeopleHelper
 
+  def institution_text(person)
+    text = []
+    if(@person.institution)
+      text << @person.institution.name
+    end
+    if(@person.affiliation)
+      text << @person.affiliation
+    end
+    text.join(', ')
+  end
   def link_to_person(person,options = {})
     show_unknown = options[:show_unknown] || false
     show_systemuser = options[:show_systemuser] || false
