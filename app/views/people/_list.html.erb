@@ -7,18 +7,20 @@
     <th>Institution</th>
     <th>Other Affiliation</th>
     <th>Location</th>
+    <th>&nbsp;</th>
     </tr>
   </thead>
 
   <tbody>
-  <%- for person in list_of_people -%>
-    <tr id="person_row_<%= person.id %>">
-      <td><%= link_to("#{person.fullname}", person_path(person)) %></td>
+  <%- for person in colleagues -%>
+    <tr id="person_row_<%= person.id %>" class="<%= status_class(person) %>">
+      <td><%= link_to_person(person) %></td>
       <td><%= person.idstring %></td>
       <td><%= person.email %></td>            
       <td><%= primary_institution_name_for_person(person,'<span class="na">not specified</span>') %></td>
       <td><%= (person.affiliation.blank?) ? '<span class="na">&nbsp;</span>'.html_safe : person.affiliation %></td>        
       <td><%= (person.location.nil?) ? '<span class="na">n/a</span>'.html_safe : person.location.abbreviation %></td>        
+      <td><%= status_icon(person) %></td>
     </tr>
   <%- end -%>
   </tbody>

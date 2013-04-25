@@ -132,10 +132,13 @@ class Activity < ActiveRecord::Base
   belongs_to :community
 
   ## scopes
+  scope :related_to_person, lambda{|person| where("person_id = ? or colleague_id = ?",person.id,person.id)}
   scope :public_activity, where("activitycode NOT IN (#{PRIVATE_ACTIVITIES.join(',')})")
-  #scope :community, where("activitycode BETWEEN #{Activity::COMMUNITY_ACTIVITY_START} AND #{Activity::COMMUNITY_ACTIVITY_END}")
+  scope :community, where("activitycode >= ? and activitycode <= ?",COMMUNITY_RANGE.first, COMMUNITY_RANGE.last)
 
-
+  def is_private?
+    PRIVATE_ACTIVITIES.include?(self.activitycode)
+  end
  
   def activitycode_to_s
    ACTIVITY_STRINGS[self.activitycode] || 'unknown'

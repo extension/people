@@ -47,10 +47,10 @@ class PeopleController < ApplicationController
                             additionaldata: {what_changed: what_changed, colleague_id: current_person.id})
 
         # activity log
-        Activity.log_activity(person_id: @person.id, 
+        Activity.log_activity(person_id:  current_person.id, 
                               activitycode: Activity::UPDATE_COLLEAGUE_PROFILE, 
                               ip_address: request.remote_ip,
-                              colleague_id: current_person.id, 
+                              colleague_id: @person.id, 
                               additionaldata: {what_changed: what_changed})
       end          
 
@@ -335,13 +335,26 @@ class PeopleController < ApplicationController
   end
 
   def activity
-    @activities = Activity.public_activity.order('created_at DESC').page(params[:page])
+    if(params[:id])
+      @person = Person.find_by_id_or_idstring(params[:id])
+      if(@person == current_person or current_person.is_admin?)
+        @activities = Activity.related_to_person(@person).order('created_at DESC').page(params[:page])
+      else
+        @activities = Activity.public_activity.related_to_person(@person).order('created_at DESC').page(params[:page])
+      end
+    else
+      if(current_person.is_admin?)
+        @activities = Activity.order('created_at DESC').page(params[:page])
+      else
+        @activities = Activity.public_activity.order('created_at DESC').page(params[:page])
+      end
+    end        
   end
 
   private
 
   def set_tab
-    @selected_tab = 'colleagues'
+    @selected_tab = 'people'
   end
 
 # # eXtensionID,First Name,Last Name,Email,Phone,Title,Position,Institution,Other Affiliation,Location,County,Agreement Status,Account Created

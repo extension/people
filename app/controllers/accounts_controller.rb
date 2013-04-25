@@ -53,7 +53,7 @@ class AccountsController < ApplicationController
 
         if(@person.nil?)
           flash.now[:warning] = "We are not able to find an account registered with that email address"
-        elsif(Settings.reserved_uids.include?(@person.id))
+        elsif(Person::SYSTEMS_USERS.include?(@person.id))
           flash.now[:warning] = "The password for that account can't be reset"
         elsif(@person.retired?)
           flash.now[:warning] = "Your account has been retired. #{link_to('Contact us for more information.',help_path)}".html_safe

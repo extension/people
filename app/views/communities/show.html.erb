@@ -8,15 +8,10 @@
 </div>
 
 <div class='row'>
-  <div class="span9">
+  <div class="span12">
         <p>
           <%= description_for_community(@community) -%>
         </p>
-  </div>
-  <div class="span3">
-    <div id="connectiontocommunity" class="connections text-center">
-      <%= render :partial => 'make_connection' %>
-    </div>
   </div>
 </div>
 
@@ -29,14 +24,20 @@
         <small><%= link_to('Invite people to join this community', invite_community_path(@community), class: '') %></small>
       <%- end -%>
       </h3>
-      <div id="communitynumbers" class="dashmodule">
-      <%= render(:partial => 'community_numbers') -%>
+      <div class="dashmodule">
+        <div class="row">
+          <div id='communitynumbers' class='span2'>
+            <%= render(:partial => 'community_numbers') -%>
+          </div>
+          <div id="connectiontocommunity" class="span3 connections text-center">
+            <%= render :partial => 'make_connection' %>
+          </div>
+        </div>
       </div>
 
       <h3>Community Information</h3>
       <div id="communityreports" class="dashmodule">
-      <p><%= link_to("Community Activity (todo)", '#') -%></p>
-      <p><%= link_to("Community Membership Statistics (todo)",'#') -%></p>
+      <p><%= link_to("Community Activity", activity_community_path(@community)) -%></p>
       </div>
 
     </div>

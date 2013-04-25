@@ -43,32 +43,11 @@ module ApplicationHelper
     end
   end
 
-
-  def link_to_person(person,options = {})
-    show_unknown = options[:show_unknown] || false
-    show_systemuser = options[:show_systemuser] || false
-    nolink = options[:nolink] || false
-
-    if person.nil?
-      show_unknown ? 'Unknown' : 'System'
-    elsif(person.id == 1 and !show_systemuser)
-      'System'
-    elsif(nolink)
-      "#{person.fullname}"
+  def display_date(time)
+    if(time.blank?)
+      ''
     else
-      link_to(person.fullname,person_path(person)).html_safe
-    end
-  end
-
-  def link_to_community(community,options = {})
-    nolink = options[:nolink] || false
-
-    if community.nil?
-      'Unknown'
-    elsif(nolink)
-      "#{community.name}"
-    else
-      link_to(community.name,community_path(community)).html_safe
+      time.strftime("%B %e, %Y")
     end
   end
 

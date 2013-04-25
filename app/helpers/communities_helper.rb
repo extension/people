@@ -4,6 +4,18 @@
 # see LICENSE file
 module CommunitiesHelper
 
+  def link_to_community(community,options = {})
+    nolink = options[:nolink] || false
+
+    if community.nil?
+      '[unknown community]'
+    elsif(nolink)
+      "#{community.name}"
+    else
+      link_to(community.name,community_path(community)).html_safe
+    end
+  end
+
   def display_invited_as(connectiontype)
     case connectiontype
     when 'invitedleader'

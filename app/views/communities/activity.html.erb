@@ -1,4 +1,4 @@
-<%- @page_title = @person.blank? ? "Colleague Activity" : "Activity for #{@person.fullname}"-%>
+<%- @page_title = @community.nil? ? "Community Activity" : "Community Activity for #{@community.name}" -%>
 
 <div class="page-header">
   <h2><%= @page_title %></h2>
@@ -12,10 +12,9 @@
     <table class="table">
       <thead>
         <tr>
-        <th>&nbsp;</th>
         <th>Date/Time</th>
         <th>Description</th>
-        <%- if(current_person.is_admin? or (!@person.blank? and @person == current_person)) -%>
+        <%- if(current_person.is_admin?) -%>
           <th><i class='icon-lock'></i> IP Address</th>
         <%- end -%>
         </tr>
@@ -24,18 +23,12 @@
       <tbody>
       <%- for activity in @activities -%>
         <tr id="activity_row_<%= activity.id %>">
-          <%- if(activity.is_private?) -%>
-            <td><i class='icon-lock'></i></td>
-          <%- else -%>
-            <td>&nbsp;</td>
-          <%- end -%>
           <td><%= display_time(activity.created_at) %></td>
-
-          <%- if(@person and activity.person_id == @person.id) -%>
-            <td><%= activity_to_s(activity, {hide_person_text: true}) %></td>        
-          <%- else -%>
-            <td><%= activity_to_s(activity) %></td>
-          <%- end -%>
+          <%- if @community -%>
+            <td><%= activity_to_s(activity,{hide_community_text: true}) %></td>
+          <%- else -%>     
+            <td><%= activity_to_s(activity,{hide_community_text: false}) %></td>               
+          <%- end -%>          
 
           <%- if(current_person.is_admin? or (!@person.blank? and @person == current_person)) -%>
             <td><%= activity.ip_address %></td>

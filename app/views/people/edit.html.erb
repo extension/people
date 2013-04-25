@@ -30,6 +30,8 @@
         <%- end -%>
         <%= f.input :phone, :label => 'Phone number', input_html: { value: number_to_phone(@person.phone, :area_code => true)} %>
         <%= f.input :title %>
+        <%= f.input :biography, :input_html => { :rows => 7, :class => 'span6' }, :hint =>  "You can use html markup to include links to additional information." %>
+
         <%= f.input :time_zone, priority: /US/, :input_html => { :class => 'span4' } %>
         <%= f.association :position, collection: Position.order('name'), :as => :radio_buttons %>
         <%= f.association :location, collection: Location.order('entrytype,name'), include_blank: true %>
@@ -45,7 +47,6 @@
         <%= f.input :affiliation, 
                     :input_html => { :class => 'span4' }, 
                     :hint =>  "Department or other affiliation at your institution or another institution if yours was not listed." %>
-
       </fieldset>
 
 

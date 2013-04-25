@@ -8,9 +8,10 @@
 require 'bcrypt'
 class Person < ActiveRecord::Base
   include BCrypt
+  include MarkupScrubber
   attr_accessor :password, :current_password, :password_confirmation
 
-  attr_accessible :first_name, :last_name, :email, :title, :phone, :time_zone, :affiliation, :involvement
+  attr_accessible :first_name, :last_name, :email, :title, :phone, :time_zone, :affiliation, :involvement, :biography
   attr_accessible :password
   attr_accessible :position_id, :position, :location_id, :location, :county_id, :county, :institution_id, :institution
   attr_accessible :invitation, :invitation_id 
@@ -18,6 +19,9 @@ class Person < ActiveRecord::Base
 
 
   ## constants
+  DEFAULT_TIMEZONE = 'America/New_York'
+  SYSTEMS_USERS = [1,2,3,4,5,6,7,8]
+
   # account status
   STATUS_CONTRIBUTOR = 0
   STATUS_REVIEW = 1
@@ -79,7 +83,7 @@ class Person < ActiveRecord::Base
   ## scopes  
   scope :validaccounts, where("retired = #{false} and vouched = #{true}") 
   scope :pendingreview, where("retired = #{false} and vouched = #{false} and account_status != #{STATUS_SIGNUP} && email_confirmed = #{true}")
-  scope :not_system, where("people.id NOT IN(#{Settings.reserved_uids.join(',')})")
+  scope :not_system, where("people.id NOT IN(#{SYSTEMS_USERS.join(',')})")
   scope :display_accounts, validaccounts.not_system
 
 
@@ -166,12 +170,16 @@ class Person < ActiveRecord::Base
     person
   end
 
+  def is_signup?
+    self.account_status == STATUS_SIGNUP
+  end
+
   def pendingreview?
-    (!self.vouched? && !self.retired? && self.account_status != STATUS_SIGNUP && self.email_confirmed?)
+    (!self.vouched? && !self.retired? && !self.is_signup? && self.email_confirmed?)
   end
 
   def validaccount?
-    if(self.retired? or !self.vouched? or self.account_status == STATUS_SIGNUP)
+    if(self.retired? or !self.vouched? or self.is_signup?)
       return false
     else
       return true
@@ -181,7 +189,7 @@ class Person < ActiveRecord::Base
   def signin_allowed?
     if self.retired?
       return false
-    elsif Settings.reserved_uids.include?(self.id)
+    elsif SYSTEMS_USERS.include?(self.id)
       return false
     elsif(!self.last_activity_at.blank?)
       if(self.last_activity_at < Time.now.utc - 4.days)
@@ -526,6 +534,10 @@ class Person < ActiveRecord::Base
     end
   end
 
+  # attr_writer override for response to scrub html
+  def biography=(description)
+    write_attribute(:biography, self.cleanup_html(description))
+  end
 
   def self.cleanup_signup_accounts
     self.where(account_status: STATUS_SIGNUP).where("created_at < ?",Time.now - 14.day).each do |person|
@@ -840,6 +852,8 @@ class Person < ActiveRecord::Base
   def clear_reset_token
     self.update_column(:reset_token,nil)
   end
+
+
 
   # # returns a hash of public attributes
   # def public_attributes  
