@@ -18,6 +18,9 @@ class Person < ActiveRecord::Base
 
 
   ## constants
+  DEFAULT_TIMEZONE = 'America/New_York'
+  SYSTEMS_USERS = [1,2,3,4,5,6,7,8]
+
   # account status
   STATUS_CONTRIBUTOR = 0
   STATUS_REVIEW = 1
@@ -79,7 +82,7 @@ class Person < ActiveRecord::Base
   ## scopes  
   scope :validaccounts, where("retired = #{false} and vouched = #{true}") 
   scope :pendingreview, where("retired = #{false} and vouched = #{false} and account_status != #{STATUS_SIGNUP} && email_confirmed = #{true}")
-  scope :not_system, where("people.id NOT IN(#{Settings.reserved_uids.join(',')})")
+  scope :not_system, where("people.id NOT IN(#{SYSTEMS_USERS.join(',')})")
   scope :display_accounts, validaccounts.not_system
 
 
@@ -185,7 +188,7 @@ class Person < ActiveRecord::Base
   def signin_allowed?
     if self.retired?
       return false
-    elsif Settings.reserved_uids.include?(self.id)
+    elsif SYSTEMS_USERS.include?(self.id)
       return false
     elsif(!self.last_activity_at.blank?)
       if(self.last_activity_at < Time.now.utc - 4.days)
