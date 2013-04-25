@@ -544,6 +544,10 @@ def transfer_activities_to_activities
       insert_values = []
       group.each do |activity|
         insert_list = []
+        # validate community and skip if no longer valid
+        if(!activity.community_id.nil?)
+          next if(!(community = Community.find_by_id(activity.community_id)))
+        end
         if(activity.activitycode.between?(200,500) and ![208,209].include?(activity.activitycode))
           # community activity
           if(activity.activitycode == 102)
