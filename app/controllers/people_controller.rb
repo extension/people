@@ -354,7 +354,7 @@ class PeopleController < ApplicationController
   private
 
   def set_tab
-    @selected_tab = 'colleagues'
+    @selected_tab = 'people'
   end
 
 # # eXtensionID,First Name,Last Name,Email,Phone,Title,Position,Institution,Other Affiliation,Location,County,Agreement Status,Account Created

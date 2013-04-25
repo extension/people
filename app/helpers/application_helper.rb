@@ -51,35 +51,6 @@ module ApplicationHelper
     end
   end
 
-
-  def link_to_person(person,options = {})
-    show_unknown = options[:show_unknown] || false
-    show_systemuser = options[:show_systemuser] || false
-    nolink = options[:nolink] || false
-
-    if person.nil?
-      show_unknown ? 'Unknown' : 'System'
-    elsif(person.id == 1 and !show_systemuser)
-      'System'
-    elsif(nolink)
-      "#{person.fullname}"
-    else
-      link_to(person.fullname,person_path(person)).html_safe
-    end
-  end
-
-  def link_to_community(community,options = {})
-    nolink = options[:nolink] || false
-
-    if community.nil?
-      '[unknown community]'
-    elsif(nolink)
-      "#{community.name}"
-    else
-      link_to(community.name,community_path(community)).html_safe
-    end
-  end
-
   def navtab(tabtext,whereto)
     if(@selected_tab and @selected_tab == tabtext.downcase)
       "<li class='active'>#{link_to(tabtext,whereto)}</li>".html_safe

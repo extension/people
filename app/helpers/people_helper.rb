@@ -6,6 +6,22 @@
 
 module PeopleHelper
 
+  def link_to_person(person,options = {})
+    show_unknown = options[:show_unknown] || false
+    show_systemuser = options[:show_systemuser] || false
+    nolink = options[:nolink] || false
+
+    if person.nil?
+      show_unknown ? 'Unknown' : 'System'
+    elsif(person.id == 1 and !show_systemuser)
+      'System'
+    elsif(nolink)
+      "#{person.fullname}"
+    else
+      link_to(person.fullname,person_path(person),class: 'person').html_safe
+    end
+  end
+
   def social_network_link(network_and_connection)
     if(!network_and_connection.accounturl.blank?)
       begin
@@ -99,6 +115,17 @@ module PeopleHelper
     else
       '&nbsp;'.html_safe
     end
+  end
+
+  def status_class(person)
+    if(person.retired?)
+      'retired'
+    elsif(person.last_activity_at < (Time.zone.now - Settings.months_for_inactive_flag.months))
+      'inactive'
+    else
+      'active'
+    end
+
   end 
 
 end

@@ -29,33 +29,7 @@
   <div class="span12">
     <%= page_entries_info @colleagues %>
     <%= paginate(@colleagues) %>
-    <table class="table table-bordered table-striped">
-      <thead>
-        <tr>
-        <th>&nbsp;</th>
-        <th>Name</th>
-        <th>ID string</th>
-        <th>Email</th>
-        <th>Institution</th>
-        <th>Other Affiliation</th>
-        <th>Location</th>
-        </tr>
-      </thead>
-
-      <tbody>
-      <%- for person in @colleagues -%>
-        <tr id="person_row_<%= person.id %>">
-          <td><%= status_icon(person) %></td>
-          <td><%= link_to("#{person.fullname}", person_path(person)) %></td>
-          <td><%= person.idstring %></td>
-          <td><%= person.email %></td>            
-          <td><%= primary_institution_name_for_person(person,'<span class="na">not specified</span>') %></td>
-          <td><%= (person.affiliation.blank?) ? '<span class="na">&nbsp;</span>'.html_safe : person.affiliation %></td>        
-          <td><%= (person.location.nil?) ? '<span class="na">n/a</span>'.html_safe : person.location.abbreviation %></td>        
-        </tr>
-      <%- end -%>
-      </tbody>
-    </table>
+    <%= render(:partial => 'list', locals: {colleagues: @colleagues}) %>
   </div>
 </div>
 <%- end -%>
