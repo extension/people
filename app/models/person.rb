@@ -915,7 +915,27 @@ class Person < ActiveRecord::Base
   #  return returnhash
   # end
 
+  def aae_id
+    if(id_value = read_attribute(:aae_id))
+      id_value
+    elsif(id_value = AaeUser.where(darmok_id: self.id).pluck(:id).first)
+      self.update_column(:aae_id,id_value)
+      id_value
+    else
+      nil
+    end
+  end
 
+  def learn_id
+    if(id_value = read_attribute(:learn_id))
+      id_value
+    elsif(id_value = LearnLearner.where(darmok_id: self.id).pluck(:id).first)
+      self.update_column(:learn_id,id_value)
+      id_value
+    else
+      nil
+    end
+  end
 
   private
 

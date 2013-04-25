@@ -88,6 +88,21 @@
       <p>No social networking connections listed.</p>
       <%- end -%>
     </div>
+
+    <div class="well">
+        <h4>Profiles across eXtension</h4>
+        <ul class="unstyled">
+          <%- if(aae_id = @person.aae_id) -%>
+            <li><%= link_to("Ask an Expert Profile","https://ask.extension.org/expert/users/#{aae_id}") %></li>
+          <%- end -%>
+          <li><%= link_to("Create Profile","http://create.extension.org/user/#{@person.id}") %></li>
+          <li><%= link_to("Data Profile","http://data.extension.org/contributors/#{@person.id}") %></li>
+          <%- if(learn_id = @person.learn_id) -%>
+            <li><%= link_to("Learn Profile","https://learn.extension.org/learners/#{learn_id}/portfolio") %></li>
+          <%- end -%>          
+        </ul>
+    </div>
+
   </div>
     
 </div>
