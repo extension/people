@@ -8,9 +8,10 @@
 require 'bcrypt'
 class Person < ActiveRecord::Base
   include BCrypt
+  include MarkupScrubber
   attr_accessor :password, :current_password, :password_confirmation
 
-  attr_accessible :first_name, :last_name, :email, :title, :phone, :time_zone, :affiliation, :involvement
+  attr_accessible :first_name, :last_name, :email, :title, :phone, :time_zone, :affiliation, :involvement, :biography
   attr_accessible :password
   attr_accessible :position_id, :position, :location_id, :location, :county_id, :county, :institution_id, :institution
   attr_accessible :invitation, :invitation_id 
@@ -533,6 +534,10 @@ class Person < ActiveRecord::Base
     end
   end
 
+  # attr_writer override for response to scrub html
+  def biography=(description)
+    write_attribute(:biography, self.cleanup_html(description))
+  end
 
   def self.cleanup_signup_accounts
     self.where(account_status: STATUS_SIGNUP).where("created_at < ?",Time.now - 14.day).each do |person|
@@ -847,6 +852,8 @@ class Person < ActiveRecord::Base
   def clear_reset_token
     self.update_column(:reset_token,nil)
   end
+
+
 
   # # returns a hash of public attributes
   # def public_attributes  

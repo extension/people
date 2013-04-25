@@ -32,6 +32,7 @@ class Accounts < ActiveRecord::Migration
       t.integer  "login_increment"
       t.integer  "primary_account_id"
       t.string   "affiliation"
+      t.text     "biography"
       t.text     "involvement"
       t.integer  "invitation_id"
       t.string   "reset_token", :limit => 40

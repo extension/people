@@ -89,7 +89,7 @@ end
 
 
 def account_transfer_query
-  reject_columns = ['password_hash','involvement','institution_id','invitation_id','previous_email','reset_token']
+  reject_columns = ['password_hash','involvement','institution_id','invitation_id','previous_email','reset_token','biography']
   columns = Person.column_names.reject{|n| reject_columns.include?(n)}
   insert_clause = "#{@my_database}.#{Person.table_name} (#{columns.join(',')})"
   from_clause = "#{@darmok_database}.accounts"

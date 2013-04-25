@@ -11,7 +11,7 @@ class ProfilePublicSetting < ActiveRecord::Base
   belongs_to :person
   
   
-  KNOWN_ITEMS = ['email','phone','title','position','institution','location','county','time_zone']
+  KNOWN_ITEMS = ['email','phone','title','position','institution','location','county','time_zone','biography']
   
   ITEM_LABELS =  {'email' => 'Email Address',
                   'phone' => 'Phone Number',
@@ -21,7 +21,8 @@ class ProfilePublicSetting < ActiveRecord::Base
                   'location' => 'Location',
                   'county' => 'County',
                   'interests' => 'Interests',
-                  'time_zone' => 'Time zone'}
+                  'time_zone' => 'Time zone',
+                  'biography' => 'Biography'}
                         
   def self.find_or_create_by_person_and_item(person,item,is_public = false)  
     if(setting = self.where(person_id: person.id).where(item: item).first)
