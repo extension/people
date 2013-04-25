@@ -203,6 +203,8 @@ GEM
     rest-client (1.6.7)
       mime-types (>= 1.16)
     ruby-openid (2.2.3)
+    safe_attributes (1.0.10)
+      activerecord (>= 3.0.0)
     sass (3.2.7)
     sass-rails (3.2.6)
       railties (~> 3.2.0)
@@ -295,6 +297,7 @@ DEPENDENCIES
   redis-rails
   rest-client
   ruby-openid
+  safe_attributes
   sass-rails (~> 3.2.3)
   select2-rails
   sidekiq

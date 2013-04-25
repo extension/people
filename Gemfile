@@ -27,6 +27,9 @@ group :assets do
   gem "select2-rails"
 end
 
+# legacy data support
+gem 'safe_attributes'
+
 # mobile device detection
 gem 'mobile-fu'
 
