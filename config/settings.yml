@@ -13,3 +13,4 @@ token_salt: 'use_local_settings'
 googleapps_account: "use_local_settings"
 googleapps_secret:  "use_local_settings"
 default_display_timezone: 'Eastern Time (US & Canada)'
+months_for_inactive_flag: 12

@@ -43,6 +43,14 @@ module ApplicationHelper
     end
   end
 
+  def display_date(time)
+    if(time.blank?)
+      ''
+    else
+      time.strftime("%B %e, %Y")
+    end
+  end
+
 
   def link_to_person(person,options = {})
     show_unknown = options[:show_unknown] || false

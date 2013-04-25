@@ -1,21 +1,6 @@
 <% @page_title = "Profile for #{@person.fullname}" %>
 
-
-<%- if @person.pendingreview? -%>
-<div class='row'>
-  <div class='span12'>
-    <div class='well'>
-      <%= render(partial: 'review_form', locals: {person: @person}) -%>
-    </div>
-  </div>
-</div>
-<%- elsif(@person.retired?) -%>
-<div class="row">
-  <div class="span12">
-    <%= render(partial: 'retired_notice', locals: {person: @person, retired_account: @person.retired_account}) %>
-  </div>
-</div>
-<%- end -%>
+<%= render(:partial => 'show_status_banner', locals: {person: @person}) %>
 
 <div class="row">
   <div class="span7"> 

@@ -32,6 +32,7 @@
     <table class="table table-bordered table-striped">
       <thead>
         <tr>
+        <th>&nbsp;</th>
         <th>Name</th>
         <th>ID string</th>
         <th>Email</th>
@@ -44,6 +45,7 @@
       <tbody>
       <%- for person in @colleagues -%>
         <tr id="person_row_<%= person.id %>">
+          <td><%= status_icon(person) %></td>
           <td><%= link_to("#{person.fullname}", person_path(person)) %></td>
           <td><%= person.idstring %></td>
           <td><%= person.email %></td>            
@@ -69,5 +71,7 @@ $('#showform').on('show', function () {
 $('#showform').on('hide', function () {
   $('#formtoggler').html("Filter Options <i class='icon-caret-right'></i>");
 });
+
+$(".status_icon").tooltip();
 
 </script>

@@ -1,0 +1,46 @@
+<%- if @person.is_signup? -%>
+<div class="row">
+  <div class="span12">
+    <div class='alert alert-warning'>
+     <h4>This account is waiting email confirmation.</h4>
+     <p><%= @person.first_name %> has not yet confirmed their email address from signup. They'll need to confirm their email address to use eXtension sites and services.</p>
+    </div>
+  </div>
+</div>
+<%- elsif @person.retired? -%>
+<div class="row">
+  <div class="span12">
+    <%= render(partial: 'retired_notice', locals: {person: @person, retired_account: @person.retired_account}) %>
+  </div>
+</div>
+<%- elsif @person.pendingreview? -%>
+<div class='row'>
+  <div class='span12'>
+    <div class='well'>
+      <%= render(partial: 'review_form', locals: {person: @person}) -%>
+    </div>
+  </div>
+</div>
+<%- elsif(!@person.email_confirmed?) -%>
+<div class="row">
+  <div class="span12">
+    <div class='alert alert-warning'>
+     <h4>This account is waiting email confirmation.</h4>
+     <%- if !@person.previous_email.blank? -%>
+       <p><%= @person.first_name %> changed their email from <%= @person.previous_email %> to <%= @person.email %> and has not yet confirmed their changed email address.</p>
+     <%- else -%>
+       <p><%= @person.first_name %> changed their email to <%= @person.email %> and has not yet confirmed their changed email address.</p>
+     <%- end -%>
+    </div>
+  </div>
+</div>
+<%- elsif(@person.last_activity_at < (Time.zone.now - Settings.months_for_inactive_flag.months)) -%>
+<div class="row">
+  <div class="span12">
+    <div class='alert alert-warning'>
+     <h4>This account has been inactive for longer than <%= Settings.months_for_inactive_flag %> months</h4>
+     <p><%= @person.first_name %> was last active on <%= display_date(@person.last_activity_at) %>.</p>
+    </div>
+  </div>
+</div>
+<%- end -%>

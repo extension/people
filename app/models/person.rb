@@ -166,12 +166,16 @@ class Person < ActiveRecord::Base
     person
   end
 
+  def is_signup?
+    self.account_status == STATUS_SIGNUP
+  end
+
   def pendingreview?
-    (!self.vouched? && !self.retired? && self.account_status != STATUS_SIGNUP && self.email_confirmed?)
+    (!self.vouched? && !self.retired? && !self.is_signup? && self.email_confirmed?)
   end
 
   def validaccount?
-    if(self.retired? or !self.vouched? or self.account_status == STATUS_SIGNUP)
+    if(self.retired? or !self.vouched? or self.is_signup?)
       return false
     else
       return true
