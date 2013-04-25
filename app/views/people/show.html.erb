@@ -26,7 +26,7 @@
         <dd><%= @person.email%></dd>
         <%- if @person == current_person or current_person.is_admin? -%>
           <%- if !@person.email_forward.blank? and @person.email_forward.alias_type == EmailAlias::CUSTOM_FORWARD -%>
-          <dd>Forwards to: <%= person.email_forward.destination%></dd>
+          <dd>Forwards to: <%= @person.email_forward.destination%></dd>
           <%- end -%>        
         <%- end -%>        
         <dt>Preferred Phone:</dt>
