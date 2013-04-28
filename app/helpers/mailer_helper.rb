@@ -46,7 +46,7 @@ module MailerHelper
 
       return_text_lines << "#{display_attribute} : changed from #{display_from} to #{display_to}"
     end
-    return_text_lines.join('\n')
+    return_text_lines.join("\r\n")
   end
 
   def blank_or_name(id,model)
