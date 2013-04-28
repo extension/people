@@ -190,6 +190,24 @@ class AccountsController < ApplicationController
   end
 
   def contributor_agreement
+    if(request.post?)
+      if(current_person.contributor_agreement.nil?)
+        if(params[:agreement_agree])
+          current_person.contributor_agreement = true
+          current_person.contributor_agreement_at = Time.zone.now
+          if(current_person.save)
+            flash[:success] = 'Thank you for your response'
+          end
+        elsif(params[:agreement_noagree])
+          current_person.contributor_agreement = false
+          current_person.contributor_agreement_at = Time.zone.now
+          if(current_person.save)
+            flash[:success] = 'Thank you for your response'
+          end
+        end
+      end
+      return redirect_to(accounts_contributor_agreement_url)
+    end 
   end
 
 
