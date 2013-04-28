@@ -1,6 +1,11 @@
-body.people {
+body#people {
   padding-bottom: 40px;
   background: #1d4fa9;
+}
+
+body#data {
+  padding-top: 88px;
+  padding-bottom: 40px;
 }
 .sidebar-nav {
   padding: 9px 0;
