@@ -4,7 +4,7 @@
 # === LICENSE:
 #  see LICENSE file
 class PeopleController < ApplicationController
-  skip_before_filter :check_hold_status, except: [:browse, :index, :vouch, :pendingreview, :invitations, :invite]
+  skip_before_filter :check_hold_status, except: [:browsefile, :browse, :index, :vouch, :pendingreview, :invitations, :invite]
   before_filter :set_tab
 
   def show
@@ -63,18 +63,39 @@ class PeopleController < ApplicationController
   def index
   end
 
-  def browse
+  def browsefile
     if(params[:filter] and @browse_filter = BrowseFilter.find_by_id(params[:filter]))
-      @browse_filter_objects = @browse_filter.settings_to_objects
-
-      if(!params[:download].nil? and params[:download] == 'csv')
-        @colleagues = Person.display_accounts.filtered_by(@browse_filter).order('last_name ASC')
-        send_data(meta_contributions_csv(@colleagues),
+      if(@browse_filter.dump_count < Settings.max_live_dump_count)
+        @browse_filter.dump_to_file
+        send_file(@browse_filter.filename,
                   :type => 'text/csv; charset=iso-8859-1; header=present',
-                  :disposition => "attachment; filename=colleagues_filtered_by_filter#{@browse_filter.id}.csv")
+                  :disposition => "attachment; filename=#{File.basename(@browse_filter.filename)}")        
       else
-        @colleagues = Person.display_accounts.filtered_by(@browse_filter).page(params[:page]).order('last_name ASC')
+        if(@browse_filter.dump_in_progress?)
+          @browse_filter.add_to_notifylist(current_person)
+          flash[:notice] = "This export is currently in progress. We will send you a notification when it is available"
+          return redirect_to(browse_people_url(filter: @browse_filter.id))
+        elsif(!@browse_filter.dumpfile_updated?)
+          @browse_filter.add_to_notifylist(current_person)
+          @browse_filter.delay.dump_to_file
+          flash[:notice] = 'This csv file is out of date. We will send you a notification when it is available'
+          return redirect_to(browse_people_url(filter: @browse_filter.id))
+        else
+          send_file(@browse_filter.filename,
+                    :type => 'text/csv; charset=iso-8859-1; header=present',
+                    :disposition => "attachment; filename=#{File.basename(@browse_filter.filename)}")
+        end
       end
+    else
+      flash[:warning] = 'Invalid filter provided.'
+      return redirect_to(browse_people_url)
+    end
+  end
+
+  def browse
+    if(params[:filter] && params[:filter].to_i != BrowseFilter::ALL && @browse_filter = BrowseFilter.find_by_id(params[:filter]))
+      @browse_filter_objects = @browse_filter.settings_to_objects
+      @colleagues = Person.display_accounts.filtered_by(@browse_filter).page(params[:page]).order('last_name ASC')
     else
       @colleagues = Person.display_accounts.page(params[:page]).order('last_name ASC')
     end
@@ -357,43 +378,6 @@ class PeopleController < ApplicationController
     @selected_tab = 'people'
   end
 
-# # eXtensionID,First Name,Last Name,Email,Phone,Title,Position,Institution,Other Affiliation,Location,County,Agreement Status,Account Created
-# # <% for showuser in @userlist %><%= makeusercsvstring(showuser)+"\n" %><% end %>
-
-#   def colleagues_csv(colleagues)
-#     CSV.generate do |csv|
-#       headers = []
-#       headers << 'First Name'
-#       headers << 'Last Name'
-#       headers << 'idstring'
-#       headers << 'Email'
-#       headers << 'Phone'
-#       headers << 'Title'
-#       headers << 'Position'
-#       headers << 'Institution'
-#       headers << 'Other Affiliation'
-#       headers << 'Location'
-#       headers << 'County'
-#       headers << 'Agreement Status'
-#       headers << 'Account Created'
-#       headers << 'Last Active At'
-#       headers << 'Communities'
-#       csv << headers
-#       colleagues.each do |person|
-#         row = []
-#         row << person.first_name
-#         row << person.last_name
-#         row << person.idstring
-#         row << person.email
-#         row << person.phone
-#         row << person.title
-#         row << (person.position.blank? ? '' : person.position.name)
-#         row << (person.institution.blank? ? '' : person.institution.name)
-#         row << person.affiliation
-#         csv << row
-#       end
-#     end
-#   end  
 
 
 end

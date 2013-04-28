@@ -125,6 +125,7 @@ People::Application.routes.draw do
     collection do
       get :activity
       get :browse
+      get :browsefile
       post :filter
       get :invite
       post :invite

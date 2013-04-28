@@ -62,6 +62,8 @@ class Notification < ActiveRecord::Base
   INVITATION_TO_EXTENSIONID           = 400
   INVITATION_ACCEPTED                 = 401
 
+  # Downloads
+  COLLEAGUE_DOWNLOAD_AVAILABLE        = 500
 
   
 
@@ -256,6 +258,19 @@ class Notification < ActiveRecord::Base
     AccountMailer.invitation_accepted({invitation: self.notifiable, notification: self}).deliver
   end
 
+
+  def colleague_download_available
+    if(self.notifiable.notifylist)
+      self.notifiable.notifylist.each do |id|
+        if(person = Person.find_by_id(id))
+          AccountMailer.colleague_download_available({browse_filter: self.notifiable, notification: self, recipient: person}).deliver
+        end
+      end
+    end
+    # clear notify list
+    self.notifiable.notifylist = []
+    self.notifiable.save
+  end
 
   def self.code_to_constant_string(code)
     constantslist = self.constants

@@ -27,6 +27,11 @@
 <%- if !@colleagues.blank? -%>
 <div class="row">
   <div class="span12">
+    <p class='pull-right'>
+      <%= link_to("<i class='icon-file-alt'></i> Download this list (.csv)".html_safe,
+                  browsefile_people_path(filter: (@browse_filter.blank? ? BrowseFilter::ALL : @browse_filter.id)),
+                  :class => 'btn') %>
+    </p>
     <%= page_entries_info @colleagues %>
     <%= paginate(@colleagues) %>
     <%= render(:partial => 'list', locals: {colleagues: @colleagues}) %>

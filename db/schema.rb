@@ -38,9 +38,14 @@ ActiveRecord::Schema.define(:version => 20130419142105) do
   create_table "browse_filters", :force => true do |t|
     t.integer  "created_by"
     t.text     "settings"
-    t.string   "fingerprint", :limit => 40
-    t.datetime "created_at",                :null => false
-    t.datetime "updated_at",                :null => false
+    t.text     "notifylist"
+    t.string   "fingerprint",            :limit => 40
+    t.boolean  "dump_in_progress"
+    t.datetime "dump_last_generated_at"
+    t.float    "dump_last_runtime"
+    t.integer  "dump_last_filesize"
+    t.datetime "created_at",                           :null => false
+    t.datetime "updated_at",                           :null => false
   end
 
   add_index "browse_filters", ["fingerprint"], :name => "fingerprint_ndx", :unique => true

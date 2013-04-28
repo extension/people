@@ -128,7 +128,7 @@ class Person < ActiveRecord::Base
   def self.filtered_by(browse_filter)
     with_scope do
       base_scope = select('DISTINCT people.id, people.*')
-      if(browse_filter and settings = browse_filter.settings)
+      if(browse_filter  && !browse_filter.is_all? && settings = browse_filter.settings)
         BrowseFilter::KNOWN_KEYS.each do |filter_key|
           if(settings[filter_key])
             case filter_key
@@ -941,6 +941,69 @@ class Person < ActiveRecord::Base
       nil
     end
   end
+
+  def contributor_agreement_to_s
+    if(self.contributor_agreement.nil?)
+      'Not reviewed'
+    elsif(!self.contributor_agreement)
+      'Not accepted'
+    else
+      'Accepted'
+    end
+  end
+
+  def self.name_or_nil(item)
+    item.nil? ? nil : item.name
+  end
+
+  def self.dump_to_csv(filename)
+    with_scope do
+      CSV.open(filename,'wb') do |csv|
+        headers = []
+        headers << 'Internal ID'
+        headers << 'First Name'
+        headers << 'Last Name'
+        headers << 'ID String'
+        headers << 'Email'
+        headers << 'Phone'
+        headers << 'Title'
+        headers << 'Position'
+        headers << 'Institution'
+        headers << 'Other Affiliation'
+        headers << 'Location'
+        headers << 'County'
+        headers << 'Agreement Status'
+        headers << 'Account Created'
+        headers << 'Last Active At'
+        headers << 'Communities'
+        csv << headers
+        self.includes(:position, :location, :county, :institution).find_in_batches do |people_group|
+          people_group.each do |person|
+            row = []
+            row << person.id
+            row << person.first_name
+            row << person.last_name
+            row << person.idstring
+            row << person.email
+            row << person.phone
+            row << person.title
+            row << self.name_or_nil(person.position)
+            row << self.name_or_nil(person.institution)
+            row << person.affiliation
+            row << self.name_or_nil(person.location)
+            row << self.name_or_nil(person.county)
+            row << person.contributor_agreement_to_s
+            row << (person.created_at ? person.created_at.utc.strftime("%Y-%m-%d %H:%M:%S") : nil)
+            row << (person.last_activity_at ? person.last_activity_at.utc.strftime("%Y-%m-%d %H:%M:%S") : nil)
+            row << person.communities.where(Community::CONNECTION_CONDITIONS['joined']).map(&:name).join('; ')
+            csv << row
+          end # person
+        end # people group
+      end # csv 
+    end # with_scope
+  end
+
+
 
   private
 

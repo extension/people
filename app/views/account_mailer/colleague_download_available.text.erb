@@ -1,0 +1,14 @@
+<%= render(:partial => 'shared_mailer/demo_notice') if is_demo? -%>
+Hi <%= @recipient.first_name %>,
+
+The CSV download you requested is now available.  
+
+You can download the file today by returning to:
+
+<%= browse_people_url(filter: @browse_filter.id) %>
+
+and again clicking "Download this list"
+
+(Please note, the download file will be flagged for a rebuild daily at midnight GMT, if you don't download the file by then, you may have to wait again for the download to be built again)
+
+<%= render(:partial => 'shared_mailer/help_footer') %>
