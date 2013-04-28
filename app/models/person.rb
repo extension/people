@@ -1,4 +1,3 @@
-# === COPYRIGHT:
 #  Copyright (c) North Carolina State University
 #  Developed with funding for the National eXtension Initiative.
 # === LICENSE:
@@ -372,7 +371,13 @@ class Person < ActiveRecord::Base
 
     # institution check
     if(previous_changes_keys.include?('institution_id'))
-      self.connect_to_community(self.institution,'member',options.merge({connector_id: options[:colleague_id]}))
+      if(self.institution.blank?)
+        if(institution = Community.find_by_id(self.previous_changes['institution_id'].first))
+          self.remove_from_community(institution,options.merge({connector_id: options[:colleague_id]}))
+        end
+      else
+        self.connect_to_community(self.institution,'member',options.merge({connector_id: options[:colleague_id]}))
+      end
     end
 
     if(previous_changes_keys.include?('email'))
