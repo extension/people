@@ -11,11 +11,17 @@
     <%= csrf_meta_tags %>
     <%= render(partial: 'shared/google_tracking') %>
   </head>
-  <body>
+  <body class='people'>
 
     <div class="navbar navbar-static-top">
       <%= javascript_include_tag "https://www.extension.org/javascripts/global_nav_internal.js" %>
     </div>
+
+    <%- if current_person and current_person.is_admin? -%>
+    <div id="admin_banner">
+      <p><strong>You are signed in using an admin account</strong></p>
+    </div>
+    <%- end -%>
 
     <div class="container" id="main">
 
