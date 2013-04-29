@@ -14,11 +14,14 @@ class CommunitiesController < ApplicationController
   def show
     # will raise ActiveRecord::RecordNotFound on not found 
     @community = Community.find_by_shortname_or_id(params[:id])
+    member_breadcrumbs
     @current_person_community_connection = current_person.connection_with_community(@community)
   end
 
   def edit
     @community = Community.find(params[:id])
+    member_breadcrumbs(['Edit community settings'])
+
     if(!current_person.can_edit_community?(@community))
       flash[:warning] = "You do not have permission to edit the settings for this community."
       return redirect_to(community_url(@community))
@@ -54,6 +57,7 @@ class CommunitiesController < ApplicationController
   end
 
   def new
+    collection_breadcrumbs(['Add new community'])
     @community = Community.new
   end
 
@@ -86,25 +90,27 @@ class CommunitiesController < ApplicationController
   end  
 
   def newest
+    collection_breadcrumbs(['List (by creation time)'])
     @communities = Community.order('created_at DESC').page(params[:page])
   end
 
   def connections
     # will raise ActiveRecord::RecordNotFound on not found 
     @community = Community.find_by_shortname_or_id(params[:id])
-
     allowed_connections = Community::CONNECTION_CONDITIONS.keys
     if(params[:connection] and allowed_connections.include?(params[:connection]))
       connection = params[:connection]
     else
       connection = 'joined'
     end
+    member_breadcrumbs(["Connections (#{connection})"])
 
     @connections = @community.connected(connection).order('people.last_name').page(params[:page])
   end
 
   def invite
     @community = Community.find_by_shortname_or_id(params[:id])
+    member_breadcrumbs(['Invite colleagues'])
 
     if (!params[:q].blank?) 
       @connections = Person.patternsearch(params[:q]).order('last_name,first_name').page(params[:page])
@@ -145,6 +151,8 @@ class CommunitiesController < ApplicationController
   end
 
   def find
+    collection_breadcrumbs(['Find communities'])
+
     if (!params[:q].blank?)
       @found_communities = Community.findcommunity(params[:q])
       if(@found_communities.blank?)
@@ -158,14 +166,44 @@ class CommunitiesController < ApplicationController
   def activity
     if(params[:id])
       @community = Community.find_by_shortname_or_id(params[:id])
+      member_breadcrumbs(['Activity'])
+
       @activities = @community.activities.order('created_at DESC').page(params[:page])
     else
+      collection_breadcrumbs(['Activity'])
       @activities = Activity.community.order('created_at DESC').page(params[:page])
     end         
   end    
 
 
   private
+
+  def member_breadcrumbs(endpoints = [])
+    add_breadcrumb("Communities", :communities_path)
+    add_breadcrumb("#{@community.name}", community_path(@community))
+    if(!endpoints.blank?)
+      endpoints.each do |endpoint|
+        if(endpoint.is_a?(Array))  
+          add_breadcrumb(endpoint[0],endpoint[1])
+        else
+          add_breadcrumb(endpoint)
+        end
+      end
+    end
+  end
+
+  def collection_breadcrumbs(endpoints = [])
+    add_breadcrumb("Communities", :communities_path)
+    if(!endpoints.blank?)
+      endpoints.each do |endpoint|
+        if(endpoint.is_a?(Array))  
+          add_breadcrumb(endpoint[0],endpoint[1])
+        else
+          add_breadcrumb(endpoint)
+        end
+      end
+    end
+  end  
 
   def set_tab
     @selected_tab = 'communities'
