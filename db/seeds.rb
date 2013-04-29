@@ -98,6 +98,10 @@ def account_transfer_query
   select_columns = []
   columns.each do |c|
     case c
+    when 'first_name'
+      select_columns << "TRIM(#{from_clause}.first_name)"
+    when 'last_name'
+      select_columns << "TRIM(#{from_clause}.last_name)"
     when 'idstring'
       select_columns << "#{from_clause}.login"
     when 'legacy_password'
