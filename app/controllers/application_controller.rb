@@ -16,6 +16,7 @@ class ApplicationController < ActionController::Base
   before_filter :update_last_activity
   before_filter :check_hold_status
   before_filter :check_for_metric 
+  before_filter :set_latest_yearweek
   helper_method :current_person
 
 

@@ -134,6 +134,7 @@ GEM
     net-ssh-gateway (1.2.0)
       net-ssh (>= 2.6.5)
     nokogiri (1.5.9)
+    outfielding-jqplot-rails (1.0.8)
     polyglot (0.3.3)
     posix-spawn (0.3.6)
     powder (0.2.0)
@@ -273,6 +274,7 @@ DEPENDENCIES
   mysql2
   net-http-spy
   nokogiri
+  outfielding-jqplot-rails
   powder
   pry
   quiet_assets

@@ -25,6 +25,7 @@ group :assets do
   gem 'jquery-tablesorter'
   gem 'extension-html5shiv-rails', :require => 'html5shiv-rails'
   gem "select2-rails"
+  gem 'outfielding-jqplot-rails'
 end
 
 # legacy data support

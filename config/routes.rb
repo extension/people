@@ -10,7 +10,7 @@
 People::Application.routes.draw do
   ### data subdomain support ###
   constraints(DataSubdomain) do
-    match '/' => 'data_home#index' 
+    match '/' => 'data_home#index', as: 'data_root'
 
     resources :pages, :only => [:index, :show] do
       member do
@@ -82,7 +82,8 @@ People::Application.routes.draw do
 
     # experiments named routes
     match '/experiments', to: 'experiments#index', :as => 'experiments'
-
+    # wildcard
+    match "/experiments/:action", to: "experiments", :via => [:get,:post]
   end
   
   root :to => 'home#index'

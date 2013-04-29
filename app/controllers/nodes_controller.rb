@@ -6,6 +6,9 @@
 #  see LICENSE file
 
 class NodesController < ApplicationController
+  layout 'data'
+  skip_before_filter :signin_required, :check_hold_status
+  before_filter :signin_optional
   before_filter :check_for_group
   helper_method :display_node_scope
 

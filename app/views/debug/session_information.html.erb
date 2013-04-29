@@ -1,5 +1,13 @@
 <% @page_title = "Session Information" %>
 
+  <h2>Request Information</h2>
+  <table class='table'>
+    <tr>
+      <td>Subdomain</td>
+      <td><%= request.subdomain %></td>
+    </tr>
+  </table>
+
 <%- if !session -%>
   <h2>No session data</h2>
 <%- else -%>

@@ -5,7 +5,10 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
-class PersonExperimentsController < ApplicationController
+class ExperimentsController < ApplicationController
+  layout 'data'
+  skip_before_filter :signin_required, :check_hold_status
+  before_filter :signin_optional
   before_filter :check_for_contributor, :check_for_group
 
   def index

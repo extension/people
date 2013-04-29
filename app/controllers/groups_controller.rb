@@ -6,7 +6,10 @@
 #  see LICENSE file
 
 class GroupsController < ApplicationController
-
+  layout 'data'
+  skip_before_filter :signin_required, :check_hold_status
+  before_filter :signin_optional
+  
   def index
     @grouplist = Group.launched.order(:name)
   end

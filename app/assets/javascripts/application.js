@@ -14,3 +14,13 @@
 //= require jquery_ujs
 //= require twitter/bootstrap
 //= require select2
+//= require jquery.jqplot
+//= require jqplot-plugins/jqplot.dateAxisRenderer
+//= require jqplot-plugins/jqplot.highlighter
+//= require jqplot-plugins/jqplot.enhancedLegendRenderer
+//= require jqplot-plugins/jqplot.cursor
+//= require responsive-tables
+//= require jquery.ui.datepicker
+//= require jquery.ui.autocomplete
+//= require jquery-tablesorter
+//= require tables

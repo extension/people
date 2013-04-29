@@ -8,7 +8,9 @@ require 'csv'
 
 class ContributorsController < ApplicationController
   layout 'data'
-
+  skip_before_filter :signin_required, :check_hold_status
+  before_filter :signin_optional
+  
   def show
     @contributor = Person.find(params[:id])
     @node_contribution_stats = YearWeekStatsComparator.new
