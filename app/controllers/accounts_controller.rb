@@ -48,7 +48,7 @@ class AccountsController < ApplicationController
       else
         @person = Person.find_by_email(params[:email])
         if(@person.nil?)
-          @person = Person.find_by_login(params[:email])
+          @person = Person.find_by_idstring(params[:email])
         end
 
         if(@person.nil?)

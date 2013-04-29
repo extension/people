@@ -14,7 +14,7 @@ class CommunityMailer < BaseMailer
     @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
    
     if(!@recipient.email.blank?)
-      return_email = mail(to: @recipient.email, subject: @subject)
+      return_email = create_mail(to: @recipient.email, subject: @subject)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
     
@@ -29,7 +29,7 @@ class CommunityMailer < BaseMailer
     @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
    
     if(!@recipient.email.blank?)
-      return_email = mail(to: @recipient.email, subject: @subject)
+      return_email = create_mail(to: @recipient.email, subject: @subject)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
     
@@ -45,7 +45,7 @@ class CommunityMailer < BaseMailer
     @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
 
     if(!@recipient.email.blank?)
-      return_email = mail(to: @recipient.email, subject: @subject)
+      return_email = create_mail(to: @recipient.email, subject: @subject)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
     
@@ -60,7 +60,7 @@ class CommunityMailer < BaseMailer
     @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
    
     if(!@recipient.email.blank?)
-      return_email = mail(to: @recipient.email, subject: @subject)
+      return_email = create_mail(to: @recipient.email, subject: @subject)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
     
@@ -75,7 +75,7 @@ class CommunityMailer < BaseMailer
     @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
    
     if(!@recipient.email.blank?)
-      return_email = mail(to: @recipient.email, subject: @subject)
+      return_email = create_mail(to: @recipient.email, subject: @subject)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
     
@@ -98,7 +98,7 @@ class CommunityMailer < BaseMailer
     @subject = "eXtension: A colleague is invited to the #{@community.name} community"
 
     if(!@recipient.email.blank?)
-      return_email = mail(to: @recipient.email, subject: @subject)
+      return_email = create_mail(to: @recipient.email, subject: @subject)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
     
@@ -122,7 +122,7 @@ class CommunityMailer < BaseMailer
     if(!@recipient.email.blank?)
       mail_options = {to: @recipient.email, subject: @subject}
       mail_options[:cc] = @bycolleague.email if !@bycolleague.email.blank?     
-      return_email = mail(mail_options)
+      return_email = create_mail(mail_options)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
     
@@ -145,7 +145,7 @@ class CommunityMailer < BaseMailer
     @subject = "eXtension: A colleague was added to the #{@community.name} community"
 
     if(!@recipient.email.blank?)
-      return_email = mail(to: @recipient.email, subject: @subject)
+      return_email = create_mail(to: @recipient.email, subject: @subject)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
     
@@ -169,7 +169,7 @@ class CommunityMailer < BaseMailer
     if(!@recipient.email.blank?)
       mail_options = {to: @recipient.email, subject: @subject}
       mail_options[:cc] = @bycolleague.email if !@bycolleague.email.blank?     
-      return_email = mail(mail_options)
+      return_email = create_mail(mail_options)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
     
@@ -195,7 +195,7 @@ class CommunityMailer < BaseMailer
     @subject = "eXtension: A colleague was removed from the #{@community.name} community"
 
     if(!@recipient.email.blank?)
-      return_email = mail(to: @recipient.email, subject: @subject)
+      return_email = create_mail(to: @recipient.email, subject: @subject)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
     
@@ -222,7 +222,7 @@ class CommunityMailer < BaseMailer
     if(!@recipient.email.blank?)
       mail_options = {to: @recipient.email, subject: @subject}
       mail_options[:cc] = @bycolleague.email if !@bycolleague.email.blank?     
-      return_email = mail(mail_options)
+      return_email = create_mail(mail_options)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
     

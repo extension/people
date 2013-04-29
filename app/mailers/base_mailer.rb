@@ -42,4 +42,17 @@ class BaseMailer < ActionMailer::Base
   def is_demo?
     Settings.app_location != 'production'
   end
+
+  def create_mail(options = {})
+    mailoptions = options.dup
+    send_in_demo = mailoptions.delete(:send_in_demo)
+    if(is_demo? and !send_in_demo)
+      mailoptions[:subject] = "[#{options[:to]}] #{options[:subject]}"  
+      mailoptions[:to] = Settings.email_test_address
+      mailoptions[:cc] = nil
+      mailoptions[:bcc] = nil
+    end
+    mail(mailoptions)
+  end
+
 end

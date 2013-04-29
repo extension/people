@@ -7,7 +7,8 @@ display_percentiles: [99,90,75,50]
 display_percentiles_labels: ['99th percentile','90th percentile', '75th percentile', '50th percentile']
 downloads_data_dir: 'notset'
 email_bcc_address: 'use_local_settings'
-email_from_address: 'peoplemail@extension.org'
+email_from_address: 'people-notify@extension.org'
+email_test_address: 'people-notify-testing@extension.org'
 email_from_name:  'eXtension People Notification - Do Not Reply'
 flat_percentage: 0.025
 geoip_data_file: 'notset'

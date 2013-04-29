@@ -220,6 +220,10 @@ class Person < ActiveRecord::Base
         return false
       end
     end
+  end
+
+  def is_inactive?
+    (self.last_activity_at.nil? or self.last_activity_at  < (Time.zone.now - Settings.months_for_inactive_flag.months))
   end 
 
   def set_hashed_password(options = {})
