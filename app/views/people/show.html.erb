@@ -88,7 +88,7 @@
       <%- if(@person.communities.count > 0) %>
       <ul class="unstyled">
         <%- @person.communities.each do |community| -%>
-          <li><%= link_to(community.name, community) %> <small><%= community_connection_for_person(community, @person)%></small></li>
+          <li><%= link_to(community.name, community) %> <small><%= @person.connection_with_community_expanded(community) %></small></li>
         <%- end -%>
       </ul>
       <%- else -%>

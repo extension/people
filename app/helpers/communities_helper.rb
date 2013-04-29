@@ -4,6 +4,15 @@
 # see LICENSE file
 module CommunitiesHelper
 
+  def connection_nav_item(label,connection)
+    if(!params['connection'] and connection == 'joined')
+      list_item_class = " class='active'"
+    else
+      list_item_class = ((params[:connection] == connection) ? " class='active'" : '')
+    end
+    "<li#{list_item_class}>#{link_to(label,connections_community_path(@community,connection: connection))}</li>".html_safe
+  end
+
   def link_to_community(community,options = {})
     nolink = options[:nolink] || false
 
@@ -35,19 +44,6 @@ module CommunitiesHelper
     end
   end
 
-
-  def community_connection_for_person(community,person)
-    connection = person.connection_with_community(community)
-    case connection
-    when 'invitedleader'
-      locale_key = (community.is_institution? ? 'invitedleader_institution' : 'invitedleader')
-    when 'leader'
-      locale_key = (community.is_institution? ? 'institutional_team' : 'leader')
-    else
-      locale_key = connection
-    end
-    I18n.translate("communities.connections.#{locale_key}")     
-  end
 
   def community_connection_for_person_for_list(community,person)
     connection = person.connection_with_community(community)

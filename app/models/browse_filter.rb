@@ -87,7 +87,7 @@ class BrowseFilter < ActiveRecord::Base
       self.update_attributes(dump_in_progress: true)
       benchmark = Benchmark.measure do
         # todo: something other than display accounts?
-        Person.display_accounts.filtered_by(self).order('last_name ASC').dump_to_csv(this_filename)
+        Person.display_accounts.filtered_by(self).dump_to_csv(this_filename)
       end
       Notification.create(:notification_type => Notification::COLLEAGUE_DOWNLOAD_AVAILABLE, :notifiable => self)
       self.update_attributes(dump_last_generated_at: Time.now, dump_last_runtime: benchmark.real, dump_last_filesize: File.size(this_filename), dump_in_progress: false)

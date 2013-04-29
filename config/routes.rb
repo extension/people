@@ -154,6 +154,7 @@ People::Application.routes.draw do
     member do
       get :activity
       get :connections
+      get :connectionsfile
       get :invite
       post :invite
       post :join

@@ -94,6 +94,16 @@ class CommunitiesController < ApplicationController
     @communities = Community.order('created_at DESC').page(params[:page])
   end
 
+  def connectionsfile
+    # will raise ActiveRecord::RecordNotFound on not found 
+    @community = Community.find_by_shortname_or_id(params[:id])
+    filename = "#{Settings.downloads_data_dir}/#{@community.name.tr(' ','_').tr(',','').gsub('\W','').downcase}_connections.csv"
+    @community.people.display_accounts.dump_to_csv(filename,{community: @community})
+    send_file(filename,
+              :type => 'text/csv; charset=iso-8859-1; header=present',
+              :disposition => "attachment; filename=#{File.basename(filename)}")
+  end
+
   def connections
     # will raise ActiveRecord::RecordNotFound on not found 
     @community = Community.find_by_shortname_or_id(params[:id])
@@ -103,7 +113,12 @@ class CommunitiesController < ApplicationController
     else
       connection = 'joined'
     end
-    member_breadcrumbs(["Connections (#{connection})"])
+
+    if (@community.is_institution? and connection == 'leaders')
+      member_breadcrumbs(["Connections (Institutional Team)"])
+    else
+      member_breadcrumbs(["Connections (#{connection.capitalize})"])
+    end
 
     @connections = @community.connected(connection).order('people.last_name').page(params[:page])
   end

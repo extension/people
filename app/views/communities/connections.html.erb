@@ -4,7 +4,32 @@
   <h2><%= @page_title %></h2>
 </div>
 
-<p>#TODO Navigation</p>
+<div class="row">
+  <div class="span12">
+    <div class='pull-right'>
+      <p>
+      <%= link_to("<i class='icon-file-alt'></i> Download community connections list (.csv)".html_safe,
+                  connectionsfile_community_path(@community,download: 'csv'),
+                  :class => 'btn') %>
+      </p>
+    </div>    
+    <ul class="nav nav-pills">
+      <%= connection_nav_item('Joined','joined') %>
+      <%- if @community.is_institution? %>
+        <%= connection_nav_item('Institutional Team','leaders') %>
+      <%- else -%>
+        <%= connection_nav_item('Leaders','leaders') %>
+      <%- end -%>
+      <%= connection_nav_item('Members','members') %>
+
+      <% if @community.memberfilter == Community::MODERATED %>
+        <%= connection_nav_item('Pending','pending') %>
+      <% end %>
+      <%= connection_nav_item('Invited','invited') %>
+
+    </ul>
+  </div>
+</div>
 
 <div class="row">
   <div class="span12">

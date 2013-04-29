@@ -349,6 +349,19 @@ class Person < ActiveRecord::Base
     end
   end
 
+  def connection_with_community_expanded(community)
+    connection = self.connection_with_community(community)
+    case connection
+    when 'invitedleader'
+      locale_key = (community.is_institution? ? 'invitedleader_institution' : 'invitedleader')
+    when 'leader'
+      locale_key = (community.is_institution? ? 'institutional_team' : 'leader')
+    else
+      locale_key = connection
+    end
+    I18n.translate("communities.connections.#{locale_key}")     
+  end
+
   def primary_institution
     self.communities.institutions.where(id: self.institution_id).first
   end
@@ -956,7 +969,7 @@ class Person < ActiveRecord::Base
     item.nil? ? nil : item.name
   end
 
-  def self.dump_to_csv(filename)
+  def self.dump_to_csv(filename,options={})
     with_scope do
       CSV.open(filename,'wb') do |csv|
         headers = []
@@ -969,13 +982,17 @@ class Person < ActiveRecord::Base
         headers << 'Title'
         headers << 'Position'
         headers << 'Institution'
-        headers << 'Other Affiliation'
+        headers << 'Other affiliation'
         headers << 'Location'
         headers << 'County'
-        headers << 'Agreement Status'
-        headers << 'Account Created'
-        headers << 'Last Active At'
-        headers << 'Communities'
+        headers << 'Agreement status'
+        headers << 'Account created'
+        headers << 'Last active at'
+        if(options[:community])
+          headers << 'Community connection'          
+        else
+          headers << 'Communities'
+        end
         csv << headers
         self.includes(:position, :location, :county, :institution).find_in_batches do |people_group|
           people_group.each do |person|
@@ -995,7 +1012,11 @@ class Person < ActiveRecord::Base
             row << person.contributor_agreement_to_s
             row << (person.created_at ? person.created_at.utc.strftime("%Y-%m-%d %H:%M:%S") : nil)
             row << (person.last_activity_at ? person.last_activity_at.utc.strftime("%Y-%m-%d %H:%M:%S") : nil)
-            row << person.communities.where(Community::CONNECTION_CONDITIONS['joined']).map(&:name).join('; ')
+            if(options[:community])
+              row << person.connection_with_community_expanded(options[:community])
+            else
+              row << person.communities.where(Community::CONNECTION_CONDITIONS['joined']).map(&:name).join('; ')
+            end            
             csv << row
           end # person
         end # people group

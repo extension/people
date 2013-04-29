@@ -42,7 +42,7 @@
           <li>
             <%= community_icon(community) %>
             <%= link_to(community.name, community) %> 
-            <small><%= community_connection_for_person(community, current_person)%></small>
+            <small><%= current_person.connection_with_community_expanded(community)%></small>
           </li>
         <%- end -%>
       </ul>    
