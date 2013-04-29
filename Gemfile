@@ -99,6 +99,8 @@ gem 'geoip'
 # google analytics retrieval
 gem "garb" # garb for now until it breaks 
 
+# breadcrumbs
+gem "breadcrumbs_on_rails"
 
 group :development do
   # require the powder gem

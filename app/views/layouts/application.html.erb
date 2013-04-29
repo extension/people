@@ -47,6 +47,14 @@
         </div>
       </div>
 
+      <%- if !breadcrumbs.blank? -%>
+      <div class="row">
+        <div class='span12'>
+          <%= render_breadcrumbs :builder => ::BootstrapBreadcrumbsBuilder %>
+        </div>
+      </div>
+      <%- end -%>
+
       <%= yield %>
     </div>
 

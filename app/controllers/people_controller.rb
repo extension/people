@@ -9,6 +9,8 @@ class PeopleController < ApplicationController
 
   def show
     @person = Person.find_by_id_or_idstring(params[:id])
+    member_breadcrumbs
+
     if(@person != current_person)
       # manual check_hold_status
       return redirect_to home_pending_url if (!current_person.activity_allowed?)
@@ -17,6 +19,7 @@ class PeopleController < ApplicationController
 
   def edit
     @person = Person.find(params[:id])
+    member_breadcrumbs(['Edit profile'])
     if(@person != current_person)
       # manual check_hold_status
       return redirect_to home_pending_url if (!current_person.activity_allowed?)
@@ -93,6 +96,7 @@ class PeopleController < ApplicationController
   end
 
   def browse
+    collection_breadcrumbs(['Browse'])
     if(params[:filter] && params[:filter].to_i != BrowseFilter::ALL && @browse_filter = BrowseFilter.find_by_id(params[:filter]))
       @browse_filter_objects = @browse_filter.settings_to_objects
       @colleagues = Person.display_accounts.filtered_by(@browse_filter).page(params[:page]).order('last_name ASC')
@@ -111,6 +115,8 @@ class PeopleController < ApplicationController
   end
 
   def find
+    collection_breadcrumbs(['Find colleagues'])
+
     if (!params[:q].blank?) 
       @colleagues = Person.patternsearch(params[:q]).order('last_name,first_name').page(params[:page])
       if @colleagues.blank?
@@ -120,11 +126,15 @@ class PeopleController < ApplicationController
   end  
 
   def pendingreview
+    collection_breadcrumbs(['Pending review'])
+
     @colleagues = Person.pendingreview.order('updated_at DESC').page(params[:page])
   end
 
   def vouch
     @person = Person.find(params[:id])
+    member_breadcrumbs(['Vouch'])
+
     if params[:explanation].blank?
       flash[:failure] = 'An explanation for vouching for this eXtensionID is required'
       return redirect_to(person_url(@person))
@@ -140,10 +150,14 @@ class PeopleController < ApplicationController
   end
 
   def invitations
+    collection_breadcrumbs(['Invitations'])
+
     @invitations = Invitation.includes(:person).pending.order('created_at DESC').page(params[:page])
   end
 
   def invite
+    collection_breadcrumbs([['Invitations',invitations_people_path],'Invite colleague'])
+
     @invite_communities = current_person.invite_communities
     if(request.post?)
       @invitation = Invitation.new(params[:invitation])
@@ -166,6 +180,8 @@ class PeopleController < ApplicationController
 
   def retire
     @person = Person.find(params[:id])
+    member_breadcrumbs(['Retire account'])
+
     if(@person != current_person)
       # manual check_hold_status
       return redirect_to home_pending_url if (!current_person.activity_allowed?)
@@ -188,6 +204,7 @@ class PeopleController < ApplicationController
 
   def restore
     @person = Person.find(params[:id])
+    member_breadcrumbs(['Restore account'])
 
     if(@person != current_person)
       # manual check_hold_status
@@ -205,6 +222,8 @@ class PeopleController < ApplicationController
 
   def password
     @person = Person.find_by_id_or_idstring(params[:id])
+    member_breadcrumbs(['Change password'])
+
     return redirect_to(person_url(current_person)) if(@person != current_person)
     if(request.post?)
       if(!params[:person])
@@ -254,6 +273,8 @@ class PeopleController < ApplicationController
   
   def public_settings
     @person = Person.find_by_id_or_idstring(params[:id])
+    member_breadcrumbs(['Change public profile settings'])
+
     return redirect_to(person_url(current_person)) if(@person != current_person)
 
     # this is a bit of an odd way of doing this, but this guarrantees 
@@ -265,11 +286,17 @@ class PeopleController < ApplicationController
   end
 
   def change_social_networks
+    @person = current_person
+    member_breadcrumbs(['Social networks'])
+
     @socialnetworks = SocialNetwork.active.where("id <> ?",SocialNetwork::OTHER_NETWORK).order(:display_name).all
     @socialnetworks << SocialNetwork.find_by_id(SocialNetwork::OTHER_NETWORK)
   end
 
   def edit_social_network
+    @person = current_person
+    member_breadcrumbs([['Social networks',change_social_networks_people_path],'Edit social network'])
+
     if(request.get?)
       if(params[:network_connection])
         @social_network_connection = SocialNetworkConnection.find(params[:network_connection])
@@ -358,12 +385,16 @@ class PeopleController < ApplicationController
   def activity
     if(params[:id])
       @person = Person.find_by_id_or_idstring(params[:id])
+      member_breadcrumbs(['Activity'])
+      
       if(@person == current_person or current_person.is_admin?)
         @activities = Activity.related_to_person(@person).order('created_at DESC').page(params[:page])
       else
         @activities = Activity.public_activity.related_to_person(@person).order('created_at DESC').page(params[:page])
       end
     else
+      collection_breadcrumbs(['Activity'])
+
       if(current_person.is_admin?)
         @activities = Activity.order('created_at DESC').page(params[:page])
       else
@@ -373,6 +404,33 @@ class PeopleController < ApplicationController
   end
 
   private
+
+  def member_breadcrumbs(endpoints = [])
+    add_breadcrumb("People", :people_path)
+    add_breadcrumb("#{@person.fullname}", person_path(@person))
+    if(!endpoints.blank?)
+      endpoints.each do |endpoint|
+        if(endpoint.is_a?(Array))  
+          add_breadcrumb(endpoint[0],endpoint[1])
+        else
+          add_breadcrumb(endpoint)
+        end
+      end
+    end
+  end
+
+  def collection_breadcrumbs(endpoints = [])
+    add_breadcrumb("People", :people_path)
+    if(!endpoints.blank?)
+      endpoints.each do |endpoint|
+        if(endpoint.is_a?(Array))  
+          add_breadcrumb(endpoint[0],endpoint[1])
+        else
+          add_breadcrumb(endpoint)
+        end
+      end
+    end
+  end
 
   def set_tab
     @selected_tab = 'people'
