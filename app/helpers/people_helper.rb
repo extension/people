@@ -97,6 +97,11 @@ module PeopleHelper
       text_macro_options[:emailaddress] =  activity.additionalinfo
     end
 
+    if(activity.activitycode == Activity::EMAIL_CHANGE)
+      text_macro_options[:current_email] =  (activity.person.email || 'unknown')
+      text_macro_options[:previous_email] =  (activity.person.previous_email || 'unknown')
+    end    
+
     I18n.translate("activity.#{activity.activitycode_to_s}",text_macro_options).html_safe
 
   end
