@@ -12,7 +12,6 @@ class HomeController < ApplicationController
   def index
     scoped = Person.display_accounts.where('last_activity_at >= ?',Time.zone.now - 1.month)
     @active_count = scoped.count
-    @location_count = scoped.pluck(:location_id).uniq.size   
   end
 
   def help
