@@ -10,7 +10,7 @@
   <% if @community.memberfilter == Community::MODERATED %>
       <li>
           <span class='mednumber'><%= @community.pending.count %></span>
-          <%= link_if_not_zero(@community.pending.count,'People who want to join', connections_community_path(@community, :connection => 'pending')) %>
+          <%= link_if_not_zero(@community.pending.count,'Pending', connections_community_path(@community, :connection => 'pending')) %>
       </li>
   <% end %>
   <li>
