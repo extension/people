@@ -25,7 +25,7 @@
       <td><%= (person.location.nil?) ? '<span class="na">n/a</span>'.html_safe : person.location.abbreviation %></td>
       <%- if @browse_filter_objects and @browse_filter_objects['social_networks'] -%>
         <%- sn_id_list = @browse_filter_objects['social_networks'].map(&:id) -%>
-        <td>
+        <td class='social_network_link'>
           <ul class='unstyled'>
           <%- person.social_networks.each do |network| -%>
             <%- if sn_id_list.include?(network.id) -%>
