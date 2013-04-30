@@ -7,6 +7,9 @@
     <th>Institution</th>
     <th>Other Affiliation</th>
     <th>Location</th>
+    <%- if @browse_filter_objects and @browse_filter_objects['social_networks'] -%>
+      <th>Social Networks</th>
+    <%- end -%>
     <th>&nbsp;</th>
     </tr>
   </thead>
@@ -19,7 +22,19 @@
       <td><%= person.email %></td>            
       <td><%= primary_institution_name_for_person(person,'<span class="na">not specified</span>') %></td>
       <td><%= (person.affiliation.blank?) ? '<span class="na">&nbsp;</span>'.html_safe : person.affiliation %></td>        
-      <td><%= (person.location.nil?) ? '<span class="na">n/a</span>'.html_safe : person.location.abbreviation %></td>        
+      <td><%= (person.location.nil?) ? '<span class="na">n/a</span>'.html_safe : person.location.abbreviation %></td>
+      <%- if @browse_filter_objects and @browse_filter_objects['social_networks'] -%>
+        <%- sn_id_list = @browse_filter_objects['social_networks'].map(&:id) -%>
+        <td>
+          <ul class='unstyled'>
+          <%- person.social_networks.each do |network| -%>
+            <%- if sn_id_list.include?(network.id) -%>
+              <li><%= social_network_link(network) -%></li>
+            <%- end -%>
+          <%- end -%>
+          </ul>
+        </td>
+      <%- end -%>              
       <td><%= status_icon(person) %></td>
     </tr>
   <%- end -%>

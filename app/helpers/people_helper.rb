@@ -44,9 +44,9 @@ module PeopleHelper
       else
         uristring = network_and_connection.accounturl
       end
-      return "#{network_icon(network_and_connection.name)} <a href=\"#{uristring}\">#{network_and_connection.accountid}</a>".html_safe
+      return "<span class='social_network_link'>#{network_icon(network_and_connection.name)} <a href=\"#{uristring}\">#{network_and_connection.accountid}</a></span>".html_safe
     else
-      return "#{network_icon(network_and_connection.name)} #{network_and_connection.accountid}".html_safe
+      return "<span class='social_network_link'>#{network_icon(network_and_connection.name)} #{network_and_connection.accountid}</span>".html_safe
     end
   end
 

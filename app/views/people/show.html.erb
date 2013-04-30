@@ -78,6 +78,7 @@
         <%- @person.social_networks.each do |network| -%>
           <li><%= social_network_link(network) %></li>
         <%- end -%>
+      </ul>
       <%- else -%>
       <p>No social networking connections listed.</p>
       <%- end -%>
