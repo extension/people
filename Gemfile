@@ -69,7 +69,7 @@ gem 'redis-rails'
 gem 'simple_form'
 
 # openid
-gem 'ruby-openid'
+gem "ruby-openid", :require => 'openid'
 
 # rest posts
 gem 'rest-client'
@@ -109,7 +109,7 @@ group :development do
   gem 'pry'
 
   # footnotes
-  gem 'rails-footnotes', '>= 3.7.5.rc4'
+  #gem 'rails-footnotes', '>= 3.7.5.rc4'
   gem 'quiet_assets'
 
   gem 'better_errors'

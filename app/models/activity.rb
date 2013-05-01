@@ -348,5 +348,44 @@ class Activity < ActiveRecord::Base
 
   end
 
+  def self.log_remote_auth_success(options = {})
+    required = [:person_id,:site]
+    required.each do |required_option|
+      if(!options[required_option])
+        return nil
+      end
+    end
+
+    create_parameters = {}
+    create_parameters[:site] = options[:site]
+    create_parameters[:person_id] = options[:person_id]
+    create_parameters[:activityclass] = AUTHENTICATION
+    create_parameters[:activitycode] = AUTH_REMOTE_SUCCESS
+    create_parameters[:ip_address] = options[:ip_address] || 'unknown'
+
+    self.create(create_parameters)
+
+  end
+
+  def self.log_remote_auth_failure(options = {})
+    required = [:site]
+    required.each do |required_option|
+      if(options[required_option].nil?)
+        return false
+      end
+    end
+
+    create_parameters = {}
+    create_parameters[:site] = options[:site]
+    create_parameters[:person_id] = options[:person_id]
+    create_parameters[:activityclass] = AUTHENTICATION
+    create_parameters[:activitycode] = AUTH_LOCAL_FAILURE
+    create_parameters[:ip_address] = options[:ip_address] || 'unknown'
+    create_parameters[:reasoncode] = options[:fail_code] || AUTH_UNKNOWN
+
+    self.create(create_parameters)
+
+  end
+
 
 end

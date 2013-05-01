@@ -5,7 +5,7 @@
 #  BSD(-compatible)
 #  see LICENSE file or view at http://about.extension.org/wiki/LICENSE
 
-require "openid"
+require 'openid'
 require 'openid/consumer/discovery'
 require 'openid/extensions/sreg'
 require 'openid/store/filesystem'
@@ -21,6 +21,7 @@ end
 class OpieController < ApplicationController
   layout nil
   include OpenID::Server
+  skip_before_filter :verify_authenticity_token
   skip_before_filter :signin_required, :check_hold_status, except: [:decision]
   before_filter :signin_optional
 
@@ -58,35 +59,29 @@ class OpieController < ApplicationController
     end
     #
 
-    server_url = url_for(:action => 'index', :protocol => 'https://')
+    server_url = url_for(:action => 'index', :protocol => ((Settings.app_location == 'localdev') ? 'http://': 'https://'))
 
     if opierequest.kind_of?(CheckIDRequest)
-
-      if self.is_authorized(opierequest.id_select,opierequest.identity, opierequest.trust_root)
+      if is_authorized?(opierequest.id_select,opierequest.identity, opierequest.trust_root)
         if(opierequest.id_select)
           if(opierequest.message.is_openid1)
-            response = opierequest.answer(true,server_url,@currentuser.openid_url(true))
+            response = opierequest.answer(true,server_url,current_person.openid_url)
           else
-            response = opierequest.answer(true,nil,@currentuser.openid_url,@currentuser.openid_url(true))
+            response = opierequest.answer(true,nil,current_person.openid_url,current_person.openid_url)
           end
         else
           response = opierequest.answer(true)
         end
         # add the sreg response if requested
-        self.add_sreg(opierequest, response)
-        @currentuser.update_attribute(:last_login_at,Time.now.utc)
-        UserEvent.log_event(:etype => UserEvent::LOGIN_OPENID_SUCCESS,:user => @currentuser,:description => 'openid login',:appname => opierequest.trust_root)
-        log_user_activity(:user => @currentuser,:activitytype => Activity::LOGIN, :activitycode => Activity::LOGIN_OPENID,:trustroot => opierequest.trust_root)
+        add_sreg(opierequest, response)
+        Activity.log_remote_auth_success(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip)
       elsif opierequest.immediate
         response = opierequest.answer(false, server_url)
       else
-        if (self.checklogin(opierequest.id_select,opierequest.identity,opierequest.trust_root))
-          if(!check_purgatory)
-            return
-          end
+        if (checklogin(opierequest.id_select,opierequest.identity,opierequest.trust_root))
           session[:last_opierequest] = opierequest
           @opierequest = opierequest
-          @desicionurl = url_for(:controller => 'opie', :action => 'decision', :protocol => 'https://')
+          @desicionurl = url_for(:controller => 'opie', :action => 'decision', :protocol => ((Settings.app_location == 'localdev') ? 'http://': 'https://'))
           sregrequest = OpenID::SReg::Request.from_openid_request(opierequest)
           if(!sregrequest.nil?)
             askedfields = (sregrequest.required+sregrequest.optional).uniq
@@ -94,13 +89,13 @@ class OpieController < ApplicationController
             askedfields.each do |field|
               case field
                 when 'nickname'
-                  @willprovide << "Nickname: #{@currentuser.first_name}"
+                  @willprovide << "Nickname: #{current_person.first_name}"
                 when 'email'
-                  @willprovide << "Email: #{@currentuser.email}"
+                  @willprovide << "Email: #{current_person.email}"
                 when 'fullname'
-                  @willprovide << "Fullname: #{@currentuser.first_name} #{@currentuser.last_name}"
+                  @willprovide << "Fullname: #{current_person.first_name} #{current_person.last_name}"
                 when 'extensionid'
-                  @willprovide << "eXtensionID: #{@currentuser.login}"
+                  @willprovide << "eXtensionID: #{current_person.login}"
                 else
                   # nada
               end # case
@@ -108,11 +103,9 @@ class OpieController < ApplicationController
           end
           render(:template => 'opie/decide', :layout => 'application')
         else
-          @currentuser = nil
-          session[:userid] = nil
           session[:last_opierequest] = opierequest
-          session[:return_to] = url_for(:controller=>"opie", :action =>"index", :returnfrom => 'login')
-          return(redirect_to login_url)
+          cookies[:return_to] = url_for(:controller=>"opie", :action =>"index", :returnfrom => 'login')
+          return(redirect_to signin_url)
         end
         return
       end
@@ -121,7 +114,7 @@ class OpieController < ApplicationController
       response = server.handle_request(opierequest)
     end
 
-    self.render_response(response)
+    render_response(response)
   end
 
   def person
@@ -146,8 +139,14 @@ class OpieController < ApplicationController
     render(template: 'people/show_public', layout: 'application')
   end
 
-  def idp_xrds
-    types = [OpenID::OPENID_IDP_2_0_TYPE]
+  def person_xrds
+    @person= Person.find_by_idstring(params[:extensionid])
+    if(@person.nil?)
+      redirect_to(:action => 'person')
+    end
+
+    proto = ((Settings.app_location == 'localdev') ? 'http://' : 'https://')
+    types = [OpenID::OPENID_2_0_TYPE, OpenID::OPENID_1_0_TYPE,OpenID::SREG_URI]
     types_string = ''
     types.each do |type|
       types_string += "<Type>#{type}</Type>\n"
@@ -161,40 +160,13 @@ class OpieController < ApplicationController
       <XRD>
         <Service priority="1">
           #{types_string}
-          <URI>#{url_for(:controller => 'opie',:protocol => 'https://')}</URI>
+          <URI>#{url_for(:controller => 'opie',:protocol => proto)}</URI>
+          <LocalID>#{@person.openid_url}</LocalID>
         </Service>
       </XRD>
     </xrds:XRDS>
     END
-
-    response.headers['content-type'] = 'application/xrds+xml'
-    render(:text => yadis)
-  end
-
-  def person_xrds
-    @person= Person.find_by_idstring(params[:extensionid])
-    if(@person.nil?)
-      redirect_to(:action => 'person')
-    end
-
-    types = [OpenID::OPENID_2_0_TYPE, OpenID::OPENID_1_0_TYPE,OpenID::SREG_URI]
-    types_string = ''
-    types.each do |type|
-      types_string += "<Type>#{type}</Type>\n"
-    end
-
-    yadis = '<?xml version="1.0" encoding="UTF-8"?>'+"\n"
-    yadis += '<xrds:XRDS xmlns:xrds="xri://$xrds" xmlns="xri://$xrd*($v*2.0)">'+"\n"
-    yadis += "<XRD>\n"
-    yadis += '<Service priority="0">' + "\n"
-    yadis += "#{types_string}\n"
-    yadis += "<URI>#{url_for(:controller => 'opie',:protocol => 'https://')}</URI>\n"
-    yadis += "<LocalID>#{@person.openid_url}</LocalID>\n"
-    yadis += "</Service>\n"
-    yadis += "</XRD>\n"
-    yadis += "</xrds:XRDS>\n"
-    response.headers['content-type'] = 'application/xrds+xml'
-    render(:text => yadis)
+    render(:text => yadis, :content_type => 'application/xrds+xml')    
   end
 
   def decision
@@ -210,57 +182,45 @@ class OpieController < ApplicationController
       end
     end
 
-    if params[:Allow].nil?
+    if(params[:commit].blank? or params[:commit] != 'Allow')
       session[:last_opierequest] = nil
       return redirect_to(opierequest.cancel_url)
     else
-      if(!self.approved(opierequest.trust_root))
-        @currentuser.opie_approvals.create(:trust_root => opierequest.trust_root)
+      if(!site_approved?(opierequest.trust_root))
+        current_person.auth_approvals.create(:trust_root => opierequest.trust_root)
       end
       server_url = url_for(:action => 'index', :protocol => 'https://')
       if(opierequest.id_select)
         if(opierequest.message.is_openid1)
-          response = opierequest.answer(true,server_url,@currentuser.openid_url(true))
+          response = opierequest.answer(true,server_url,current_person.openid_url(true))
         else
-          response = opierequest.answer(true,nil,@currentuser.openid_url,@currentuser.openid_url(true))
+          response = opierequest.answer(true,nil,current_person.openid_url,current_person.openid_url(true))
         end
       else
         response = opierequest.answer(true)
       end
-      self.add_sreg(opierequest, response)
-      @currentuser.update_attribute(:last_login_at,Time.now.utc)
-      UserEvent.log_event(:etype => UserEvent::LOGIN_OPENID_SUCCESS,:user => @currentuser,:description => 'openid login',:appname => opierequest.trust_root)
-      log_user_activity(:user => @currentuser,:activitytype => Activity::LOGIN, :activitycode => Activity::LOGIN_OPENID,:trustroot => opierequest.trust_root)
+      add_sreg(opierequest, response)
+      Activity.log_remote_auth_success(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip)
       session[:last_opierequest] = nil
-      return self.render_response(response)
+      return render_response(response)
     end
   end
 
-  protected
+  def idp_xrds
+    return xrds_for_identity_provider
+  end
 
+  private
 
   def checklogin(is_idselect,identity,trust_root)
-    if session[:userid]
-      checkuser = User.find_by_id(session[:userid])
-      if not checkuser
-        return false
-      elsif(is_idselect)
-        if(authorize?(checkuser))
-          @currentuser = checkuser
-          return true
-        else
-          return false
-        end
+    if current_person
+      if(is_idselect)
+        return current_person.activity_allowed?
       else
-        if(check_openidurl_foruser(checkuser,identity))
-          if(authorize?(checkuser))
-            @currentuser = checkuser
-            return true
-          else
-            return false
-          end
+        if(current_person.openid_url == identity or current_person.openid_url == identity +'/')
+          return current_person.activity_allowed?
         else
-          flash[:failure] = "The OpenID you used doesn't match the OpenID for your account.  Please use your back button and enter your OpenID: #{checkuser.openid_url(true)}"
+          flash[:failure] = "The OpenID you used doesn't match the OpenID for your account.  Please use your back button and enter your OpenID: #{current_person.openid_url}"
           return false
         end
       end
@@ -272,28 +232,28 @@ class OpieController < ApplicationController
   def server
     if @server.nil?
       endpoint = url_for(:action => 'index', :only_path => false)
-      dir = Pathname.new(RAILS_ROOT).join('openid').join('store')
+      dir = Pathname.new(Rails.root).join('openid').join('store')
       store = OpenID::Store::Filesystem.new(dir)
       @server = Server.new(store,endpoint)
     end
     return @server
   end
 
-  def approved(trust_root)
-    if(OpieApproval.find(:first, :conditions => ['user_id = ? and trust_root = ?',@currentuser.id,trust_root]))
+  def site_approved?(trust_root)
+    if(AuthApproval.find(:first, :conditions => ['person_id = ? and trust_root = ?',current_person.id,trust_root]))
       return true
     elsif(trust_root =~ %r{extension\.org}) 
       # auto-approve extension.org
-      @currentuser.opie_approvals.create(:trust_root => trust_root)
+      current_person.auth_approvals.create(:trust_root => trust_root)
       return true        
     else
       return false
     end
   end
 
-  def is_authorized(is_idselect,identity,trust_root)
-    if(self.checklogin(is_idselect,identity,trust_root))
-      return self.approved(trust_root)
+  def is_authorized?(is_idselect,identity,trust_root)
+    if(checklogin(is_idselect,identity,trust_root))
+      return site_approved?(trust_root)
     else
       return false
     end
@@ -310,13 +270,13 @@ class OpieController < ApplicationController
     askedfields.each do |field|
       case field
         when 'nickname'
-          sreg_response_data['nickname'] = @currentuser.first_name
+          sreg_response_data['nickname'] = current_person.first_name
         when 'email'
-          sreg_response_data['email'] = @currentuser.email
+          sreg_response_data['email'] = current_person.email
         when 'fullname'
-          sreg_response_data['fullname'] = @currentuser.fullname
+          sreg_response_data['fullname'] = current_person.fullname
         when 'extensionid'
-          sreg_response_data['extensionid'] = @currentuser.login
+          sreg_response_data['extensionid'] = current_person.idstring
         else
           logger.debug("OpenID Consumer asked for field: #{field} - we don't know how to answer that.")
       end
@@ -325,6 +285,7 @@ class OpieController < ApplicationController
     sregresponse = OpenID::SReg::Response.extract_response(sregrequest, sreg_response_data)
     response.add_extension(sregresponse)
   end
+
 
   def render_response(openidresponse)
     if openidresponse.needs_signing

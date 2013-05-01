@@ -71,7 +71,7 @@ class Person < ActiveRecord::Base
 
   belongs_to :invitation
   has_many :activities
-
+  has_many :auth_approvals
   has_many :profile_public_settings, dependent: :destroy
   has_many :social_network_connections, dependent: :destroy
   has_many :social_networks, through: :social_network_connections, 

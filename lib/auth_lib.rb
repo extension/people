@@ -100,16 +100,46 @@ module AuthLib
 
 
   def access_denied
-    redirect_to(signin_url)
+    # check for xrds request
+    # if(request.env['HTTP_ACCEPT'] and request.env['HTTP_ACCEPT'].include?('application/xrds+xml'))
+    #   return xrds_for_identity_provider
+    # else
+      openid_xrds_header
+      return redirect_to(signin_url)
+    # end
   end
 
   def access_notice
     redirect_to home_pending_url
-  end  
-  
+  end
+
+  def xrds_for_identity_provider
+    proto = ((Settings.app_location == 'localdev') ? 'http://' : 'https://')
+    types = [OpenID::OPENID_IDP_2_0_TYPE]
+    types_string = ''
+    types.each do |type|
+      types_string += "<Type>#{type}</Type>\n"
+    end
+
+    yadis = <<-END
+    <?xml version="1.0" encoding="UTF-8"?>
+    <xrds:XRDS
+        xmlns:xrds="xri://$xrds"
+        xmlns="xri://$xrd*($v*2.0)">
+      <XRD>
+        <Service priority="1">
+          #{types_string}
+          <URI>#{url_for(:controller => 'opie',:protocol => proto)}</URI>
+        </Service>
+      </XRD>
+    </xrds:XRDS>
+    END
+
+    render(:text => yadis, :content_type => 'application/xrds+xml')    
+  end
 
   def openid_xrds_header
-    proto = ((Settings.app_location == 'localdev') ? 'https://' : 'http://')
+    proto = ((Settings.app_location == 'localdev') ? 'http://' : 'https://')
     response.headers['X-XRDS-Location'] = url_for(:controller => '/opie', :action => :idp_xrds, :protocol => proto)
     xrds_url = url_for(:controller=>'/opie', :action=> 'idp_xrds', :protocol => proto)
     return xrds_url

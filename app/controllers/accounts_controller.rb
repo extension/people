@@ -169,10 +169,8 @@ class AccountsController < ApplicationController
     end
 
     # STATUS_SIGNUP
-    @person.account_status = Person::STATUS_SIGNUP
-    
-    # last login at == now
-    @person.last_login_at = Time.zone.now
+    @person.account_status = Person::STATUS_SIGNUP    
+    @person.last_activity_at = Time.zone.now
     
     if(@person.save)
       # automatically log them in

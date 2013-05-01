@@ -7,6 +7,7 @@
 
 class AuthApproval < ActiveRecord::Base
   belongs_to :person
+  attr_accessible :person, :person_id, :trust_root
 
   # TODO add a host whitelist for things to be auto-approved
 end
