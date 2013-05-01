@@ -4,53 +4,53 @@
 
 
 <div class="row">
+
   <div class="span7"> 
-    <div class="row">
-      <div class="span7">    
-      <div class="page-header">
-        <h2><%= @person.fullname %></h2>
-        <ul class='unstyled'>
-          <li><%= @person.title %></li>
-          <li><%= institution_text(@person) %></li>
-        </ul>
-      </div>
-      <%- if(!@person.biography.blank?) -%>
-      <div class='biography'>
-        <%= @person.biography.html_safe %>
-      </div>
-      <%- end -%>
-      <dl class='dl-horizontal dashmodule'>
-        <dt>eXtensionID</dt>
-        <dd><%= @person.idstring%></dd>
-        <dt>Email:</dt>
-        <dd><%= @person.email%></dd>
-        <%- if @person == current_person or current_person.is_admin? -%>
-          <%- if !@person.email_forward.blank? and @person.email_forward.alias_type == EmailAlias::CUSTOM_FORWARD -%>
-          <dd>Forwards to: <%= @person.email_forward.destination%></dd>
-          <%- end -%>        
-        <%- end -%>        
-        <dt>Preferred Phone:</dt>
-        <dd><%= (@person.phone.blank?) ? 'n/a' : number_to_phone(@person.phone, :area_code => true)  %></dd>
-        <dt>Position:</dt>
-        <dd><%= (@person.position.blank?) ? 'n/a' : @person.position.name %></span>
-        <dt>Location:</dt>
-        <dd><%= (@person.location.blank?) ? 'n/a' : @person.location.name %></span>
-        <dt>County:</dt>
-        <dd><%= (@person.county.blank?) ? 'n/a' : @person.county.name %></span>
-        <dt>Time zone:</dt>
-        <dd><%= @person.time_zone %></span>
-      </div>
+    <div class="page-header">
+      <h2><%= @person.fullname %></h2>
+      <ul class='unstyled'>
+        <li><%= @person.title %></li>
+        <li><%= institution_text(@person) %></li>
+      </ul>
     </div>
+    <%- if(!@person.biography.blank?) -%>
+    <div class='biography'>
+      <%= @person.biography.html_safe %>
+    </div>
+    <%- end -%>
+    <dl class='dl-horizontal dashmodule'>
+      <dt>eXtensionID</dt>
+      <dd><%= @person.idstring%></dd>
+      <dt>Email:</dt>
+      <dd><%= @person.email%></dd>
+      <%- if @person == current_person or current_person.is_admin? -%>
+        <%- if !@person.email_forward.blank? and @person.email_forward.alias_type == EmailAlias::CUSTOM_FORWARD -%>
+        <dd>Forwards to: <%= @person.email_forward.destination%></dd>
+        <%- end -%>        
+      <%- end -%>        
+      <dt>Preferred Phone:</dt>
+      <dd><%= (@person.phone.blank?) ? 'n/a' : number_to_phone(@person.phone, :area_code => true)  %></dd>
+      <dt>Position:</dt>
+      <dd><%= (@person.position.blank?) ? 'n/a' : @person.position.name %></span>
+      <dt>Location:</dt>
+      <dd><%= (@person.location.blank?) ? 'n/a' : @person.location.name %></span>
+      <dt>County:</dt>
+      <dd><%= (@person.county.blank?) ? 'n/a' : @person.county.name %></span>
+      <dt>Time zone:</dt>
+      <dd><%= @person.time_zone %></dd>
+    </dl>
   </div>
+
   <div class="span5">
+    
     <div class='pull-right'>
      <ul class="nav nav-pills">
         <li><%= link_to('Activity',activity_person_path(@person)) %></li>
         <li><%= link_to('Edit profile',edit_person_path(@person)) %></li>
       </ul>
     </div>
-    <div class='clearfix'>
-    </div> 
+
+    <div class='clearfix'></div> 
 
     <div class="well">
         <h4>Profiles across eXtension</h4>
@@ -96,10 +96,6 @@
       <p>No community connections.</p>
       <%- end -%>
     </div>
-
-
-
-
   </div>
     
 </div>
