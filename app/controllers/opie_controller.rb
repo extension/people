@@ -25,13 +25,9 @@ class OpieController < ApplicationController
   before_filter(:check_purgatory, :only => [:decision])
 
   def delegate
-    @openiduser = User.find_by_login(params[:extensionid])
-    @openidmeta = openidmeta(@openiduser)
-    if(!@openiduser.nil?)
-      @publicattributes = @openiduser.public_attributes
-    end
-    # force format to be html
-    params[:format] = 'html'
+    @person = Person.find_by_idstring(params[:extensionid])
+    @openidmeta = openidmeta(@person)
+    render(template: 'people/show_public', layout: 'application')
   end
 
   def index
@@ -128,27 +124,25 @@ class OpieController < ApplicationController
     self.render_response(response)
   end
 
-  def user
-    @openiduser = User.find_by_login(params[:extensionid])
+  def person
+    @person= Person.find_by_idstring(params[:extensionid])
     # Yadis content-negotiation: we want to return the xrds if asked for.
     accept = request.env['HTTP_ACCEPT']
 
     # This is not technically correct, and should eventually be updated
     # to do real Accept header parsing and logic.  Though I expect it will work
     # 99% of the time.
-    if (accept and accept.include?('application/xrds+xml') and !@openiduser.nil?)
-      return user_xrds
+    if (accept and accept.include?('application/xrds+xml') and !@person.nil?)
+      return person_xrds
     end
 
     # content negotiation failed, so just render the user page
-    if(@openiduser.nil?)
+    if(@person.nil?)
       flash.now[:failure] = 'No user by that name here.'
     else
-      @openidmeta = openidmeta(@openiduser)
-      @publicattributes = @openiduser.public_attributes
+      @openidmeta = openidmeta(@person)
     end
-    @right_column = false
-    render(:layout => 'pubsite')
+    render(template: 'people/show_public', layout: 'application')
   end
 
   def idp_xrds
@@ -158,28 +152,28 @@ class OpieController < ApplicationController
       types_string += "<Type>#{type}</Type>\n"
     end
 
-    yadis = <<EOS
-<?xml version="1.0" encoding="UTF-8"?>
-<xrds:XRDS
-    xmlns:xrds="xri://$xrds"
-    xmlns="xri://$xrd*($v*2.0)">
-  <XRD>
-    <Service priority="1">
-      #{types_string}
-      <URI>#{url_for(:controller => 'opie',:protocol => 'https://')}</URI>
-    </Service>
-  </XRD>
-</xrds:XRDS>
-EOS
+    yadis = <<-END
+    <?xml version="1.0" encoding="UTF-8"?>
+    <xrds:XRDS
+        xmlns:xrds="xri://$xrds"
+        xmlns="xri://$xrd*($v*2.0)">
+      <XRD>
+        <Service priority="1">
+          #{types_string}
+          <URI>#{url_for(:controller => 'opie',:protocol => 'https://')}</URI>
+        </Service>
+      </XRD>
+    </xrds:XRDS>
+    END
 
     response.headers['content-type'] = 'application/xrds+xml'
     render(:text => yadis)
   end
 
-  def user_xrds
-    @openiduser = User.find_by_login(params[:extensionid])
-    if(@openiduser.nil?)
-      redirect_to(:action => 'user')
+  def person_xrds
+    @person= Person.find_by_idstring(params[:extensionid])
+    if(@person.nil?)
+      redirect_to(:action => 'person')
     end
 
     types = [OpenID::OPENID_2_0_TYPE, OpenID::OPENID_1_0_TYPE,OpenID::SREG_URI]
@@ -194,7 +188,7 @@ EOS
     yadis += '<Service priority="0">' + "\n"
     yadis += "#{types_string}\n"
     yadis += "<URI>#{url_for(:controller => 'opie',:protocol => 'https://')}</URI>\n"
-    yadis += "<LocalID>#{@openiduser.openid_url}</LocalID>\n"
+    yadis += "<LocalID>#{@person.openid_url}</LocalID>\n"
     yadis += "</Service>\n"
     yadis += "</XRD>\n"
     yadis += "</xrds:XRDS>\n"
@@ -287,6 +281,10 @@ EOS
   def approved(trust_root)
     if(OpieApproval.find(:first, :conditions => ['user_id = ? and trust_root = ?',@currentuser.id,trust_root]))
       return true
+    elsif(trust_root =~ %r{extension\.org}) 
+      # auto-approve extension.org
+      @currentuser.opie_approvals.create(:trust_root => trust_root)
+      return true        
     else
       return false
     end
