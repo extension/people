@@ -65,8 +65,8 @@ namespace :deploy do
     ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml &&
     ln -nfs #{shared_path}/config/settings.local.yml #{release_path}/config/settings.local.yml &&
     ln -nfs #{shared_path}/config/robots.txt #{release_path}/public/robots.txt &&
-    ln -nfs #{shared_path}/openid #{release_path}/openid
-
+    ln -nfs #{shared_path}/openid #{release_path}/openid &&
+    ln -nfs #{shared_path}/downloads #{release_path}/tmp/downloads
     CMD
   end
   
