@@ -28,3 +28,4 @@ sudoers: ['use_local_settings']
 token_salt: 'use_local_settings'
 urlwriter_host: 'people.dev'
 max_live_dump_count: 200
+openid_endpoint: 'http://people.dev/opie'

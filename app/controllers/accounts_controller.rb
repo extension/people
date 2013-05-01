@@ -16,8 +16,7 @@ class AccountsController < ApplicationController
   end
 
   def signin
-    #  TODO: put openidmeta data in header
-    # @openidmeta = openidmeta(@openiduser)
+    @openidmeta = openidmeta(nil)
 
     if request.post?
       if(params[:email].present? and params[:password].present?)

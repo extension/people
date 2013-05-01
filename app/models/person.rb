@@ -7,6 +7,7 @@
 require 'bcrypt'
 class Person < ActiveRecord::Base
   include BCrypt
+  include CacheTools
   include MarkupScrubber
   attr_accessor :password, :current_password, :password_confirmation
 
@@ -71,6 +72,7 @@ class Person < ActiveRecord::Base
   belongs_to :invitation
   has_many :activities
 
+  has_many :profile_public_settings, dependent: :destroy
   has_many :social_network_connections, dependent: :destroy
   has_many :social_networks, through: :social_network_connections, 
                          select:  "social_network_connections.id as connection_id,
@@ -123,6 +125,12 @@ class Person < ActiveRecord::Base
     end
     {:conditions => conditions}
   }
+
+  def openid_url
+    protocol = ((Settings.app_location == 'localdev') ? 'http' : 'https')
+    "#{protocol}://#{Settings.urlwriter_host}/#{self.idstring}"
+  end
+
 
 
   def self.filtered_by(browse_filter)
@@ -877,65 +885,27 @@ class Person < ActiveRecord::Base
 
 
 
-  # # returns a hash of public attributes
-  # def public_attributes  
-  #   returnhash = {}
-  #   publicsettings = self.pro.showpublicly.all
-  #   socialnetworks = self.social_networks.showpublicly.all
-   
-  #   if(publicsettings.empty? and socialnetworks.empty?)
-  #     # cache the blank value
-  #     if(directory_item_cache)
-  #       directory_item_cache.update_attributes({:public_attributes => nil})      
-  #     else
-  #       DirectoryItemCache.create({:user => self, :public_attributes => nil})      
-  #     end
-  #     return nil
-  #   else
-  #     returnhash.merge!({:fullname => self.fullname, :last_name => self.last_name, :first_name => self.first_name})
-  #   end
-   
-  #  if(!publicsettings.empty?)
-  #   publicsettings.each do |setting|
-  #     case setting.item
-  #     when 'email'
-  #      returnhash.merge!({:email => self.email})
-  #     when 'phone'
-  #      returnhash.merge!({:phone => self.phonenumber.nil? ? '' : self.phonenumber})
-  #     when 'time_zone'
-  #      returnhash.merge!({:phone => self.has_time_zone? ? '' : self.time_zone})
-  #     when 'title'
-  #      returnhash.merge!({:title => self.title.nil? ? '' : self.title})
-  #     when 'position'
-  #      returnhash.merge!({:position => self.position.nil? ? '' : self.position.name})
-  #     when 'institution'
-  #      returnhash.merge!({:institution => self.primary_institution_name('')})
-  #     when 'location'
-  #      returnhash.merge!({:location => (self.location.nil? ? '' : self.location.name)})
-  #     when 'county'
-  #      returnhash.merge!({:county => (self.county.nil? ? '' : self.county.name)})
-  #     when 'interests'
-  #      returnhash.merge!({:interests => self.tag_displaylist_by_ownerid_and_kind(self.id,Tagging::ALL,true)})
-  #     end
-  #   end  
-  #  end
-   
-  #  if(!socialnetworks.empty?)
-  #   returnnetworks = []
-  #   socialnetworks.each do |sn|
-  #     returnnetworks << {:accountid => sn.accountid, :network => sn.network, :displayname => sn.displayname, :accounturl => sn.accounturl}
-  #   end
-  #   returnhash.merge!({:socialnetworks => returnnetworks})
-  #  end
-   
-  #  # cache it
-  #  if(directory_item_cache)
-  #    directory_item_cache.update_attributes({:public_attributes => returnhash})      
-  #  else
-  #    DirectoryItemCache.create({:user => self, :public_attributes => returnhash})
-  #  end 
-  #  return returnhash
-  # end
+  def public_attributes(cache_options = {})
+    returnvalues = {profile_attributes: {}}
+    public_profile_attributes = self.profile_public_settings.is_public.map(&:item)
+    if(!public_profile_attributes.empty?)
+      public_profile_attributes.each do |profile_attribute|
+        case profile_attribute
+        when 'position'
+          returnvalues[:profile_attributes]['position'] = (self.position.blank? ? nil : self.position.name)
+        when 'location'
+          returnvalues[:profile_attributes]['location'] = (self.location.blank? ? nil : self.location.name)
+        when 'county'
+          returnvalues[:profile_attributes]['county'] = (self.county.blank? ? nil : self.county.name)            
+        when 'institution'
+          returnvalues[:profile_attributes]['institution'] = (self.institution.blank? ? nil : self.institution.name)
+        else
+          returnvalues[:profile_attributes][profile_attribute] = self.send(profile_attribute)
+        end
+      end
+    end
+    returnvalues
+  end
 
   def aae_id
     if(id_value = read_attribute(:aae_id))

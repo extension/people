@@ -144,7 +144,6 @@ module PeopleHelper
     else
       'active'
     end
-
   end 
 
 end

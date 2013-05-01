@@ -200,6 +200,14 @@ People::Application.routes.draw do
   match "debug/:action", to: "debug", :via => [:get]
 
 
+  # openid related routing
+  match 'openid/xrds', to: 'opie#idp_xrds'
+  match 'opie/delegate/:extensionid', to: 'opie#delegate'
+  match 'opie/:action', to: 'opie'
+  
+  match '/:extensionid', to: 'opie#person', as: 'public_profile'
+  match '/:extensionid/xrds', to: 'opie#person_xrds'
+
 
 end
 
