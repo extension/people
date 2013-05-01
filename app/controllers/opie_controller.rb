@@ -21,8 +21,8 @@ end
 class OpieController < ApplicationController
   layout nil
   include OpenID::Server
-  before_filter(:login_required, :only => [:decision])
-  before_filter(:check_purgatory, :only => [:decision])
+  skip_before_filter :signin_required, :check_hold_status, except: [:decision]
+  before_filter :signin_optional
 
   def delegate
     @person = Person.find_by_idstring(params[:extensionid])
@@ -142,6 +142,7 @@ class OpieController < ApplicationController
     else
       @openidmeta = openidmeta(@person)
     end
+    @no_show_navtabs = true
     render(template: 'people/show_public', layout: 'application')
   end
 
