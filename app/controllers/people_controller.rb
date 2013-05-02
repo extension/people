@@ -35,7 +35,7 @@ class PeopleController < ApplicationController
     end
 
     if @person.update_attributes(params[:person])
-      what_changed = @person.previous_changes.reject{|attribute,value| ['updated_at'].include?(attribute)}
+      what_changed = @person.previous_changes.reject{|attribute,value| (['updated_at'].include?(attribute) or (value[0].blank? and value[1].blank?))}
       @person.check_profile_changes({colleague_id: current_person.id, ip_address: request.remote_ip})
 
       if(current_person == @person)
