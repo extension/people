@@ -705,13 +705,13 @@ class Person < ActiveRecord::Base
     if(connection = self.community_connections.where(community_id: community.id).first)
       oldconnectiontype = connection.connectiontype
       connection.update_attributes({connectiontype: connectiontype})
-      Activity.log_community_connection_change(options.merge({person_id: self.id, community_id: community.id, connectiontype: connectiontype, oldconnectiontype: oldconnectiontype}))
+      Activity.log_community_connection_change(options.merge({colleague_id: self.id, community_id: community.id, connectiontype: connectiontype, oldconnectiontype: oldconnectiontype}))
       if(options[:nonotify].nil? or !options[:nonotify])
         Notification.create_community_connection_change(options.merge({person_id: self.id, community_id: community.id, connectiontype: connectiontype, oldconnectiontype: oldconnectiontype}))
       end
     else
       self.community_connections.create(community_id: community.id, sendnotifications: (connectiontype == 'leader'), connectiontype: connectiontype)
-      Activity.log_community_connection(options.merge({person_id: self.id, community_id: community.id, connectiontype: connectiontype}))
+      Activity.log_community_connection(options.merge({colleague_id: self.id, community_id: community.id, connectiontype: connectiontype}))
       if(options[:nonotify].nil? or !options[:nonotify])
         Notification.create_community_connection(options.merge({person_id: self.id, community_id: community.id, connectiontype: connectiontype}))
       end
@@ -738,7 +738,7 @@ class Person < ActiveRecord::Base
       end
 
       connection.destroy
-      Activity.log_community_removal(options.merge({person_id: self.id, community_id: community.id, oldconnectiontype: oldconnectiontype}))
+      Activity.log_community_removal(options.merge({colleague_id: self.id, community_id: community.id, oldconnectiontype: oldconnectiontype}))
       if(options[:nonotify].nil? or !options[:nonotify])
         Notification.create_community_removal(options.merge({person_id: self.id, community_id: community.id, oldconnectiontype: oldconnectiontype}))
       end

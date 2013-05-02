@@ -177,7 +177,7 @@ class Activity < ActiveRecord::Base
   end
 
   def self.log_community_removal(options = {})
-    required = [:person_id,:community_id,:oldconnectiontype]
+    required = [:colleague_id,:community_id,:oldconnectiontype]
     required.each do |required_option|
       if(!options[required_option])
         return nil
@@ -187,21 +187,22 @@ class Activity < ActiveRecord::Base
     connector_id = options[:connector_id] || Person.system_id
 
     create_parameters = {}
-    create_parameters[:person_id] = options[:person_id]
+    create_parameters[:person_id] = connector_id  
+    create_parameters[:colleague_id] = options[:colleague_id]
     create_parameters[:site] = 'local'
     case options[:oldconnectiontype]
     when 'leader'
-      create_parameters[:activitycode] = ( (options[:person_id] == connector_id) ? COMMUNITY_LEFT : COMMUNITY_REMOVEDASLEADER )
+      create_parameters[:activitycode] = ( (options[:colleague_id] == connector_id) ? COMMUNITY_LEFT : COMMUNITY_REMOVEDASLEADER )
     when 'member'
-      create_parameters[:activitycode] = ( (options[:person_id] == connector_id) ? COMMUNITY_LEFT : COMMUNITY_REMOVEDASMEMBER )
+      create_parameters[:activitycode] = ( (options[:colleague_id] == connector_id) ? COMMUNITY_LEFT : COMMUNITY_REMOVEDASMEMBER )
     when 'invitedleader'
-      if((options[:person_id] == connector_id))
+      if((options[:colleague_id] == connector_id))
         create_parameters[:activitycode] = COMMUNITY_DECLINE_INVITATION      
       else
         return nil
       end
     when 'invitedmember'
-      if((options[:person_id] == connector_id))
+      if((options[:colleague_id] == connector_id))
         create_parameters[:activitycode] = COMMUNITY_DECLINE_INVITATION      
       else
         return nil
@@ -213,7 +214,6 @@ class Activity < ActiveRecord::Base
     end
 
     create_parameters[:community_id] = options[:community_id]       
-    create_parameters[:colleague_id] = connector_id  
     create_parameters[:additionalinfo] = options[:additionalinfo]
     create_parameters[:additionaldata] = options[:additionaldata]
     create_parameters[:ip_address] = options[:ip_address] || 'unknown'
@@ -222,7 +222,7 @@ class Activity < ActiveRecord::Base
   end
 
   def self.log_community_connection_change(options = {})
-    required = [:person_id,:community_id,:connectiontype,:oldconnectiontype]
+    required = [:colleague_id,:community_id,:connectiontype,:oldconnectiontype]
     required.each do |required_option|
       if(!options[required_option])
         return nil
@@ -232,20 +232,21 @@ class Activity < ActiveRecord::Base
     connector_id = options[:connector_id] || Person.system_id
 
     create_parameters = {}
-    create_parameters[:person_id] = options[:person_id]
+    create_parameters[:person_id] = connector_id  
+    create_parameters[:colleague_id] = options[:colleague_id]
     create_parameters[:site] = 'local'
     case options[:connectiontype]
     when 'leader'
       case options[:oldconnectiontype]
       when 'invitedleader'
-        create_parameters[:activitycode] = ( (options[:person_id] == connector_id) ? COMMUNITY_ACCEPT_INVITATION : COMMUNITY_ADDEDASLEADER )
+        create_parameters[:activitycode] = ( (options[:colleague_id] == connector_id) ? COMMUNITY_ACCEPT_INVITATION : COMMUNITY_ADDEDASLEADER )
       else
         create_parameters[:activitycode] = COMMUNITY_ADDEDASLEADER
       end
     when 'member'
       case options[:oldconnectiontype]
       when 'invitedmember'
-        create_parameters[:activitycode] = ( (options[:person_id] == connector_id) ? COMMUNITY_ACCEPT_INVITATION : COMMUNITY_ADDEDASMEMBER )
+        create_parameters[:activitycode] = ( (options[:colleague_id] == connector_id) ? COMMUNITY_ACCEPT_INVITATION : COMMUNITY_ADDEDASMEMBER )
       when 'leader'
         create_parameters[:activitycode] = COMMUNITY_REMOVEDASLEADER        
       else
@@ -260,7 +261,6 @@ class Activity < ActiveRecord::Base
     end
 
     create_parameters[:community_id] = options[:community_id]       
-    create_parameters[:colleague_id] = connector_id  
     create_parameters[:additionalinfo] = options[:additionalinfo]
     create_parameters[:additionaldata] = options[:additionaldata]
     create_parameters[:ip_address] = options[:ip_address] || 'unknown'
@@ -270,7 +270,7 @@ class Activity < ActiveRecord::Base
 
 
   def self.log_community_connection(options = {})
-    required = [:person_id,:community_id,:connectiontype]
+    required = [:colleague_id,:community_id,:connectiontype]
     required.each do |required_option|
       if(!options[required_option])
         return nil
@@ -280,13 +280,14 @@ class Activity < ActiveRecord::Base
     connector_id = options[:connector_id] || Person.system_id
 
     create_parameters = {}
-    create_parameters[:person_id] = options[:person_id]
+    create_parameters[:person_id] = connector_id  
+    create_parameters[:colleague_id] = options[:colleague_id]
     create_parameters[:site] = 'local'
     case options[:connectiontype]
     when 'leader'
-      create_parameters[:activitycode] = ( (options[:person_id] == connector_id) ? COMMUNITY_JOIN : COMMUNITY_ADDEDASLEADER )
+      create_parameters[:activitycode] = ( (options[:colleague_id] == connector_id) ? COMMUNITY_JOIN : COMMUNITY_ADDEDASLEADER )
     when 'member'
-      create_parameters[:activitycode] = ( (options[:person_id] == connector_id) ? COMMUNITY_JOIN : COMMUNITY_ADDEDASMEMBER )
+      create_parameters[:activitycode] = ( (options[:colleague_id] == connector_id) ? COMMUNITY_JOIN : COMMUNITY_ADDEDASMEMBER )
     when 'pending'
       create_parameters[:activitycode] = COMMUNITY_PENDING
     when 'invitedleader'
@@ -297,7 +298,6 @@ class Activity < ActiveRecord::Base
       return nil
     end
      
-    create_parameters[:colleague_id] = connector_id
     create_parameters[:community_id] = options[:community_id]           
     create_parameters[:additionalinfo] = options[:additionalinfo]
     create_parameters[:additionaldata] = options[:additionaldata]
