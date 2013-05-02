@@ -6,8 +6,10 @@
 #  see LICENSE file
 
 class QuestionActivity < ActiveRecord::Base
+  extend YearMonth
+
   belongs_to :question
-  belongs_to :contributor
+  belongs_to :person
 
 ## constants
   ASSIGNED_TO = 1
@@ -25,6 +27,8 @@ class QuestionActivity < ActiveRecord::Base
   ASSIGNED_TO_GROUP = 15
   CHANGED_GROUP = 16
   CHANGED_LOCATION = 17
+
+  scope :resolved, where(activity: RESOLVED)
 
   def self.rebuild
     self.connection.execute("truncate table #{self.table_name};")
@@ -48,5 +52,49 @@ class QuestionActivity < ActiveRecord::Base
       self.connection.execute(insert_sql)
     end # all questions
   end
+
+  def self.experts_for_year_month(year_month)
+    with_scope do
+      self.where("DATE_FORMAT(activity_at,'%Y-%m') = ?",year_month_string(year_month)).pluck('person_id').uniq
+    end
+  end
+
+  def self.yearly_expert_growth(year)
+    year_month_counts = {}
+    with_scope do
+      (1..12).each do |month|
+        yms = year_month_string([year,month])
+        end_of_month = Date.strptime(yms,'%Y-%m').end_of_month
+        unique_count = self.where('YEAR(activity_at) = ?',year).where('DATE(activity_at) <= ?',end_of_month.to_s(:db)).count('DISTINCT(person_id)')
+        year_month_counts[yms] = unique_count
+      end
+    end
+    year_month_counts
+  end
+
+
+  def self.monthly_changeover_for_year_month(year_month)
+    returnvalues = {new: 0, returning: 0, lost: 0}
+    with_scope do
+      experts_this_month = experts_for_year_month(year_month)
+      experts_previous_month = experts_for_year_month(previous_year_month(year_month))
+      returnvalues[:total] = experts_this_month
+      returnvalues[:new] = experts_this_month - experts_previous_month
+      returnvalues[:lost] = experts_previous_month - experts_this_month
+      returnvalues[:returning] = experts_this_month & experts_previous_month
+    end
+    returnvalues
+  end
+
+  def self.changeover_counts(changeover)
+    counts = {}
+    [:total,:new,:returning,:lost].each do |metric|
+      counts[metric] = changeover[metric].size
+    end
+    counts
+  end
+
+
+
 
 end
