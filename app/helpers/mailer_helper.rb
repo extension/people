@@ -16,7 +16,9 @@ module MailerHelper
     link_to('View in a browser', view_link).html_safe
   end
 
-  def profile_changes_text(changes)
+
+
+  def profile_changes(changes)
     return_text_lines = []
     changes.each do |attribute,values|
       changed_from = values[0]
@@ -46,8 +48,14 @@ module MailerHelper
 
       return_text_lines << "#{display_attribute} : changed from #{display_from} to #{display_to}"
     end
-    return_text_lines.join("\r\n")
+    return_text_lines
   end
+
+  def profile_changes_text(changes)
+    profile_changes(changes).join("\r\n")
+  end
+
+
 
   def blank_or_name(id,model)
     object = Object.const_get(model)

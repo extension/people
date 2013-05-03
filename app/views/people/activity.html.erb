@@ -31,11 +31,28 @@
           <%- end -%>
           <td><%= display_time(activity.created_at) %></td>
 
+          <td>
           <%- if(@person and activity.person_id == @person.id) -%>
-            <td><%= activity_to_s(activity, {hide_person_text: true}) %></td>        
+            <%= activity_to_s(activity, {hide_person_text: true}) %>        
           <%- else -%>
-            <td><%= activity_to_s(activity) %></td>
+            <%= activity_to_s(activity) %>
           <%- end -%>
+
+          <%- if [Activity::UPDATE_PROFILE,Activity::UPDATE_COLLEAGUE_PROFILE].include?(activity.activitycode) and activity.additionaldata and activity.additionaldata[:what_changed] -%>
+               <%= link_to("(details)".html_safe, 
+                '#',
+                id: "detailstoggler_#{activity.id}", 
+                data: {toggle: 'collapse', target: "#showdetails_#{activity.id}"}) %>
+
+          <div id="showdetails_<%= activity.id %>" class="collapse">
+            <ul class='unstyled'>
+              <%- profile_changes(activity.additionaldata[:what_changed]).each do |change| -%>
+                <li><%= change %></li>
+              <%- end -%>
+            </ul>
+          </div>
+          <%- end -%> 
+          </td>
 
           <%- if(current_person.is_admin? or (!@person.blank? and @person == current_person)) -%>
             <td><%= activity.ip_address %></td>
@@ -47,5 +64,7 @@
   </div>
 </div>
 <%- end -%>
+
+
 
 
