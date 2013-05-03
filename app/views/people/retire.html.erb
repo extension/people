@@ -11,22 +11,24 @@
   <p>We're sorry to see you go, but congratulations on your new opportunities!</p>
   <%= form_tag(retire_person_path(@person), class: 'form-inline') do -%>
     <fieldset>
-      <span class="help-block">Let us know why you are retiring your account.</span>
-      <%= text_field_tag("explanation","", class: 'span4' )%>       
-      <p><%= submit_tag "Retire my account", :class => "btn btn-primary" %> <%= link_to "Cancel", person_path(@person), :class => "btn" %></p>
+      <p><span class="help-block">Let us know why you are retiring your account.</span>
+      <%= text_field_tag("explanation","", class: 'span4' )%></p>       
+    <p><%= submit_tag "Retire my account", :class => "btn btn-primary" %> <%= link_to "Cancel", person_path(@person), :class => "btn" %></p>
     </fieldset>
+
   <%- end -%>
 
   <%- else -%>
   <h4>Retire this account?</h4>
   <p>If <%= @person.fullname %> is no longer working or associated with Extension, you can retire their account.</p>
 
-  <%= form_tag(retire_person_path(@person), class: 'form-inline') do -%>
+  <%= form_tag(retire_person_path(@person)) do -%>
     <fieldset>
-      <span class="help-block">Please tell us why you are retiring the account for <%= @person.first_name%></span>
-      <%= text_field_tag("explanation","", class: 'span4' )%> 
-      <p><%= submit_tag "Retire this account", :class => "btn btn-primary" %> <%= link_to "Cancel", person_path(@person), :class => "btn" %></p>
+      <p><span class="help-block">Please tell us why you are retiring the account for <%= @person.first_name%></span>
+      <%= text_field_tag("explanation","", class: 'span4' )%></p>
+    <p><%= submit_tag "Retire this account", :class => "btn btn-primary" %> <%= link_to "Cancel", person_path(@person), :class => "btn" %></p>
     </fieldset>
+
   <%- end -%>  
 <%- end -%>
   </div>
