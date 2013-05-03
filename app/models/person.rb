@@ -962,6 +962,14 @@ class Person < ActiveRecord::Base
         headers << 'Agreement status'
         headers << 'Account created'
         headers << 'Last active at'
+        if(options[:browse_filter])
+          filter_objects = options[:browse_filter].settings_to_objects
+          if(filter_objects['social_networks'])
+            filter_objects['social_networks'].each do |network|
+              headers << "#{network.display_name}"
+            end
+          end
+        end
         if(options[:community])
           headers << 'Community connection'          
         else
@@ -986,6 +994,18 @@ class Person < ActiveRecord::Base
             row << person.contributor_agreement_to_s
             row << (person.created_at ? person.created_at.utc.strftime("%Y-%m-%d %H:%M:%S") : nil)
             row << (person.last_activity_at ? person.last_activity_at.utc.strftime("%Y-%m-%d %H:%M:%S") : nil)
+            if(options[:browse_filter])
+              filter_objects = options[:browse_filter].settings_to_objects
+              if(filter_objects['social_networks'])
+                filter_objects['social_networks'].each do |network|
+                  if(sn = person.social_networks.where('social_networks.id = ?',network.id).first)
+                    row << sn.accountid
+                  else
+                    row << nil
+                  end
+                end
+              end
+            end
             if(options[:community])
               row << person.connection_with_community_expanded(options[:community])
             else
