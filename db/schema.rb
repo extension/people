@@ -22,6 +22,7 @@ ActiveRecord::Schema.define(:version => 20130419142105) do
     t.string   "ip_address"
     t.integer  "colleague_id",   :default => 0
     t.string   "site",           :default => "local"
+    t.boolean  "is_private",     :default => false
     t.string   "additionalinfo"
     t.text     "additionaldata"
     t.datetime "created_at"

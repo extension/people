@@ -30,7 +30,6 @@ en:
     auth_local_success: "%{persontext}signed in to People"
     auth_local_failure: "%{persontext}was unable to sign in to People"
     auth_remote_success: "%{persontext}signed in to %{site}"
-    auth_remote_failure: "%{persontext}was unable to sign into %{site}"
     auth_unknown: 'todo: auth_unknown'
     auth_invalid_id: 'todo: auth_invalid_id'
     auth_password_expired: 'todo: auth_password_expired'

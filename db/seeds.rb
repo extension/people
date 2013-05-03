@@ -436,12 +436,23 @@ def transfer_user_authentication_events_to_activities
         when DarmokUserEvent::LOGIN_LOCAL_SUCCESS
           insert_list << Activity::AUTH_LOCAL_SUCCESS
           insert_list << 'NULL'
+          insert_list << 0
         when DarmokUserEvent::LOGIN_API_SUCCESS
           insert_list << Activity::AUTH_REMOTE_SUCCESS
-          insert_list << 'NULL'          
+          insert_list << 'NULL'
+          if(user_event.appname =~ %r{dev})
+            insert_list << 1
+          else
+            insert_list << 0
+          end                       
         when DarmokUserEvent::LOGIN_OPENID_SUCCESS
           insert_list << Activity::AUTH_REMOTE_SUCCESS
           insert_list << 'NULL'
+          if(user_event.appname =~ %r{\.extension\.org})
+            insert_list << 0
+          else
+            insert_list << 1
+          end            
         when DarmokUserEvent::LOGIN_LOCAL_FAILED
           insert_list << Activity::AUTH_LOCAL_FAILURE
           if(user_event.description =~ %r{incorrect password})
@@ -455,6 +466,7 @@ def transfer_user_authentication_events_to_activities
           else
             insert_list << Activity::AUTH_UNKNOWN
           end
+          insert_list << 1
         when DarmokUserEvent::LOGIN_API_FAILED
           insert_list << Activity::AUTH_LOCAL_FAILURE
           if(user_event.description =~ %r{incorrect password})
@@ -468,10 +480,12 @@ def transfer_user_authentication_events_to_activities
           else
             insert_list << Activity::AUTH_UNKNOWN
           end
+          insert_list << 1
         else
           # uh-oh what happened?
           insert_list << 0
           insert_list << 'NULL'
+          insert_list << 0
         end
         insert_list << ActiveRecord::Base.quote_value(user_event.login)
         insert_list << ActiveRecord::Base.quote_value(user_event.appname)
@@ -479,7 +493,7 @@ def transfer_user_authentication_events_to_activities
         insert_list << ActiveRecord::Base.quote_value(user_event.created_at.to_s(:db))
         insert_values << "(#{insert_list.join(',')})"
       end
-      insert_sql = "INSERT INTO #{Activity.table_name} (person_id,activityclass,activitycode,reasoncode,additionalinfo,site,ip_address,created_at) VALUES #{insert_values.join(',')};"
+      insert_sql = "INSERT INTO #{Activity.table_name} (person_id,activityclass,activitycode,reasoncode,is_private,additionalinfo,site,ip_address,created_at) VALUES #{insert_values.join(',')};"
       ActiveRecord::Base.connection.execute(insert_sql)        
     end
   end

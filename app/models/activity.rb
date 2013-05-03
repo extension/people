@@ -10,7 +10,8 @@ class Activity < ActiveRecord::Base
 
   ## attributes
   serialize :additionaldata
-  attr_accessible :person, :person_id, :site, :activityclass, :activitycode, :reasoncode,  :additionalinfo, :additionaldata, :ip_address, :community, :community_id, :colleague_id, :colleague
+  attr_accessible :person, :person_id, :site, :activityclass, :activitycode, :reasoncode,  :additionalinfo, :additionaldata
+  attr_accessible :ip_address, :community, :community_id, :colleague_id, :colleague, :is_private
 
  ## constants
   #### activity types
@@ -29,9 +30,7 @@ class Activity < ActiveRecord::Base
   # PEOPLE
   AUTH_LOCAL_SUCCESS                  = 1
   AUTH_LOCAL_FAILURE                  = 2
-
   AUTH_REMOTE_SUCCESS                 = 11
-  AUTH_REMOTE_FAILURE                 = 12
 
   # reason codes for failure conditions
   AUTH_UNKNOWN                        = 0
@@ -86,7 +85,6 @@ class Activity < ActiveRecord::Base
   AUTH_LOCAL_SUCCESS                  => 'auth_local_success',          
   AUTH_LOCAL_FAILURE                  => 'auth_local_failure',
   AUTH_REMOTE_SUCCESS                 => 'auth_remote_success',
-  AUTH_REMOTE_FAILURE                 => 'auth_remote_failure',
   SIGNUP                              => 'signup',
   INVITATION                          => 'invitation',
   VOUCHED_FOR                         => 'vouched_for',
@@ -119,12 +117,13 @@ class Activity < ActiveRecord::Base
   ENABLE_ACCOUNT                      => 'enable_account',
   RETIRE_ACCOUNT                      => 'retire_account'}
 
-  PRIVATE_ACTIVITIES = [AUTH_LOCAL_FAILURE,AUTH_REMOTE_FAILURE,PASSWORD_RESET_REQUEST,PASSWORD_RESET,PASSWORD_CHANGE]
+  PRIVATE_ACTIVITIES = [AUTH_LOCAL_FAILURE,PASSWORD_RESET_REQUEST,PASSWORD_RESET,PASSWORD_CHANGE]
 
   ## validations
 
   ## filters
   before_save :set_activity_class
+  before_save :check_privacy_flag
 
   ## associations
   belongs_to :person
@@ -133,15 +132,19 @@ class Activity < ActiveRecord::Base
 
   ## scopes
   scope :related_to_person, lambda{|person| where("person_id = ? or colleague_id = ?",person.id,person.id)}
-  scope :public_activity, where("activitycode NOT IN (#{PRIVATE_ACTIVITIES.join(',')})")
+  scope :public_activity, lambda{where(is_private: false)}
   scope :community, where("activitycode >= ? and activitycode <= ?",COMMUNITY_RANGE.first, COMMUNITY_RANGE.last)
 
-  def is_private?
-    PRIVATE_ACTIVITIES.include?(self.activitycode)
+  def check_privacy_flag
+    if(PRIVATE_ACTIVITIES.include?(self.activitycode))
+      self.is_private = true
+    elsif(self.activitycode == AUTH_REMOTE_SUCCESS and !(self.site =~ %{\.extension\.org}))
+      self.is_private = true
+    end      
   end
  
   def activitycode_to_s
-   ACTIVITY_STRINGS[self.activitycode] || 'unknown'
+    ACTIVITY_STRINGS[self.activitycode] || 'unknown'
   end
 
   def set_activity_class
@@ -362,30 +365,8 @@ class Activity < ActiveRecord::Base
     create_parameters[:activityclass] = AUTHENTICATION
     create_parameters[:activitycode] = AUTH_REMOTE_SUCCESS
     create_parameters[:ip_address] = options[:ip_address] || 'unknown'
-
     self.create(create_parameters)
 
   end
-
-  def self.log_remote_auth_failure(options = {})
-    required = [:site]
-    required.each do |required_option|
-      if(options[required_option].nil?)
-        return false
-      end
-    end
-
-    create_parameters = {}
-    create_parameters[:site] = options[:site]
-    create_parameters[:person_id] = options[:person_id]
-    create_parameters[:activityclass] = AUTHENTICATION
-    create_parameters[:activitycode] = AUTH_LOCAL_FAILURE
-    create_parameters[:ip_address] = options[:ip_address] || 'unknown'
-    create_parameters[:reasoncode] = options[:fail_code] || AUTH_UNKNOWN
-
-    self.create(create_parameters)
-
-  end
-
 
 end

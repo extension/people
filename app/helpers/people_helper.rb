@@ -82,7 +82,7 @@ module PeopleHelper
     # note space on the end of link - required in string formatting
     text_macro_options[:persontext]  = hide_person_text ? '' : "#{link_to_person(activity.person,{nolink: nolink})} "
 
-    if([Activity::AUTH_REMOTE_SUCCESS,Activity::AUTH_REMOTE_FAILURE].include?(activity.activitycode))
+    if(activity.activitycode == Activity::AUTH_REMOTE_SUCCESS)
       text_macro_options[:site] =  activity.site
     end
 
