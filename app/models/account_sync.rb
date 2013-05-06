@@ -29,11 +29,9 @@ class AccountSync < ActiveRecord::Base
 
   def aae
     if(aae_user = AaeUser.find_by_darmok_id(self.person_id))
-      if(aae_user.has_exid?)
-        self.connection.execute(aae_update_query)
-      else
-        self.connection.execute(aae_conversion_query)        
-      end
+      self.connection.execute(aae_update_query)
+    elsif(aae_user = AaeUser.find_by_email(self.person.email))
+      self.connection.execute(aae_conversion_query)        
     else
       self.connection.execute(aae_insert_query)
     end
