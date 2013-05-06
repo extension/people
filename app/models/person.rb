@@ -49,7 +49,7 @@ class Person < ActiveRecord::Base
   before_validation :set_idstring
 
   after_create :create_email_forward
-  after_update :update_email_forward
+  after_update :update_email_forward, :sync_accounts
   after_save :update_email_aliases
 
   ## associations
@@ -81,6 +81,8 @@ class Person < ActiveRecord::Base
                                    social_network_connections.accounturl as accounturl,
                                    social_network_connections.is_public as is_public, 
                                    social_networks.*"  
+
+  has_many :account_syncs
   ## scopes  
   scope :validaccounts, where("retired = #{false} and vouched = #{true}") 
   scope :pendingreview, where("retired = #{false} and vouched = #{false} and account_status != #{STATUS_SIGNUP} && email_confirmed = #{true}")
@@ -176,6 +178,8 @@ class Person < ActiveRecord::Base
 
     person
   end
+
+
 
   def is_signup?
     self.account_status == STATUS_SIGNUP
@@ -426,10 +430,6 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def check_institution_change(options = {})
-
-  end  
-
   def confirm_email(options = {})
     self.email_confirmed = true
     self.email_confirmed_at = Time.zone.now
@@ -445,6 +445,7 @@ class Person < ActiveRecord::Base
   def create_email_forward
     self.set_email_forward(googleapps: false)
   end
+
 
   def update_email_forward
 
@@ -506,6 +507,12 @@ class Person < ActiveRecord::Base
     end
   end
 
+  def sync_accounts
+    if((self.validaccount? or self.retired?) and !self.is_systems_account?)
+      self.account_syncs.create
+    end
+  end
+
   def self.system_id
     1
   end
@@ -516,6 +523,10 @@ class Person < ActiveRecord::Base
 
   def is_system_account?
    return (self.id == 1)
+  end
+
+  def is_systems_account?
+    SYSTEMS_USERS.include?(self.id)
   end
 
   # since we return a default string from timezone, this routine

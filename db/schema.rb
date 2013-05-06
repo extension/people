@@ -11,7 +11,16 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130419142105) do
+ActiveRecord::Schema.define(:version => 20130506145830) do
+
+  create_table "account_syncs", :force => true do |t|
+    t.integer  "person_id"
+    t.boolean  "processed",  :default => false
+    t.datetime "created_at",                    :null => false
+    t.datetime "updated_at",                    :null => false
+  end
+
+  add_index "account_syncs", ["person_id"], :name => "person_ndx"
 
   create_table "activities", :force => true do |t|
     t.integer  "person_id",      :default => 0
