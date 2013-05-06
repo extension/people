@@ -885,7 +885,7 @@ class Person < ActiveRecord::Base
 
 
 
-  def public_attributes(cache_options = {})
+  def public_attributes
     returnvalues = {profile_attributes: {}}
     public_profile_attributes = self.profile_public_settings.is_public.map(&:item)
     if(!public_profile_attributes.empty?)

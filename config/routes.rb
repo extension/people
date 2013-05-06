@@ -31,11 +31,6 @@ People::Application.routes.draw do
 
     resources :groups, :only => [:index, :show]
 
-    # data routes
-    scope "data" do
-      match "/groups", to: "data#groups", :as => 'data_groups'
-    end
-
     resources :contributors, :only => [:show] do
       member do
         get :contributions
@@ -192,6 +187,12 @@ People::Application.routes.draw do
     match "/webmail/view/:hashvalue" => "webmail#view", :as => 'webmail_view'
   end
 
+  # data routes
+  controller "data" do
+    simple_named_route 'groups', via: [:get]
+    simple_named_route 'publicprofile', via: [:get]
+    simple_named_route 'communitymembers', via: [:get]
+  end
 
   # email example routing
   match "/email_examples/:action", to: "email_examples", via: [:get]
