@@ -113,7 +113,9 @@ def account_transfer_query
     when 'phone'
       select_columns << "#{from_clause}.phonenumber"      
     when 'last_activity_at'
-      select_columns << "#{from_clause}.last_login_at"      
+      select_columns << "#{from_clause}.last_login_at"
+    when 'is_create_admin'
+      select_columns << "#{from_clause}.is_admin"            
     else
       select_columns << "#{from_clause}.#{c}"
     end

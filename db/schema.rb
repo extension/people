@@ -477,6 +477,7 @@ ActiveRecord::Schema.define(:version => 20130506145830) do
     t.datetime "vouched_at"
     t.boolean  "email_confirmed",                        :default => false
     t.boolean  "is_admin",                               :default => false
+    t.boolean  "is_create_admin",                        :default => false
     t.boolean  "announcements",                          :default => true
     t.boolean  "retired",                                :default => false
     t.string   "base_login_string"

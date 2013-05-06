@@ -9,8 +9,10 @@ class AccountSync < ActiveRecord::Base
   belongs_to :person
   attr_accessible :person, :person_id, :processed
 
-  UPDATE_DATABASES = {'aae' => 'prod_aae',
-                      'learn' => 'prod_learn'}
+  CREATE_ADMIN_ROLE = 3
+  UPDATE_DATABASES = {'aae' => Settings.aae_database,
+                      'learn' => Settings.learn_database,
+                      'create' => Settings.create_database}
 
   after_create  :queue_update
 
@@ -49,6 +51,22 @@ class AccountSync < ActiveRecord::Base
     end
     self.connection.execute(learn_authmap_insert_query)
   end
+
+  def create
+    self.connection.execute(create_insert_update_query)
+    self.connection.execute(create_admin_roles_deletion_query)
+    if(self.person.is_create_admin?)
+      self.connection.execute(create_admin_roles_query)
+    end
+    ['first','last'].each do |name|
+      ['data','revision'].each do |data_or_revision|
+        self.connection.execute(create_names_update_query(name,data_or_revision))
+      end
+    end
+    self.connection.execute(create_authmap_insert_query)
+
+  end
+
 
   def aae_update_query
     person = self.person
@@ -191,6 +209,85 @@ class AccountSync < ActiveRecord::Base
            NOW()
     FROM #{update_database}.learners
     WHERE #{update_database}.learners.darmok_id = #{person.id}
+    END_SQL
+    query    
+  end
+
+
+  def create_insert_update_query
+    person = self.person
+    update_database = UPDATE_DATABASES['create']
+    query = <<-END_SQL.gsub(/\s+/, " ").strip
+    INSERT INTO #{update_database}.users (uid,name,pass,mail,created,status)
+    SELECT  #{person.id}, 
+            #{quoted_value_or_null(person.idstring)},
+            #{ActiveRecord::Base.quote_value(Settings.create_password_string)},
+            #{quoted_value_or_null(person.email)},
+            #{quoted_value_or_null(person.created_at.to_s(:db))},
+            #{(person.validaccount? ? 1 : 0)}
+    ON DUPLICATE KEY 
+    UPDATE name=#{quoted_value_or_null(person.idstring)},
+           pass=#{ActiveRecord::Base.quote_value(Settings.create_password_string)},
+           mail=#{quoted_value_or_null(person.email)},
+           status=#{(person.validaccount? ? 1 : 0)}
+    END_SQL
+    query
+  end
+
+
+  def create_admin_roles_deletion_query
+    person = self.person
+    update_database = UPDATE_DATABASES['create']
+    query = <<-END_SQL.gsub(/\s+/, " ").strip
+    DELETE FROM #{update_database}.users_roles
+    WHERE uid = #{person.id} AND rid = #{CREATE_ADMIN_ROLE}
+    END_SQL
+    query
+  end
+
+  def create_admin_roles_query
+    person = self.person
+    update_database = UPDATE_DATABASES['create']
+    query = <<-END_SQL.gsub(/\s+/, " ").strip
+    INSERT INTO #{update_database}.users_roles (uid,rid)
+    SELECT  #{person.id}, 
+            #{CREATE_ADMIN_ROLE},
+    END_SQL
+    query
+  end
+
+  def create_names_update_query(name,data_or_revision)
+    person = self.person
+    update_database = UPDATE_DATABASES['create']
+    query = <<-END_SQL.gsub(/\s+/, " ").strip
+    INSERT INTO #{update_database}.field_#{data_or_revision}_field_#{name}_name (entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_#{name}_name_value, field_#{name}_name_format)
+    SELECT 'user', 
+           'user', 
+           0, 
+           #{person.id}, 
+           #{person.id}, 
+           'und', 
+           0, 
+           #{quoted_value_or_null(person.send("#{name}_name"))}, 
+           'NULL'
+    ON DUPLICATE KEY 
+    UPDATE field_#{name}_name_value=#{quoted_value_or_null(person.send("#{name}_name"))}
+    END_SQL
+    query  
+  end
+
+  def create_authmap_insert_query      
+    person = self.person
+    update_database = UPDATE_DATABASES['create']
+    query = <<-END_SQL.gsub(/\s+/, " ").strip
+    INSERT INTO #{update_database}.authmap (aid,uid,authname,module)
+    SELECT #{person.id},
+           #{person.id},  
+           CONCAT('https://people.extension.org/',#{ActiveRecord::Base.quote_value(person.idstring)}), 
+           'openid'
+    ON DUPLICATE KEY
+    UPDATE uid=#{person.id},
+           authname=CONCAT('https://people.extension.org/',#{ActiveRecord::Base.quote_value(person.idstring)})
     END_SQL
     query    
   end
