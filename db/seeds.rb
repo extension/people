@@ -165,12 +165,7 @@ def community_transfer_query
   from_clause = "#{@darmok_database}.communities"
   select_columns = []
   columns.each do |c|
-    case c
-    when 'publishing_community'
-      select_columns << "#{from_clause}.show_in_public_list"
-    else
-      select_columns << "#{from_clause}.#{c}"
-    end
+    select_columns << "#{from_clause}.#{c}"
   end
   select_clause = "#{select_columns.join(',')}"
   where_clause = "#{from_clause}.entrytype IN (1,2,3)"
