@@ -118,7 +118,7 @@ class OpieController < ApplicationController
   end
 
   def person
-    @person= Person.find_by_idstring(params[:extensionid])
+    @person=Person.find_by_id_or_idstring(params[:extensionid])
     # Yadis content-negotiation: we want to return the xrds if asked for.
     accept = request.env['HTTP_ACCEPT']
 
@@ -130,21 +130,13 @@ class OpieController < ApplicationController
     end
 
     # content negotiation failed, so just render the user page
-    if(@person.nil?)
-      flash.now[:failure] = 'No user by that name here.'
-    else
-      @openidmeta = openidmeta(@person)
-    end
+    @openidmeta = openidmeta(@person)
     @no_show_navtabs = true
     render(template: 'people/show_public', layout: 'application')
   end
 
   def person_xrds
-    @person= Person.find_by_idstring(params[:extensionid])
-    if(@person.nil?)
-      redirect_to(:action => 'person')
-    end
-
+    @person= Person.find_by_id_or_idstring(params[:extensionid])
     proto = ((Settings.app_location == 'localdev') ? 'http://' : 'https://')
     types = [OpenID::OPENID_2_0_TYPE, OpenID::OPENID_1_0_TYPE,OpenID::SREG_URI]
     types_string = ''
