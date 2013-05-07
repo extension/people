@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130506145830) do
+ActiveRecord::Schema.define(:version => 20130507123207) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -233,6 +233,13 @@ ActiveRecord::Schema.define(:version => 20130506145830) do
   end
 
   add_index "google_groups", ["community_id"], :name => "community_ndx", :unique => true
+
+  create_table "interests", :force => true do |t|
+    t.string   "name"
+    t.datetime "created_at"
+  end
+
+  add_index "interests", ["name"], :name => "name_ndx", :unique => true
 
   create_table "invitations", :force => true do |t|
     t.string   "token",              :limit => 40,                    :null => false
@@ -498,6 +505,14 @@ ActiveRecord::Schema.define(:version => 20130506145830) do
   add_index "people", ["idstring"], :name => "idstring_ndx", :unique => true
   add_index "people", ["reset_token"], :name => "token_ndx"
   add_index "people", ["vouched", "retired"], :name => "validity_ndx"
+
+  create_table "person_interests", :force => true do |t|
+    t.integer  "interest_id"
+    t.integer  "person_id"
+    t.datetime "created_at"
+  end
+
+  add_index "person_interests", ["interest_id", "person_id"], :name => "tagging_ndx", :unique => true
 
   create_table "positions", :force => true do |t|
     t.integer  "entrytype",  :default => 0, :null => false

@@ -89,6 +89,21 @@ class DarmokInvitation < ActiveRecord::Base
   PENDING = 0  
 end
 
+class DarmokTagging < ActiveRecord::Base
+  base_config = ActiveRecord::Base.connection.instance_variable_get("@config").dup
+  base_config[:database] = 'prod_darmok'
+  establish_connection(base_config)
+  self.set_table_name 'taggings'
+end
+
+class DarmokTags < ActiveRecord::Base
+  base_config = ActiveRecord::Base.connection.instance_variable_get("@config").dup
+  base_config[:database] = 'prod_darmok'
+  establish_connection(base_config)
+  self.set_table_name 'tags'
+end
+
+
 
 def account_transfer_query
   reject_columns = ['password_hash','involvement','institution_id','invitation_id','previous_email','reset_token','aae_id','learn_id','biography']
@@ -128,7 +143,7 @@ end
 
 def profile_public_settings_transfer_query
   query = <<-END_SQL.gsub(/\s+/, " ").strip
-    INSERT INTO #{@my_database}.#{ProfilePublicSetting.table_name} SELECT * FROM #{@darmok_database}.privacy_settings WHERE #{@darmok_database}.privacy_settings.item <> 'interests'
+    INSERT INTO #{@my_database}.#{ProfilePublicSetting.table_name} SELECT * FROM #{@darmok_database}.privacy_settings
   END_SQL
   query
 end
@@ -714,6 +729,31 @@ def transfer_invitations
   print "\t\tfinished in #{benchmark.real.round(1)}s\n"
 end
 
+def transform_interests
+  print "Transferring interests..."
+  benchmark = Benchmark.measure do
+    interests = {}
+    DarmokTagging.where(taggable_type: 'Account').where(tagging_kind: 1).find_in_batches do |tagging_group|
+      insert_values = []
+      tagging_group.each do |tagging|
+        if(darmok_tag = DarmokTag.find_by_id(tagging.tag_id))
+          if(!interests[darmok_tag.name])
+            interests[darmok_tag.name] = Interest.create(name: darmok_tag.name).id
+          end
+          insert_list = []
+          insert_list << interests[darmok_tag.name]
+          insert_list << tagging.taggable_id
+          insert_list << ActiveRecord::Base.quote_value(tagging.created_at.to_s(:db))
+          insert_values << "(#{insert_list.join(',')})"     
+        end
+      end
+      insert_sql = "INSERT INTO #{PersonInterest.table_name} (interest_id,person_id,created_at) VALUES #{insert_values.join(',')};"
+      ActiveRecord::Base.connection.execute(insert_sql)   
+    end
+  end
+  print "\t\tfinished in #{benchmark.real.round(1)}s\n"
+end
+
 
 # seed queries
 announce_and_run_query('Transferring accounts',account_transfer_query)
@@ -766,3 +806,4 @@ transfer_user_profile_events_to_activities
 transfer_admin_events_to_activities
 transfer_activities_to_activities
 associate_social_networks
+transform_interests

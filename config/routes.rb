@@ -171,6 +171,7 @@ People::Application.routes.draw do
     simple_named_route 'locations', via: [:get]
     simple_named_route 'positions', via: [:get]
     simple_named_route 'social_networks', via: [:get]
+    simple_named_route 'interests', via: [:get]
   end  
 
   controller :debug do

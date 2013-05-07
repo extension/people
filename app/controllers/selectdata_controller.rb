@@ -30,4 +30,10 @@ class SelectdataController < ApplicationController
     render(json: token_hash)
   end    
 
+  def interests
+    @interests = Interest.where("name like ?", "%#{params[:q]}%")
+    token_hash = @interests.collect{|interest| {id: interest.id, text: interest.name}}
+    render(json: token_hash)
+  end    
+
 end

@@ -11,7 +11,7 @@ class ProfilePublicSetting < ActiveRecord::Base
   belongs_to :person
   
   
-  KNOWN_ITEMS = ['email','phone','title','position','institution','location','county','time_zone','biography']
+  KNOWN_ITEMS = ['email','phone','title','position','institution','location','county','interests','time_zone','biography']
   
   ITEM_LABELS =  {'email' => 'Email Address',
                   'phone' => 'Phone Number',

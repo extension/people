@@ -83,6 +83,9 @@ class Person < ActiveRecord::Base
                                    social_networks.*"  
 
   has_many :account_syncs
+  has_many :person_interests
+  has_many :interests, through: :person_interests
+  
   ## scopes  
   scope :validaccounts, where("retired = #{false} and vouched = #{true}") 
   scope :pendingreview, where("retired = #{false} and vouched = #{false} and account_status != #{STATUS_SIGNUP} && email_confirmed = #{true}")
