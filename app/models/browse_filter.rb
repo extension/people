@@ -12,7 +12,7 @@ class BrowseFilter < ActiveRecord::Base
   attr_accessible :dump_last_filesize, :dump_last_generated_at, :dump_last_runtime, :dump_in_progress
 
   ALL = 1
-  KNOWN_KEYS = ['communities','locations','positions','social_networks']
+  KNOWN_KEYS = ['communities','locations','positions','social_networks','interests']
 
   before_save :set_fingerprint
   belongs_to :creator, :class_name => "Person", :foreign_key => "created_by"
@@ -57,7 +57,10 @@ class BrowseFilter < ActiveRecord::Base
          objecthash[filter_key] = Position.where("id in (#{id_list.join(',')})").order(:name).all    
       when 'social_networks'
         objecthash[filter_key] = SocialNetwork.active.where("id in (#{id_list.join(',')})").order(:display_name).all
-      end        
+      when 'interests'
+        objecthash[filter_key] = Interest.used.where("interests.id in (#{id_list.join(',')})").order(:name).all        
+      end
+
     end
     objecthash
   end

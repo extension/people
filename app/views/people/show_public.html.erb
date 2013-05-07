@@ -52,7 +52,17 @@
       <%- if(@person.public_attributes[:profile_attributes]['time_zone']) -%>               
       <dt>Time zone:</dt>
       <dd><%= @person.time_zone %></span>
-      <%- end -%> 
+      <%- end -%>
+      <%- if(@person.public_attributes[:profile_attributes]['interests']) -%>               
+      <dt>Interests:</dt>
+      <dd>
+        <ul class="inline">
+          <%- @person.interests.order('name').each do |i| -%>
+            <li><%= i.name -%></li>
+          <%- end -%>
+        </ul>
+      </dd>
+      <%- end -%>      
     </dl>       
 
     <%- if @person.social_networks.where('is_public = ?',true).count > 0 -%>

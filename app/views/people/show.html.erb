@@ -38,7 +38,17 @@
       <dd><%= (@person.county.blank?) ? 'n/a' : @person.county.name %></span>
       <dt>Time zone:</dt>
       <dd><%= @person.time_zone %></dd>
+      <dt>Interests:</dt>
+      <dd>
+        <ul class="inline interests">
+          <%- @person.interests.order('name').each do |i| -%>
+            <li><%= link_to(i.name,filter_people_path(interests: i.id)) -%></li>
+          <%- end -%>
+        </ul>
+      </dd>
     </dl>
+
+
   </div>
 
   <div class="span5">

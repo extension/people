@@ -33,7 +33,7 @@ class SelectdataController < ApplicationController
   end    
 
   def interests
-    @interests = Interest.used.where("name like ?", "%#{params[:q]}%")
+    @interests = Interest.used.where("name like ?", "#{params[:q]}%")
     token_hash = @interests.collect{|interest| {id: interest.id, text: interest.name}}
     render(json: token_hash)
   end    

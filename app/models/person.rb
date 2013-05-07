@@ -150,6 +150,8 @@ class Person < ActiveRecord::Base
               base_scope = base_scope.where("people.position_id IN (#{settings[filter_key].join(',')})")
             when 'social_networks'
               base_scope = base_scope.joins(:social_networks).where("social_networks.id IN (#{settings[filter_key].join(',')})")
+            when 'interests'
+              base_scope = base_scope.joins(:interests).where("interests.id IN (#{settings[filter_key].join(',')})")
             end
           end
         end
@@ -933,6 +935,8 @@ class Person < ActiveRecord::Base
           returnvalues[:profile_attributes]['county'] = (self.county.blank? ? nil : self.county.name)            
         when 'institution'
           returnvalues[:profile_attributes]['institution'] = (self.institution.blank? ? nil : self.institution.name)
+        when 'interests'
+          returnvalues[:profile_attributes]['interests'] = self.interests.blank? ? nil : self.interests.map(&:name)
         else
           returnvalues[:profile_attributes][profile_attribute] = self.send(profile_attribute)
         end

@@ -123,6 +123,7 @@ People::Application.routes.draw do
       get :browse
       get :browsefile
       post :filter
+      get :filter
       get :invite
       post :invite
       get :invitations

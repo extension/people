@@ -6,3 +6,6 @@ tr.inactive {color: #000000;}
 .biography {display: block;}
 
 .social_network_link {white-space: nowrap;}
+
+.interests li a {text-decoration:none; background:#f2f2f2;}
+.interests li a:hover {text-decoration:none; background:#003ba1; color:#fff;}

@@ -35,6 +35,13 @@
         </div>
       </div>            
 
+      <div class="control-group">
+        <%= label_tag('interests', 'Interests', :class => 'control-label') -%>
+        <div class="controls">
+          <%= text_field_tag("interests","", class: 'span8' ) -%> 
+        </div>
+      </div>          
+
     </fieldset>
 
       <p><%= submit_tag "Filter", :class => "btn btn-primary" %> <%= link_to "cancel", '#', :class => "btn", :id => 'cancel_button' %></p>
@@ -143,5 +150,29 @@
     <%- if (@browse_filter_objects && @browse_filter_objects['social_networks']) -%>
       $('#social_networks').select2('data', <%= @browse_filter_objects['social_networks'].map{|sn|  {id: sn.id, text: sn.display_name}}.to_json.html_safe %>);
     <%- end -%>          
-   });      
+   });
+
+    $(function () {
+      $('#interests').select2({
+        minimumInputLength: 2,
+        multiple: true,
+        ajax: {
+          url: "<%= selectdata_interests_path -%>",
+          dataType: 'json',
+          data: function(term,page) {
+            return {
+              q: term
+            };
+          },
+          results: function (data, page) {
+            return { results: data };
+          }
+        }
+     });
+
+    <%- if (@browse_filter_objects && @browse_filter_objects['interests']) -%>
+      $('#interests').select2('data', <%= @browse_filter_objects['interests'].map{|c|  {id: c.id, text: c.name}}.to_json.html_safe %>);
+    <%- end -%>
+   });
+        
  </script>
