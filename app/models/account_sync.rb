@@ -17,8 +17,8 @@ class AccountSync < ActiveRecord::Base
   after_create  :queue_update
 
   def queue_update
-    #self.delay.update_accounts
-    self.update_accounts
+    self.delay.update_accounts
+    #self.update_accounts
   end
 
   def update_accounts
@@ -76,8 +76,8 @@ class AccountSync < ActiveRecord::Base
     SET #{update_database}.users.login        = #{quoted_value_or_null(person.idstring)}, 
         #{update_database}.users.first_name   = #{quoted_value_or_null(person.first_name)},
         #{update_database}.users.last_name    = #{quoted_value_or_null(person.last_name)},
-        #{update_database}.users.retired      = #{value_or_null(person.retired)},
-        #{update_database}.users.is_admin     = #{value_or_null(person.is_admin)},
+        #{update_database}.users.retired      = #{person.retired},
+        #{update_database}.users.is_admin     = #{person.is_admin},
         #{update_database}.users.email        = #{quoted_value_or_null(person.email)},
         #{update_database}.users.time_zone    = #{quoted_value_or_null(person.time_zone)},
         #{update_database}.users.location_id  = #{value_or_null(person.location_id)},
@@ -99,8 +99,8 @@ class AccountSync < ActiveRecord::Base
         #{update_database}.users.login        = #{quoted_value_or_null(person.idstring)}, 
         #{update_database}.users.first_name   = #{quoted_value_or_null(person.first_name)},
         #{update_database}.users.last_name    = #{quoted_value_or_null(person.last_name)},
-        #{update_database}.users.retired      = #{value_or_null(person.retired)},
-        #{update_database}.users.is_admin     = #{value_or_null(person.is_admin)},
+        #{update_database}.users.retired      = #{person.retired},
+        #{update_database}.users.is_admin     = #{person.is_admin},
         #{update_database}.users.time_zone    = #{quoted_value_or_null(person.time_zone)},
         #{update_database}.users.location_id  = #{value_or_null(person.location_id)},
         #{update_database}.users.county_id    = #{value_or_null(person.county_id)},
@@ -123,7 +123,7 @@ class AccountSync < ActiveRecord::Base
             #{quoted_value_or_null(person.email)},
             #{quoted_value_or_null(person.time_zone)},
             #{person.id},
-            #{value_or_null(person.is_admin)},
+            #{person.is_admin},
             #{value_or_null(person.location_id)},
             #{value_or_null(person.county_id)},
             #{quoted_value_or_null(person.title)},
@@ -155,8 +155,8 @@ class AccountSync < ActiveRecord::Base
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     UPDATE #{update_database}.learners
     SET #{update_database}.learners.name         = #{quoted_value_or_null(person.fullname)},
-        #{update_database}.learners.retired      = #{value_or_null(person.retired)},
-        #{update_database}.learners.is_admin     = #{value_or_null(person.is_admin)},
+        #{update_database}.learners.retired      = #{person.retired},
+        #{update_database}.learners.is_admin     = #{person.is_admin},
         #{update_database}.learners.email        = #{quoted_value_or_null(person.email)},
         #{update_database}.learners.time_zone    = #{quoted_value_or_null(person.time_zone)}
     WHERE #{update_database}.learners.darmok_id = #{person.id}
@@ -170,8 +170,8 @@ class AccountSync < ActiveRecord::Base
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     UPDATE #{update_database}.learners
     SET #{update_database}.learners.name         = #{quoted_value_or_null(person.fullname)},
-        #{update_database}.learners.retired      = #{value_or_null(person.retired)},
-        #{update_database}.learners.is_admin     = #{value_or_null(person.is_admin)},
+        #{update_database}.learners.retired      = #{person.retired},
+        #{update_database}.learners.is_admin     = #{person.is_admin},
         #{update_database}.learners.email        = #{quoted_value_or_null(person.email)},
         #{update_database}.learners.time_zone    = #{quoted_value_or_null(person.time_zone)}
     WHERE #{update_database}.learners.email = #{ActiveRecord::Base.quote_value(person.email)}
