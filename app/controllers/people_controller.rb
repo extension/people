@@ -19,6 +19,7 @@ class PeopleController < ApplicationController
 
   def edit
     @person = Person.find(params[:id])
+    @person_interests = @person.interests
     member_breadcrumbs(['Edit profile'])
     if(@person != current_person)
       # manual check_hold_status

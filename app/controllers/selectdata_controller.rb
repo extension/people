@@ -5,6 +5,8 @@
 # see LICENSE file
 
 class SelectdataController < ApplicationController
+  skip_before_filter :verify_authenticity_token
+
 
   def communities
     @communities = Community.where("name like ?", "%#{params[:q]}%")
@@ -31,7 +33,7 @@ class SelectdataController < ApplicationController
   end    
 
   def interests
-    @interests = Interest.where("name like ?", "%#{params[:q]}%")
+    @interests = Interest.used.where("name like ?", "%#{params[:q]}%")
     token_hash = @interests.collect{|interest| {id: interest.id, text: interest.name}}
     render(json: token_hash)
   end    

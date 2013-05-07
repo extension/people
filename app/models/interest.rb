@@ -13,7 +13,8 @@ class Interest < ActiveRecord::Base
   has_many :person_interests
   has_many :people, through: :person_interests
 
-
+  scope :used, joins(:person_interests).select("#{self.table_name}.*, COUNT(person_interests.id) AS interest_count").group("#{self.table_name}.id").having("interest_count > 0")
+  
   def name=(name)
     write_attribute(:name, self.class.normalizename(name))
   end
@@ -33,6 +34,14 @@ class Interest < ActiveRecord::Base
     # remove leading and trailing whitespace
     returnstring.strip!
     returnstring
+  end
+
+
+  def self.find_or_create_by_name(name)
+    if(!(interest = self.find_by_name(self.normalizename(name))))
+      interest = self.create(name: name)
+    end
+    interest
   end
 
 end

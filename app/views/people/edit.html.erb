@@ -47,6 +47,8 @@
         <%= f.input :affiliation, 
                     :input_html => { :class => 'span4' }, 
                     :hint =>  "Department or other affiliation at your institution or another institution if yours was not listed." %>
+        <%= f.input :interest_tags, :input_html => { :rows => 3, :class => 'span6' }, as: :text, :label => 'Interests' %>
+
       </fieldset>
 
 
@@ -79,6 +81,43 @@
   </div>
 
   <script type="text/javascript">
+
+     $(function () {
+        $('#person_interest_tags').select2({
+          minimumInputLength: 1,
+          tags: true,
+          tokenSeparators: [","],
+          multiple: true,
+          createSearchChoice: function(term, data) {
+            if ($(data).filter(function() {
+              return this.text.localeCompare(term) === 0;
+            }).length === 0) {
+              return {
+                id: term,
+                text: term
+              };
+            }
+          },         
+          ajax: {
+            url: "<%= selectdata_interests_path -%>",
+            dataType: 'json',
+            data: function(term,page) {
+              return {
+                q: term
+              };
+            },
+            results: function (data, page) {
+              return { results: data };
+            }
+          }
+       });
+
+      <%- if (!@person_interests.blank?) -%>
+        $('#person_interest_tags').select2('data', <%= @person_interests.map{|i|  {id: i.id, text: i.name}}.to_json.html_safe %>);
+      <%- end -%>
+
+     });
+
     $("#person_location_id").change(function() {
 
       $.post('<%= locations_counties_path %>', { location: $(this).val() }, function(data) {

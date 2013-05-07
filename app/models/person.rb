@@ -9,14 +9,12 @@ class Person < ActiveRecord::Base
   include BCrypt
   include CacheTools
   include MarkupScrubber
-  attr_accessor :password, :current_password, :password_confirmation
+  attr_accessor :password, :current_password, :password_confirmation, :interest_tags
 
   attr_accessible :first_name, :last_name, :email, :title, :phone, :time_zone, :affiliation, :involvement, :biography
-  attr_accessible :password
+  attr_accessible :password, :interest_tags
   attr_accessible :position_id, :position, :location_id, :location, :county_id, :county, :institution_id, :institution
   attr_accessible :invitation, :invitation_id 
-
-
 
   ## constants
   DEFAULT_TIMEZONE = 'America/New_York'
@@ -85,7 +83,7 @@ class Person < ActiveRecord::Base
   has_many :account_syncs
   has_many :person_interests
   has_many :interests, through: :person_interests
-  
+
   ## scopes  
   scope :validaccounts, where("retired = #{false} and vouched = #{true}") 
   scope :pendingreview, where("retired = #{false} and vouched = #{false} and account_status != #{STATUS_SIGNUP} && email_confirmed = #{true}")
@@ -135,7 +133,6 @@ class Person < ActiveRecord::Base
     protocol = ((Settings.app_location == 'localdev') ? 'http' : 'https')
     "#{protocol}://#{Settings.urlwriter_host}/#{self.idstring}"
   end
-
 
 
   def self.filtered_by(browse_filter)
@@ -581,6 +578,29 @@ class Person < ActiveRecord::Base
   # attr_writer override for response to scrub html
   def biography=(description)
     write_attribute(:biography, self.cleanup_html(description))
+  end
+
+
+  def interest_tags=(list)
+    list_array = list.split(',').map{|i| i.strip}.sort
+    id_list = []
+    list_array.each do |t|
+      if(t.to_i > 0)
+        id_list << t.to_i
+      else
+        id_list << Interest.find_or_create_by_name(t).id
+      end
+    end
+
+    if(id_list.sort != interests.map(&:id).sort)
+      attribute_will_change!('interest_tags')
+      self.interest_ids=id_list
+    end
+    interest_tags
+  end
+
+  def interest_tags
+    self.interests.map(&:name)
   end
 
   def self.cleanup_signup_accounts
