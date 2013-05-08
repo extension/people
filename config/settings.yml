@@ -33,4 +33,5 @@ create_password_string: 'use_local_settings'
 aae_database: 'use_local_settings'
 learn_database: 'use_local_settings'
 create_database: 'use_local_settings'
+www_database: 'use_local_settings'
 sync_accounts: true

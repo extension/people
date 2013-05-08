@@ -10,9 +10,10 @@ class AccountSync < ActiveRecord::Base
   attr_accessible :person, :person_id, :processed
 
   CREATE_ADMIN_ROLE = 3
-  UPDATE_DATABASES = {'aae' => Settings.aae_database,
-                      'learn' => Settings.learn_database,
-                      'create' => Settings.create_database}
+  UPDATE_DATABASES = {'aae_database' => Settings.aae_database,
+                      'learn_database' => Settings.learn_database,
+                      'create_database' => Settings.create_database,
+                      'www_database' => Settings.www_database}
 
   after_create  :queue_update
 
@@ -30,7 +31,7 @@ class AccountSync < ActiveRecord::Base
     end
   end
 
-  def aae
+  def aae_database
     if(aae_user = AaeUser.find_by_darmok_id(self.person_id))
       self.connection.execute(aae_update_query)
     elsif(aae_user = AaeUser.find_by_email(self.person.email))
@@ -41,7 +42,7 @@ class AccountSync < ActiveRecord::Base
     self.connection.execute(aae_authmap_insert_query)
   end
 
-  def learn
+  def learn_database
     if(learn_learner = LearnLearner.find_by_darmok_id(self.person_id))
       self.connection.execute(learn_update_query)
     elsif(learn_learner = LearnLearner.find_by_email(self.person.email))
@@ -52,7 +53,7 @@ class AccountSync < ActiveRecord::Base
     self.connection.execute(learn_authmap_insert_query)
   end
 
-  def create
+  def create_database
     self.connection.execute(create_insert_update_query)
     self.connection.execute(create_admin_roles_deletion_query)
     if(self.person.is_create_admin?)
@@ -64,8 +65,11 @@ class AccountSync < ActiveRecord::Base
       end
     end
     self.connection.execute(create_authmap_insert_query)
-
   end
+
+  def www_database
+    self.connection.execute(www_insert_update_query)
+  end    
 
 
   def aae_update_query
@@ -291,6 +295,31 @@ class AccountSync < ActiveRecord::Base
     END_SQL
     query    
   end
+
+
+  def www_insert_update_query
+    person = self.person
+    update_database = UPDATE_DATABASES['www']
+    query = <<-END_SQL.gsub(/\s+/, " ").strip
+    INSERT INTO #{update_database}.people (id,uid,first_name,last_name,is_admin,retired,created_at,updated_at)
+    SELECT  #{person.id}, 
+            #{ActiveRecord::Base.quote_value(person.openid_url)},
+            #{quoted_value_or_null(person.first_name)},
+            #{quoted_value_or_null(person.last_name)},
+            #{person.retired},
+            #{person.is_admin},
+            #{ActiveRecord::Base.quote_value(person.created_at.to_s(:db))},
+            #{ActiveRecord::Base.quote_value(person.updated_at.to_s(:db))}
+    ON DUPLICATE KEY 
+    UPDATE uid=#{ActiveRecord::Base.quote_value(person.openid_url)},
+           first_name=#{quoted_value_or_null(person.first_name)},
+           last_name=#{quoted_value_or_null(person.last_name)},
+           retired=#{person.retired},
+           is_admin=#{person.retired},
+           updated_at=NOW()
+    END_SQL
+    query
+  end  
 
   def value_or_null(value)
     value.blank? ? 'NULL' : value
