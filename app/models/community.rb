@@ -56,6 +56,7 @@ class Community < ActiveRecord::Base
   before_save :set_shortname, :flag_attributes_for_approved
   after_save :update_email_alias
   after_save :update_google_group
+  after_save :sync_communities
 
   belongs_to :creator, :class_name => "Person", :foreign_key => "created_by"
   belongs_to :location
@@ -69,10 +70,18 @@ class Community < ActiveRecord::Base
   has_one :email_alias, :as => :aliasable, :dependent => :destroy
   has_one  :google_group
   has_many :activities
+  has_many :community_syncs
 
   scope :approved, where(entrytype: APPROVED)
   scope :institutions, where(entrytype: INSTITUTION)
   scope :connected_as, lambda{|connectiontype| where(CONNECTION_CONDITIONS[connectiontype])}
+
+
+  def sync_communities
+    if(Settings.sync_communities)
+      self.community_syncs.create(sync_on_create: true)
+    end
+  end
 
   # attr_writer override for response to scrub html
   def description=(description)

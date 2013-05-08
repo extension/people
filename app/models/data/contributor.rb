@@ -31,24 +31,6 @@ class Contributor < Person
 
 
 
-  def self.find_by_uid(uid,provider)
-    case provider
-    when 'extension'
-      Person.find_by_openid_uid(uid)
-    else
-      nil
-    end
-  end
-
-  def login
-    # do nothing
-    true
-  end
-
-  def fullname
-    "#{self.first_name} #{self.last_name}"
-  end
-
   def contributions_by_page
     self.contributed_pages.group("pages.id").select("pages.*, max(node_activities.created_at) as last_contribution_at, group_concat(node_activities.event) as contributions")
   end

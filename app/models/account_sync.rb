@@ -7,7 +7,7 @@
 
 class AccountSync < ActiveRecord::Base
   belongs_to :person
-  attr_accessible :person, :person_id, :processed
+  attr_accessible :person, :person_id, :processed, :sync_on_create
 
   CREATE_ADMIN_ROLE = 3
   UPDATE_DATABASES = {'aae_database' => Settings.aae_database,
@@ -18,8 +18,11 @@ class AccountSync < ActiveRecord::Base
   after_create  :queue_update
 
   def queue_update
-    self.delay.update_accounts
-    #self.update_accounts
+    if(self.sync_on_create)
+      self.update_accounts
+    else
+      self.delay.update_accounts
+    end
   end
 
   def update_accounts
@@ -74,7 +77,7 @@ class AccountSync < ActiveRecord::Base
 
   def aae_update_query
     person = self.person
-    update_database = UPDATE_DATABASES['aae']
+    update_database = UPDATE_DATABASES['aae_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     UPDATE #{update_database}.users
     SET #{update_database}.users.login        = #{quoted_value_or_null(person.idstring)}, 
@@ -95,7 +98,7 @@ class AccountSync < ActiveRecord::Base
 
   def aae_conversion_query
     person = self.person
-    update_database = UPDATE_DATABASES['aae']
+    update_database = UPDATE_DATABASES['aae_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     UPDATE #{update_database}.users
     SET #{update_database}.users.kind         = 'User',
@@ -117,7 +120,7 @@ class AccountSync < ActiveRecord::Base
 
   def self.aae_insert_query
     person = self.person
-    update_database = UPDATE_DATABASES['aae']
+    update_database = UPDATE_DATABASES['aae_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{update_database}.users (login, first_name, last_name, kind, email, time_zone, darmok_id, is_admin, location_id, county_id, title, created_at, updated_at)
     SELECT  #{quoted_value_or_null(person.idstring)}, 
@@ -139,7 +142,7 @@ class AccountSync < ActiveRecord::Base
 
   def aae_authmap_insert_query      
     person = self.person
-    update_database = UPDATE_DATABASES['aae']
+    update_database = UPDATE_DATABASES['aae_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT IGNORE INTO #{update_database}.authmaps (user_id, authname, source, created_at, updated_at) 
     SELECT #{update_database}.users.id, 
@@ -155,7 +158,7 @@ class AccountSync < ActiveRecord::Base
 
   def learn_update_query
     person = self.person
-    update_database = UPDATE_DATABASES['learn']
+    update_database = UPDATE_DATABASES['learn_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     UPDATE #{update_database}.learners
     SET #{update_database}.learners.name         = #{quoted_value_or_null(person.fullname)},
@@ -170,7 +173,7 @@ class AccountSync < ActiveRecord::Base
 
   def learn_conversion_query
     person = self.person
-    update_database = UPDATE_DATABASES['learn']
+    update_database = UPDATE_DATABASES['learn_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     UPDATE #{update_database}.learners
     SET #{update_database}.learners.name         = #{quoted_value_or_null(person.fullname)},
@@ -186,7 +189,7 @@ class AccountSync < ActiveRecord::Base
 
   def self.learn_insert_query
     person = self.person
-    update_database = UPDATE_DATABASES['learn']
+    update_database = UPDATE_DATABASES['learn_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{update_database}.learners (name, email, has_profile, time_zone, darmok_id, is_admin, created_at, updated_at) 
     SELECT  #{quoted_value_or_null(person.fullname)},
@@ -203,7 +206,7 @@ class AccountSync < ActiveRecord::Base
 
   def learn_authmap_insert_query      
     person = self.person
-    update_database = UPDATE_DATABASES['learn']
+    update_database = UPDATE_DATABASES['learn_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT IGNORE INTO #{update_database}.authmaps (learner_id, authname, source, created_at, updated_at) 
     SELECT #{update_database}.learners.id, 
@@ -220,7 +223,7 @@ class AccountSync < ActiveRecord::Base
 
   def create_insert_update_query
     person = self.person
-    update_database = UPDATE_DATABASES['create']
+    update_database = UPDATE_DATABASES['create_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{update_database}.users (uid,name,pass,mail,created,status)
     SELECT  #{person.id}, 
@@ -241,7 +244,7 @@ class AccountSync < ActiveRecord::Base
 
   def create_admin_roles_deletion_query
     person = self.person
-    update_database = UPDATE_DATABASES['create']
+    update_database = UPDATE_DATABASES['create_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     DELETE FROM #{update_database}.users_roles
     WHERE uid = #{person.id} AND rid = #{CREATE_ADMIN_ROLE}
@@ -251,7 +254,7 @@ class AccountSync < ActiveRecord::Base
 
   def create_admin_roles_query
     person = self.person
-    update_database = UPDATE_DATABASES['create']
+    update_database = UPDATE_DATABASES['create_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{update_database}.users_roles (uid,rid)
     SELECT  #{person.id}, 
@@ -262,7 +265,7 @@ class AccountSync < ActiveRecord::Base
 
   def create_names_update_query(name,data_or_revision)
     person = self.person
-    update_database = UPDATE_DATABASES['create']
+    update_database = UPDATE_DATABASES['create_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{update_database}.field_#{data_or_revision}_field_#{name}_name (entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_#{name}_name_value, field_#{name}_name_format)
     SELECT 'user', 
@@ -282,7 +285,7 @@ class AccountSync < ActiveRecord::Base
 
   def create_authmap_insert_query      
     person = self.person
-    update_database = UPDATE_DATABASES['create']
+    update_database = UPDATE_DATABASES['create_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{update_database}.authmap (aid,uid,authname,module)
     SELECT #{person.id},
@@ -299,7 +302,7 @@ class AccountSync < ActiveRecord::Base
 
   def www_insert_update_query
     person = self.person
-    update_database = UPDATE_DATABASES['www']
+    update_database = UPDATE_DATABASES['www_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{update_database}.people (id,uid,first_name,last_name,is_admin,retired,created_at,updated_at)
     SELECT  #{person.id}, 
