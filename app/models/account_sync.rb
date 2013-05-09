@@ -134,7 +134,7 @@ class AccountSync < ActiveRecord::Base
     query
   end
 
-  def self.aae_insert_query
+  def aae_insert_query
     person = self.person
     update_database = UPDATE_DATABASES['aae_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
@@ -203,7 +203,7 @@ class AccountSync < ActiveRecord::Base
     query
   end
 
-  def self.learn_insert_query
+  def learn_insert_query
     person = self.person
     update_database = UPDATE_DATABASES['learn_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
