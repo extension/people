@@ -16,7 +16,9 @@ ActiveRecord::Schema.define(:version => 20130509151936) do
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
     t.boolean  "processed",      :default => false
+    t.boolean  "success"
     t.boolean  "sync_on_create", :default => false
+    t.text     "errors"
     t.datetime "created_at",                        :null => false
     t.datetime "updated_at",                        :null => false
   end
@@ -135,7 +137,9 @@ ActiveRecord::Schema.define(:version => 20130509151936) do
     t.integer  "person_id"
     t.integer  "community_id"
     t.boolean  "processed",      :default => false
+    t.boolean  "success"
     t.boolean  "sync_on_create", :default => false
+    t.text     "errors"
     t.datetime "created_at",                        :null => false
     t.datetime "updated_at",                        :null => false
   end
@@ -145,7 +149,9 @@ ActiveRecord::Schema.define(:version => 20130509151936) do
   create_table "community_syncs", :force => true do |t|
     t.integer  "community_id"
     t.boolean  "processed",      :default => false
+    t.boolean  "success"
     t.boolean  "sync_on_create", :default => false
+    t.text     "errors"
     t.datetime "created_at",                        :null => false
     t.datetime "updated_at",                        :null => false
   end

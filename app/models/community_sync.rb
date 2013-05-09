@@ -6,6 +6,8 @@
 #  see LICENSE file
 
 class CommunitySync < ActiveRecord::Base
+  serialize :errors
+  attr_accessible :success, :errors
   attr_accessible :community, :community_id, :processed, :sync_on_create
 
   UPDATE_DATABASES = {'create_database' => Settings.create_database,
@@ -27,10 +29,14 @@ class CommunitySync < ActiveRecord::Base
 
   def update_communities
     if(!self.processed?)
-      UPDATE_DATABASES.keys.each do |sync_target|
-        self.send(sync_target)
+      begin 
+        UPDATE_DATABASES.keys.each do |sync_target|
+          self.send(sync_target)
+        end
+        self.update_attributes({processed: true, success: true})
+      rescue StandardError => e
+        self.update_attributes({processed: true, success: false, errors: e.message})
       end
-      self.update_attributes({processed: true})
     end
   end
 

@@ -6,7 +6,9 @@
 #  see LICENSE file
 
 class AccountSync < ActiveRecord::Base
-  attr_accessible :person, :person_id, :processed, :sync_on_create
+  serialize :errors
+  attr_accessible :success, :errors
+  attr_accessible :person, :person_id, :processed, :sync_on_create 
 
   CREATE_ADMIN_ROLE = 3
   UPDATE_DATABASES = {'aae_database' => Settings.aae_database,
@@ -29,10 +31,14 @@ class AccountSync < ActiveRecord::Base
 
   def update_accounts
     if(!self.processed?)
-      UPDATE_DATABASES.keys.each do |sync_target|
-        self.send(sync_target)
+      begin 
+        UPDATE_DATABASES.keys.each do |sync_target|
+          self.send(sync_target)
+        end
+        self.update_attributes({processed: true, success: true})
+      rescue StandardError => e
+        self.update_attributes({processed: true, success: false, errors: e.message})
       end
-      self.update_attributes({processed: true})
     end
   end
 
