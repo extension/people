@@ -36,3 +36,4 @@ create_database: 'use_local_settings'
 www_database: 'use_local_settings'
 sync_accounts: true
 sync_communities: true
+redis_enabled: true

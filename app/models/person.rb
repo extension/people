@@ -757,6 +757,9 @@ class Person < ActiveRecord::Base
 
     # force cache update
     community.joined_count(force: true)
+
+    # sync members with whatever we sync with
+    CommunityMemberSync.create_with_pending_check({community: community, person: self, sync_on_create: true})
   end
 
   def remove_from_community(community,options={})
@@ -783,6 +786,9 @@ class Person < ActiveRecord::Base
     end    
     # force cache update
     community.joined_count(force: true)
+
+    # sync members with whatever we sync with
+    CommunityMemberSync.create_with_pending_check({community: community, person: self, sync_on_create: true})   
   end
 
 

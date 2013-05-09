@@ -6,7 +6,6 @@
 #  see LICENSE file
 
 class AccountSync < ActiveRecord::Base
-  belongs_to :person
   attr_accessible :person, :person_id, :processed, :sync_on_create
 
   CREATE_ADMIN_ROLE = 3
@@ -17,8 +16,10 @@ class AccountSync < ActiveRecord::Base
 
   after_create  :queue_update
 
+  belongs_to :person
+
   def queue_update
-    if(self.sync_on_create)
+    if(self.sync_on_create or !Settings.redis_enabled)
       self.update_accounts
     else
       self.delay.update_accounts

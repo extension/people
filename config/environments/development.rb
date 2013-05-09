@@ -7,7 +7,7 @@ People::Application.configure do
   config.cache_classes = false
 
   # cache
-  if(Settings.redis_development_caching)
+  if(Settings.redis_enabled)
     config.cache_store = :redis_store, "redis://localhost:6379/1"
   end
   
