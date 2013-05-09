@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130508215114) do
+ActiveRecord::Schema.define(:version => 20130509151936) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -130,6 +130,17 @@ ActiveRecord::Schema.define(:version => 20130508215114) do
 
   add_index "community_connections", ["connectiontype"], :name => "index_communityconnections_on_connectiontype"
   add_index "community_connections", ["person_id", "community_id"], :name => "person_community_ndx", :unique => true
+
+  create_table "community_member_syncs", :force => true do |t|
+    t.integer  "person_id"
+    t.integer  "community_id"
+    t.boolean  "processed",      :default => false
+    t.boolean  "sync_on_create", :default => false
+    t.datetime "created_at",                        :null => false
+    t.datetime "updated_at",                        :null => false
+  end
+
+  add_index "community_member_syncs", ["person_id", "community_id"], :name => "community_person_ndx"
 
   create_table "community_syncs", :force => true do |t|
     t.integer  "community_id"
