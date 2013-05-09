@@ -79,7 +79,7 @@ class Community < ActiveRecord::Base
 
   def sync_communities
     if(Settings.sync_communities)
-      self.community_syncs.create(sync_on_create: true)
+      self.community_syncs.create
     end
   end
 
