@@ -160,6 +160,8 @@ People::Application.routes.draw do
     end
   end
 
+  resources :numbers, only: [:index]
+  
   # json data endpoints
   controller :locations do
     simple_named_route 'counties', via: [:post]

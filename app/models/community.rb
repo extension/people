@@ -74,6 +74,8 @@ class Community < ActiveRecord::Base
 
   scope :approved, where(entrytype: APPROVED)
   scope :institutions, where(entrytype: INSTITUTION)
+  scope :contributed, where(entrytype: USERCONTRIBUTED)
+
   scope :connected_as, lambda{|connectiontype| where(CONNECTION_CONDITIONS[connectiontype])}
 
 

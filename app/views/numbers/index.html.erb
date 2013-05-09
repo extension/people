@@ -1,0 +1,75 @@
+<%- @page_title = "eXtension Numbers" -%>
+
+<div class="page-header">
+  <h2>eXtension Numbers</h2>
+</div>
+
+
+<div class="row">
+<div class='span6'>
+  <h3>People</h3>
+
+  <table class="table table-bordered">
+      <tbody>
+      <tr>
+      <td>Accounts</td>
+      <td class="mednumber"><%= number_with_delimiter(Person.display_accounts.count) %></td>
+      </tr>
+      <tr>
+          <td>New Users (within the last month)</td>
+          <td class="mednumber"><%= number_with_delimiter(Person.display_accounts.where('created_at >= ?',Time.zone.now - 1.month).count) %></td>
+      </tr>
+      <tr>
+          <td>Active Users (those with sign in within the last month)</td>
+          <td class="mednumber"><%= number_with_delimiter(Person.display_accounts.where('last_activity_at >= ?',Time.zone.now - 1.month).count) %></td>
+      </tr>
+      </tbody>
+  </table>
+
+  <h3>Communities and Institutions</h3>
+
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+      <th>&nbsp;</th>
+      <th>#</th>
+      <th>Members</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>Institutions</td>
+      <td class="mednumber"><%= number_with_delimiter(Community.institutions.count) %></td>
+      <td class="mednumber"><%= number_with_delimiter(Community.institutions.joins(:community_connections).where("connectiontype IN ('leader','member')").count('DISTINCT(person_id)')) %></td>
+    </tr>
+    <tr>
+      <td>eXtension Communities of Practice</td>
+      <td class="mednumber"><%= number_with_delimiter(Community.approved.count)  %></td>
+      <td class="mednumber"><%= number_with_delimiter(Community.approved.joins(:community_connections).where("connectiontype IN ('leader','member')").count('DISTINCT(person_id)')) %></td>
+    </tr>
+    <tr>
+      <td>People-contributed Communities</td>
+      <td class="mednumber"><%= number_with_delimiter(Community.contributed.count)  %></td>
+      <td class="mednumber"><%= number_with_delimiter(Community.contributed.joins(:community_connections).where("connectiontype IN ('leader','member')").count('DISTINCT(person_id)')) %></td>
+    </tr>    
+    </tbody>
+
+  </table>  
+
+</div>
+  
+<div class='span6'>
+
+<div class='dashmodule'>
+<h4>Published Content</h4>
+<p>See the <%= link_to('published content report', 'http://data.extension.org/pages/publishedcontent') %> for the latest information on published content</p>
+</div>
+
+<div class='dashmodule'>
+  <h4>More Data</h4>
+<p>Visit <%= link_to('data.extension.org', 'http://data.extension.org') %> for more data and analysis on page performance and eXtension Activity.</p>
+</div>
+
+
+</div>
+</div>
