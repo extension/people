@@ -136,6 +136,7 @@ GEM
       net-ssh (>= 2.6.5)
     nokogiri (1.5.9)
     outfielding-jqplot-rails (1.0.8)
+    php_serialize (1.2)
     polyglot (0.3.3)
     posix-spawn (0.3.6)
     powder (0.2.0)
@@ -275,6 +276,7 @@ DEPENDENCIES
   net-http-spy
   nokogiri
   outfielding-jqplot-rails
+  php_serialize
   powder
   pry
   quiet_assets

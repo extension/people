@@ -12,7 +12,8 @@ class AccountSync < ActiveRecord::Base
   UPDATE_DATABASES = {'aae_database' => Settings.aae_database,
                       'learn_database' => Settings.learn_database,
                       'create_database' => Settings.create_database,
-                      'www_database' => Settings.www_database}
+                      'www_database' => Settings.www_database,
+                      'wordpress_databases' => [Settings.about_database, Settings.milfam_database]}
 
   after_create  :queue_update
 
@@ -73,6 +74,14 @@ class AccountSync < ActiveRecord::Base
 
   def www_database
     self.connection.execute(www_insert_update_query)
+  end
+
+  def wordpress_databases
+    UPDATE_DATABASES['wordpress_databases'].each do |update_database|
+      self.connection.execute(wordpress_user_replace_query(update_database))
+      self.connection.execute(wordpress_openid_replace_query(update_database))
+      self.connection.execute(wordpress_usermeta_insert_update_query(update_database))
+    end
   end    
 
 
@@ -323,7 +332,62 @@ class AccountSync < ActiveRecord::Base
            updated_at=NOW()
     END_SQL
     query
-  end  
+  end
+
+  def wordpress_user_replace_query(update_database)
+    person = self.person
+    query = <<-END_SQL.gsub(/\s+/, " ").strip
+    REPLACE INTO #{update_database}.wp_users (id,user_login,user_pass,user_email,user_nicename,display_name)
+    SELECT #{person.id},
+           #{ActiveRecord::Base.quote_value(person.idstring)},
+           #{ActiveRecord::Base.quote_value(Settings.create_password_string)},
+           #{quoted_value_or_null(person.email)},
+           #{ActiveRecord::Base.quote_value(person.idstring)},
+           #{ActiveRecord::Base.quote_value(person.fullname)}
+    END_SQL
+    query  
+  end
+
+  def wordpress_openid_replace_query(update_database)
+    person = self.person
+    query = <<-END_SQL.gsub(/\s+/, " ").strip
+    REPLACE INTO #{update_database}.wp_openid_identities (uurl_id,user_id,url)
+    SELECT #{person.id},
+           #{person.id},
+           #{ActiveRecord::Base.quote_value(person.openid_url)}
+    END_SQL
+    query  
+  end
+
+  def wordpress_usermeta_insert_update_query(update_database)
+    person = self.person
+    if(person.retired?)
+      capability_string = PHP.serialize({})
+    elsif(person.is_admin?)
+      capability_string = PHP.serialize({"administrator"=>true})
+    else
+      capability_string = PHP.serialize({"editor"=>true})
+    end      
+
+    # does a row exist? then update, else insert
+    result = self.connection.execute("SELECT * from #{update_database}.wp_usermeta WHERE user_id = #{person.id} and meta_key = 'wp_capabilities'")
+    if(result.first.blank?)
+      query = <<-END_SQL.gsub(/\s+/, " ").strip
+      INSERT INTO #{update_database}.wp_usermeta (user_id,meta_key,meta_value)
+      SELECT #{person.id},
+             'wp_capabilities',
+             #{ActiveRecord::Base.quote_value(capability_string)}
+      END_SQL
+
+    else
+      query = <<-END_SQL.gsub(/\s+/, " ").strip
+      UPDATE #{update_database}.wp_usermeta 
+      SET meta_value = #{ActiveRecord::Base.quote_value(capability_string)}
+      WHERE user_id = #{person.id} AND meta_key = 'wp_capabilities'
+      END_SQL
+    end
+    query
+  end
 
   def value_or_null(value)
     value.blank? ? 'NULL' : value

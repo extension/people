@@ -34,6 +34,8 @@ aae_database: 'use_local_settings'
 learn_database: 'use_local_settings'
 create_database: 'use_local_settings'
 www_database: 'use_local_settings'
+about_database: 'use_local_settings'
+milfam_database: 'use_local_settings'
 sync_accounts: true
 sync_communities: true
 redis_enabled: true

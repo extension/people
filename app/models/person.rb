@@ -512,7 +512,7 @@ class Person < ActiveRecord::Base
   def sync_accounts
     if(Settings.sync_accounts)
       if((self.validaccount? or self.retired?) and !self.is_systems_account?)
-        self.account_syncs.create
+        self.account_syncs.create({sync_on_create: true})
       end
     end
   end

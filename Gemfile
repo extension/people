@@ -102,6 +102,9 @@ gem "garb" # garb for now until it breaks
 # breadcrumbs
 gem "breadcrumbs_on_rails"
 
+# php db munging
+gem "php_serialize"
+
 group :development do
   # require the powder gem
   gem 'powder'
