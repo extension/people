@@ -21,7 +21,7 @@ class CommunityMailer < BaseMailer
     return_email  
   end
 
-  def pending
+  def pending(options = {})
     @community = options[:community]
     @person = options[:person]
     @recipient = options[:recipient]
