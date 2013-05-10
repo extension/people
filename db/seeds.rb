@@ -568,12 +568,13 @@ def transfer_admin_events_to_activities
         end
         next if(!(person = Person.where('idstring = ?',extensionid).first))
         insert_list = []
-        insert_list << (person.id)
+        insert_list << admin_event.user_id
         insert_list << Activity::ADMIN
-        insert_list << (admin_event.event == 3) ? Activity::ENABLE_ACCOUNT : Activity::RETIRE_ACCOUNT
+        insert_list << ((admin_event.event == 3) ? Activity::ENABLE_ACCOUNT : Activity::RETIRE_ACCOUNT)
         insert_list << (reason.nil? ? 'NULL' : ActiveRecord::Base.quote_value(reason))
         insert_list << ActiveRecord::Base.quote_value('local')
         insert_list << ActiveRecord::Base.quote_value(admin_event.ip)
+        insert_list << (person.id)
         insert_list << ActiveRecord::Base.quote_value(admin_event.created_at.to_s(:db))
         if(admin_event.data.is_a?(String))
           additionaldata = {extra: admin_event.data}.to_yaml
@@ -583,7 +584,7 @@ def transfer_admin_events_to_activities
         insert_list << ActiveRecord::Base.quote_value(additionaldata)      
         insert_values << "(#{insert_list.join(',')})"
       end
-      insert_sql = "INSERT INTO #{Activity.table_name} (person_id,activityclass,activitycode,additionalinfo,site,ip_address,created_at,additionaldata) VALUES #{insert_values.join(',')};"
+      insert_sql = "INSERT INTO #{Activity.table_name} (person_id,activityclass,activitycode,additionalinfo,site,ip_address,colleague_id,created_at,additionaldata) VALUES #{insert_values.join(',')};"
       ActiveRecord::Base.connection.execute(insert_sql)        
     end
   end
