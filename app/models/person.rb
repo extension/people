@@ -9,13 +9,14 @@ class Person < ActiveRecord::Base
   include BCrypt
   include CacheTools
   include MarkupScrubber
+  serialize :password_reset
   attr_accessor :password, :current_password, :password_confirmation, :interest_tags
 
   attr_accessible :first_name, :last_name, :email, :title, :phone, :time_zone, :affiliation, :involvement, :biography
   attr_accessible :password, :interest_tags
   attr_accessible :position_id, :position, :location_id, :location, :county_id, :county, :institution_id, :institution
   attr_accessible :invitation, :invitation_id 
-  attr_accessible :last_account_reminder
+  attr_accessible :last_account_reminder, :password_reset
 
   ## constants
   DEFAULT_TIMEZONE = 'America/New_York'
@@ -48,7 +49,7 @@ class Person < ActiveRecord::Base
   before_validation :set_idstring
 
   after_create :create_email_forward
-  after_update :update_email_forward, :sync_accounts
+  after_update :update_email_forward, :sync_accounts, :update_google_account
   after_save :update_email_aliases
 
   ## associations
@@ -244,12 +245,64 @@ class Person < ActiveRecord::Base
     (self.last_activity_at.nil? or self.last_activity_at  < (Time.zone.now - Settings.months_for_inactive_flag.months))
   end 
 
+  def expire_password
+    self.password_hash = nil
+    self.legacy_password = nil
+    self.password_reset = SecureRandom.hex(16)
+    self.save
+  end
+
   def set_hashed_password(options = {})
-    self.password_hash = Password.create(@password)
-    if(options[:save])
-      self.save!
+    if(!@password.blank?)
+      self.password_hash = Password.create(@password)
+      self.password_reset = @password
+      if(options[:save])
+        self.save!
+      end
+    else
+      return false
     end
   end
+
+  def clear_password_reset
+    self.update_column(:password_reset, nil)
+  end
+
+  def password_reset
+    information = read_attribute(:password_reset)
+    if(information.blank? or !information[:iv] or !information[:encrypted_data])
+      return nil
+    end
+
+    sha256 = Digest::SHA2.new(256)
+    aes = OpenSSL::Cipher.new("AES-256-CFB")
+    key = sha256.digest("#{self.password_hash}::#{Settings.session_token}")
+    aes.decrypt
+    aes.key = key
+    aes.iv = information[:iv]
+    decrypted_data_string = aes.update(information[:encrypted_data]) + aes.final
+    decrypted_data = YAML.load(decrypted_data_string)
+    if(!decrypted_data.is_a?(Hash) or !decrypted_data[:password])
+      return nil
+    else
+      return decrypted_data[:password]
+    end
+  end
+
+
+  def password_reset=(clear_password_string)
+    data = {password: Digest::SHA1.hexdigest(clear_password_string)}
+    data_string = data.to_yaml
+    sha256 = Digest::SHA2.new(256)
+    aes = OpenSSL::Cipher.new("AES-256-CFB")
+    iv = rand.to_s
+    key = sha256.digest("#{self.password_hash}::#{Settings.session_token}")
+    aes.encrypt
+    aes.key = key
+    aes.iv = iv
+    encrypted_data = aes.update(data_string) + aes.final
+    write_attribute(:password_reset, {iv: iv, encrypted_data: encrypted_data})
+  end    
 
   # TODO - dump this when or if we can ever let people choose their own idstrings
   def set_idstring(reset=false)
@@ -1080,6 +1133,20 @@ class Person < ActiveRecord::Base
     end # with_scope
   end
 
+  def update_google_account
+    if(self.google_account.blank?)
+      if(self.validaccount?)
+        self.create_google_account
+        self.google_account.queue_account_update
+      end
+    elsif(self.retired?)
+      self.google_account.update_attributes({suspended: true})
+      self.google_account.queue_account_update
+    else
+      self.google_account.update_attributes({suspended: false})
+      self.google_account.queue_account_update
+    end
+  end 
 
 
   private

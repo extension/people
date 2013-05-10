@@ -36,7 +36,7 @@ create_database: 'use_local_settings'
 www_database: 'use_local_settings'
 about_database: 'use_local_settings'
 milfam_database: 'use_local_settings'
-sync_accounts: true
-sync_communities: true
-sync_google: true
+sync_accounts: false
+sync_communities: false
+sync_google: false
 redis_enabled: true

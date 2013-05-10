@@ -231,16 +231,14 @@ ActiveRecord::Schema.define(:version => 20130509151936) do
   add_index "geo_names", ["feature_name", "state_abbreviation", "county"], :name => "name_state_county_ndx"
 
   create_table "google_accounts", :force => true do |t|
-    t.integer  "person_id",        :default => 0,     :null => false
-    t.string   "username",                            :null => false
-    t.boolean  "no_sync_password", :default => false
-    t.string   "password",                            :null => false
-    t.string   "given_name",                          :null => false
-    t.string   "family_name",                         :null => false
-    t.boolean  "is_admin",         :default => false
-    t.boolean  "suspended",        :default => false
+    t.integer  "person_id",       :default => 0,     :null => false
+    t.string   "username",                           :null => false
+    t.string   "given_name",                         :null => false
+    t.string   "family_name",                        :null => false
+    t.boolean  "is_admin",        :default => false
+    t.boolean  "suspended",       :default => false
     t.datetime "apps_updated_at"
-    t.boolean  "has_error",        :default => false
+    t.boolean  "has_error",       :default => false
     t.text     "last_error"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -492,6 +490,7 @@ ActiveRecord::Schema.define(:version => 20130509151936) do
     t.string   "idstring",                 :limit => 80,                    :null => false
     t.string   "password_hash"
     t.string   "legacy_password",          :limit => 40
+    t.text     "password_reset"
     t.string   "first_name"
     t.string   "last_name"
     t.string   "email",                    :limit => 96

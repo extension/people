@@ -106,7 +106,7 @@ end
 
 
 def account_transfer_query
-  reject_columns = ['password_hash','involvement','institution_id','invitation_id','previous_email','reset_token','aae_id','learn_id','biography','last_account_reminder']
+  reject_columns = ['password_hash','involvement','institution_id','invitation_id','previous_email','reset_token','aae_id','learn_id','biography','last_account_reminder','password_reset']
   columns = Person.column_names.reject{|n| reject_columns.include?(n)}
   insert_clause = "#{@my_database}.#{Person.table_name} (#{columns.join(',')})"
   from_clause = "#{@darmok_database}.accounts"
@@ -149,8 +149,21 @@ def profile_public_settings_transfer_query
 end
 
 def google_account_transfer_query
+  columns = GoogleAccount.column_names
+  insert_clause = "#{@my_database}.#{GoogleAccount.table_name} (#{columns.join(',')})"
+  from_clause = "#{@darmok_database}.google_accounts"
+  select_columns = []
+  columns.each do |c|
+    case c
+    when 'person_id'
+      select_columns << "#{from_clause}.user_id"            
+    else
+      select_columns << "#{from_clause}.#{c}"
+    end
+  end
+  select_clause = "#{select_columns.join(',')}"
   query = <<-END_SQL.gsub(/\s+/, " ").strip
-    INSERT INTO #{@my_database}.#{GoogleAccount.table_name} SELECT * FROM #{@darmok_database}.google_accounts
+    INSERT INTO #{insert_clause} SELECT #{select_clause} FROM #{from_clause}
   END_SQL
   query
 end
