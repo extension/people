@@ -10,6 +10,7 @@ include GAppsProvisioning
 class GoogleGroup < ActiveRecord::Base
   attr_accessor :apps_connection
   serialize :last_error
+  attr_accessible :community, :community_id, :group_id, :group_name, :email_permission, :apps_updated_at, :has_error, :last_error
 
   GDATA_ERROR_ENTRYDOESNOTEXIST = 1301
 
@@ -17,15 +18,39 @@ class GoogleGroup < ActiveRecord::Base
   
   belongs_to :community
 
-  scope :needs_apps_update, where("updated_at > apps_updated_at")
-  scope :no_apps_error, where(has_error: false)
-  scope :null_apps_update, where("apps_updated_at IS NULL")
-
   def set_values_from_community
     self.group_id = self.community.shortname
     self.group_name = self.community.name
     self.email_permission = 'Anyone'
     return true
+  end
+
+  def queue_group_update
+    if(Settings.sync_google)
+      if(Settings.redis_enabled)
+        self.delay.update_apps_group
+      else
+        self.update_apps_group
+      end
+    end
+  end
+
+  def queue_members_update
+    if(Settings.sync_google)
+      if(Settings.redis_enabled)
+        self.delay.update_apps_group_members_and_owners
+      else
+        self.update_apps_group_members_and_owners
+      end
+    end
+  end
+
+
+
+  def update_apps_group_members_and_owners
+    if(group = update_apps_group_members)
+      update_apps_group_owners
+    end
   end
   
   def update_apps_group
@@ -54,7 +79,7 @@ class GoogleGroup < ActiveRecord::Base
       end
     end
     
-    self.touch(:apps_updated_at)  
+    self.update_attributes({has_error: false, last_error: nil, apps_updated_at: Time.now.utc})
     # if we made it here, it must have worked
     return google_group
   end
@@ -74,7 +99,7 @@ class GoogleGroup < ActiveRecord::Base
       end
       
       # map the community members to an array of "blah@extension.org"
-      community_members = self.community.joined.map{|u| "#{u.login}@extension.org"}
+      community_members = self.community.joined.map{|person| "#{person.idstring}@extension.org"}
       
       adds = community_members - apps_group_members
       removes = apps_group_members - community_members
@@ -110,7 +135,7 @@ class GoogleGroup < ActiveRecord::Base
     end
     
     # map the community members to an array of "blah@extension.org"
-    community_owners = self.community.leaders.map{|u| "#{u.login}@extension.org"}
+    community_owners = self.community.leaders.map{|person| "#{person.idstring}@extension.org"}
     
     adds = community_owners - apps_group_owners
     removes = apps_group_owners - community_owners

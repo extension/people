@@ -130,12 +130,17 @@ class Community < ActiveRecord::Base
     end
   end  
 
-  def update_google_group
+  def update_google_group(update_members = false)
     if(self.connect_to_google_apps?)
       if(!self.google_group.blank?)
         self.google_group.touch
       else
         self.create_google_group
+      end
+      if(update_members)
+        self.google_group.queue_members_update        
+      else
+        self.google_group.queue_group_update
       end
     else
       # do nothing

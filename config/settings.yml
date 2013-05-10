@@ -38,4 +38,5 @@ about_database: 'use_local_settings'
 milfam_database: 'use_local_settings'
 sync_accounts: true
 sync_communities: true
+sync_google: true
 redis_enabled: true

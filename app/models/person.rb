@@ -766,6 +766,10 @@ class Person < ActiveRecord::Base
     if(Settings.sync_communities)
       CommunityMemberSync.create_with_pending_check({community: community, person: self})
     end
+
+    if(Settings.sync_google and community.connect_to_google_apps? and ['leader','member'].include?(connectiontype))
+      community.update_google_group(true)
+    end
   end
 
   def remove_from_community(community,options={})
@@ -797,6 +801,10 @@ class Person < ActiveRecord::Base
     if(Settings.sync_communities)
       CommunityMemberSync.create_with_pending_check({community: community, person: self})
     end
+
+    if(Settings.sync_google and community.connect_to_google_apps?)
+      community.update_google_group(true)
+    end    
   end
 
 
