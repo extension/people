@@ -17,6 +17,7 @@ class Accounts < ActiveRecord::Migration
       t.datetime "contributor_agreement_at"
       t.integer  "account_status"
       t.datetime "last_activity_at"
+      t.datetime "last_account_reminder"
       t.integer  "position_id", :default => 0
       t.integer  "location_id", :default => 0
       t.integer  "county_id", :default => 0

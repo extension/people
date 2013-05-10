@@ -33,6 +33,7 @@ class Notification < ActiveRecord::Base
   RECONFIRM_SIGNUP                    = 103
   CONFIRM_EMAIL                       = 104
   RECONFIRM_EMAIL                     = 105
+  ACCOUNT_REMINDER                    = 106
 
   # colleague profile
   UPDATE_COLLEAGUE_PROFILE            = 111
@@ -110,6 +111,11 @@ class Notification < ActiveRecord::Base
 
   def welcome
     AccountMailer.welcome({recipient: self.notifiable, notification: self}).deliver
+  end
+
+  def account_reminder
+    AccountMailer.account_reminder({recipient: self.notifiable, notification: self}).deliver
+    self.notifiable.update_column(:last_account_reminder,Time.now.utc)
   end
 
   def update_colleague_profile

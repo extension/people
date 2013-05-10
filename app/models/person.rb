@@ -15,6 +15,7 @@ class Person < ActiveRecord::Base
   attr_accessible :password, :interest_tags
   attr_accessible :position_id, :position, :location_id, :location, :county_id, :county, :institution_id, :institution
   attr_accessible :invitation, :invitation_id 
+  attr_accessible :last_account_reminder
 
   ## constants
   DEFAULT_TIMEZONE = 'America/New_York'
@@ -89,8 +90,8 @@ class Person < ActiveRecord::Base
   scope :pendingreview, where("retired = #{false} and vouched = #{false} and account_status != #{STATUS_SIGNUP} && email_confirmed = #{true}")
   scope :not_system, where("people.id NOT IN(#{SYSTEMS_USERS.join(',')})")
   scope :display_accounts, validaccounts.not_system
-
-
+  scope :inactive, lambda{ where('last_activity_at <= ?',Time.now.utc - 6.months) }
+  scope :reminder_pool, lambda{ inactive.where('(last_account_reminder IS NULL or last_account_reminder <= ?)',Time.now.utc - 6.months) }
 
   
   # duplicated from darmok
@@ -181,6 +182,9 @@ class Person < ActiveRecord::Base
     person
   end
 
+  def send_account_reminder
+    Notification.create(notifiable: self, notification_type: Notification::ACCOUNT_REMINDER)
+  end
 
 
   def is_signup?

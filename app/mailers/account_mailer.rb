@@ -46,6 +46,19 @@ class AccountMailer < BaseMailer
     return_email    
   end
 
+  def account_reminder(options={})
+    @recipient = options[:recipient]
+    @subject = "eXtension: Check out our new services!"
+    @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
+    
+    if(!@recipient.email.blank?)
+      return_email = create_mail(to: @recipient.email, subject: @subject, send_in_demo: false)
+      save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
+    end
+    
+    return_email    
+  end
+
   def invitation(options={})
     @invitation = options[:invitation]
     @subject = "eXtension: You have been invited to join us"
