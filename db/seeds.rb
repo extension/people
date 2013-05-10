@@ -532,20 +532,43 @@ def transfer_user_profile_events_to_activities
     DarmokUserEvent.where("etype = 3").find_in_batches do |group|
       insert_values = []
       group.each do |user_event|
-        next if(user_event.description =~ %r{vouched}) 
-        next if(user_event.description =~ %r{retired}) 
+        case user_event.description.strip
+        when 'signup'
+          activitycode = Activity::SIGNUP
+        when 'requested new password confirmation'
+          activitycode = Activity::PASSWORD_RESET_REQUEST
+        when 'set new password'
+          activitycode = Activity::PASSWORD_RESET
+        when 'interests updated'
+          activitycode = Activity::UPDATE_PROFILE
+        when 'profile updated'
+          activitycode = Activity::UPDATE_PROFILE          
+        when 'email confirmed'
+          activitycode = Activity::CONFIRMED_EMAIL          
+        when 'social networks updated'
+          activitycode = Activity::UPDATE_SOCIAL_NETWORKS                    
+        when 'tags updated'
+          activitycode = Activity::UPDATE_PROFILE                    
+        when 'email address change'
+          activitycode = Activity::EMAIL_CHANGE                    
+        when 'changed password'
+          activitycode = Activity::PASSWORD_CHANGE          
+        else
+          next
+        end
         insert_list = []
         insert_list << (user_event.user_id.nil? ? 'NULL' : user_event.user_id)
         insert_list << Activity::PEOPLE
-        insert_list << Activity::UPDATE_PROFILE
+        insert_list << activitycode
         insert_list << ActiveRecord::Base.quote_value(user_event.description)
         insert_list << ActiveRecord::Base.quote_value(user_event.appname)
         insert_list << ActiveRecord::Base.quote_value(user_event.ip)
+        insert_list << (Activity::PRIVATE_ACTIVITIES.include?(activitycode))
         insert_list << ActiveRecord::Base.quote_value(user_event.created_at.to_s(:db))
         insert_list << ActiveRecord::Base.quote_value(user_event.read_attribute(:additionaldata))      
         insert_values << "(#{insert_list.join(',')})"
       end
-      insert_sql = "INSERT INTO #{Activity.table_name} (person_id,activityclass,activitycode,additionalinfo,site,ip_address,created_at,additionaldata) VALUES #{insert_values.join(',')};"
+      insert_sql = "INSERT INTO #{Activity.table_name} (person_id,activityclass,activitycode,additionalinfo,site,ip_address,is_private,created_at,additionaldata) VALUES #{insert_values.join(',')};"
       ActiveRecord::Base.connection.execute(insert_sql)        
     end
   end
@@ -816,7 +839,7 @@ set_person_institution_column
 
 transform_person_additionaldata_data
 transfer_user_authentication_events_to_activities
-#transfer_user_profile_events_to_activities
+transfer_user_profile_events_to_activities
 transfer_admin_events_to_activities
 transfer_activities_to_activities
 associate_social_networks
