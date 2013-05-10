@@ -27,6 +27,21 @@ class BrowseFilter < ActiveRecord::Base
     browse_filter
   end
 
+  def queue_filedump
+    if(!Settings.redis_enabled)
+      self.dump_to_file
+    else
+      self.class.delay.delayed_dump_to_file(self.id)
+    end
+  end
+
+  def self.delayed_dump_to_file(record_id)
+    if(record = find_by_id(record_id))
+      record.dump_to_file
+    end
+  end
+
+
   def is_all?
     (self.id == 1)
   end

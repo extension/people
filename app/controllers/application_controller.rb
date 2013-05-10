@@ -21,7 +21,7 @@ class ApplicationController < ActionController::Base
 
 
   def update_last_activity
-    current_person.touch(:last_activity_at) if current_person
+    current_person.update_column(:last_activity_at,Time.now.utc) if current_person
   end
 
   def set_time_zone_from_user

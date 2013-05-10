@@ -9,7 +9,7 @@ class Notification < ActiveRecord::Base
   ## attributes
   serialize :additionaldata
   serialize :results
-  attr_accessible :notifiable, :notifiable_type, :notifiable_id, :notification_type, :delivery_time, :additionaldata, :processed, :results
+  attr_accessible :notifiable, :notifiable_type, :notifiable_id, :notification_type, :delivery_time, :additionaldata, :processed, :results, :process_on_create
 
   ## validations
 
@@ -75,8 +75,19 @@ class Notification < ActiveRecord::Base
   end
 
   def queue_notification
-    self.delay_until(self.delivery_time).notify
+    if(Settings.redis_enabled and !self.process_on_create?)
+      self.class.delay_until(self.delivery_time).delayed_notify(self.id)
+    else
+      self.notify
+    end
   end
+
+  def self.delayed_notify(record_id)
+    if(record = find_by_id(record_id))
+      record.notify
+    end
+  end
+
 
   def notify
     method_name = self.class.code_to_constant_string(self.notification_type)

@@ -8,7 +8,7 @@
 class AccountSync < ActiveRecord::Base
   serialize :errors
   attr_accessible :success, :errors
-  attr_accessible :person, :person_id, :processed, :sync_on_create 
+  attr_accessible :person, :person_id, :processed, :process_on_create 
 
   CREATE_ADMIN_ROLE = 3
   UPDATE_DATABASES = {'aae_database' => Settings.aae_database,
@@ -22,10 +22,16 @@ class AccountSync < ActiveRecord::Base
   belongs_to :person
 
   def queue_update
-    if(self.sync_on_create or !Settings.redis_enabled)
+    if(self.process_on_create or !Settings.redis_enabled)
       self.update_accounts
     else
-      self.delay.update_accounts
+      self.class.delay.delayed_update_accounts(self.id)
+    end
+  end
+
+  def self.delayed_update_accounts(record_id)
+    if(record = find_by_id(record_id))
+      record.update_accounts
     end
   end
 
@@ -274,7 +280,7 @@ class AccountSync < ActiveRecord::Base
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{update_database}.users_roles (uid,rid)
     SELECT  #{person.id}, 
-            #{CREATE_ADMIN_ROLE},
+            #{CREATE_ADMIN_ROLE}
     END_SQL
     query
   end

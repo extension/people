@@ -28,7 +28,7 @@ class GoogleGroup < ActiveRecord::Base
   def queue_group_update
     if(Settings.sync_google)
       if(Settings.redis_enabled)
-        self.delay.update_apps_group
+        self.class.delay.delayed_update_apps_group(self.id)
       else
         self.update_apps_group
       end
@@ -38,13 +38,18 @@ class GoogleGroup < ActiveRecord::Base
   def queue_members_update
     if(Settings.sync_google)
       if(Settings.redis_enabled)
-        self.delay.update_apps_group_members_and_owners
+        self.class.delay.delayed_update_apps_group_members_and_owners(self.id)
       else
         self.update_apps_group_members_and_owners
       end
     end
   end
 
+  def self.delayed_update_apps_group(record_id)
+    if(record = find_by_id(record_id))
+      record.update_apps_group
+    end
+  end
 
 
   def update_apps_group_members_and_owners
@@ -53,6 +58,13 @@ class GoogleGroup < ActiveRecord::Base
     end
   end
   
+  def self.delayed_update_apps_group_members_and_owners(record_id)
+    if(record = find_by_id(record_id))
+      record.update_apps_group_members_and_owners
+    end
+  end
+
+
   def update_apps_group
     self.establish_apps_connection
     

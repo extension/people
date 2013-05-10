@@ -8,7 +8,7 @@
 class CommunityMemberSync < ActiveRecord::Base
   serialize :errors
   attr_accessible :success, :errors
-  attr_accessible :community, :community_id, :person, :person_id, :processed, :sync_on_create
+  attr_accessible :community, :community_id, :person, :person_id, :processed, :process_on_create
 
   UPDATE_DATABASES = {'create_database' => Settings.create_database}
 
@@ -25,12 +25,18 @@ class CommunityMemberSync < ActiveRecord::Base
   end
 
   def queue_update
-    if(self.sync_on_create? or !Settings.redis_enabled)
+    if(self.process_on_create? or !Settings.redis_enabled)
       self.update_community_members
     else
-      self.delay.update_community_members
+      self.class.delay.delayed_update_community_members(self.id)
     end
   end
+
+  def self.delayed_update_community_members(record_id)
+    if(record = find_by_id(record_id))
+      record.update_community_members
+    end
+  end  
 
   def update_community_members
     if(!self.processed?)

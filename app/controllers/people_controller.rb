@@ -81,7 +81,7 @@ class PeopleController < ApplicationController
           return redirect_to(browse_people_url(filter: @browse_filter.id))
         elsif(!@browse_filter.dumpfile_updated?)
           @browse_filter.add_to_notifylist(current_person)
-          @browse_filter.delay.dump_to_file
+          @browse_filter.queue_filedump
           flash[:notice] = 'This csv file is out of date. We will send you a notification when it is available'
           return redirect_to(browse_people_url(filter: @browse_filter.id))
         else
