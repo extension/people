@@ -5,8 +5,11 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
-class LearnLearner < ActiveRecord::Base
+class LearnVersion < ActiveRecord::Base
   # connects to the learn database
   self.establish_connection :learn
-  self.table_name='learners'
+  self.table_name='versions'
+
+  belongs_to :learner, class_name: 'LearnLearner', foreign_key: 'whodunnit'
+
 end

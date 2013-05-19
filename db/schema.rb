@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130509151936) do
+ActiveRecord::Schema.define(:version => 20130519154106) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -204,6 +204,16 @@ ActiveRecord::Schema.define(:version => 20130509151936) do
 
   add_index "email_aliases", ["aliasable_type", "aliasable_id", "alias_type"], :name => "alisable_ndx"
   add_index "email_aliases", ["mail_alias", "destination", "disabled"], :name => "postfix_select_ndx"
+
+  create_table "event_activities", :force => true do |t|
+    t.integer  "event_id"
+    t.integer  "person_id"
+    t.integer  "item_id"
+    t.string   "activity_category", :limit => 25
+    t.datetime "created_at"
+  end
+
+  add_index "event_activities", ["person_id", "event_id", "item_id", "activity_category", "created_at"], :name => "person_activity_ndx"
 
   create_table "geo_names", :force => true do |t|
     t.string  "feature_name",       :limit => 121
