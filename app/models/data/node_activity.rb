@@ -196,27 +196,28 @@ class NodeActivity < ActiveRecord::Base
     list.uniq.map{|contribution| self.event_to_s(contribution.to_i)}.join(', ')
   end
 
+  def self.maximum_data_date 
+    self.maximum(:created_at).to_date
+  end  
+
   def self.periodic_activity_by_person_id(options = {})
     returndata = {}
     months = options[:months]
     end_date = options[:end_date]
-    maxdate = self.maximum(:created_at).to_date
-    if(maxdate < end_date)
-      end_date = maxdate
-    end
     start_date = end_date - months.months
     persons = self.where("DATE(created_at) >= ?",start_date).where('person_id > 1').pluck('person_id').uniq
     returndata['months'] = months
     returndata['start_date'] = start_date
     returndata['end_date'] = end_date
-    returndata['persons'] = persons.size
+    returndata['people_count'] = persons.size
+    returndata['people'] = {}
     persons.each do |person_id|
-      returndata[person_id] ||= {}
+      returndata['people'][person_id] ||= {}
       base_scope = self.where("DATE(created_at) >= ?",start_date).where('person_id = ?',person_id)
-      returndata[person_id]['dates'] = base_scope.pluck('DATE(created_at)').uniq
-      returndata[person_id]['days'] = returndata[person_id]['dates'].size
-      returndata[person_id]['items'] = base_scope.count('DISTINCT(node_id)')
-      returndata[person_id]['actions'] = base_scope.count('id')
+      returndata['people'][person_id]['dates'] = base_scope.pluck('DATE(created_at)').uniq
+      returndata['people'][person_id]['days'] = returndata['people'][person_id]['dates'].size
+      returndata['people'][person_id]['items'] = base_scope.count('DISTINCT(node_id)')
+      returndata['people'][person_id]['actions'] = base_scope.count('id')
     end
     returndata
   end

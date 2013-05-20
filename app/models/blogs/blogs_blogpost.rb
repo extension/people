@@ -13,7 +13,7 @@ class BlogsBlogpost < ActiveRecord::Base
 
   belongs_to :blogs_user, foreign_key: 'post_author'
 
-  scope :activity_entries, lambda{where("post_type IN ('post','page','revision')")}
+  scope :activity_entries, lambda{where("post_type IN ('post','page','revision')").where("post_status != 'future'")}
 
 
   def self.repoint(blog_id)

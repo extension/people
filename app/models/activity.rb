@@ -369,4 +369,31 @@ class Activity < ActiveRecord::Base
 
   end
 
+
+  def self.periodic_activity_by_person_id(options = {})
+    returndata = {}
+    months = options[:months]
+    end_date = options[:end_date]
+    maxdate = self.maximum(:created_at).to_date
+    if(maxdate < end_date)
+      end_date = maxdate
+    end
+    start_date = end_date - months.months
+    persons = self.where("DATE(created_at) >= ?",start_date).where('person_id > 1').pluck('person_id').uniq
+    returndata['months'] = months
+    returndata['start_date'] = start_date
+    returndata['end_date'] = end_date
+    returndata['persons'] = persons.size
+    persons.each do |person_id|
+      returndata[person_id] ||= {}
+      base_scope = self.where("DATE(created_at) >= ?",start_date).where('person_id = ?',person_id)
+      returndata[person_id]['dates'] = base_scope.pluck('DATE(created_at)').uniq
+      returndata[person_id]['days'] = returndata[person_id]['dates'].size
+      returndata[person_id]['items'] = base_scope.count('DISTINCT(activitycode)')
+      returndata[person_id]['actions'] = base_scope.count('id')
+    end
+    returndata
+  end
+
+
 end
