@@ -617,7 +617,7 @@ end
 def transfer_activities_to_activities
   print "Transferring activities to activity log..."
   benchmark = Benchmark.measure do
-    DarmokActivity.where("activitycode NOT IN (105,103,106,107,301,302,303,304,305,306,307,308,403)").find_in_batches do |group|
+    DarmokActivity.where("activitycode NOT IN (105,103,106,107,208,209,301,302,303,304,305,306,307,308,403)").find_in_batches do |group|
       insert_values = []
       group.each do |activity|
         insert_list = []
@@ -625,7 +625,7 @@ def transfer_activities_to_activities
         if(!activity.community_id.nil?)
           next if(!(community = Community.find_by_id(activity.community_id)))
         end
-        if(activity.activitycode.between?(200,500) and ![208,209].include?(activity.activitycode))
+        if(activity.activitycode.between?(200,500))
           # community activity
           if(activity.activitycode == 102)
             insert_list << (activity.user_id)
