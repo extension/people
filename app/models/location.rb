@@ -34,5 +34,17 @@ class Location < ActiveRecord::Base
         nil
       end
     end
-  end  
+  end
+
+
+  # the spec says leading 0 is required
+  # but the R maps package leaves it as numeric, so I'm doing that
+  def fips(make_integer = true)
+    if(make_integer)
+      fipsid
+    else
+      "%02d" % fipsid
+    end
+  end
+
 end

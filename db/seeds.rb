@@ -822,7 +822,6 @@ announce_and_run_query('Transferring community email aliases',community_email_al
   'page_totals',
   'pages',
   'question_activities',
-  'questions',
   'revisions',
   'tags',
   'update_times'].each do |table_name|

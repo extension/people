@@ -2,11 +2,13 @@ class AddAaeQuestionSummary < ActiveRecord::Migration
   def change
 
     create_table "questions", :force => true do |t|
+      t.string  :ip_address
       t.integer :detected_location_id
       t.integer :detected_county_id
       t.integer :location_id
       t.integer :county_id
-      t.integer :detected_county_id
+      t.integer :original_location_id
+      t.integer :original_county_id      
       t.integer :original_group_id
       t.string  :original_group_name
       t.integer :assigned_group_id

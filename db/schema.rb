@@ -616,10 +616,13 @@ ActiveRecord::Schema.define(:version => 20130520142628) do
   add_index "question_assignments", ["question_id"], :name => "question_ndx"
 
   create_table "questions", :force => true do |t|
+    t.string   "ip_address"
     t.integer  "detected_location_id"
     t.integer  "detected_county_id"
     t.integer  "location_id"
     t.integer  "county_id"
+    t.integer  "original_location_id"
+    t.integer  "original_county_id"
     t.integer  "original_group_id"
     t.string   "original_group_name"
     t.integer  "assigned_group_id"
