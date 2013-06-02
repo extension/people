@@ -325,6 +325,18 @@ def data_transfer_query(table_name)
   query
 end
 
+def questions_data_transfer_query
+  columns = Question.column_names
+  insert_clause = "#{@my_database}.#{Question.table_name} (#{columns.join(',')})"
+  from_clause = "#{@data_database}.questions"
+  select_clause = "#{columns.join(',')}"
+  query = <<-END_SQL.gsub(/\s+/, " ").strip
+    INSERT INTO #{insert_clause} SELECT #{select_clause} FROM #{from_clause}
+  END_SQL
+  query
+end
+
+
 def set_person_institution_column
   print "Setting person's institution column..."
   benchmark = Benchmark.measure do
@@ -827,6 +839,10 @@ announce_and_run_query('Transferring community email aliases',community_email_al
   'update_times'].each do |table_name|
   announce_and_run_query("Transferring #{table_name} data",data_transfer_query(table_name))
 end
+
+# column names are in a different order, hence this
+announce_and_run_query("Transferring summarized question data",questions_data_transfer_query)
+
 
 # data manipulation
 transfer_retired_account_data

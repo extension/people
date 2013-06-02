@@ -29,6 +29,8 @@ class AddAaeQuestionSummary < ActiveRecord::Migration
       t.float :initial_response_time
       t.float :mean_response_time
       t.float :median_response_time
+      t.boolean :demographic_eligible
+      t.boolean :evaluation_eligible
       t.text  :tags
     end
 
