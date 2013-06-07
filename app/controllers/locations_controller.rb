@@ -6,7 +6,7 @@
 #  see LICENSE file
 
 class LocationsController < ApplicationController
-  skip_before_filter :signin_required
+  skip_before_filter :signin_required, :check_hold_status
 
 
   def counties
