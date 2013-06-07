@@ -12,6 +12,13 @@ People::Application.routes.draw do
   constraints(DataSubdomain) do
     match '/' => 'data_home#index', as: 'data_root'
 
+    resources :aae, :only => [:index] do 
+      collection do
+        get :demographics
+        get :evaluations
+      end
+    end  
+  
     resources :pages, :only => [:index, :show] do
       member do
         get :traffic_chart
