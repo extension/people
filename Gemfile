@@ -83,7 +83,7 @@ gem "csspool"
 gem "inline-style", "0.5.2ex"
 
 # tokens and such
-gem 'hashids', "0.0.4ex"
+gem 'hashids'
 
 # html scrubbing
 gem "loofah"
