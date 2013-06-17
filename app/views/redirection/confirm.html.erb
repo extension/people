@@ -1,0 +1,13 @@
+<%- @page_title = "eXtension Email Confirmation" -%>
+
+<div class="well">
+
+<h2>We've Changed!</h2>
+
+<p>We're so sorry, we've made some changes in the last few days that changed how our links work for email confirmation, and that link you've clicked is no longer valid.</p>
+
+<p>Fixing this is very easy! Just have us <%= link_to("send you another confirmation email", accounts_resend_confirmation_path) %> using our new links.</p>
+
+<p>And if that doesn't work - please <%= link_to("contact us", help_path) %> for more information.</p>
+
+</div>

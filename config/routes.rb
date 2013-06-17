@@ -90,6 +90,21 @@ People::Application.routes.draw do
   
   root :to => 'home#index'
 
+  # straight up redirects
+  match "invite/:token", to: redirect("/signup/%{token}")
+  match "colleagues/showuser/:idstring", to: redirect("/people/%{idstring}")
+
+
+  controller :redirection do
+    match "profile/me", action: 'my_profile', via: [:get]
+    match "accounts/change_password", action: 'password', via: [:get]
+    match "sp/:token", action: "reset", via: [:get]
+    match "account/set_password", action: "reset", via: [:get]
+    match "account/new_password", action: "reset", via: [:get]
+    match "signup/confirm", action: "confirm", via: [:get]
+    match "signup/confirmemail", action: "confirm", via: [:get]
+  end
+
   controller :accounts do
     # non accounts/blah paths
     match "signin", action: "signin", via: [:get,:post]
@@ -98,7 +113,7 @@ People::Application.routes.draw do
     match "signup/:invite", action: "signup", via: [:get], as: "invited_signup"
     match "confirm/:token", action: "confirm", via: [:get,:post], as: "confirm_account"
 
-    match "sp/:token", action: "set_password", via: [:get], as: "set_password"
+    match "reset/:token", action: "set_password", via: [:get], as: "set_password"
 
     # everything else
     simple_named_route 'create', via: [:post]
@@ -111,7 +126,9 @@ People::Application.routes.draw do
     simple_named_route 'pending_confirmation'
     simple_named_route 'resend_confirmation'
     simple_named_route 'set_password', via: [:post]
-  end    
+  end
+
+
 
   resources :people, only: [:index, :show, :edit, :update] do
     member do
