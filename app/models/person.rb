@@ -23,7 +23,7 @@ class Person < ActiveRecord::Base
   SYSTEMS_USERS = [1,2,3,4,5,6,7,8]
 
   # account status
-  STATUS_CONTRIBUTOR = 0
+  STATUS_CONTRIBUTOR = 42
   STATUS_REVIEW = 1
   STATUS_CONFIRM_EMAIL = 2
   STATUS_REVIEWAGREEMENT = 3
