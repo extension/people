@@ -141,6 +141,11 @@ def account_transfer_query
   account_transfer_query
 end
 
+def account_status_change
+  "UPDATE #{@my_database}.#{Person.table_name} SET account_status = #{Person::STATUS_CONTRIBUTOR} WHERE account_status = 0"
+end
+
+
 def profile_public_settings_transfer_query
   query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{@my_database}.#{ProfilePublicSetting.table_name} SELECT * FROM #{@darmok_database}.privacy_settings
@@ -806,6 +811,7 @@ end
 
 # seed queries
 announce_and_run_query('Transferring accounts',account_transfer_query)
+announce_and_run_query('Resetting Account Status',account_status_change)
 announce_and_run_query('Transferring google accounts',google_account_transfer_query)
 announce_and_run_query('Transferring profile privacy settings',profile_public_settings_transfer_query)
 announce_and_run_query('Transferring counties',county_transfer_query)
