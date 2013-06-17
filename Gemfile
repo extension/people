@@ -4,7 +4,7 @@ source 'http://systems.extension.org/rubygems/'
 gem 'rails', '3.2.13'
 
 # all things xml
-gem 'nokogiri'
+gem 'nokogiri', '1.5.10'
 
 # data
 gem 'mysql2'
