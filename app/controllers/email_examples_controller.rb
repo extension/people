@@ -6,15 +6,107 @@
 
 class EmailExamplesController < ApplicationController
 
+  def index
+  end
+
   def signup
-    mail_message = AccountMailer.signup(person: Person.system_account, cache_email: false)
+    mail_message = AccountMailer.signup(recipient: Person.system_account, cache_email: false)
     return render_mail(mail_message)
   end
 
   def welcome
-    mail_message = AccountMailer.welcome(person: Person.system_account, cache_email: false)
+    mail_message = AccountMailer.welcome(recipient: Person.system_account, cache_email: false)
     return render_mail(mail_message)
   end
+
+  def confirm
+    mail_message = AccountMailer.confirm(recipient: Person.system_account, cache_email: false)
+    return render_mail(mail_message)
+  end
+
+
+  def account_reminder(options={})
+    mail_message = AccountMailer.account_reminder(recipient: Person.system_account, cache_email: false)
+    return render_mail(mail_message)
+  end
+
+  def password_reset_request(options = {})
+    mail_message = AccountMailer.password_reset_request(recipient: Person.system_account, cache_email: false)
+    return render_mail(mail_message)
+  end
+
+  def password_reset(options = {})
+    mail_message = AccountMailer.password_reset(recipient: Person.system_account, cache_email: false)
+    return render_mail(mail_message)
+  end
+
+  # def colleague_download_available(options = {})
+  #   @browse_filter = options[:browse_filter]
+  #   @recipient = options[:recipient]
+  #   @subject = "eXtension: Your download is now available"
+  #   @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
+    
+  #   if(!@recipient.email.blank?)
+  #     return_email = create_mail(to: @recipient.email, subject: @subject, send_in_demo: true)
+  #     save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
+  #   end
+    
+  #   return_email   
+  # end
+
+
+  # def invitation(options={})
+  #   @invitation = options[:invitation]
+  #   @subject = "eXtension: You have been invited to join us"
+  #   @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
+    
+  #   if(!@invitation.email.blank?)
+  #     mail_options = {to: @invitation.email, subject: @subject}
+  #     mail_options[:cc] = @invitation.person.email if !@invitation.person.email.blank?     
+  #     return_email = create_mail(mail_options)
+  #     save_sent_email_for_recipient(return_email,@invitation.email,options) if @save_sent_email
+  #   end
+    
+  #   return_email    
+  # end
+
+  # def invitation_accepted(options={})
+  #   @invitation = options[:invitation]
+  #   @subject = "eXtension: Your invitation to eXtension has been accepted"
+  #   @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
+    
+  #   if(!@invitation.person.email.blank?)
+  #     mail_options = {to: @invitation.person.email, subject: @subject}
+  #     mail_options[:cc] = @invitation.colleague.email if (@invitation.colleague && !@invitation.colleague.email.blank?)
+  #     return_email = create_mail(mail_options)
+  #     save_sent_email_for_recipient(return_email,@invitation.email,options) if @save_sent_email
+  #   end
+    
+  #   return_email    
+  # end  
+
+  # def profile_update(options={})
+  #   @bycolleague = options[:colleague]
+  #   @recipient = options[:recipient]
+  #   @what_changed = options[:what_changed]
+  #   @subject = "eXtension: Your profile was updated by a colleague"
+  #   @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
+    
+  #   if(!@recipient.email.blank?)
+  #     mail_options = {to: @recipient.email, subject: @subject}
+  #     mail_options[:cc] = @bycolleague.email if !@bycolleague.email.blank?     
+  #     return_email = create_mail(mail_options)
+  #     save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
+  #   end
+    
+  #   return_email    
+  # end
+
+
+
+
+
+
   
   private
   
