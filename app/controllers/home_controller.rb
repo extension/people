@@ -6,7 +6,10 @@
 #  see LICENSE file
 
 class HomeController < ApplicationController
-  skip_before_filter :check_hold_status, only: [:pending]
+  skip_before_filter :signin_required, only: [:help]
+  skip_before_filter :check_hold_status, only: [:pending, :help]
+  before_filter :signin_optional, only: [:help]
+
   before_filter :set_tab
 
   def index
