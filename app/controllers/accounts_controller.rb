@@ -38,6 +38,11 @@ class AccountsController < ApplicationController
         redirect_to(root_url)
       end
     end
+
+    # html only
+    respond_to do |format|
+      format.html 
+    end    
   end
 
   def reset_password
