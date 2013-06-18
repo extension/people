@@ -39,10 +39,6 @@ class AccountsController < ApplicationController
       end
     end
 
-    # html only
-    respond_to do |format|
-      format.html 
-    end    
   end
 
   def reset_password
