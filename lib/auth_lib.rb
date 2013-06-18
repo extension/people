@@ -122,7 +122,7 @@ module AuthLib
       types_string += "<Type>#{type}</Type>\n"
     end
 
-    yadis = <<-END
+    yadis = <<-END.strip_heredoc
     <?xml version="1.0" encoding="UTF-8"?>
     <xrds:XRDS
         xmlns:xrds="xri://$xrds"
