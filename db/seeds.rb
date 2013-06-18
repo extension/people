@@ -96,7 +96,7 @@ class DarmokTagging < ActiveRecord::Base
   self.set_table_name 'taggings'
 end
 
-class DarmokTags < ActiveRecord::Base
+class DarmokTag < ActiveRecord::Base
   base_config = ActiveRecord::Base.connection.instance_variable_get("@config").dup
   base_config[:database] = 'prod_darmok'
   establish_connection(base_config)
@@ -321,26 +321,6 @@ def community_email_alias_query
   transfer_query = "INSERT INTO #{insert_clause} SELECT #{select_clause} FROM #{from_clause} WHERE #{where_clause}"
   transfer_query
 end
-
-
-def data_transfer_query(table_name)
-  query = <<-END_SQL.gsub(/\s+/, " ").strip
-    INSERT INTO #{@my_database}.#{table_name} SELECT * FROM #{@data_database}.#{table_name}
-  END_SQL
-  query
-end
-
-def questions_data_transfer_query
-  columns = Question.column_names
-  insert_clause = "#{@my_database}.#{Question.table_name} (#{columns.join(',')})"
-  from_clause = "#{@data_database}.questions"
-  select_clause = "#{columns.join(',')}"
-  query = <<-END_SQL.gsub(/\s+/, " ").strip
-    INSERT INTO #{insert_clause} SELECT #{select_clause} FROM #{from_clause}
-  END_SQL
-  query
-end
-
 
 def set_person_institution_column
   print "Setting person's institution column..."
@@ -823,31 +803,6 @@ announce_and_run_query('Transferring lists',lists_transfer_query)
 announce_and_run_query('Transferring social network connections',social_network_transfer_query)
 announce_and_run_query('Transferring individual email aliases',individual_email_alias_query)
 announce_and_run_query('Transferring community email aliases',community_email_alias_query)
-
-# data transfers
-['geo_names',
-  'downloads',
-  'rebuilds',
-  'collected_page_stats',
-  'landing_stats',
-  'node_activities',
-  'node_groups',
-  'node_metacontributions',
-  'node_totals',
-  'nodes',
-  'page_stats',
-  'page_taggings',
-  'page_totals',
-  'pages',
-  'question_activities',
-  'revisions',
-  'tags',
-  'update_times'].each do |table_name|
-  announce_and_run_query("Transferring #{table_name} data",data_transfer_query(table_name))
-end
-
-# column names are in a different order, hence this
-announce_and_run_query("Transferring summarized question data",questions_data_transfer_query)
 
 
 # data manipulation
