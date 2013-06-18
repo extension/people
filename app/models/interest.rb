@@ -4,8 +4,6 @@
 # === LICENSE:
 #  BSD(-compatible)
 #  see LICENSE file
-require 'gappsprovisioning/provisioningapi'
-include GAppsProvisioning
 
 class Interest < ActiveRecord::Base
   attr_accessible :name
