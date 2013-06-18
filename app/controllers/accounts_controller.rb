@@ -39,6 +39,8 @@ class AccountsController < ApplicationController
       end
     end
 
+    render(template: 'accounts/signin', formats: [:html])
+
   end
 
   def reset_password

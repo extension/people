@@ -101,13 +101,13 @@ module AuthLib
 
   def access_denied
     # check for xrds request
-    if(request.env['HTTP_ACCEPT'] and request.env['HTTP_ACCEPT'].include?('application/xrds+xml'))
-      openid_xrds_header
-      return xrds_for_identity_provider
-    else
+    # if(request.env['HTTP_ACCEPT'] and request.env['HTTP_ACCEPT'].include?('application/xrds+xml'))
+    #   openid_xrds_header
+    #   return xrds_for_identity_provider
+    # else
       openid_xrds_header
       return redirect_to(signin_url)
-    end
+    # end
   end
 
   def access_notice
