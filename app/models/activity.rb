@@ -138,7 +138,7 @@ class Activity < ActiveRecord::Base
   def check_privacy_flag
     if(PRIVATE_ACTIVITIES.include?(self.activitycode))
       self.is_private = true
-    elsif(self.activitycode == AUTH_REMOTE_SUCCESS and !(self.site =~ %{\.extension\.org}))
+    elsif(self.activitycode == AUTH_REMOTE_SUCCESS and !(self.site =~ %r{\.extension\.org}))
       self.is_private = true
     end      
   end

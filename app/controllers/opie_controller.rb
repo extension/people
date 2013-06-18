@@ -74,7 +74,7 @@ class OpieController < ApplicationController
         end
         # add the sreg response if requested
         add_sreg(opierequest, response)
-        Activity.log_remote_auth_success(person_id: current_person.id, site: opierequest.trust_root.unparsed, ip_address: request.remote_ip)
+        Activity.log_remote_auth_success(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip)
       elsif opierequest.immediate
         response = opierequest.answer(false, server_url)
       else
@@ -192,7 +192,7 @@ class OpieController < ApplicationController
         response = opierequest.answer(true)
       end
       add_sreg(opierequest, response)
-      Activity.log_remote_auth_success(person_id: current_person.id, site: opierequest.trust_root.unparsed, ip_address: request.remote_ip)
+      Activity.log_remote_auth_success(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip)
       session[:last_opierequest] = nil
       return render_response(response)
     end
