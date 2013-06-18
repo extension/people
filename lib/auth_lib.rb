@@ -106,7 +106,7 @@ module AuthLib
     else
       openid_xrds_header
       return redirect_to(signin_url)
-    # end
+    end
   end
 
   def access_notice
