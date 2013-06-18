@@ -184,9 +184,9 @@ class OpieController < ApplicationController
       server_url = url_for(:action => 'index', :protocol => 'https://')
       if(opierequest.id_select)
         if(opierequest.message.is_openid1)
-          response = opierequest.answer(true,server_url,current_person.openid_url(true))
+          response = opierequest.answer(true,server_url,current_person.openid_url)
         else
-          response = opierequest.answer(true,nil,current_person.openid_url,current_person.openid_url(true))
+          response = opierequest.answer(true,nil,current_person.openid_url,current_person.openid_url)
         end
       else
         response = opierequest.answer(true)
