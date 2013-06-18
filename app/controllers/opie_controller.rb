@@ -144,20 +144,19 @@ class OpieController < ApplicationController
       types_string += "<Type>#{type}</Type>\n"
     end
 
-    yadis = <<-END.strip_heredoc
-    <?xml version="1.0" encoding="UTF-8"?>
-    <xrds:XRDS
-        xmlns:xrds="xri://$xrds"
-        xmlns="xri://$xrd*($v*2.0)">
-      <XRD>
-        <Service priority="1">
-          #{types_string}
-          <URI>#{url_for(:controller => 'opie',:protocol => proto)}</URI>
-          <LocalID>#{@person.openid_url}</LocalID>
-        </Service>
-      </XRD>
-    </xrds:XRDS>
+    yadis = <<-END
+<?xml version="1.0" encoding="UTF-8"?>
+<xrds:XRDS xmlns:xrds="xri://$xrds" xmlns="xri://$xrd*($v*2.0)">
+  <XRD>
+    <Service priority="1">
+      #{types_string}
+      <URI>#{url_for(:controller => 'opie',:protocol => proto)}</URI>
+      <LocalID>#{@person.openid_url}</LocalID>
+    </Service>
+  </XRD>
+</xrds:XRDS>
     END
+
     render(:text => yadis, :content_type => 'application/xrds+xml')    
   end
 
