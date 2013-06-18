@@ -14,6 +14,7 @@ People::Application.routes.draw do
 
   # straight up redirects
   match "invite/:token", to: redirect("/signup/%{token}")
+  match "/colleagues", to: redirect("/people")
   match "colleagues/showuser/:idstring", to: redirect("/people/%{idstring}")
 
 
