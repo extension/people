@@ -153,7 +153,7 @@ People::Application.routes.draw do
 
 
   # openid related routing
-  match 'opie', to: 'opie#index'
+  match 'opie', to: 'opie#index', via: [:get,:post]
   match 'openid/xrds', to: 'opie#idp_xrds'
   match 'opie/delegate/:extensionid', to: 'opie#delegate'
   match 'opie/:action', to: 'opie'
