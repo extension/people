@@ -25,7 +25,7 @@ class AccountsController < ApplicationController
           set_current_person(person)
           flash[:success] = "Login successful"
           Activity.log_local_auth_success(person_id: person.id, authname: params[:email], ip_address: request.remote_ip)
-          redirect_back_or_default(root_url)
+          return redirect_back_or_default(root_url)
         rescue AuthenticationError => ae
           flash.now[:failure] = explain_auth_result(ae.error_code.to_i)
           Activity.log_local_auth_failure(person_id: ae.person_id, authname: params[:email], ip_address: request.remote_ip, fail_code: ae.error_code)
@@ -35,7 +35,7 @@ class AccountsController < ApplicationController
       end
     else
       if(!current_person.nil?)
-        redirect_to(root_url)
+        return redirect_to(root_url)
       end
     end
 
