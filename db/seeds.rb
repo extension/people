@@ -1,9 +1,7 @@
 # global settings
 
 @my_database = ActiveRecord::Base.connection.instance_variable_get("@config")[:database]
-@darmok_database = 'prod_darmok'
-@data_database = 'prod_data'
-
+@darmok_database = Settings.www_database
 
 
 ## utility methods
@@ -28,7 +26,7 @@ end
 
 class DarmokAccount < ActiveRecord::Base
   base_config = ActiveRecord::Base.connection.instance_variable_get("@config").dup
-  base_config[:database] = 'prod_darmok'
+  base_config[:database] = Settings.www_database
   establish_connection(base_config)
   self.set_table_name 'accounts'
   self.inheritance_column = "inheritance_type"
@@ -38,7 +36,7 @@ end
 
 class DarmokUserEvent < ActiveRecord::Base
   base_config = ActiveRecord::Base.connection.instance_variable_get("@config").dup
-  base_config[:database] = 'prod_darmok'
+  base_config[:database] = Settings.www_database
   establish_connection(base_config)
   self.set_table_name 'user_events'
   serialize :additionaldata
@@ -53,7 +51,7 @@ end
 
 class DarmokAdminEvent< ActiveRecord::Base
   base_config = ActiveRecord::Base.connection.instance_variable_get("@config").dup
-  base_config[:database] = 'prod_darmok'
+  base_config[:database] = Settings.www_database
   establish_connection(base_config)
   self.set_table_name 'admin_events'
   serialize :data
@@ -61,7 +59,7 @@ end
 
 class DarmokActivity < ActiveRecord::Base
   base_config = ActiveRecord::Base.connection.instance_variable_get("@config").dup
-  base_config[:database] = 'prod_darmok'
+  base_config[:database] = Settings.www_database
   establish_connection(base_config)
   self.set_table_name 'activities'
   serialize :additionaldata
@@ -69,7 +67,7 @@ end
 
 class DarmokCommunityConnection < ActiveRecord::Base
   base_config = ActiveRecord::Base.connection.instance_variable_get("@config").dup
-  base_config[:database] = 'prod_darmok'
+  base_config[:database] = Settings.www_database
   establish_connection(base_config)
   self.set_table_name 'communityconnections'
 
@@ -80,7 +78,7 @@ end
 
 class DarmokInvitation < ActiveRecord::Base
   base_config = ActiveRecord::Base.connection.instance_variable_get("@config").dup
-  base_config[:database] = 'prod_darmok'
+  base_config[:database] = Settings.www_database
   establish_connection(base_config)
   self.set_table_name 'invitations'
   serialize :additionaldata
@@ -91,14 +89,14 @@ end
 
 class DarmokTagging < ActiveRecord::Base
   base_config = ActiveRecord::Base.connection.instance_variable_get("@config").dup
-  base_config[:database] = 'prod_darmok'
+  base_config[:database] = Settings.www_database
   establish_connection(base_config)
   self.set_table_name 'taggings'
 end
 
 class DarmokTag < ActiveRecord::Base
   base_config = ActiveRecord::Base.connection.instance_variable_get("@config").dup
-  base_config[:database] = 'prod_darmok'
+  base_config[:database] = Settings.www_database
   establish_connection(base_config)
   self.set_table_name 'tags'
 end
