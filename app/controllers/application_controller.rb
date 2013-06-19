@@ -7,7 +7,6 @@
 
 class ApplicationController < ActionController::Base
   include AuthLib
-  require_dependency 'year_week_stats'
 
   protect_from_forgery
   has_mobile_fu false
