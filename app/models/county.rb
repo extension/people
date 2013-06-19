@@ -6,8 +6,6 @@
 #  see LICENSE file
 
 class County < ActiveRecord::Base
-  include CacheTools
-
   has_many :people
   belongs_to :location
 

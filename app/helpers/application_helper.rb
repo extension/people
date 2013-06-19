@@ -5,7 +5,7 @@
 # see LICENSE file
 module ApplicationHelper
 
-    def twitter_alert_class(type)
+  def twitter_alert_class(type)
     baseclass = "alert"
     case type
     when :alert
@@ -56,6 +56,18 @@ module ApplicationHelper
       "<li class='active'>#{link_to(tabtext,whereto)}</li>".html_safe
     else
       "<li>#{link_to(tabtext,whereto)}</li>".html_safe
+    end
+  end
+
+  # code from: https://github.com/ripienaar/mysql-dump-split
+  def humanize_bytes(bytes,defaultstring='')
+    if(!bytes.nil? and bytes != 0)
+      units = %w{B KB MB GB TB}
+      e = (Math.log(bytes)/Math.log(1024)).floor
+      s = "%.1f"%(bytes.to_f/1024**e)
+      s.sub(/\.?0*$/,units[e])
+    else
+      defaultstring
     end
   end
 

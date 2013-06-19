@@ -6,8 +6,6 @@
 #  see LICENSE file
 
 class Location < ActiveRecord::Base
-  include CacheTools
-
 
   UNKNOWN = 0
   STATE = 1

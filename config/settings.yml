@@ -3,25 +3,13 @@ account_review_url: 'https://ask.extension.org/questions/account_review_request'
 airbrake_api_key: 'use_local_settings'
 app_location: 'localdev'
 default_display_timezone: 'Eastern Time (US & Canada)'
-display_percentiles: [99,90,75,50]
-display_percentiles_labels: ['99th percentile','90th percentile', '75th percentile', '50th percentile']
 downloads_data_dir: 'notset'
 email_bcc_address: 'use_local_settings'
 email_from_address: 'people-notify@extension.org'
 email_test_address: 'people-notify-testing@extension.org'
 email_from_name:  'eXtension People Notification - Do Not Reply'
-flat_percentage: 0.025
-geoip_data_file: 'notset'
 googleapps_account: "use_local_settings"
-googleapps_analytics: 'notset'
-googleapps_analytics_limit: 10000
-googleapps_analytics_secret: 'notset'
 googleapps_secret:  "use_local_settings"
-googleapps_traffic_start: '2007-02-23'
-group_concat_max_len: 1048576
-panda_start: '2011-02-28'
-recent_weeks: 4
-reserved_uids: [1,2,3,4,5,6,7,8]
 session_token: '123456789012345678901234567890'
 months_for_inactive_flag: 12
 sudoers: ['use_local_settings']
