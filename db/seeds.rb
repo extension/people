@@ -230,7 +230,7 @@ def transfer_community_connections
         else
           insert_list << ActiveRecord::Base.quote_value(connection.connectiontype)
         end
-        insert_list << (connection.sendnotifications ? 1 : 0 )
+        insert_list << ((connection.connectiontype == 'leader') ? 1 : 0 )
         insert_list << ActiveRecord::Base.quote_value(connection.created_at.to_s(:db))
         insert_list << ActiveRecord::Base.quote_value(connection.updated_at.to_s(:db))
         insert_values << "(#{insert_list.join(',')})"
