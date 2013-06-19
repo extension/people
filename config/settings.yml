@@ -12,7 +12,6 @@ googleapps_account: "use_local_settings"
 googleapps_secret:  "use_local_settings"
 session_token: '123456789012345678901234567890'
 months_for_inactive_flag: 12
-sudoers: ['use_local_settings']
 token_salt: 'use_local_settings'
 urlwriter_host: 'people.dev'
 max_live_dump_count: 200

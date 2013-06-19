@@ -29,23 +29,22 @@ module AuthLib
   def signin_required
     if session[:person_id]      
       person = Person.find_by_id(session[:person_id])
-      if (person.signin_allowed?)
+      if(person and person.signin_allowed?)
         @current_person = person
+        return true
       end
-      return true
     end
 
     # store current location so that we can 
     # come back after the user logged in
     store_location
-    access_denied
-    return false 
+    return access_denied
   end
   
   def signin_optional
     if session[:person_id]      
       person = Person.find_by_id(session[:person_id])
-      if (person.signin_allowed?)
+      if(person and person.signin_allowed?)
         @current_person = person
       end
     end
@@ -53,65 +52,36 @@ module AuthLib
   end
 
   def check_hold_status
-    if current_person.activity_allowed?
+    if(current_person and current_person.activity_allowed?)
       return true
     else
       clear_location
-      access_notice
-      return false
+      return access_notice
     end
   end
 
   def admin_required
     if session[:person_id]      
       person = Person.find_by_id(session[:person_id])
-      if (person.signin_allowed? and person.is_admin?)
+      if(person and person.signin_allowed? and person.is_admin?)
         @current_person = person
+        return true
       end
-      return true
     end
 
     # store current location so that we can 
     # come back after the user logged in
     store_location
-    access_denied
-    return false 
+    return access_denied
   end
-
-
-
-
-  def sudo_required
-    if session[:person_id]      
-      person = Person.find_by_id(session[:person_id])
-      if (person.is_sudoer?)
-        @current_person = person
-      end
-      return true
-    end
-
-    # store current location so that we can 
-    # come back after the user logged in
-    store_location
-    access_denied
-    return false 
-  end
-
-
 
   def access_denied
-    # check for xrds request
-    # if(request.env['HTTP_ACCEPT'] and request.env['HTTP_ACCEPT'].include?('application/xrds+xml'))
-    #   openid_xrds_header
-    #   return xrds_for_identity_provider
-    # else
-      openid_xrds_header
-      return redirect_to(signin_url)
-    # end
+    openid_xrds_header
+    return redirect_to(signin_url)
   end
 
   def access_notice
-    redirect_to home_pending_url
+    return redirect_to(home_pending_url)
   end
 
   def xrds_for_identity_provider

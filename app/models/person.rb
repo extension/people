@@ -220,10 +220,6 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def is_sudoer?
-    (self.signin_allowed? && Settings.sudoers.include?(self.login))
-  end
-
   def activity_allowed?
     if(!self.vouched?)
       return false

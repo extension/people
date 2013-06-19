@@ -10,7 +10,7 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery
   has_mobile_fu false
-  before_filter :signin_required
+  prepend_before_filter :signin_required
   before_filter :set_time_zone_from_user
   before_filter :update_last_activity
   before_filter :check_hold_status
