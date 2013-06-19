@@ -22,10 +22,8 @@ group :assets do
   gem 'anjlab-bootstrap-rails', '>= 2.0', :require => 'bootstrap-rails'
   gem 'font-awesome-sass-rails'
   gem 'jquery-ui-rails'
-  gem 'jquery-tablesorter'
   gem 'extension-html5shiv-rails', :require => 'html5shiv-rails'
   gem "select2-rails"
-  gem 'outfielding-jqplot-rails'
 end
 
 # legacy data support

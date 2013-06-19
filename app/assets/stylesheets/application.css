@@ -14,12 +14,6 @@
  *= require bootstrap_overrides
  *= require twitter/bootstrap-responsive
  *= require media_pagination
- *= require jquery.jqplot
- *= require sortable
- *= require responsive-tables
- *= require jquery.ui.datepicker
- *= require autocomplete
- *= require jquery-tablesorter/theme.blue
  *= require select2
  *= require global
  *= require communities

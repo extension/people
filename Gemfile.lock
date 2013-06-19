@@ -103,8 +103,6 @@ GEM
     jquery-rails (3.0.1)
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
-    jquery-tablesorter (1.4.1)
-      railties (~> 3.1)
     jquery-ui-rails (4.0.3)
       jquery-rails
       railties (>= 3.1.0)
@@ -137,7 +135,6 @@ GEM
     net-ssh-gateway (1.2.0)
       net-ssh (>= 2.6.5)
     nokogiri (1.5.10)
-    outfielding-jqplot-rails (1.0.8)
     php_serialize (1.2)
     polyglot (0.3.3)
     posix-spawn (0.3.6)
@@ -269,7 +266,6 @@ DEPENDENCIES
   inline-style (= 0.5.2ex)
   jbuilder
   jquery-rails
-  jquery-tablesorter
   jquery-ui-rails
   kaminari
   loofah
@@ -278,7 +274,6 @@ DEPENDENCIES
   mysql2
   net-http-spy
   nokogiri (= 1.5.10)
-  outfielding-jqplot-rails
   php_serialize
   powder
   pry
