@@ -5,7 +5,6 @@ require 'capatross'
 require "bundler/capistrano"
 require './config/boot'
 require 'airbrake/capistrano'
-require 'sidekiq/capistrano'
 
 TRUE_VALUES = [true, 1, '1', 't', 'T', 'true', 'TRUE', 'yes','YES','y','Y']
 FALSE_VALUES = [false, 0, '0', 'f', 'F', 'false', 'FALSE','no','NO','n','N']
@@ -25,16 +24,20 @@ set :bundle_dir, ''
 before "deploy", "deploy:checks:git_push"
 if(TRUE_VALUES.include?(ENV['MIGRATE']))
   before "deploy", "deploy:web:disable"
+  before "deploy", "sidekiq:stop"
   after "deploy:update_code", "deploy:update_maint_msg"
   after "deploy:update_code", "deploy:link_and_copy_configs"
   after "deploy:update_code", "deploy:cleanup"
   after "deploy:update_code", "deploy:migrate"
+  after "deploy", "sidekiq:start"
   after "deploy", "deploy:web:enable"
 else
   before "deploy", "deploy:checks:git_migrations"
+  before "deploy", "sidekiq:stop"
   after "deploy:update_code", "deploy:update_maint_msg"
   after "deploy:update_code", "deploy:link_and_copy_configs"
   after "deploy:update_code", "deploy:cleanup"
+  after "deploy", "sidekiq:start"
 end
 
 
@@ -130,6 +133,22 @@ namespace :deploy do
 end 
 
 
+namespace :sidekiq do
+  desc 'Stop sidekiq'
+  task 'stop', :roles => :app do
+    invoke_command 'sudo stop workers'
+  end
 
+  desc 'Start sidekiq'
+  task 'start', :roles => :app do
+    invoke_command 'sudo start workers'
+  end
+
+  desc 'Restart sidekiq'
+  task 'restart', :roles => :app do
+    stop
+    start
+  end
+end   
 
 
