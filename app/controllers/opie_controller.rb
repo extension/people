@@ -118,7 +118,7 @@ class OpieController < ApplicationController
   end
 
   def person
-    @person=Person.find_by_id_or_idstring(params[:extensionid])
+    @person=Person.find_by_email_or_idstring_or_id(params[:extensionid])
     # Yadis content-negotiation: we want to return the xrds if asked for.
     accept = request.env['HTTP_ACCEPT']
 
@@ -136,7 +136,7 @@ class OpieController < ApplicationController
   end
 
   def person_xrds
-    @person= Person.find_by_id_or_idstring(params[:extensionid])
+    @person= Person.find_by_email_or_idstring_or_id(params[:extensionid])
     proto = ((Settings.app_location == 'localdev') ? 'http://' : 'https://')
     types = [OpenID::OPENID_2_0_TYPE, OpenID::OPENID_1_0_TYPE,OpenID::SREG_URI]
     types_string = ''

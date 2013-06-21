@@ -24,7 +24,7 @@ class DataController < ApplicationController
       return render :text => returnhash.to_json
     end
 
-    @person = Person.find_by_id_or_idstring(person_id,false)
+    @person = Person.find_by_email_or_idstring_or_id(person_id,false)
     if(@person.nil?)
       returnhash = {:success => false, :errormessage => 'No such user.'}
       return render :text => returnhash.to_json

@@ -8,7 +8,7 @@ class PeopleController < ApplicationController
   before_filter :set_tab
 
   def show
-    @person = Person.find_by_id_or_idstring(params[:id])
+    @person = Person.find_by_email_or_idstring_or_id(params[:id])
     member_breadcrumbs
 
     if(@person != current_person)
@@ -222,7 +222,7 @@ class PeopleController < ApplicationController
   end
 
   def password
-    @person = Person.find_by_id_or_idstring(params[:id])
+    @person = Person.find_by_email_or_idstring_or_id(params[:id])
     member_breadcrumbs(['Change password'])
 
     return redirect_to(person_url(current_person)) if(@person != current_person)
@@ -273,7 +273,7 @@ class PeopleController < ApplicationController
   end
   
   def public_settings
-    @person = Person.find_by_id_or_idstring(params[:id])
+    @person = Person.find_by_email_or_idstring_or_id(params[:id])
     member_breadcrumbs(['Change public profile settings'])
 
     return redirect_to(person_url(current_person)) if(@person != current_person)
@@ -385,7 +385,7 @@ class PeopleController < ApplicationController
 
   def activity
     if(params[:id])
-      @person = Person.find_by_id_or_idstring(params[:id])
+      @person = Person.find_by_email_or_idstring_or_id(params[:id])
       member_breadcrumbs(['Activity'])
       
       if(@person == current_person or current_person.is_admin?)
