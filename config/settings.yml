@@ -1,29 +1,31 @@
+aae_database: 'use_local_settings'
+about_database: 'use_local_settings'
 account_review_key: 'use_local_settings'
 account_review_url: 'https://ask.extension.org/questions/account_review_request'
 airbrake_api_key: 'use_local_settings'
 app_location: 'localdev'
+create_database: 'use_local_settings'
+create_password_string: 'use_local_settings'
 default_display_timezone: 'Eastern Time (US & Canada)'
 downloads_data_dir: 'notset'
 email_bcc_address: 'use_local_settings'
 email_from_address: 'people-notify@extension.org'
-email_test_address: 'people-notify-testing@extension.org'
 email_from_name:  'eXtension People Notification - Do Not Reply'
+email_test_address: 'people-notify-testing@extension.org'
 googleapps_account: "use_local_settings"
 googleapps_secret:  "use_local_settings"
-session_token: '123456789012345678901234567890'
-months_for_inactive_flag: 12
-token_salt: 'use_local_settings'
-urlwriter_host: 'people.dev'
-max_live_dump_count: 200
-openid_endpoint: 'http://people.dev/opie'
-create_password_string: 'use_local_settings'
-aae_database: 'use_local_settings'
 learn_database: 'use_local_settings'
-create_database: 'use_local_settings'
-www_database: 'use_local_settings'
-about_database: 'use_local_settings'
+max_live_dump_count: 200
 milfam_database: 'use_local_settings'
+months_for_inactive_flag: 12
+openid_endpoint: 'http://people.dev/opie'
+redis_enabled: true
+session_token: '123456789012345678901234567890'
 sync_accounts: false
 sync_communities: false
 sync_google: false
-redis_enabled: true
+token_salt: 'use_local_settings'
+urlwriter_host: 'people.dev'
+www_database: 'use_local_settings'
+
+
