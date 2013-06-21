@@ -29,8 +29,6 @@ if(TRUE_VALUES.include?(ENV['SEED']))
   after "deploy:update_code", "deploy:cleanup"
   after "deploy:update_code", "deploy:migrate"
   after "deploy:migrate", "deploy:db:seed" 
-  after "deploy", "sidekiq:start"
-  after "deploy", "deploy:web:enable"
 elsif(TRUE_VALUES.include?(ENV['MIGRATE']))
   before "deploy", "deploy:web:disable"
   before "deploy", "sidekiq:stop"
