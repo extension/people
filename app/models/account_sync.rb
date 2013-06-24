@@ -108,7 +108,7 @@ class AccountSync < ActiveRecord::Base
         #{update_database}.users.retired      = #{person.retired},
         #{update_database}.users.is_admin     = #{person.is_admin},
         #{update_database}.users.email        = #{quoted_value_or_null(person.email)},
-        #{update_database}.users.time_zone    = #{quoted_value_or_null(person.time_zone)},
+        #{update_database}.users.time_zone    = #{quoted_value_or_null(person.time_zone(false))},
         #{update_database}.users.location_id  = #{value_or_null(person.location_id)},
         #{update_database}.users.county_id    = #{value_or_null(person.county_id)},
         #{update_database}.users.title        = #{quoted_value_or_null(person.title)}
@@ -130,7 +130,7 @@ class AccountSync < ActiveRecord::Base
         #{update_database}.users.last_name    = #{quoted_value_or_null(person.last_name)},
         #{update_database}.users.retired      = #{person.retired},
         #{update_database}.users.is_admin     = #{person.is_admin},
-        #{update_database}.users.time_zone    = #{quoted_value_or_null(person.time_zone)},
+        #{update_database}.users.time_zone    = #{quoted_value_or_null(person.time_zone(false))},
         #{update_database}.users.location_id  = #{value_or_null(person.location_id)},
         #{update_database}.users.county_id    = #{value_or_null(person.county_id)},
         #{update_database}.users.title        = #{quoted_value_or_null(person.title)}
@@ -150,7 +150,7 @@ class AccountSync < ActiveRecord::Base
             #{quoted_value_or_null(person.last_name)},
             'User',
             #{quoted_value_or_null(person.email)},
-            #{quoted_value_or_null(person.time_zone)},
+            #{quoted_value_or_null(person.time_zone(false))},
             #{person.id},
             #{person.is_admin},
             #{value_or_null(person.location_id)},
@@ -187,7 +187,7 @@ class AccountSync < ActiveRecord::Base
         #{update_database}.learners.retired      = #{person.retired},
         #{update_database}.learners.is_admin     = #{person.is_admin},
         #{update_database}.learners.email        = #{quoted_value_or_null(person.email)},
-        #{update_database}.learners.time_zone    = #{quoted_value_or_null(person.time_zone)}
+        #{update_database}.learners.time_zone    = #{quoted_value_or_null(person.time_zone(false))}
     WHERE #{update_database}.learners.darmok_id = #{person.id}
     END_SQL
     query
@@ -202,7 +202,7 @@ class AccountSync < ActiveRecord::Base
         #{update_database}.learners.retired      = #{person.retired},
         #{update_database}.learners.is_admin     = #{person.is_admin},
         #{update_database}.learners.email        = #{quoted_value_or_null(person.email)},
-        #{update_database}.learners.time_zone    = #{quoted_value_or_null(person.time_zone)}
+        #{update_database}.learners.time_zone    = #{quoted_value_or_null(person.time_zone(false))}
     WHERE #{update_database}.learners.email = #{ActiveRecord::Base.quote_value(person.email)}
     AND #{update_database}.learners.darmok_id IS NULL
     END_SQL
@@ -217,7 +217,7 @@ class AccountSync < ActiveRecord::Base
     SELECT  #{quoted_value_or_null(person.fullname)},
             #{quoted_value_or_null(person.email)},
             1,
-            #{quoted_value_or_null(person.time_zone)},
+            #{quoted_value_or_null(person.time_zone(false))},
             #{person.id},
             #{value_or_null(person.is_admin)},
             #{quoted_value_or_null(person.created_at.to_s(:db))},
