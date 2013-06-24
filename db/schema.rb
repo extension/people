@@ -350,6 +350,14 @@ ActiveRecord::Schema.define(:version => 20130509151936) do
   add_index "sent_emails", ["hashvalue"], :name => "hashvalue_ndx"
   add_index "sent_emails", ["person_id", "open_count"], :name => "person_view_ndx"
 
+  create_table "share_accounts", :force => true do |t|
+    t.integer "person_id", :default => 0, :null => false
+    t.string  "username",                 :null => false
+    t.string  "password",                 :null => false
+  end
+
+  add_index "share_accounts", ["person_id"], :name => "person_ndx", :unique => true
+
   create_table "social_network_connections", :force => true do |t|
     t.integer  "person_id"
     t.integer  "social_network_id"

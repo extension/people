@@ -77,6 +77,14 @@ class Accounts < ActiveRecord::Migration
     add_index "google_accounts", ["person_id"], :name => "person_ndx", :unique => true
 
 
+    create_table "share_accounts", :force => true do |t|
+      t.integer  "person_id",          :default => 0,     :null => false
+      t.string   "username",                  :null => false
+      t.string   "password",                  :null => false
+    end
+
+    add_index "share_accounts", ["person_id"], :name => "person_ndx", :unique => true
+
 
   end
 

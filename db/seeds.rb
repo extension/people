@@ -786,6 +786,20 @@ def transform_interests
   print "\t\tfinished in #{benchmark.real.round(1)}s\n"
 end
 
+def transfer_share_accounts
+  print "Transferring share accounts..."
+  benchmark = Benchmark.measure do
+    # list of accounts that have used the apache authentication in last 90 days
+    ['jayoung','sdnall','athundle','idenev','llippke','johnmcqueen'].each do |idstring|
+      if(p = Person.find_by_idstring(idstring))
+        p.create_share_account(password: p.legacy_password)
+      end
+    end
+  end
+  print "\t\tfinished in #{benchmark.real.round(1)}s\n"
+end
+
+
 
 # seed queries
 announce_and_run_query('Transferring accounts',account_transfer_query)
@@ -806,6 +820,7 @@ announce_and_run_query('Transferring community email aliases',community_email_al
 # data manipulation
 transfer_retired_account_data
 dump_never_completed_signups
+transfer_share_accounts
 create_milfam_wordpress_list_email_alias
 transfer_community_connections
 transfer_invitations

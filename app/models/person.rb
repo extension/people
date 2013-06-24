@@ -68,6 +68,8 @@ class Person < ActiveRecord::Base
   
   has_many :email_aliases, as: :aliasable
   has_one :google_account, dependent: :destroy
+  has_one :share_account, dependent: :destroy
+
 
   belongs_to :invitation
   has_many :activities
