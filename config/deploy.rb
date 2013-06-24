@@ -22,14 +22,7 @@ set :bundle_flags, ''
 set :bundle_dir, ''
 
 before "deploy", "deploy:checks:git_push"
-if(TRUE_VALUES.include?(ENV['SEED']))
-  before "deploy", "deploy:web:disable"
-  after "deploy:update_code", "deploy:update_maint_msg"
-  after "deploy:update_code", "deploy:link_and_copy_configs"
-  after "deploy:update_code", "deploy:cleanup"
-  after "deploy:update_code", "deploy:migrate"
-  after "deploy:migrate", "deploy:db:seed" 
-elsif(TRUE_VALUES.include?(ENV['MIGRATE']))
+if(TRUE_VALUES.include?(ENV['MIGRATE']))
   before "deploy", "deploy:web:disable"
   before "deploy", "sidekiq:stop"
   after "deploy:update_code", "deploy:update_maint_msg"
@@ -99,18 +92,6 @@ namespace :deploy do
       invoke_command "rm -f #{shared_path}/system/maintenancemode"
     end
     
-  end
-
-  namespace :db do
-    desc "drop the database, create the database, run migrations, seed"
-    task :rebuild, :roles => :db, :only => {:primary => true} do
-      run "cd #{release_path} && #{rake} db:demo_rebuild RAILS_ENV=production"
-    end
-
-    desc "reload the database with seed data"
-    task :seed do
-      run "cd #{release_path} && #{rake} db:seed RAILS_ENV=production"
-    end    
   end
 
   namespace :checks do
