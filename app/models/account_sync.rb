@@ -338,7 +338,7 @@ class AccountSync < ActiveRecord::Base
            first_name=#{quoted_value_or_null(person.first_name)},
            last_name=#{quoted_value_or_null(person.last_name)},
            retired=#{person.retired},
-           is_admin=#{person.retired},
+           is_admin=#{person.is_admin},
            updated_at=NOW()
     END_SQL
     query
