@@ -163,13 +163,14 @@ class Person < ActiveRecord::Base
   end
 
   def self.find_by_email_or_idstring_or_id(id,raise_not_found = true)
-    if(id =~ %r{@})
+
+    if(id.to_i > 0)
+      person = self.find_by_id(id)
+    elsif(id =~ %r{@})
       person = self.find_by_email(id)
     # does the id contain a least one alpha? let's search by idstring
     elsif(id =~ %r{[[:alpha:]]?})
       person = self.find_by_idstring(id)
-    else
-      person = self.find_by_id(id)
     end
 
     if(!person)
