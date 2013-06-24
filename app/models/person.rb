@@ -514,6 +514,7 @@ class Person < ActiveRecord::Base
     current_forward = self.email_forward
     if(current_forward and current_forward.alias_type == EmailAlias::FORWARD)
       current_forward.update_attributes({destination: self.email})
+      true
     else
       false
     end
@@ -563,6 +564,7 @@ class Person < ActiveRecord::Base
     else
       self.email_aliases.update_all(disabled: false)
     end
+    true
   end
 
   def sync_accounts
@@ -571,6 +573,7 @@ class Person < ActiveRecord::Base
         self.account_syncs.create
       end
     end
+    true
   end
 
   def self.system_id
@@ -1145,6 +1148,7 @@ class Person < ActiveRecord::Base
       self.google_account.update_attributes({suspended: false})
       self.google_account.queue_account_update
     end
+    true
   end 
 
 
