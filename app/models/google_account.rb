@@ -109,6 +109,15 @@ class GoogleAccount < ActiveRecord::Base
     class_apps_connection = ProvisioningApi.new(Settings.googleapps_account,Settings.googleapps_secret)
     class_apps_connection.retrieve_all_users
   end
+
+  def self.process_missing_accounts
+    pool = self.includes(:person).where("apps_updated_at IS NULL")
+    pool.each do |ga|
+      if(ga.person.validaccount?)
+        ga.queue_account_update
+      end
+    end
+  end
   
   def self.clear_errors
     self.update_all("has_error = 0, last_error = ''","has_error = 1")
