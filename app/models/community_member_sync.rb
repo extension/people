@@ -17,6 +17,8 @@ class CommunityMemberSync < ActiveRecord::Base
   belongs_to :community
   belongs_to :person
 
+  scope :not_processed, lambda{ where(processed: false)}
+
 
   def self.create_with_pending_check(options)
     if(!(sync_record = self.where(community_id: options[:community].id).where(person_id: options[:person].id).where(processed: false).first))
@@ -28,7 +30,7 @@ class CommunityMemberSync < ActiveRecord::Base
     if(self.process_on_create? or !Settings.redis_enabled)
       self.update_community_members
     else
-      self.class.delay.delayed_update_community_members(self.id)
+      self.class.delay_for(5.seconds).delayed_update_community_members(self.id)
     end
   end
 

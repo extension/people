@@ -17,12 +17,13 @@ class CommunitySync < ActiveRecord::Base
 
   belongs_to :community
 
+  scope :not_processed, lambda{ where(processed: false)}
 
   def queue_update
     if(self.process_on_create? or !Settings.redis_enabled)
       self.update_communities
     else
-      self.class.delay.delayed_update_communities(self.id)
+      self.class.delay_for(5.seconds).delayed_update_communities(self.id)
     end
   end
 

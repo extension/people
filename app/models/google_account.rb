@@ -29,7 +29,7 @@ class GoogleAccount < ActiveRecord::Base
   def queue_account_update
     if(Settings.sync_google)
       if(Settings.redis_enabled)
-        self.class.delay.delayed_update_apps_account(self.id)
+        self.class.delay_for(5.seconds).delayed_update_apps_account(self.id)
       else
         self.update_apps_account
       end

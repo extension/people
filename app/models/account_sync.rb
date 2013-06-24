@@ -19,6 +19,8 @@ class AccountSync < ActiveRecord::Base
 
   belongs_to :person
 
+  scope :not_processed, lambda{ where(processed: false)}
+
   def queue_update
     if(self.process_on_create or !Settings.redis_enabled)
       self.update_accounts

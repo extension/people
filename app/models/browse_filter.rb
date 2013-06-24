@@ -31,7 +31,7 @@ class BrowseFilter < ActiveRecord::Base
     if(!Settings.redis_enabled)
       self.dump_to_file
     else
-      self.class.delay.delayed_dump_to_file(self.id)
+      self.class.delay_for(5.seconds).delayed_dump_to_file(self.id)
     end
   end
 
