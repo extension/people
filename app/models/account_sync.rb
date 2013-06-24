@@ -17,8 +17,6 @@ class AccountSync < ActiveRecord::Base
                       'www_database' => Settings.www_database,
                       'wordpress_databases' => [Settings.about_database, Settings.milfam_database]}
 
-  after_create  :queue_update
-
   belongs_to :person
 
   def queue_update
