@@ -23,7 +23,7 @@ class AccountSync < ActiveRecord::Base
     if(self.process_on_create or !Settings.redis_enabled)
       self.update_accounts
     else
-      self.class.delay.delayed_update_accounts(self.id)
+      self.class.delay_for(5.seconds).delayed_update_accounts(self.id)
     end
   end
 

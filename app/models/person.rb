@@ -49,7 +49,9 @@ class Person < ActiveRecord::Base
   before_validation :set_idstring
 
   after_create :create_email_forward
-  after_update :update_email_forward, :sync_accounts, :update_google_account
+  after_update :update_email_forward
+  after_update :synchronize_accounts
+  after_update :update_google_account
   after_save :update_email_aliases
 
   ## associations
@@ -567,7 +569,7 @@ class Person < ActiveRecord::Base
     true
   end
 
-  def sync_accounts
+  def synchronize_accounts
     if(Settings.sync_accounts)
       if((self.validaccount? or self.retired?) and !self.is_systems_account?)
         if(as = self.account_syncs.create)
