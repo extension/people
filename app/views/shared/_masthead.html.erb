@@ -7,7 +7,7 @@
     <ul class="nav nav-pills">
       <li class="dropdown">
       <a class="dropdown-toggle" data-toggle="dropdown" href="#"><%= current_person.fullname -%><b class="caret"></b></a>
-      <ul class="dropdown-menu">
+      <ul class="dropdown-menu pull-right">
         <li><%= link_to('My Profile',person_path(current_person)) -%></li>
         <li class="divider"></li>
         <li><%= link_to('Change password',password_person_path(current_person)) %></li>
