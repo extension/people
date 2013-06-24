@@ -10,11 +10,13 @@
 
         <p>If you allow the request, we'll share the following information requested by: <%= @opierequest.trust_root -%>. If you deny the request, you won't be able to sign in to the site using your eXtension account.</p>
 
+        <%- if !@willprovide.blank? -%>
         <ul>
           <%- @willprovide.each do |item| -%>
           <li><%= item %></li>
           <%- end -%>
         </ul>
+        <%- end -%>
 
         <p><%= submit_tag "Allow", :class => "btn" %> <%= submit_tag "Deny", :class => "btn" %></p>
       </fieldset>
