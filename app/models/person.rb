@@ -963,9 +963,11 @@ class Person < ActiveRecord::Base
     self.save
 
     if(self.retired_account)
-      self.retired_account.communities.each do |community_id,connectiontype|
-        if(community = Community.find_by_id(community_id))
-          self.connect_to_community(community,connectiontype,{:connector_id => colleague.id, :nonotify => true, :ip_address => options[:ip_address]})
+      if(self.retired_account.communities)
+        self.retired_account.communities.each do |community_id,connectiontype|
+          if(community = Community.find_by_id(community_id))
+            self.connect_to_community(community,connectiontype,{:connector_id => colleague.id, :nonotify => true, :ip_address => options[:ip_address]})
+          end
         end
       end
       self.retired_account.destroy
