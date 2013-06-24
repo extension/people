@@ -236,7 +236,11 @@ class OpieController < ApplicationController
     elsif(trust_root =~ %r{extension\.org}) 
       # auto-approve extension.org
       current_person.auth_approvals.create(:trust_root => trust_root)
-      return true        
+      return true
+    elsif(trust_root =~ %r{lsuagcenter\.com}) 
+      # auto-approve lsuagcenter.com
+      current_person.auth_approvals.create(:trust_root => trust_root)
+      return true              
     else
       return false
     end
