@@ -15,7 +15,8 @@
 <div class="row">
   <div class="span12">
     <h3>Browse directory</h3>
-    <p>You can <%= link_to("browse the directory", browse_people_path())%> of <span class='mednumber'><%= number_with_delimiter(Person.display_accounts.count) %></span> accounts and filter the list by communities, locations, positions, and social networks</p>
+    <p>You can <%= link_to("browse the directory", browse_people_path())%> of <span class='mednumber'><%= number_with_delimiter(Person.display_accounts.count) %></span> accounts and 
+    <%= link_to("filter the list by communities, locations, positions, and social networks", browse_people_path(showform: true))%></p>
   </div>
 </div>
 

@@ -2,12 +2,12 @@
 
 <div class="page-header">
   <h2><%= @page_title %></h2>
-    <%= link_to("Filter Options <i class='icon-caret-right'></i>".html_safe, 
+    <%= link_to(@showform ? "Filter Options <i class='icon-caret-down'></i>".html_safe : "Filter Options <i class='icon-caret-right'></i>".html_safe, 
                 '#',
                 id: 'formtoggler', 
                 data: {toggle: 'collapse', target: '#showform'}) %>
 
-    <div id="showform" class="collapse">
+    <div id="showform" class="<%= (@showform ? 'collapse in' : 'collapse') -%>">
       <%= render(:partial => 'people/browse_filter_form') %>
     </div>
 </div>  

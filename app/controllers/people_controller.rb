@@ -98,6 +98,8 @@ class PeopleController < ApplicationController
 
   def browse
     collection_breadcrumbs(['Browse'])
+    @showform = (params[:showform] and TRUE_VALUES.include?(params[:showform]))
+
     if(params[:filter] && params[:filter].to_i != BrowseFilter::ALL && @browse_filter = BrowseFilter.find_by_id(params[:filter]))
       @browse_filter_objects = @browse_filter.settings_to_objects
       @colleagues = Person.display_accounts.filtered_by(@browse_filter).page(params[:page]).order('last_name ASC')

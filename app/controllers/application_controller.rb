@@ -8,6 +8,10 @@
 class ApplicationController < ActionController::Base
   include AuthLib
 
+  TRUE_VALUES = [true, 1, '1', 't', 'T', 'true', 'TRUE', 'yes','YES','y','Y']
+  FALSE_VALUES = [false, 0, '0', 'f', 'F', 'false', 'FALSE','no','NO','n','N']
+
+
   protect_from_forgery
   has_mobile_fu false
   prepend_before_filter :signin_required

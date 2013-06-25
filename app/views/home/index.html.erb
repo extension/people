@@ -21,11 +21,19 @@
 </ul>
   </div>
   <div class="span6">
-    <h3>Search for Colleagues</h3>
+    <div class='dashmodule'>
+    <h3>Find Colleagues</h3>
     <%= render(:partial => 'people/find_form') %>
-   
+    <p>You can also <%= link_to("browse the directory", browse_people_path())%> of <span class='mednumber'><%= number_with_delimiter(Person.display_accounts.count) %></span> accounts and 
+    <%= link_to("filter the list by communities, locations, positions, and social networks", browse_people_path(showform: true))%></p>
+    </div>
+    
+    <div class='dashmodule'>
     <h3>Search for Communities and Institutions</h3>
     <%= render(:partial => 'communities/find_form') %>
+
+    <p>You can also <%= link_to("browse the list", communities_path())%> of the eXtension Communities of Practice and the newest communities created by your colleagues.</p>
+    </div>
 
   </div>
 </div>
