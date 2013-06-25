@@ -930,14 +930,17 @@ class Person < ActiveRecord::Base
 
 
   def retire(options = {})
-    return false if self.retired?
+    forceretire = options[:force].blank? ? false : options[:force] 
+    return false if(self.retired? and !forceretire)
     colleague = options[:colleague]
     self.retired = true
     self.save
 
     communities = {}
     self.communities.map{|c| communities[c.id] = c.connectiontype}
-    self.create_retired_account(retiring_colleague_id: colleague.id, explanation: options[:explanation], communities: communities)
+    if(!self.retired_account)
+      self.create_retired_account(retiring_colleague_id: colleague.id, explanation: options[:explanation], communities: communities)
+    end
 
 
     # drop community connections
@@ -957,7 +960,8 @@ class Person < ActiveRecord::Base
   end  
 
   def restore(options={})
-    return false if !self.retired?
+    forcerestore = options[:force].blank? ? false : options[:force] 
+    return false if(!self.retired? and !forcerestore)    
     colleague = options[:colleague]
     self.retired = false
     self.save
