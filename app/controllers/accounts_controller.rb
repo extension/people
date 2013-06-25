@@ -113,11 +113,11 @@ class AccountsController < ApplicationController
 
   def confirm
     if(params[:token].nil?)
-      return render(:template => 'account/invalid_token')
+      return render(:template => 'accounts/invalid_token')
     end
 
     if(!(status_code = current_person.check_token(params[:token])))
-      return render(:template => 'account/invalid_token')
+      return render(:template => 'accounts/invalid_token')
     end
 
     case status_code
@@ -126,7 +126,7 @@ class AccountsController < ApplicationController
     when Person::STATUS_CONFIRM_EMAIL
       confirm_email
     else
-      return render(:template => 'account/invalid_token')
+      return render(:template => 'accounts/invalid_token')
     end
   end    
 
