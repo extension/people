@@ -12,6 +12,9 @@ class Community < ActiveRecord::Base
   attr_accessible :name, :description, :location, :location_id, :memberfilter, :connect_to_drupal
   attr_accessible :connect_to_google_apps, :entrytype, :shortname, :publishing_community
 
+  # hardcoded community ids
+  INSTITUTIONAL_TEAMS_COMMUNITY_ID = 80
+
   # community types
   APPROVED = 1
   USERCONTRIBUTED = 2
