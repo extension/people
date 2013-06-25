@@ -101,7 +101,7 @@ class AccountsController < ApplicationController
   end
 
   def resend_confirmation
-    if([Person::STATUS_SIGNUP,Person::STATUS_CONFIRM_EMAIL].include?(current_person.account_status) and !current_person.emailconfirmed?)
+    if([Person::STATUS_SIGNUP,Person::STATUS_CONFIRM_EMAIL].include?(current_person.account_status) and !current_person.email_confirmed?)
       current_person.resend_confirmation
       flash[:notice] = 'Confirmation email resent.'
       return redirect_to(accounts_pending_confirmation_url)
