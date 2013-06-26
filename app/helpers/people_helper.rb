@@ -144,6 +144,28 @@ module PeopleHelper
     else
       'active'
     end
-  end 
+  end
+
+  def agreement_status(person)
+    if(person.contributor_agreement.nil?)
+      status_text = 'Not Yet Reviewed'
+      date_text = ''
+    elsif(person.contributor_agreement)
+      status_text = "Accepted"
+      date_text = "(#{display_time(person.contributor_agreement_at)})"
+    else
+      status_text = "Declined"
+      date_text = "(#{display_time(person.contributor_agreement_at)})"
+    end
+
+    if(current_person and (current_person == person))
+      "#{link_to(status_text,accounts_contributor_agreement_path).html_safe} #{date_text}".html_safe
+    else
+      "#{status_text} #{date_text}".html_safe
+    end
+  end
+
+
+
 
 end
