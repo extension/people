@@ -102,16 +102,17 @@ class AccountSync < ActiveRecord::Base
     update_database = UPDATE_DATABASES['aae_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     UPDATE #{update_database}.users
-    SET #{update_database}.users.login        = #{quoted_value_or_null(person.idstring)}, 
-        #{update_database}.users.first_name   = #{quoted_value_or_null(person.first_name)},
-        #{update_database}.users.last_name    = #{quoted_value_or_null(person.last_name)},
-        #{update_database}.users.retired      = #{person.retired},
-        #{update_database}.users.is_admin     = #{person.is_admin},
-        #{update_database}.users.email        = #{quoted_value_or_null(person.email)},
-        #{update_database}.users.time_zone    = #{quoted_value_or_null(person.time_zone(false))},
-        #{update_database}.users.location_id  = #{value_or_null(person.location_id)},
-        #{update_database}.users.county_id    = #{value_or_null(person.county_id)},
-        #{update_database}.users.title        = #{quoted_value_or_null(person.title)}
+    SET #{update_database}.users.login                = #{quoted_value_or_null(person.idstring)}, 
+        #{update_database}.users.first_name           = #{quoted_value_or_null(person.first_name)},
+        #{update_database}.users.last_name            = #{quoted_value_or_null(person.last_name)},
+        #{update_database}.users.retired              = #{person.retired},
+        #{update_database}.users.is_admin             = #{person.is_admin},
+        #{update_database}.users.email                = #{quoted_value_or_null(person.email)},
+        #{update_database}.users.time_zone            = #{quoted_value_or_null(person.time_zone(false))},
+        #{update_database}.users.location_id          = #{value_or_null(person.location_id)},
+        #{update_database}.users.county_id            = #{value_or_null(person.county_id)},
+        #{update_database}.users.title                = #{quoted_value_or_null(person.title)},
+        #{update_database}.users.needs_search_update  = 1
     WHERE #{update_database}.users.darmok_id = #{person.id}
     AND #{update_database}.users.kind = 'User'
     END_SQL
@@ -123,17 +124,18 @@ class AccountSync < ActiveRecord::Base
     update_database = UPDATE_DATABASES['aae_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     UPDATE #{update_database}.users
-    SET #{update_database}.users.kind         = 'User',
-        #{update_database}.users.darmok_id    = #{person.id},
-        #{update_database}.users.login        = #{quoted_value_or_null(person.idstring)}, 
-        #{update_database}.users.first_name   = #{quoted_value_or_null(person.first_name)},
-        #{update_database}.users.last_name    = #{quoted_value_or_null(person.last_name)},
-        #{update_database}.users.retired      = #{person.retired},
-        #{update_database}.users.is_admin     = #{person.is_admin},
-        #{update_database}.users.time_zone    = #{quoted_value_or_null(person.time_zone(false))},
-        #{update_database}.users.location_id  = #{value_or_null(person.location_id)},
-        #{update_database}.users.county_id    = #{value_or_null(person.county_id)},
-        #{update_database}.users.title        = #{quoted_value_or_null(person.title)}
+    SET #{update_database}.users.kind                 = 'User',
+        #{update_database}.users.darmok_id            = #{person.id},
+        #{update_database}.users.login                = #{quoted_value_or_null(person.idstring)}, 
+        #{update_database}.users.first_name           = #{quoted_value_or_null(person.first_name)},
+        #{update_database}.users.last_name            = #{quoted_value_or_null(person.last_name)},
+        #{update_database}.users.retired              = #{person.retired},
+        #{update_database}.users.is_admin             = #{person.is_admin},
+        #{update_database}.users.time_zone            = #{quoted_value_or_null(person.time_zone(false))},
+        #{update_database}.users.location_id          = #{value_or_null(person.location_id)},
+        #{update_database}.users.county_id            = #{value_or_null(person.county_id)},
+        #{update_database}.users.title                = #{quoted_value_or_null(person.title)},
+        #{update_database}.users.needs_search_update  = 1
     WHERE #{update_database}.users.email = #{ActiveRecord::Base.quote_value(person.email)}
     AND #{update_database}.users.kind = 'PublicUser'
     END_SQL
@@ -144,7 +146,7 @@ class AccountSync < ActiveRecord::Base
     person = self.person
     update_database = UPDATE_DATABASES['aae_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
-    INSERT INTO #{update_database}.users (login, first_name, last_name, kind, email, time_zone, darmok_id, is_admin, location_id, county_id, title, created_at, updated_at)
+    INSERT INTO #{update_database}.users (login, first_name, last_name, kind, email, time_zone, darmok_id, is_admin, location_id, county_id, title, needs_search_update, created_at, updated_at)
     SELECT  #{quoted_value_or_null(person.idstring)}, 
             #{quoted_value_or_null(person.first_name)},
             #{quoted_value_or_null(person.last_name)},
@@ -156,6 +158,7 @@ class AccountSync < ActiveRecord::Base
             #{value_or_null(person.location_id)},
             #{value_or_null(person.county_id)},
             #{quoted_value_or_null(person.title)},
+            1,
             #{quoted_value_or_null(person.created_at.to_s(:db))},
             NOW()
     END_SQL
