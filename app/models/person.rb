@@ -96,7 +96,7 @@ class Person < ActiveRecord::Base
   scope :not_system, where("people.id NOT IN(#{SYSTEMS_USERS.join(',')})")
   scope :display_accounts, validaccounts.not_system
   scope :inactive, lambda{ where('last_activity_at <= ?',Time.now.utc - 6.months) }
-  scope :reminder_pool, lambda{ inactive.where('(last_account_reminder IS NULL or last_account_reminder <= ?)',Time.now.utc - 6.months) }
+  scope :reminder_pool, lambda{ display_accounts.inactive.where('(last_account_reminder IS NULL or last_account_reminder <= ?)',Time.now.utc - 6.months) }
 
   
   # duplicated from darmok
@@ -675,6 +675,17 @@ class Person < ActiveRecord::Base
       person.destroy
     end
   end
+
+  # goes through and retires all accounts that have been ignored in review for the last 14 days
+  #
+  # @param [String] retired_reason Retiring reason     
+  def self.cleanup_pending_accounts(retired_reason = 'No one vouched for the account within 14 days')
+    the_system = Person.system_account
+    self.pendingreview.where("email_confirmed_at < ?",Time.now - 14.day).each do |person|
+      person.retire(colleague: the_system, explanation: retired_reason, ip_address: '127.0.0.1')
+    end
+  end
+
 
   def confirm_signup(options = {})
     now = Time.now.utc
