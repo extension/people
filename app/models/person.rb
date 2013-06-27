@@ -1025,6 +1025,9 @@ class Person < ActiveRecord::Base
     returnvalues = {profile_attributes: {}}
     public_profile_attributes = self.profile_public_settings.is_public.map(&:item)
     if(!public_profile_attributes.empty?)
+      returnvalues[:profile_attributes]['fullname'] = self.fullname
+      returnvalues[:profile_attributes]['last_name'] = self.last_name
+      returnvalues[:profile_attributes]['first_name'] = self.first_name
       public_profile_attributes.each do |profile_attribute|
         case profile_attribute
         when 'position'
