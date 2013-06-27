@@ -58,7 +58,8 @@ class Invitation < ActiveRecord::Base
     self.accepted_at = accepted_at
     if(self.save)
       Notification.create(:notification_type => Notification::INVITATION_ACCEPTED, :notifiable => self)
-      Activity.log_activity(person_id: acceptingcolleague.id, 
+      Activity.log_activity(person_id: acceptingcolleague.id,
+                            colleague_id: self.person_id, 
                             activitycode: Activity::INVITATION_ACCEPTED, 
                             additionalinfo: self.email, 
                             additionaldata: {'invitation_id' => self.id}, 
