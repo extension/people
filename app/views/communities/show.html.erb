@@ -39,9 +39,13 @@
       <div id="communityreports" class="dashmodule">
         <dl>
           <dt><%= link_to("Community Activity", activity_community_path(@community)) -%></dt>
-          <%- if(@community.connect_to_google_apps? and current_person.is_community_member?(@community)) -%>
-          <dt><%= link_to('Community Forum (Google Group)',@community.joined_google_group.forum_url) %></dt>
-          <dd>Post to forum by email: <%= link_to(@community.joined_google_group.group_email_address, "mailto:#{@community.joined_google_group.group_email_address}") %></dd>
+          <%- if(@community.connect_to_google_apps? and gg = @community.joined_google_group) -%>
+          <dt><%= link_to('Community Forum (Google Group)',gg.forum_url) %> (group members only)</dt>
+          <dd>Post to forum by email: <%= link_to(gg.group_email_address, "mailto:#{gg.group_email_address}") %></dd>
+            <%- if(lg = @community.leaders_google_group) -%>
+            <dt><%= link_to('Community Leader Forum (Google Group)',lg.forum_url) %> (group members only)</dt>
+            <dd>Post to leader forum by email: <%= link_to(lg.group_email_address, "mailto:#{lg.group_email_address}") %></dd>
+            <%- end -%>
           <%- end -%>
         </dl>
       </div>

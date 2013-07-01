@@ -28,7 +28,9 @@ class MailmanList < ActiveRecord::Base
       if(self.connectiontype == 'joined')
         gg = self.community.joined_google_group
       elsif(self.connectiontype == 'leaders')
-        gg = self.community.leaders_google_group
+        if(!gg = self.community.leaders_google_group)
+          gg = self.community.create_leaders_google_group
+        end
       else
         return nil
       end
