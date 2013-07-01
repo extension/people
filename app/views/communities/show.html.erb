@@ -37,7 +37,13 @@
 
       <h3>Community Information</h3>
       <div id="communityreports" class="dashmodule">
-      <p><%= link_to("Community Activity", activity_community_path(@community)) -%></p>
+        <dl>
+          <dt><%= link_to("Community Activity", activity_community_path(@community)) -%></dt>
+          <%- if(@community.connect_to_google_apps? and current_person.is_community_member?(@community)) -%>
+          <dt><%= link_to('Community Forum (Google Group)',@community.joined_google_group.forum_url) %></dt>
+          <dd>Post to forum by email: <%= link_to(@community.joined_google_group.group_email_address, "mailto:#{@community.joined_google_group.group_email_address}") %></dd>
+          <%- end -%>
+        </dl>
       </div>
 
     </div>

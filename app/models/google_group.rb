@@ -10,7 +10,7 @@ include GAppsProvisioning
 class GoogleGroup < ActiveRecord::Base
   attr_accessor :apps_connection
   serialize :last_error
-  attr_accessible :community, :community_id, :group_id, :group_name, :email_permission, :apps_updated_at, :has_error, :last_error
+  attr_accessible :community, :community_id, :group_id, :group_name, :email_permission, :apps_updated_at, :has_error, :last_error, :connectiontype, :lists_alias
 
   GDATA_ERROR_ENTRYDOESNOTEXIST = 1301
 
@@ -18,9 +18,23 @@ class GoogleGroup < ActiveRecord::Base
   
   belongs_to :community
 
+  def forum_url
+    "https://groups.google.com/a/extension.org/d/forum/#{self.group_id}?hl=en"
+  end
+
+  def group_email_address
+    "#{self.group_id}@extension.org"
+  end
+
+
   def set_values_from_community
-    self.group_id = self.community.shortname
-    self.group_name = self.community.name
+    if(self.connectiontype == 'leaders')
+      self.group_id = "#{self.community.shortname}-leaders"
+      self.group_name = "#{self.community.name} (Leaders)"
+    else
+      self.group_id = self.community.shortname
+      self.group_name = self.community.name
+    end
     self.email_permission = 'Anyone'
     return true
   end

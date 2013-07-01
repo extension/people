@@ -58,7 +58,7 @@ class Community < ActiveRecord::Base
 
   before_save :set_shortname, :flag_attributes_for_approved
   after_save :update_email_alias
-  after_save :update_google_group
+  after_save :update_google_groups
   after_save :sync_communities
 
   belongs_to :creator, :class_name => "Person", :foreign_key => "created_by"
@@ -70,8 +70,8 @@ class Community < ActiveRecord::Base
                               people.*"
 
   has_many :mailman_lists
-  has_one :email_alias, :as => :aliasable, :dependent => :destroy
-  has_one  :google_group
+  has_one  :email_alias, :as => :aliasable, :dependent => :destroy
+  has_many :google_groups
   has_many :activities
   has_many :community_syncs
 
@@ -100,6 +100,7 @@ class Community < ActiveRecord::Base
     end
   end
 
+
   def set_shortname
     if(self.shortname.blank?)
       tmpshortname = self.name.gsub(/\W/,'').downcase
@@ -125,25 +126,36 @@ class Community < ActiveRecord::Base
     count_scope.count > 0
   end
 
+  
+  def self.check_shortname(checkname,checkcommunity = nil)
+    !(EmailAlias.mail_alias_in_use?(checkname,checkcommunity) or Community.shortname_in_use?(checkname,checkcommunity))
+  end     
+
   def update_email_alias
     if(!self.email_alias.blank?)
-      self.email_alias.update_attribute(:alias_type, (self.connect_to_google_apps? ? EmailAlias::COMMUNITY_GOOGLEAPPS : EmailAlias::COMMUNITY_NOWHERE))
+      self.email_alias.update_attribute(:alias_type, (self.connect_to_google_apps? ? EmailAlias::GOOGLEAPPS : EmailAlias::NOWHERE))
     else
-      self.create_email_alias(:alias_type => (self.connect_to_google_apps? ? EmailAlias::COMMUNITY_GOOGLEAPPS : EmailAlias::COMMUNITY_NOWHERE))            
+      self.create_email_alias(:alias_type => (self.connect_to_google_apps? ? EmailAlias::GOOGLEAPPS : EmailAlias::NOWHERE))            
     end
   end  
 
-  def update_google_group(update_members = false)
+  def update_google_groups(update_members = false)
     if(self.connect_to_google_apps?)
-      if(!self.google_group.blank?)
-        self.google_group.touch
+      if(!self.google_groups.blank?)
+        if(update_members)
+          self.google_groups.each do |gg|
+            gg.queue_members_update
+          end        
+        else
+          self.google_groups.each do |gg|
+            gg.queue_group_update
+          end
+        end
       else
-        self.create_google_group
-      end
-      if(update_members)
-        self.google_group.queue_members_update        
-      else
-        self.google_group.queue_group_update
+        # create 'joined' group
+        if(gg = self.google_groups.create)
+          gg.queue_members_update
+        end
       end
     else
       # do nothing
@@ -257,6 +269,25 @@ class Community < ActiveRecord::Base
     Rails.cache.fetch(cache_key,cache_options) do
       joined.count
     end
+  end
+
+  def joined_google_group
+    self.google_groups.where(connectiontype: 'joined').first
+  end
+
+  def create_leaders_google_group
+    if(self.connect_to_google_apps?)
+      if(!(gg = self.leaders_google_group))
+        if(gg = self.google_groups.create(connectiontype: 'leaders'))   
+          gg.queue_members_update
+        end
+      end
+      return gg
+    end
+  end
+
+  def leaders_google_group
+    self.google_groups.where(connectiontype: 'leaders').first
   end    
 
 

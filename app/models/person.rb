@@ -417,6 +417,10 @@ class Person < ActiveRecord::Base
     self.is_admin? or self.is_community_leader?(community)
   end
   
+  def is_community_member?(community)
+    ['leader','member'].include?(self.connection_with_community(community))
+  end
+  
   def connection_with_community(community)
     if(community = self.communities.where(id: community.id).first)
       community.connectiontype
@@ -838,7 +842,7 @@ class Person < ActiveRecord::Base
     end
 
     if(Settings.sync_google and community.connect_to_google_apps? and ['leader','member'].include?(connectiontype))
-      community.update_google_group(true)
+      community.update_google_groups(true)
     end
   end
 
@@ -873,7 +877,7 @@ class Person < ActiveRecord::Base
     end
 
     if(Settings.sync_google and community.connect_to_google_apps?)
-      community.update_google_group(true)
+      community.update_google_groups(true)
     end    
   end
 

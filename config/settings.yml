@@ -12,6 +12,7 @@ email_bcc_address: 'use_local_settings'
 email_from_address: 'people-notify@extension.org'
 email_from_name:  'eXtension People Notification - Do Not Reply'
 email_test_address: 'people-notify-testing@extension.org'
+googleapps_domain: 'apps.extension.org'
 googleapps_account: "use_local_settings"
 googleapps_secret:  "use_local_settings"
 learn_database: 'use_local_settings'
