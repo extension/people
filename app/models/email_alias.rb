@@ -50,7 +50,7 @@ class EmailAlias < ActiveRecord::Base
         self.destination = "#{self.mail_alias}@#{Settings.googleapps_domain}"
       else
         self.disabled = true
-        self.mail_alias = self.community.shortname
+        self.mail_alias = self.aliasable.shortname
         self.destination = "noreply"
       end
     end
