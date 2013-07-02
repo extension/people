@@ -775,8 +775,8 @@ class Person < ActiveRecord::Base
     request_options['idstring'] = self.idstring
     request_options['email'] = self.email
     request_options['fullname'] = self.fullname
-    if (!self.affiliation.blank?)
-      request_options['additional_information'] = self.affiliation
+    if (!self.involvement.blank?)
+      request_options['additional_information'] = self.involvement
     end
 
     begin
