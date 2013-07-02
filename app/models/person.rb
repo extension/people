@@ -651,6 +651,10 @@ class Person < ActiveRecord::Base
     write_attribute(:biography, self.cleanup_html(description))
   end
 
+  # attr_writer override for response to scrub html
+  def involvement=(description)
+    write_attribute(:involvement, self.cleanup_html(description))
+  end
 
   def interest_tags=(list)
     list_array = list.split(',').map{|i| i.strip}.sort

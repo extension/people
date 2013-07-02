@@ -2,6 +2,9 @@
 
 <p>If you know <%= person.first_name%> and can verify that <%= person.first_name%> is affiliated with Cooperative Extension or working with you and others in your Communities of Practice or in Cooperative Extension in general, you can vouch for <%= person.first_name%>'s eXtension account.</p>
 
+<h5>More information about <%= person.first_name %>:</h5>
+<p><%= person.cleanup_html(person.involvement).html_safe %></p>
+
 <%= form_tag(vouch_person_path(person), class: 'form-inline') do -%>
   <fieldset>
     <span class="help-block">Please briefly describe how you know <%= person.first_name%></span>
