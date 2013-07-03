@@ -21,6 +21,7 @@
   <%- else -%>
   <h4>Retire this account?</h4>
   <p>If <%= @person.fullname %> is no longer working or associated with Extension, you can retire their account.</p>
+  <p><%= @person.fullname %> was last active in People on <%= display_time(@person.last_activity_at) %></p>
 
   <%= form_tag(retire_person_path(@person)) do -%>
     <fieldset>
