@@ -9,6 +9,7 @@ class MailmanList < ActiveRecord::Base
   belongs_to :community
   has_many :email_aliases
 
+  scope :joined, -> { where(connectiontype: 'joined')}
 
   def mailto
     "#{self.name}@lists.extension.org"
