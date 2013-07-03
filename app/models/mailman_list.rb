@@ -39,6 +39,7 @@ class MailmanList < ActiveRecord::Base
         gg.update_column(:lists_alias,self.name)
         gg.queue_members_update
         self.destroy
+        puts gg.forum_url
         return gg
       else
         return nil
