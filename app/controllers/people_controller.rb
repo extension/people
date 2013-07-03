@@ -24,6 +24,13 @@ class PeopleController < ApplicationController
     if(@person != current_person)
       # manual check_hold_status
       return redirect_to home_pending_url if (!current_person.activity_allowed?)
+
+      # avoid restrictions
+      if(Person::RESTRICTED_ACCOUNTS.include?(@person.id))
+        flash[:warning] = 'This account is restricted from editing.'
+        return redirect_to person_url(@person)
+      end
+      
     end
   end
 

@@ -60,7 +60,9 @@
     <div class='pull-right'>
      <ul class="nav nav-pills">
         <li><%= link_to('Activity',activity_person_path(@person)) %></li>
-        <li><%= link_to('Edit profile',edit_person_path(@person)) %></li>
+        <%- if(@person == current_person or !Person::RESTRICTED_ACCOUNTS.include?(@person.id)) -%>
+          <li><%= link_to('Edit profile',edit_person_path(@person)) %></li>
+        <%- end -%>
       </ul>
     </div>
 

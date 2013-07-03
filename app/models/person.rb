@@ -21,6 +21,7 @@ class Person < ActiveRecord::Base
   ## constants
   DEFAULT_TIMEZONE = 'America/New_York'
   SYSTEMS_USERS = [1,2,3,4,5,6,7,8]
+  RESTRICTED_ACCOUNTS = [116955,116966]
 
   # account status
   STATUS_CONTRIBUTOR = 42
@@ -208,6 +209,8 @@ class Person < ActiveRecord::Base
       return true
     end
   end
+
+  
 
   def signin_allowed?
     if self.retired?
