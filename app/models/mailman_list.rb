@@ -18,7 +18,7 @@ class MailmanList < ActiveRecord::Base
     community_attributes = {connect_to_google_apps: true}
     if(!shortname.blank?)
       if(Community.check_shortname(shortname,self.community))
-        community_attributes[:shortname] = 'shortname'
+        community_attributes[:shortname] = shortname
       else
         return nil
       end
