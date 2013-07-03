@@ -257,10 +257,11 @@ class Community < ActiveRecord::Base
       return [community]
     end
 
-    # query twice, first by name, and then by description
+    # query thrice, first by name, then by shortname, and then by description
     namelist = Community.where("name like ?","%#{sanitizedsearchterm}%").order(:name).all
+    shortnamelist = Community.where("shortname like ?","%#{sanitizedsearchterm}%").order(:name).all
     descriptionlist = Community.where("description like ?","%#{sanitizedsearchterm}%").order(:name).all
-    returnlist = namelist | descriptionlist
+    returnlist = namelist | shortnamelist | descriptionlist
     returnlist
   end
 
