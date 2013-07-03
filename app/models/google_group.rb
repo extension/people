@@ -68,7 +68,8 @@ class GoogleGroup < ActiveRecord::Base
 
   def update_apps_group_members_and_owners
     if(group = update_apps_group_members)
-      update_apps_group_owners
+      # no longer setting owners for the time being
+      # update_apps_group_owners
     end
   end
   
@@ -149,7 +150,7 @@ class GoogleGroup < ActiveRecord::Base
   end
   
   # owners *have* to be a member of the group first, so run this after update_apps_group_members
-  def update_apps_group_owners
+  def update_apps_group_owners(clear_owners = false)
     self.establish_apps_connection
 
     # get the owners @google
@@ -161,7 +162,11 @@ class GoogleGroup < ActiveRecord::Base
     end
     
     # map the community members to an array of "blah@extension.org"
-    community_owners = self.community.leaders.map{|person| "#{person.idstring}@extension.org"}
+    if(clear_owners)
+      community_owners = []
+    else
+      community_owners = self.community.leaders.map{|person| "#{person.idstring}@extension.org"}
+    end
     
     adds = community_owners - apps_group_owners
     removes = apps_group_owners - community_owners
