@@ -128,7 +128,7 @@ class CommunitiesController < ApplicationController
     member_breadcrumbs(['Invite colleagues'])
 
     if (!params[:q].blank?) 
-      @connections = Person.patternsearch(params[:q]).order('last_name,first_name').page(params[:page])
+      @connections = Person.display_accounts.patternsearch(params[:q]).order('last_name,first_name').page(params[:page])
       if @connections.blank?
         flash[:warning] = "No colleagues were found that matched your search term"
       end
