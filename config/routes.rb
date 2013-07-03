@@ -13,6 +13,7 @@ People::Application.routes.draw do
   root :to => 'home#index'
 
   # straight up redirects
+  match "/profile/edit", to: redirect("/people/personal_edit")
   match "invite/:token", to: redirect("/signup/%{token}")
   match "/colleagues", to: redirect("/people")
   match "colleagues/showuser/:idstring", to: redirect("/people/%{idstring}")
@@ -83,6 +84,7 @@ People::Application.routes.draw do
       get :edit_social_network
       post :edit_social_network
       post :delete_social_network
+      get :personal_edit
     end
   end
 

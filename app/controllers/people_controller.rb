@@ -7,6 +7,10 @@ class PeopleController < ApplicationController
   skip_before_filter :check_hold_status, except: [:browsefile, :browse, :index, :vouch, :pendingreview, :invitations, :invite]
   before_filter :set_tab
 
+  def personal_edit
+    return redirect_to edit_person_url(current_person)
+  end
+
   def show
     @person = Person.find_by_email_or_idstring_or_id(params[:id])
     member_breadcrumbs
