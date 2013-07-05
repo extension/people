@@ -126,7 +126,11 @@ class GoogleGroup < ActiveRecord::Base
       end
       
       # map the community members to an array of "blah@extension.org"
-      community_members = self.community.joined.map{|person| "#{person.idstring}@extension.org"}
+      if(self.connectiontype == 'leaders')
+        community_members = self.community.leaders.map{|person| "#{person.idstring}@extension.org"}        
+      else
+        community_members = self.community.joined.map{|person| "#{person.idstring}@extension.org"}
+      end
       
       adds = community_members - apps_group_members
       removes = apps_group_members - community_members
