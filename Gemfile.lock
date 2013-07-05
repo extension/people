@@ -1,6 +1,6 @@
 GEM
   remote: https://rubygems.org/
-  remote: http://systems.extension.org/rubygems/
+  remote: https://systems.extension.org/rubygems/
   specs:
     actionmailer (3.2.13)
       actionpack (= 3.2.13)
@@ -46,12 +46,13 @@ GEM
     breadcrumbs_on_rails (2.3.0)
     builder (3.0.4)
     callsite (0.0.11)
-    capatross (1.5.0)
+    capatross (1.5.1)
       capistrano (>= 2.11)
       grit (>= 2.4)
       mysql2 (>= 0.3.11)
       rest-client (>= 1.6.7)
-    capistrano (2.15.4)
+      thor (>= 0.16.0)
+    capistrano (2.15.5)
       highline
       net-scp (>= 1.0.0)
       net-sftp (>= 2.0.0)
