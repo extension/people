@@ -5,5 +5,5 @@
 <%- else -%>
   <td><span class="badge"><i class='icon-lock'></i> Private</span></td>
   <td><%= ProfilePublicSetting::ITEM_LABELS[setting.item] -%></td>
-  <td><%= link_to('Make Public',change_public_setting_people_path({id: setting.id, is_public: 'yes'}), :class => "btn", :remote => true, :method => :post) -%>
+  <td><%= link_to('Make Public',change_public_setting_people_path({id: setting.id, is_public: 'yes'}), :class => "btn", :remote => true, :method => :post) -%></td>
 <%- end -%>

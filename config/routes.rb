@@ -94,6 +94,7 @@ People::Application.routes.draw do
       get :newest
       get :find
       post :find
+      post :change_notification
     end
 
     member do

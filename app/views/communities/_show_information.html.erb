@@ -1,0 +1,21 @@
+<div class='row'>
+  <div class="span3">
+    <dl>
+      <dt><%= link_to("Community Activity", activity_community_path(@community)) -%></dt>
+      <%- if(@community.connect_to_google_apps? and gg = @community.joined_google_group and current_person.is_community_member?(@community)) -%>
+      <dt><%= link_to('Community Forum (Google Group)',gg.forum_url) %></dt>
+      <dd>Post to forum by email: <%= link_to(gg.group_email_address, "mailto:#{gg.group_email_address}") %></dd>
+        <%- if(lg = @community.leaders_google_group) -%>
+        <dt><%= link_to('Community Leader Forum (Google Group)',lg.forum_url) %></dt>
+        <dd>Post to leader forum by email: <%= link_to(lg.group_email_address, "mailto:#{lg.group_email_address}") %></dd>
+        <%- end -%>
+      <%- end -%>
+    </dl>
+  </div>
+  <%- if (current_person.is_community_member?(@community))  -%>
+  <%- @thisconnection = current_person.community_connection(@community) -%>
+  <div id="notifications" class="span2 connections text-center">
+    <%= render :partial => 'notifications' %>
+  </div>
+  <%- end -%>
+</div>

@@ -191,6 +191,17 @@ class CommunitiesController < ApplicationController
   end    
 
 
+  def change_notification
+    @thisconnection = CommunityConnection.find(params[:id])
+    if (@thisconnection.person == current_person)
+      if(!params[:is_on].nil? and params[:is_on] == 'yes')
+        @thisconnection.update_attributes({sendnotifications: true})
+      else
+        @thisconnection.update_attributes({sendnotifications: false})
+      end
+    end
+  end
+
   private
 
   def member_breadcrumbs(endpoints = [])

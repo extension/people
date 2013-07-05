@@ -425,12 +425,20 @@ class Person < ActiveRecord::Base
   end
   
   def connection_with_community(community)
-    if(community = self.communities.where(id: community.id).first)
+    if(community = self.connected_community(community))
       community.connectiontype
     else
       'none'
     end
   end
+
+  def connected_community(community)
+    self.communities.where(id: community.id).first
+  end  
+
+  def community_connection(community)
+    self.community_connections.where(community_id: community.id).first
+  end  
 
   def connection_with_community_expanded(community)
     connection = self.connection_with_community(community)

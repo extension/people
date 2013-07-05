@@ -1,0 +1,7 @@
+  <%- if @thisconnection.sendnotifications? -%>
+    <p><strong>Activity Notifications:</strong> <span class="badge badge-success">ON</span></p>
+    <p><%= link_to('Turn Off',change_notification_communities_path({id: @thisconnection.id, is_on: 'no'}), :class => "btn btn-small", :remote => true, :method => :post) -%></p>
+  <%- else -%>
+    <p><strong>Activity Notifications:</strong> <span class="badge badge-warning">OFF</span></p>
+    <p><%= link_to('Turn On',change_notification_communities_path({id: @thisconnection.id, is_on: 'yes'}), :class => "btn btn-small", :remote => true, :method => :post) -%></p>
+  <%- end -%>
