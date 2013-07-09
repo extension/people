@@ -965,6 +965,8 @@ class Person < ActiveRecord::Base
     return false if(self.retired? and !forceretire)
     colleague = options[:colleague]
     self.retired = true
+    # set is_admin to false
+    self.is_admin = false
     self.save
 
     communities = {}
