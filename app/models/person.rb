@@ -217,12 +217,6 @@ class Person < ActiveRecord::Base
       return false
     elsif SYSTEMS_USERS.include?(self.id)
       return false
-    elsif(!self.last_activity_at.blank?)
-      if(self.last_activity_at < Time.now.utc - 4.days)
-        return false
-      else
-        return true
-      end
     else
       return true
     end
