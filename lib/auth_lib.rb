@@ -32,6 +32,8 @@ module AuthLib
       if(person and person.signin_allowed?)
         @current_person = person
         return true
+      else
+        session[:person_id] = nil
       end
     end
 
