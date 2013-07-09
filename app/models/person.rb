@@ -10,6 +10,7 @@ class Person < ActiveRecord::Base
   include CacheTools
   include MarkupScrubber
   serialize :password_reset
+  serialize :admin_flags
   attr_accessor :password, :current_password, :password_confirmation, :interest_tags
 
   attr_accessible :first_name, :last_name, :email, :title, :phone, :time_zone, :affiliation, :involvement, :biography
@@ -1192,7 +1193,28 @@ class Person < ActiveRecord::Base
       self.google_account.queue_account_update
     end
     true
-  end 
+  end
+
+  def is_admin_for_application(application)
+    return (!self.admin_flags.blank? and self.admin_flags[application])
+  end
+
+  def add_admin_flag_for_application(application,save=true)
+    self.admin_flags ||= {}
+    self.admin_flags[application] = true
+    if(save)  
+      self.save
+    end
+  end
+
+  def remove_admin_flag_for_application(application,save=true)
+    self.admin_flags ||= {}
+    self.admin_flags[application] = false
+    if(save)  
+      self.save
+    end
+  end  
+
 
 
   private

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130701150644) do
+ActiveRecord::Schema.define(:version => 20130709144053) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -278,7 +278,7 @@ ActiveRecord::Schema.define(:version => 20130701150644) do
     t.datetime "vouched_at"
     t.boolean  "email_confirmed",                        :default => false
     t.boolean  "is_admin",                               :default => false
-    t.boolean  "is_create_admin",                        :default => false
+    t.text     "admin_flags"
     t.boolean  "announcements",                          :default => true
     t.boolean  "retired",                                :default => false
     t.string   "base_login_string"

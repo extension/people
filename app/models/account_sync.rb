@@ -21,6 +21,17 @@ class AccountSync < ActiveRecord::Base
 
   scope :not_processed, lambda{ where(processed: false)}
 
+  def admin_application_label_for_wordpress_database(database)
+    case database
+    when Settings.about_database
+      'about'
+    when Settings.milfam_database
+      'milfam'
+    else
+      nil
+    end
+  end
+
   def queue_update
     if(self.process_on_create or !Settings.redis_enabled)
       self.update_accounts
@@ -73,7 +84,7 @@ class AccountSync < ActiveRecord::Base
   def create_database
     self.connection.execute(create_insert_update_query)
     self.connection.execute(create_admin_roles_deletion_query)
-    if(self.person.is_create_admin?)
+    if(self.person.is_admin_for_application('create'))
       self.connection.execute(create_admin_roles_query)
     end
     ['first','last'].each do |name|
@@ -106,7 +117,7 @@ class AccountSync < ActiveRecord::Base
         #{update_database}.users.first_name           = #{quoted_value_or_null(person.first_name)},
         #{update_database}.users.last_name            = #{quoted_value_or_null(person.last_name)},
         #{update_database}.users.retired              = #{person.retired},
-        #{update_database}.users.is_admin             = #{person.is_admin},
+        #{update_database}.users.is_admin             = #{person.is_admin_for_application('aae')},
         #{update_database}.users.email                = #{quoted_value_or_null(person.email)},
         #{update_database}.users.time_zone            = #{quoted_value_or_null(person.time_zone(false))},
         #{update_database}.users.location_id          = #{value_or_null(person.location_id)},
@@ -130,7 +141,7 @@ class AccountSync < ActiveRecord::Base
         #{update_database}.users.first_name           = #{quoted_value_or_null(person.first_name)},
         #{update_database}.users.last_name            = #{quoted_value_or_null(person.last_name)},
         #{update_database}.users.retired              = #{person.retired},
-        #{update_database}.users.is_admin             = #{person.is_admin},
+        #{update_database}.users.is_admin             = #{person.is_admin_for_application('aae')},
         #{update_database}.users.time_zone            = #{quoted_value_or_null(person.time_zone(false))},
         #{update_database}.users.location_id          = #{value_or_null(person.location_id)},
         #{update_database}.users.county_id            = #{value_or_null(person.county_id)},
@@ -154,7 +165,7 @@ class AccountSync < ActiveRecord::Base
             #{quoted_value_or_null(person.email)},
             #{quoted_value_or_null(person.time_zone(false))},
             #{person.id},
-            #{person.is_admin},
+            #{person.is_admin_for_application('aae')},
             #{value_or_null(person.location_id)},
             #{value_or_null(person.county_id)},
             #{quoted_value_or_null(person.title)},
@@ -188,7 +199,7 @@ class AccountSync < ActiveRecord::Base
     UPDATE #{update_database}.learners
     SET #{update_database}.learners.name         = #{quoted_value_or_null(person.fullname)},
         #{update_database}.learners.retired      = #{person.retired},
-        #{update_database}.learners.is_admin     = #{person.is_admin},
+        #{update_database}.learners.is_admin     = #{person.is_admin_for_application('learn')},
         #{update_database}.learners.email        = #{quoted_value_or_null(person.email)},
         #{update_database}.learners.time_zone    = #{quoted_value_or_null(person.time_zone(false))}
     WHERE #{update_database}.learners.darmok_id = #{person.id}
@@ -203,7 +214,7 @@ class AccountSync < ActiveRecord::Base
     UPDATE #{update_database}.learners
     SET #{update_database}.learners.name         = #{quoted_value_or_null(person.fullname)},
         #{update_database}.learners.retired      = #{person.retired},
-        #{update_database}.learners.is_admin     = #{person.is_admin},
+        #{update_database}.learners.is_admin     = #{person.is_admin_for_application('learn')},
         #{update_database}.learners.email        = #{quoted_value_or_null(person.email)},
         #{update_database}.learners.time_zone    = #{quoted_value_or_null(person.time_zone(false))}
     WHERE #{update_database}.learners.email = #{ActiveRecord::Base.quote_value(person.email)}
@@ -222,7 +233,7 @@ class AccountSync < ActiveRecord::Base
             1,
             #{quoted_value_or_null(person.time_zone(false))},
             #{person.id},
-            #{value_or_null(person.is_admin)},
+            #{value_or_null(person.is_admin_for_application('learn'))},
             #{quoted_value_or_null(person.created_at.to_s(:db))},
             NOW()
     END_SQL
@@ -335,7 +346,7 @@ class AccountSync < ActiveRecord::Base
             #{quoted_value_or_null(person.first_name)},
             #{quoted_value_or_null(person.last_name)},
             #{person.retired},
-            #{person.is_admin},
+            #{person.is_admin_for_application('www')},
             #{ActiveRecord::Base.quote_value(person.created_at.to_s(:db))},
             #{ActiveRecord::Base.quote_value(person.updated_at.to_s(:db))}
     ON DUPLICATE KEY 
@@ -343,7 +354,7 @@ class AccountSync < ActiveRecord::Base
            first_name=#{quoted_value_or_null(person.first_name)},
            last_name=#{quoted_value_or_null(person.last_name)},
            retired=#{person.retired},
-           is_admin=#{person.is_admin},
+           is_admin=#{person.is_admin_for_application('www')},
            updated_at=NOW()
     END_SQL
     query
@@ -375,10 +386,11 @@ class AccountSync < ActiveRecord::Base
   end
 
   def wordpress_usermeta_insert_update_query(update_database)
+    admin_label = self.admin_application_label_for_wordpress_database(update_database)
     person = self.person
     if(person.retired?)
       capability_string = PHP.serialize({})
-    elsif(person.is_admin?)
+    elsif(admin_label and person.is_admin_for_application(admin_label))
       capability_string = PHP.serialize({"administrator"=>true})
     else
       capability_string = PHP.serialize({"editor"=>true})
