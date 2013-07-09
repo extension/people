@@ -138,8 +138,7 @@ class Person < ActiveRecord::Base
   }
 
   def openid_url
-    protocol = ((Settings.app_location == 'localdev') ? 'http' : 'https')
-    "#{protocol}://#{Settings.urlwriter_host}/#{self.idstring}"
+    "#{Settings.openid_host}/#{self.idstring}"
   end
 
 

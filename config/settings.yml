@@ -20,6 +20,7 @@ max_live_dump_count: 200
 milfam_database: 'use_local_settings'
 months_for_inactive_flag: 12
 openid_endpoint: 'http://people.dev/opie'
+openid_host: 'https://people.extension.org'
 redis_enabled: true
 session_token: '123456789012345678901234567890'
 sync_accounts: false
