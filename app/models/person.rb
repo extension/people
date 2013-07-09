@@ -1198,7 +1198,11 @@ class Person < ActiveRecord::Base
   end
 
   def is_admin_for_application(application)
-    return (!self.admin_flags.blank? and self.admin_flags[application])
+    if(!self.admin_flags.blank? and self.admin_flags[application])
+      true
+    else
+      false
+    end
   end
 
   def add_admin_flag_for_application(application,save=true)
