@@ -29,8 +29,13 @@ class GoogleGroup < ActiveRecord::Base
 
   def set_values_from_community
     if(self.connectiontype == 'leaders')
-      self.group_id = "#{self.community.shortname}-leaders"
-      self.group_name = "#{self.community.name} (Leaders)"
+      if(self.community.is_institution?)
+        self.group_id = "#{self.community.shortname}-institutional-team"
+        self.group_name = "#{self.community.name} (Institutional Team)"   
+      else
+        self.group_id = "#{self.community.shortname}-leaders"
+        self.group_name = "#{self.community.name} (Leaders)"     
+      end
     else
       self.group_id = self.community.shortname
       self.group_name = self.community.name
