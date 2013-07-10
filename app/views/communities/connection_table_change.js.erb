@@ -1,1 +1,5 @@
+<%- if @community.is_institution? -%>
+$("#connection_row_<%= @person.id %>").html("<%= escape_javascript(render(:partial => 'institution_connections_table_row', :locals => { community: @community, person: @person, showactions: current_person.can_edit_community?(@community)})) %>")
+<%- else -%>
 $("#connection_row_<%= @person.id %>").html("<%= escape_javascript(render(:partial => 'community_connections_table_row', :locals => { community: @community, person: @person, showactions: current_person.can_edit_community?(@community)})) %>")
+<%- end -%>

@@ -5,5 +5,7 @@
 <td><%= (person.location.nil?) ? '<span class="na">n/a</span>'.html_safe : person.location.abbreviation %></td>        
 <td><%= person.connection_with_community_expanded(community) %></td>            
 <%- if showactions -%>
-<td class="connectionactions" id="connectionactions_<%= person.id %>">#TODO</td>
+<td class="connectionactions" id="connectionactions_<%= person.id %>">
+<%= render(:partial => 'connection_links', :locals => { community: community, person: person }) %>
+</td>
 <%- end -%>

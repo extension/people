@@ -81,6 +81,7 @@ module CommunitiesHelper
   end
 
 
+
   def join_community_text(community)
     community.is_institution? ? 'Join Institution' : 'Join Community'
   end
@@ -100,11 +101,11 @@ module CommunitiesHelper
   def change_connection_link(community,person,connectiontype)
     case connectiontype
     when 'leader'
-      label = 'make&nbsp;leader'.html_safe
+      label = community.is_institution? ? 'add&nbsp;to&nbsp;institutional&nbsp;team'.html_safe : 'make&nbsp;leader'.html_safe
     when 'member'
       label = 'make&nbsp;member'.html_safe
     when 'invitedleader'
-      label = 'invite&nbsp;as&nbsp;leader'.html_safe
+      label = community.is_institution? ? 'invite&nbsp;to&nbsp;institutional&nbsp;team'.html_safe : 'invite&nbsp;as&nbsp;leader'.html_safe
     when 'invitedmember'
       label = 'invite&nbsp;as&nbsp;member'.html_safe
     else
