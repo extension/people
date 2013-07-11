@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130709144053) do
+ActiveRecord::Schema.define(:version => 20130711211022) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -224,19 +224,6 @@ ActiveRecord::Schema.define(:version => 20130709144053) do
 
   add_index "locations", ["fipsid"], :name => "fipsid_ndx", :unique => true
   add_index "locations", ["name"], :name => "name_ndx", :unique => true
-
-  create_table "mailman_lists", :force => true do |t|
-    t.integer  "community_id"
-    t.string   "name",                :limit => 50
-    t.string   "password"
-    t.datetime "last_mailman_update"
-    t.string   "connectiontype"
-    t.datetime "created_at",                        :null => false
-    t.datetime "updated_at",                        :null => false
-  end
-
-  add_index "mailman_lists", ["community_id", "connectiontype"], :name => "community_type_ndx", :unique => true
-  add_index "mailman_lists", ["name"], :name => "name_ndx", :unique => true
 
   create_table "notifications", :force => true do |t|
     t.integer  "notifiable_id"

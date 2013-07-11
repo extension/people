@@ -68,7 +68,6 @@ class Community < ActiveRecord::Base
                               community_connections.sendnotifications as sendnotifications, 
                               people.*"
 
-  has_many :mailman_lists
   has_many :google_groups
   has_many :activities
   has_many :community_syncs
