@@ -57,7 +57,6 @@ class Community < ActiveRecord::Base
   validates :entrytype, :presence => true
 
   before_save :set_shortname, :flag_attributes_for_approved
-  after_save :update_email_alias
   after_save :update_google_groups
   after_save :sync_communities
 
@@ -70,7 +69,6 @@ class Community < ActiveRecord::Base
                               people.*"
 
   has_many :mailman_lists
-  has_one  :email_alias, :as => :aliasable, :dependent => :destroy
   has_many :google_groups
   has_many :activities
   has_many :community_syncs
@@ -130,14 +128,6 @@ class Community < ActiveRecord::Base
   def self.check_shortname(checkname,checkcommunity = nil)
     !(EmailAlias.mail_alias_in_use?(checkname,checkcommunity) or Community.shortname_in_use?(checkname,checkcommunity))
   end     
-
-  def update_email_alias
-    if(!self.email_alias.blank?)
-      self.email_alias.update_attribute(:alias_type, (self.connect_to_google_apps? ? EmailAlias::GOOGLEAPPS : EmailAlias::NOWHERE))
-    else
-      self.create_email_alias(:alias_type => (self.connect_to_google_apps? ? EmailAlias::GOOGLEAPPS : EmailAlias::NOWHERE))            
-    end
-  end  
 
   def update_google_groups(update_members = false)
     if(self.connect_to_google_apps?)

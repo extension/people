@@ -42,16 +42,11 @@ class EmailAlias < ActiveRecord::Base
   def set_values_from_aliasable
     # Person aliasable settings handled in person
 
-    
-    if(self.aliasable.is_a?(Community))
+    if(self.aliasable.is_a?(GoogleGroup))
       if(self.alias_type == GOOGLEAPPS)
         self.disabled = false
-        self.mail_alias = self.aliasable.shortname
+        self.mail_alias = self.aliasable.group_id
         self.destination = "#{self.mail_alias}@#{Settings.googleapps_domain}"
-      else
-        self.disabled = true
-        self.mail_alias = self.aliasable.shortname
-        self.destination = "noreply"
       end
     end
   end

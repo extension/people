@@ -15,8 +15,19 @@ class GoogleGroup < ActiveRecord::Base
   GDATA_ERROR_ENTRYDOESNOTEXIST = 1301
 
   before_save  :set_values_from_community
+  after_save :update_email_alias
+
   
   belongs_to :community
+  has_one  :email_alias, :as => :aliasable, :dependent => :destroy
+
+  def update_email_alias
+    if(!self.email_alias.blank?)
+      self.email_alias.update_attribute(:alias_type, EmailAlias::GOOGLEAPPS)
+    else
+      self.create_email_alias(:alias_type => EmailAlias::GOOGLEAPPS)            
+    end
+  end  
 
   def forum_url
     "https://groups.google.com/a/extension.org/d/forum/#{self.group_id}?hl=en"
