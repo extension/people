@@ -38,7 +38,7 @@
 <div class="row">
   <div class="span12">
     <div class='alert alert-warning'>
-      <%- if(!@person.last_account_reminder.blank? && current_person.id = 11) -%>
+      <%- if(!@person.last_account_reminder.blank? && current_person.id == 11) -%>
       <div class="pull-right">
         <%= form_tag(retire_person_path(@person)) do -%>
           <fieldset>
