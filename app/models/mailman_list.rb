@@ -7,15 +7,22 @@
 
 class MailmanList < ActiveRecord::Base
   belongs_to :community
-  has_many :email_aliases
 
   scope :joined, -> { where(connectiontype: 'joined')}
+  scope :leaders, -> { where(connectiontype: 'leaders')}
 
   def mailto
     "#{self.name}@lists.extension.org"
   end
 
   def convert_to_google_group(shortname = '')
+    # jgg flag
+    if(self.connectiontype == 'leaders')
+      if(self.community.joined_google_group.blank?)
+        created_jgg = true
+      end
+    end
+
     community_attributes = {connect_to_google_apps: true}
     if(!shortname.blank?)
       if(Community.check_shortname(shortname,self.community))
@@ -40,7 +47,10 @@ class MailmanList < ActiveRecord::Base
         gg.update_column(:lists_alias,self.name)
         gg.queue_members_update
         self.destroy
-        puts gg.forum_url
+        if(created_jgg and jgg = self.community.joined_google_group)
+          puts "https://groups.google.com/a/extension.org/forum/#!groupsettings/#{jgg.group_id}/content"
+        end
+        puts "https://groups.google.com/a/extension.org/forum/#!groupsettings/#{gg.group_id}/content"
         return gg
       else
         return nil
@@ -48,6 +58,21 @@ class MailmanList < ActiveRecord::Base
     else
       return nil
     end
+  end
+
+
+  def self.transition_google_group_aliases
+    query = <<-END_SQL.gsub(/\s+/, " ").strip
+      UPDATE email_aliases,communities,google_groups
+      SET email_aliases.aliasable_type = 'GoogleGroup', email_aliases.aliasable_id = google_groups.id
+      WHERE email_aliases.aliasable_type = 'Community' and email_aliases.aliasable_id = communities.id
+      AND google_groups.community_id = communities.id
+    END_SQL
+    result = self.connection.execute(query)
+
+    delete_query = "DELETE from email_aliases where email_aliases.aliasable_type = 'Community'"
+    delete_result = self.connection.execute(delete_query)
+    [result,delete_result]
   end
   
 end
