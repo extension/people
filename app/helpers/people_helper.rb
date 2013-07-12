@@ -79,8 +79,15 @@ module PeopleHelper
     nolink = options[:nolink] || false
 
     text_macro_options = {}
+
     # note space on the end of link - required in string formatting
-    text_macro_options[:persontext]  = hide_person_text ? '' : "#{link_to_person(activity.person,{nolink: nolink})} "
+  
+    if(activity.person_id.blank? and activity.activitycode == Activity::AUTH_LOCAL_FAILURE)
+      # special case of showing additional information for authentication failures
+      text_macro_options[:persontext]  = hide_person_text ? '' : "#{activity.additionalinfo} (unknown account) "
+    else
+      text_macro_options[:persontext]  = hide_person_text ? '' : "#{link_to_person(activity.person,{nolink: nolink})} "
+    end
 
     if(activity.activitycode == Activity::AUTH_REMOTE_SUCCESS)
       text_macro_options[:site] =  activity.site
