@@ -410,7 +410,11 @@ class PeopleController < ApplicationController
       collection_breadcrumbs(['Activity'])
 
       if(current_person.is_admin?)
-        @activities = Activity.order('created_at DESC').page(params[:page])
+        if(params[:ip])
+          @activities = Activity.where(ip_address: params[:ip]).order('created_at DESC').page(params[:page])          
+        else
+          @activities = Activity.order('created_at DESC').page(params[:page])
+        end
       else
         @activities = Activity.public_activity.order('created_at DESC').page(params[:page])
       end
