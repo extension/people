@@ -54,7 +54,7 @@ class CronTasks < Thor
   method_option :environment,:default => 'production', :aliases => "-e", :desc => "Rails environment"
   def hourly
     load_rails(options[:environment])
-    create_account_reminders
+    create_account_reminders(50)
   end 
 
 end
