@@ -110,7 +110,11 @@ People::Application.routes.draw do
     end
   end
 
-  resources :numbers, only: [:index]
+  resources :numbers, only: [:index] do
+    collection do
+      get :reminders
+    end
+  end
   
   # json data endpoints
   controller :locations do

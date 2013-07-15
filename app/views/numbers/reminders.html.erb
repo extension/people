@@ -1,0 +1,72 @@
+<%- @page_title = "Account Reminder Statistics" -%>
+
+<div class="page-header">
+  <h2><%= @page_title %></h2>
+</div>
+
+
+<div class="row">
+<div class='span6'>
+  <table class="table table-bordered">
+  	<%- reminders = Person.where("last_account_reminder IS NOT NULL").count -%>
+  	<%- retired = Person.where(retired: true).where("last_account_reminder IS NOT NULL").count -%>
+  	<%- retired_ratio = retired / reminders -%>
+  	<%- active_post_reminder = Person.where("last_activity_at > last_account_reminder").where("last_account_reminder IS NOT NULL").count -%>
+
+	  <tbody>
+	  <tr>
+	  <td>Reminders Sent</td>
+	  <td class="mednumber"><%= number_with_delimiter(reminders) %></td>
+	  </tr>
+
+	  <tr>
+	  <td>Retired</td>
+	  <td class="mednumber">
+	  	<%= number_with_delimiter(retired)%> 
+	  	(<%=  number_to_percentage(retired_ratio*100, precision: 1) %>)
+	  </td>
+	  </tr>
+
+	  <tr>
+	  <td>Active after Reminder</td>
+	  <td class="mednumber">
+	  	<%= number_with_delimiter(active_post_reminder)%> 
+	  	(<%= number_to_percentage((active_post_reminder / (reminders - retired))*100, precision: 1) %> of valid accounts)
+	  </td>
+	  </tr>
+	  </tbody>
+  </table>
+</div>
+
+
+<div class='span6'>
+  <table class="table table-bordered">
+  	<%- total = Person.display_accounts.count -%>
+  	<%- active = Person.display_accounts.active.count -%>
+  	<%- active_ratio = active / total -%>
+
+	  <tbody>
+	  <tr>
+	  <td>Total Accounts (Not Retired)</td>
+	  <td class="mednumber"><%= number_with_delimiter(total) %></td>
+	  </tr>
+
+	  <tr>
+	  <td>Active Accounts (last 6 months)</td>
+	  <td class="mednumber">
+	  	<%= number_with_delimiter(active)%> 
+	  	(<%=  number_to_percentage(active_ratio*100, precision: 1) %>)
+	  </td>
+	  </tr>
+
+	  <tr>
+	  <td>Reminders to send</td>
+	  <td class="mednumber">
+	  	<%= number_with_delimiter(Person.reminder_pool.count)%> 
+	  </td>
+	  </tr>
+	  </tbody>
+  </table>
+</div>
+
+</div>

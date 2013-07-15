@@ -97,7 +97,8 @@ class Person < ActiveRecord::Base
   scope :pendingreview, where("retired = #{false} and vouched = #{false} and account_status != #{STATUS_SIGNUP} && email_confirmed = #{true}")
   scope :not_system, where("people.id NOT IN(#{SYSTEMS_USERS.join(',')})")
   scope :display_accounts, validaccounts.not_system
-  scope :inactive, lambda{ where('last_activity_at <= ?',Time.now.utc - 6.months) }
+  scope :inactive, lambda{ where('DATE(last_activity_at) < ?',Date.today - 6.months) }
+  scope :active, lambda{ where('DATE(last_activity_at) >= ?',Date.today - 6.months) }
   scope :reminder_pool, lambda{ display_accounts.inactive.where('(last_account_reminder IS NULL or last_account_reminder <= ?)',Time.now.utc - 6.months) }
 
   
