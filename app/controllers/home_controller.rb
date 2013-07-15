@@ -13,7 +13,7 @@ class HomeController < ApplicationController
   before_filter :set_tab
 
   def index
-    scoped = Person.display_accounts.where('last_activity_at >= ?',Time.zone.now - 1.month)
+    scoped = Person.display_accounts.where('DATE(last_activity_at) >= ?',Date.today - 1.month)
     @active_count = scoped.count
   end
 

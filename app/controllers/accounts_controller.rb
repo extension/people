@@ -58,7 +58,7 @@ class AccountsController < ApplicationController
         elsif(Person::SYSTEMS_USERS.include?(@person.id))
           flash.now[:warning] = "The password for that account can't be reset"
         elsif(@person.retired?)
-          flash.now[:warning] = "Your account has been retired. #{link_to('Contact us for more information.',help_path)}".html_safe
+          flash.now[:warning] = "Your account has been retired. #{view_context.link_to('Contact us for more information.',help_path)}".html_safe
         else
           Activity.log_activity(person_id: @person.id, activitycode: Activity::PASSWORD_RESET_REQUEST, ip_address: request.remote_ip)
           Notification.create(:notification_type => Notification::PASSWORD_RESET_REQUEST, :notifiable => @person)
@@ -250,7 +250,7 @@ class AccountsController < ApplicationController
       gourl = view_context.link_to('set a new password',accounts_reset_password_path)
       explanation = "<p>Your eXtension account password is incorrect. Please check your password again.  If you have forgotten your password, you can #{gourl} for your eXtension account.</p>"
     when Activity::AUTH_ACCOUNT_RETIRED
-      gourl = view_context.link_to('contact us','#')
+      gourl = view_context.link_to('contact us',help_path)
       explanation = "<p>Your eXtension account has been retired. Please #{gourl} for more information.</p>"
     when Activity::AUTH_PASSWORD_EXPIRED
       gourl = view_context.link_to('set a new password',accounts_reset_password_path)
