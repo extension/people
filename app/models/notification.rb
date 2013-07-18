@@ -126,7 +126,9 @@ class Notification < ActiveRecord::Base
 
   def account_reminder
     AccountMailer.account_reminder({recipient: self.notifiable, notification: self}).deliver
-    self.notifiable.update_column(:last_account_reminder,Time.now.utc)
+    person = self.notifiable
+    person.update_column(:last_account_reminder,Time.now.utc)
+    person.update_column(:account_reminders,(person.account_reminders.blank? ? 1 : person.account_reminders + 1))
   end
 
   def update_colleague_profile

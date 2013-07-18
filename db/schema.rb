@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130712171623) do
+ActiveRecord::Schema.define(:version => 20130718141830) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -257,6 +257,7 @@ ActiveRecord::Schema.define(:version => 20130712171623) do
     t.integer  "account_status"
     t.datetime "last_activity_at"
     t.datetime "last_account_reminder"
+    t.integer  "account_reminders",                      :default => 0
     t.integer  "position_id",                            :default => 0
     t.integer  "location_id",                            :default => 0
     t.integer  "county_id",                              :default => 0
