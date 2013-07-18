@@ -300,11 +300,11 @@ class Person < ActiveRecord::Base
     data_string = data.to_yaml
     sha256 = Digest::SHA2.new(256)
     aes = OpenSSL::Cipher.new("AES-256-CFB")
-    iv = rand.to_s
+    iv = aes.random_iv
     key = sha256.digest("#{self.password_hash}::#{Settings.session_token}")
     aes.encrypt
     aes.key = key
-    aes.iv = aes.random_iv    
+    aes.iv = iv
     encrypted_data = aes.update(data_string) + aes.final
     write_attribute(:password_reset, {iv: iv, encrypted_data: encrypted_data})
   end    
