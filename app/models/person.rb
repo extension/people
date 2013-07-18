@@ -93,13 +93,14 @@ class Person < ActiveRecord::Base
   has_many :interests, through: :person_interests
 
   ## scopes  
+  scope :retired, -> {where(retired: true)}
   scope :validaccounts, where("retired = #{false} and vouched = #{true}") 
   scope :pendingreview, where("retired = #{false} and vouched = #{false} and account_status != #{STATUS_SIGNUP} && email_confirmed = #{true}")
   scope :not_system, where("people.id NOT IN(#{SYSTEMS_USERS.join(',')})")
   scope :display_accounts, validaccounts.not_system
-  scope :inactive, lambda{ where('DATE(last_activity_at) < ?',Date.today - 6.months) }
-  scope :active, lambda{ where('DATE(last_activity_at) >= ?',Date.today - 6.months) }
-  scope :reminder_pool, lambda{ display_accounts.inactive.where('(last_account_reminder IS NULL or last_account_reminder <= ?)',Time.now.utc - 6.months) }
+  scope :inactive, lambda{ where('DATE(last_activity_at) < ?',Date.today - Settings.months_for_inactive_flag.months) }
+  scope :active, lambda{ where('DATE(last_activity_at) >= ?',Date.today - Settings.months_for_inactive_flag.months) }
+  scope :reminder_pool, lambda{ display_accounts.inactive.where('(last_account_reminder IS NULL or last_account_reminder <= ?)',Time.now.utc - Settings.months_for_inactive_flag.months) }
 
   
   # duplicated from darmok
@@ -244,11 +245,16 @@ class Person < ActiveRecord::Base
     (self.last_activity_at.nil? or self.last_activity_at  < (Time.zone.now - Settings.months_for_inactive_flag.months))
   end 
 
-  def expire_password
-    self.password_hash = nil
-    self.legacy_password = nil
-    self.password_reset = SecureRandom.hex(16)
-    self.save
+  def expire_password(set_google_random = true)
+    if(set_google_random)
+      self.password_hash = nil
+      self.legacy_password = nil
+      self.password_reset = SecureRandom.hex(16)
+      self.save
+    else
+      self.update_column(:password_hash,nil)
+      self.update_column(:legacy_password,nil)
+    end
   end
 
   def set_hashed_password(options = {})
@@ -298,7 +304,7 @@ class Person < ActiveRecord::Base
     key = sha256.digest("#{self.password_hash}::#{Settings.session_token}")
     aes.encrypt
     aes.key = key
-    aes.iv = iv
+    aes.iv = aes.random_iv    
     encrypted_data = aes.update(data_string) + aes.final
     write_attribute(:password_reset, {iv: iv, encrypted_data: encrypted_data})
   end    
@@ -699,6 +705,22 @@ class Person < ActiveRecord::Base
       person.retire(colleague: the_system, explanation: retired_reason, ip_address: '127.0.0.1')
     end
   end
+
+  def self.expire_dormant_account_passwords(set_google_random = true)
+    self.not_system.inactive.where('legacy_password is NOT NULL or password_hash IS NOT NULL').each do |p|
+      p.expire_password(set_google_random)
+    end
+  end
+
+
+  def self.expire_retired_account_passwords
+    retire_pool = RetiredAccount.includes(:person).where('retired_accounts.created_at <= ?',Time.now.utc - 1.week).where('people.legacy_password is NOT NULL or people.password_hash IS NOT NULL').map(&:person)
+    retire_pool.each do |p|
+      # already retired, so we aren't going to bother
+      # with the google password
+      p.expire_password(false)
+    end
+  end  
 
 
   def confirm_signup(options = {})
