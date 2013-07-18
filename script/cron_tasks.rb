@@ -32,12 +32,27 @@ class CronTasks < Thor
       puts "Retired pending accounts: #{idlist.join(', ')}"
     end
 
-    # limit = 13 assumes hourly
-    def create_account_reminders(limit = 13)
-      Person.reminder_pool.limit(limit).each do |person|
+    def create_account_reminders
+      Person.reminder_pool.each do |person|
         puts "Sending account reminder to #{person.email}"
         person.send_account_reminder
       end
+    end
+
+    def cleanup_invitations
+      invitations = Invitation.remove_expired_invitations
+      email_list = invitations.map{|i| "#{i.email}"}
+      puts "Cleaning up invitations: #{email_list.join(', ')}"
+    end
+
+    def expire_passwords
+      accounts = Person.expire_retired_account_passwords
+      idlist = accounts.map{|a| "##{a.id}"}
+      puts "Cleared passwords for the following retired accounts: #{idlist.join(', ')}"
+
+      accounts = Person.expire_dormant_account_passwords
+      idlist = accounts.map{|a| "##{a.id}"}
+      puts "Cleared passwords for the following dormant accounts: #{idlist.join(', ')}"
     end
 
   end
@@ -48,13 +63,16 @@ class CronTasks < Thor
     load_rails(options[:environment])
     cleanup_signup_accounts
     cleanup_pending_accounts
+    cleanup_invitations
+    expire_passwords
+    create_account_reminders
   end
 
   desc "hourly", "All hourly cron tasks"
   method_option :environment,:default => 'production', :aliases => "-e", :desc => "Rails environment"
   def hourly
     load_rails(options[:environment])
-    create_account_reminders(75)
+    #no-op
   end 
 
 end
