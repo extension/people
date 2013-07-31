@@ -679,6 +679,8 @@ class Person < ActiveRecord::Base
       end
     end
 
+    id_list.uniq!
+
     if(id_list.sort != interests.map(&:id).sort)
       attribute_will_change!('interest_tags')
       self.interest_ids=id_list
