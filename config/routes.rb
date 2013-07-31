@@ -13,6 +13,7 @@ People::Application.routes.draw do
   root :to => 'home#index'
 
   # straight up redirects
+  match "/account/new_password", to: redirect("/accounts/reset_password")
   match "/profile/edit", to: redirect("/people/personal_edit")
   match "invite/:token", to: redirect("/signup/%{token}")
   match "/colleagues", to: redirect("/people")
@@ -24,7 +25,6 @@ People::Application.routes.draw do
     match "accounts/change_password", action: 'password', via: [:get]
     match "sp/:token", action: "reset", via: [:get]
     match "account/set_password", action: "reset", via: [:get]
-    match "account/new_password", action: "reset", via: [:get]
     match "signup/confirm", action: "confirm", via: [:get]
     match "signup/confirmemail", action: "confirm", via: [:get]
   end
