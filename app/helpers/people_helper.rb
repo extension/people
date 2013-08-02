@@ -95,10 +95,7 @@ module PeopleHelper
 
 
     text_macro_options[:communitytext]  = hide_community_text ? 'community' : "#{link_to_community(activity.community,{nolink: nolink})} community"
-
-    if(!activity.colleague.nil?)
-      text_macro_options[:colleaguetext] =  "#{link_to_person(activity.colleague,{nolink: nolink})}"
-    end
+    text_macro_options[:colleaguetext] =  "#{link_to_person(activity.colleague,{nolink: nolink, show_unknown: true})}"
 
     if(activity.activitycode == Activity::INVITATION)
       text_macro_options[:emailaddress] =  activity.additionalinfo
