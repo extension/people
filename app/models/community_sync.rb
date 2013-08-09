@@ -57,7 +57,7 @@ class CommunitySync < ActiveRecord::Base
   end
 
   def www_database
-    if(publishing_community = DarmokPublishingCommunity.find_by_id(self.id))
+    if(publishing_community = DarmokPublishingCommunity.find_by_id(self.community_id))
       if(self.community.publishing_community?)
         self.connection.execute(www_update_query)
       else
