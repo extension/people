@@ -99,7 +99,7 @@ class CommunitySync < ActiveRecord::Base
     SELECT  #{community.id},
             #{quoted_value_or_null(community.name)},
             #{community.drupal_node_id},
-            #{quoted_value_or_null(person.created_at.to_s(:db))},
+            #{quoted_value_or_null(community.created_at.to_s(:db))},
             NOW()
     END_SQL
     query    
