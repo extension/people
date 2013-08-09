@@ -78,6 +78,8 @@ class Community < ActiveRecord::Base
 
   scope :connected_as, lambda{|connectiontype| where(CONNECTION_CONDITIONS[connectiontype])}
 
+  scope :publishing, ->{where(publishing_community: true)}
+
 
   def sync_communities
     if(Settings.sync_communities)
