@@ -102,7 +102,7 @@
       <h4>Communities</h4>
       <%- if(@person.communities.count > 0) %>
       <ul class="unstyled">
-        <%- @person.communities.each do |community| -%>
+        <%- @person.communities.order(:name).each do |community| -%>
           <li><%= link_to(community.name, community) %> <small><%= @person.connection_with_community_expanded(community) %></small></li>
         <%- end -%>
       </ul>
