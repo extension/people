@@ -103,6 +103,9 @@ gem "breadcrumbs_on_rails"
 # php db munging
 gem "php_serialize"
 
+# monitoring
+gem "newrelic_rpm"
+
 group :development do
   # require the powder gem
   gem 'powder'
