@@ -55,7 +55,7 @@
       <%- Community.order('created_at DESC').limit(5).each do |community| -%>
       <dt><%= link_to(community.name,community_url(community)) %></dt>
       <dd class='type'><%= community.entrytype_to_s %> - <%= community.memberfilter_to_s %></dd>
-      <dd class='description'><%= community.description %></dd>
+      <dd class='description'><%= description_for_community(community) %></dd>
       <%- end -%>
     </dl>
     <p><%= link_to("More...",newest_communities_path)%></p>
