@@ -166,6 +166,18 @@ class CommunitySync < ActiveRecord::Base
     community.reload
 
     if(!community.drupal_node_id.blank?)
+      ## node_access
+      sql = <<-END_SQL.gsub(/\s+/, " ").strip
+      INSERT INTO #{update_database}.node_access (nid,gid,realm,grant_view,grant_update,grant_delete) 
+      SELECT #{community.drupal_node_id},
+             0,
+             'all',
+             1,
+             0,
+             0 
+      END_SQL
+      self.connection.execute(sql)
+
       ## og
       sql = <<-END_SQL.gsub(/\s+/, " ").strip
       INSERT INTO #{update_database}.og (gid,etid,entity_type,label,state,created) 
