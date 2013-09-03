@@ -19,7 +19,7 @@ group :assets do
   gem 'coffee-rails', '~> 3.2.1'
   gem 'uglifier', '>= 1.0.3'
   # files for bootstrap-in-asset-pipeline integration
-  gem 'anjlab-bootstrap-rails', '>= 2.0', :require => 'bootstrap-rails'
+  gem 'anjlab-bootstrap-rails', '~> 2.0', :require => 'bootstrap-rails'
   gem 'font-awesome-sass-rails'
   gem 'jquery-ui-rails'
   gem 'extension-html5shiv-rails', :require => 'html5shiv-rails'
