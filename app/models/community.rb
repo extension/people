@@ -53,7 +53,7 @@ class Community < ActiveRecord::Base
     'invitedleader' => 'Community Invitation (Leader)',
     'invitedleader' => 'Community Invitation (Member)'}
 
-  validates :name, :presence => true, :uniqueness => true 
+  validates :name, :presence => true, :uniqueness => {:case_sensitive => false} 
   validates :entrytype, :presence => true
 
   before_save :set_shortname, :flag_attributes_for_approved

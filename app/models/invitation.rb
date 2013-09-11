@@ -13,7 +13,7 @@ class Invitation < ActiveRecord::Base
   attr_accessible :email, :invitedcommunities, :message
 
   ## validations
-  validates :email, :presence => true, :email => true, :uniqueness => {:message => "has already been invited" }
+  validates :email, :presence => true, :email => true, :uniqueness => {:message => "has already been invited", :case_sensitive => false }
 
   ## filters
   before_create :generate_token

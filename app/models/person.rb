@@ -40,7 +40,7 @@ class Person < ActiveRecord::Base
   ## validations
   validates :first_name, :presence => true
   validates :last_name, :presence => true
-  validates :idstring, :presence => true, :uniqueness => true 
+  validates :idstring, :presence => true, :uniqueness => {:case_sensitive => false} 
   validates :email, :presence => true, :email => true, :uniqueness => {:case_sensitive => false}
   validates :password, :length => { :in => 8..40 }, :presence => true, :on => :create
   validates :involvement, :presence => true, :on => :create
