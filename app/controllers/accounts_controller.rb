@@ -124,7 +124,11 @@ class AccountsController < ApplicationController
     when Person::STATUS_SIGNUP
       confirm_signup
     when Person::STATUS_CONFIRM_EMAIL
-      confirm_email
+      if(current_person.account_status == Person::STATUS_SIGNUP)
+        confirm_signup
+      else
+        confirm_email
+      end
     else
       return render(:template => 'accounts/invalid_token')
     end
