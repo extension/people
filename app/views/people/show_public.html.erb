@@ -1,10 +1,15 @@
 <% @page_title = "Profile for #{@person.fullname}" %>
 
-
-<%- if @person.public_attributes[:profile_attributes].blank? -%>
+<%- if !@person.validaccount? -%>
 <div class="row">
   <div class="span12">
-    <h2>This profile is private.</h2>
+    <h2>Closed profile.</h2>
+  </div>
+</div>
+<%- elsif @person.public_attributes[:profile_attributes].blank? -%>
+<div class="row">
+  <div class="span12">
+    <h2>Private profile.</h2>
   </div>
 </div>
 <%- else -%>
