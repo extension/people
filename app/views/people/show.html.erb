@@ -1,6 +1,11 @@
 <% @page_title = "Profile for #{@person.fullname}" %>
 
-<%= render(:partial => 'show_status_banner', locals: {person: @person}) %>
+<%- if current_person != @person -%>
+  <%= render(:partial => 'show_status_banner', locals: {person: @person}) %>
+<%- else -%>
+  <%= render(:partial => 'show_personal_status_banner') %>
+<%- end -%>
+
 <div class="row">
 
   <div class="span7"> 
