@@ -6,7 +6,7 @@
 
 class AccountsController < ApplicationController
   skip_before_filter :check_hold_status
-  skip_before_filter :signin_required, except: [:post_signup, :confirm, :resend_confirmation, :pending_confirmation, :contributor_agreement]
+  skip_before_filter :signin_required, except: [:post_signup, :confirm, :resend_confirmation, :pending_confirmation, :contributor_agreement, :review]
   before_filter :signin_optional
 
   def signout
