@@ -47,6 +47,7 @@ gem 'capatross'
 
 # background jobs
 gem 'sidekiq'
+gem 'sinatra'
 
 # command line tools
 gem 'thor'

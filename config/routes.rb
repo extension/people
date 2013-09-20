@@ -6,10 +6,12 @@
 #  see LICENSE file
 
 # see config/initializers/add_named_route.rb for simple_named_route
+require 'sidekiq/web'
+require 'admin_constraint'
 
 People::Application.routes.draw do
+  mount Sidekiq::Web => '/queues', :constraints => AdminConstraint.new
 
-  
   root :to => 'home#index'
 
   # straight up redirects
