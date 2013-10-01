@@ -6,7 +6,7 @@
 #  see LICENSE file
 
 class EmailAlias < ActiveRecord::Base
-  attr_accessible :aliasable, :aliasable_type, :aliasable_id, :alias_type, :mail_alias, :destination
+  attr_accessible :aliasable, :aliasable_type, :aliasable_id, :alias_type, :mail_alias, :destination, :disabled
 
   before_validation  :set_values_from_aliasable  
   before_save  :set_values_from_aliasable

@@ -541,11 +541,7 @@ class Person < ActiveRecord::Base
   end
 
   def set_email_forward(options = {})
-    return nil if(options[:destination].blank? and options[:googleapps].blank?)
-
-    # do nothing if the email isn't confirmed
-    # "true" because this runs as a callback
-    return true if(!self.email_confirmed?)
+    return nil if(options[:destination].nil? and options[:googleapps].nil?)
   
     current_forward = self.email_forward
     if(self.email =~ /extension\.org$/i)
@@ -572,9 +568,9 @@ class Person < ActiveRecord::Base
     end
 
     if(current_forward)
-      current_forward.update_attributes({destination: destination, alias_type: alias_type})
+      current_forward.update_attributes({destination: destination, alias_type: alias_type, disabled: !self.email_confirmed?})
     else
-      self.email_aliases.create({mail_alias: self.idstring, destination: destination, alias_type: alias_type})
+      self.email_aliases.create({mail_alias: self.idstring, destination: destination, alias_type: alias_type, disabled: !self.email_confirmed?})
     end
   end
 
