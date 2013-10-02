@@ -4,7 +4,6 @@
 # === LICENSE:
 # see LICENSE file
 require 'rubygems'
-require 'bundler/setup'
 require 'thor'
 
 class CronTasks < Thor
