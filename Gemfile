@@ -104,9 +104,6 @@ gem "breadcrumbs_on_rails"
 # php db munging
 gem "php_serialize"
 
-# text cleanup
-gem "auto_strip_attributes", "~> 2.0"
-
 group :development do
   # require the powder gem
   gem 'powder'
