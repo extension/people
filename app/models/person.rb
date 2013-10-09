@@ -19,6 +19,8 @@ class Person < ActiveRecord::Base
   attr_accessible :invitation, :invitation_id 
   attr_accessible :last_account_reminder, :password_reset
 
+  auto_strip_attributes :first_name, :last_name, :email, :title, :affiliation, :squish => true
+
   ## constants
   DEFAULT_TIMEZONE = 'America/New_York'
   SYSTEMS_USERS = [1,2,3,4,5,6,7,8]
