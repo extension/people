@@ -16,7 +16,7 @@ People::Application.configure do
 
   # Compress JavaScripts and CSS
   config.assets.compress = true
-  config.assets.js_compressor = Uglifier.new :quote_keys => true
+  config.assets.js_compressor = Uglifier.new :output => { :quote_keys => true }
 
   # Don't fallback to assets pipeline if a precompiled asset is missed
   config.assets.compile = false
