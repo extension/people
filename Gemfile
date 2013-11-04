@@ -43,7 +43,7 @@ gem 'jquery-rails'
 gem 'kaminari'
 
 # Deploy with Capistrano
-gem 'capistrano'
+gem 'capistrano', '~> 2.15.5' 
 gem 'capatross'
 
 # background jobs
