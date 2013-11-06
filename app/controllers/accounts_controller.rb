@@ -170,6 +170,11 @@ class AccountsController < ApplicationController
 
   def create
     @person = Person.new(params[:person])
+    if(@person.email =~ /extension\.org$/i)
+      @person.errors.add(:email, "For technical reasons, signing up with an extension.org email address is not possible.".html_safe)
+      return render(:action => "signup")
+    end
+
  
     if(!params[:invite].nil? and @invitation = Invitation.find_by_token(params[:invite]))
       @person.invitation = @invitation

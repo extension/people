@@ -40,10 +40,28 @@ class PeopleController < ApplicationController
 
   def update
     @person = Person.find(params[:id])
+
     if(current_person != @person and !current_person.is_admin? )
       update_params = params[:person].reject{|attribute,value| attribute == 'email'}
     else
       update_params = params[:person]
+    end
+
+    # prevent setting email to @extension.org unless it already is @extension.org
+    if(update_params[:email])
+      if(update_params[:email] =~ /extension\.org$/i)
+        if(@person.email =~ /extension\.org$/i)
+          if(@person.email.downcase != update_params[:email].strip.downcase)
+            @person.attributes = update_params
+            @person.errors.add(:email, "For technical reasons, changing to a different extension.org email address is not possible.".html_safe)
+            return render :action => 'edit'
+          end
+        else
+          @person.attributes = update_params
+          @person.errors.add(:email, "For technical reasons, changing to an extension.org email address is not possible.".html_safe)
+          return render :action => 'edit'
+        end
+      end
     end
 
     if @person.update_attributes(params[:person])
