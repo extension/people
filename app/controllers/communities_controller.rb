@@ -97,7 +97,7 @@ class CommunitiesController < ApplicationController
   def connectionsfile
     # will raise ActiveRecord::RecordNotFound on not found 
     @community = Community.find_by_shortname_or_id(params[:id])
-    filename = "#{Settings.downloads_data_dir}/#{@community.name.tr(' ','_').tr(',','').gsub('\W','').downcase}_connections.csv"
+    filename = "#{Settings.downloads_data_dir}/community_#{@community.id}_connections.csv"
     @community.people.display_accounts.dump_to_csv(filename,{community: @community})
     send_file(filename,
               :type => 'text/csv; charset=iso-8859-1; header=present',
