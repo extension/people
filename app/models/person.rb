@@ -514,6 +514,13 @@ class Person < ActiveRecord::Base
     self.email_confirmed = true
     self.email_confirmed_at = Time.zone.now
     self.account_status = STATUS_OK
+
+    if(!self.vouched? and self.has_whitelisted_email?)
+      self.vouched = true 
+      self.vouched_by = self.id
+      self.vouched_at = Time.now.utc
+    end
+
     if(self.save)
       Activity.log_activity(person_id: self.id, activitycode: Activity::CONFIRMED_EMAIL, additionalinfo: self.email, ip_address: options[:ip_address])
       return true
@@ -521,6 +528,7 @@ class Person < ActiveRecord::Base
       return false
     end
   end
+
 
   def create_email_forward
     self.set_email_forward(googleapps: false)
