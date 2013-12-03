@@ -66,7 +66,7 @@ gem 'airbrake'
 gem 'redis-rails'
 
 # forms
-gem 'simple_form'
+gem 'simple_form', "~> 2.1.0"
 
 # openid
 gem "ruby-openid", :require => 'openid'
