@@ -2,49 +2,31 @@
 
 
 <div class='row'>
-  <div class='span12'>
-  <h2><%= community_icon(@community) %> <%= @community.name%> <small><%= @community.entrytype_to_s -%></small></h2>
+  <div class='span9'>
+  <h2><%= community_icon(@community) %> <%= @community.name%></h2>
+      <%= description_for_community(@community) -%>
   </div>
+  <div id="connectiontocommunity" class="span2 dashmodule text-center">
+    <%= render :partial => 'make_connection' %>
+  </div>  
 </div>
-
-<div class='row'>
-  <div class="span12">
-        <p>
-          <%= description_for_community(@community) -%>
-        </p>
-  </div>
-</div>
-
 
 <div class="row">
   <div class="span6">
+      <h3>People and Activity</h3>
+      <div class="row">
+        <div id="communitynumbers" class="dashmodule span2">
+         <%= render(:partial => 'community_numbers') -%>
+         </div>
 
-      <h3>People
-      <%- if (current_person.can_invite_others_to_community?(@community))  -%>
-        <small><%= link_to('Invite people to join this community', invite_community_path(@community), class: '') %></small>
-      <%- end -%>
-      </h3>
-      <div class="dashmodule">
-        <div class="row">
-          <div id='communitynumbers' class='span2'>
-            <%= render(:partial => 'community_numbers') -%>
-          </div>
-          <div id="connectiontocommunity" class="span3 connections text-center">
-            <%= render :partial => 'make_connection' %>
+        <div class="dashmodule span3 text-center">
+          <p><%= link_to("View connection activity", activity_community_path(@community), class: '') -%></p>
+          <div id="notifications" class="text-center">
+            <%= render :partial => 'notifications' %>
           </div>
         </div>
       </div>
 
-      <h3>Community Information</h3>
-      <div id="communityreports" class="dashmodule">
-        <%= render :partial => 'show_information' %>
-      </div>
-
-
-    </div>
-
-
-    <div class="span6">
       <h3>
         <%= @community.entrytype_display_label.capitalize -%> Attributes
         <%- if(current_person.can_edit_community?(@community)) -%>
@@ -55,7 +37,7 @@
 
       
       <div class="dashmodule">
-
+        <p class="lead"><%= @community.entrytype_to_s -%></p>
         <dl>
           <dt>Membership:</dt>
           <dd><%= @community.memberfilter_to_s -%></dd>
@@ -66,23 +48,45 @@
         </dl>
       </div>
 
-      <%- if (@community.connect_to_drupal? and @community.drupal_node_id) or @community.is_launched? -%>
-      <h3>Elsewhere in eXtension</h3>
-      <div class="dashmodule">
-        <p><em>Links to information for this community in other eXtension applications</em></p>
-        <dl>
-        <%- if (@community.connect_to_drupal? and @community.drupal_node_id) -%>
-          <dt>create.extension.org</dt>
-          <dd><a href="http://create.extension.org/node/<%= @community.drupal_node_id %>">Community Dashboard</a></dd>
-        <%- end -%>
-        <%- if  @community.is_launched? -%>
-          <dt>data.extension.org</dt>
-          <dd><a href="http://data.extension.org/groups/<%= @community.id %>">Group Information</a></dd>
-        <%- end -%>
-        </dl>
+  </div>
+
+
+  <div class="span6">
+
+
+    <%- if (@community.connect_to_drupal? and @community.drupal_node_id) or @community.is_launched? -%>
+    <h3>Elsewhere in eXtension</h3>
+    <div class="dashmodule">
+      <p><em>Links to information for this community in other eXtension applications</em></p>
+      <dl>
+      <%- if (@community.connect_to_drupal? and @community.drupal_node_id) -%>
+        <dt>create.extension.org</dt>
+        <dd><a href="http://create.extension.org/node/<%= @community.drupal_node_id %>">Community Dashboard</a></dd>
+      <%- end -%>
+      <%- if  @community.is_launched? -%>
+        <dt>data.extension.org</dt>
+        <dd><a href="http://data.extension.org/groups/<%= @community.id %>">Group Information</a></dd>
+      <%- end -%>
+      </dl>
+    </div>
+    <%- end -%>
+
+    <div id="communityforums">
+      <%- if(@community.connect_to_google_apps? and gg = @community.joined_google_group and (current_person.is_community_member?(@community) or current_person.is_admin?)) -%>
+      <h3>Community Forums</h3>      
+        <div class="dashmodule">
+          <dl>
+            <dt><%= link_to('Community Forum (Google Group)',gg.forum_url) %></dt>
+            <dd>Post to forum by email: <%= link_to(gg.group_email_address, "mailto:#{gg.group_email_address}") %></dd>
+              <%- if(lg = @community.leaders_google_group) -%>
+              <dt><%= link_to('Community Leader Forum (Google Group)',lg.forum_url) %></dt>
+              <dd>Post to leader forum by email: <%= link_to(lg.group_email_address, "mailto:#{lg.group_email_address}") %></dd>
+              <%- end -%>
+          </dl>
       </div>
       <%- end -%>
-
     </div>
+
   </div>
+</div>
 

@@ -16,6 +16,7 @@ class CommunitiesController < ApplicationController
     @community = Community.find_by_shortname_or_id(params[:id])
     member_breadcrumbs
     @current_person_community_connection = current_person.connection_with_community(@community)
+    @thisconnection = current_person.community_connection(@community)
   end
 
   def edit
@@ -141,6 +142,7 @@ class CommunitiesController < ApplicationController
     @community = Community.find_by_shortname_or_id(params[:id])
     current_person.join_community(@community,{ip_address: request.remote_ip})
     @current_person_community_connection = current_person.connection_with_community(@community)
+    @thisconnection = current_person.community_connection(@community)
     render(template: 'communities/connect')
   end
 
@@ -148,6 +150,7 @@ class CommunitiesController < ApplicationController
     @community = Community.find_by_shortname_or_id(params[:id])
     current_person.leave_community(@community,{ip_address: request.remote_ip})
     @current_person_community_connection = current_person.connection_with_community(@community)
+    @thisconnection = current_person.community_connection(@community)
     render(template: 'communities/connect')   
   end
 
@@ -193,6 +196,7 @@ class CommunitiesController < ApplicationController
 
   def change_notification
     @thisconnection = CommunityConnection.find(params[:id])
+    @community = @thisconnection.community
     if (@thisconnection.person == current_person)
       if(!params[:is_on].nil? and params[:is_on] == 'yes')
         @thisconnection.update_attributes({sendnotifications: true})
