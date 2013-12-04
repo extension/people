@@ -126,9 +126,9 @@ class Person < ActiveRecord::Base
        :secondword => words[1]
       }
       conditions = ["((first_name rlike :firstword AND last_name rlike :secondword) OR (first_name rlike :secondword AND last_name rlike :firstword))",findvalues]
-    elsif(sanitizedsearchterm.to_i != 0)
+    elsif(sanitizedsearchterm.cast_to_i != 0)
       # special case of an id search - needed in admin/colleague searches
-      conditions = ["id = #{sanitizedsearchterm.to_i}"]
+      conditions = ["id = #{sanitizedsearchterm.cast_to_i}"]
     else
       findvalues = {
        :findlogin => sanitizedsearchterm,
@@ -173,7 +173,7 @@ class Person < ActiveRecord::Base
 
   def self.find_by_email_or_idstring_or_id(id,raise_not_found = true)
 
-    if(id.to_i > 0)
+    if(id.cast_to_i > 0)
       person = self.find_by_id(id)
     elsif(id =~ %r{@})
       person = self.find_by_email(id)
@@ -680,8 +680,8 @@ class Person < ActiveRecord::Base
     list_array = list.split(',').map{|i| i.strip}.sort
     id_list = []
     list_array.each do |t|
-      if(t.to_i > 0)
-        id_list << t.to_i
+      if(t.cast_to_i > 0)
+        id_list << t.cast_to_i
       else
         id_list << Interest.find_or_create_by_name(t).id
       end

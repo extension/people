@@ -217,7 +217,7 @@ class Community < ActiveRecord::Base
   end
 
   def self.find_by_shortname_or_id(searchterm,raise_not_found = true)
-    if(searchterm.to_i > 0)
+    if(searchterm.cast_to_i > 0)
       community = self.where(id: searchterm).first
     else
       community = self.where(shortname: searchterm).first

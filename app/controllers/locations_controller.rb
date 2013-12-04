@@ -11,7 +11,7 @@ class LocationsController < ApplicationController
 
   def counties
     if(find_location = params[:location])
-      if(find_location.to_i > 0)
+      if(find_location.cast_to_i > 0)
         location = Location.where(id: find_location).first
       end
       # TODO find by name or abbreviation if ever needed
@@ -29,7 +29,7 @@ class LocationsController < ApplicationController
 
   def institutions
     if(find_location = params[:location])
-      if(find_location.to_i > 0)
+      if(find_location.cast_to_i > 0)
         location = Location.where(id: find_location).first
       end
       # TODO find by name or abbreviation if ever needed
