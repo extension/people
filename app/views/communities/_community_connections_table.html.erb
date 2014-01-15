@@ -1,4 +1,3 @@
-<%- showactions = current_person.can_edit_community?(@community) -%>
 <table class="table table-bordered table-striped">
   <thead>
     <tr>
@@ -9,7 +8,7 @@
     <th>Other Affiliation</th>
     <th>Location</th>
     <th>Connection</th>
-    <%- if showactions -%>
+    <%- if (current_person.can_edit_community?(@community) or current_person.can_invite_others_to_community?(@community)) -%>
     <th>Actions</th>
     <%- end -%>
     </tr>
@@ -18,7 +17,7 @@
   <tbody>
   <%- for person in @connections -%>
     <tr id="connection_row_<%= person.id %>">
-      <%= render(:partial => 'community_connections_table_row', :locals => { community: @community, person: person, showactions: showactions}) %>
+      <%= render(:partial => 'community_connections_table_row', :locals => { community: @community, person: person}) %>
     </tr>
   <%- end -%>
   </tbody>
