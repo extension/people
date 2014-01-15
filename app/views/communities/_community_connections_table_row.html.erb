@@ -5,8 +5,12 @@
 <td><%= (person.affiliation.blank?) ? '<span class="na">&nbsp;</span>'.html_safe : person.affiliation %></td>        
 <td><%= (person.location.nil?) ? '<span class="na">n/a</span>'.html_safe : person.location.abbreviation %></td>        
 <td><%= person.connection_with_community_expanded(community) %></td>            
-<%- if showactions -%>
-<td class="connectionactions" id="connectionactions_<%= person.id %>">
-<%= render(:partial => 'connection_links', :locals => { community: community, person: person }) %>
-</td>
+<%- if current_person.can_edit_community?(community) -%>
+  <td class="connectionactions" id="connectionactions_<%= person.id %>">
+  <%= render(:partial => 'connection_links', :locals => { community: community, person: person }) %>
+  </td>
+<%- elsif current_person.can_invite_others_to_community?(community) -%>
+  <td class="connectionactions" id="connectionactions_<%= person.id %>">
+  <%= render(:partial => 'invite_connection_links', :locals => { community: community, person: person }) %>
+  </td>
 <%- end -%>
