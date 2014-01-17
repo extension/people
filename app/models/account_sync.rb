@@ -13,7 +13,7 @@ class AccountSync < ActiveRecord::Base
   CREATE_ADMIN_ROLE = 3
   UPDATE_DATABASES = {'aae_database' => Settings.aae_database,
                       'learn_database' => Settings.learn_database,
-                      'create_database' => Settings.create_database,
+                      'create_databases' => [Settings.create_database, Settings.create_bootcamp_database],
                       'www_database' => Settings.www_database,
                       'wordpress_databases' => [Settings.about_database, Settings.milfam_database]}
 
@@ -81,18 +81,20 @@ class AccountSync < ActiveRecord::Base
     self.connection.execute(learn_authmap_insert_query)
   end
 
-  def create_database
-    self.connection.execute(create_insert_update_query)
-    self.connection.execute(create_admin_roles_deletion_query)
-    if(self.person.is_admin_for_application('create'))
-      self.connection.execute(create_admin_roles_query)
-    end
-    ['first','last'].each do |name|
-      ['data','revision'].each do |data_or_revision|
-        self.connection.execute(create_names_update_query(name,data_or_revision))
+  def create_databases
+    UPDATE_DATABASES['create_databases'].each do |update_database|
+      self.connection.execute(create_insert_update_query(update_database))
+      self.connection.execute(create_admin_roles_deletion_query(update_database))
+      if(self.person.is_admin_for_application('create'))
+        self.connection.execute(create_admin_roles_query(update_database))
       end
+      ['first','last'].each do |name|
+        ['data','revision'].each do |data_or_revision|
+          self.connection.execute(create_names_update_query(update_database,name,data_or_revision))
+        end
+      end
+      self.connection.execute(create_authmap_insert_query(update_database))
     end
-    self.connection.execute(create_authmap_insert_query)
   end
 
   def www_database
@@ -257,9 +259,8 @@ class AccountSync < ActiveRecord::Base
   end
 
 
-  def create_insert_update_query
+  def create_insert_update_query(update_database)
     person = self.person
-    update_database = UPDATE_DATABASES['create_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{update_database}.users (uid,name,pass,mail,created,status)
     SELECT  #{person.id}, 
@@ -278,9 +279,8 @@ class AccountSync < ActiveRecord::Base
   end
 
 
-  def create_admin_roles_deletion_query
+  def create_admin_roles_deletion_query(update_database)
     person = self.person
-    update_database = UPDATE_DATABASES['create_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     DELETE FROM #{update_database}.users_roles
     WHERE uid = #{person.id} AND rid = #{CREATE_ADMIN_ROLE}
@@ -288,9 +288,8 @@ class AccountSync < ActiveRecord::Base
     query
   end
 
-  def create_admin_roles_query
+  def create_admin_roles_query(update_database)
     person = self.person
-    update_database = UPDATE_DATABASES['create_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{update_database}.users_roles (uid,rid)
     SELECT  #{person.id}, 
@@ -299,9 +298,8 @@ class AccountSync < ActiveRecord::Base
     query
   end
 
-  def create_names_update_query(name,data_or_revision)
+  def create_names_update_query(update_database,name,data_or_revision)
     person = self.person
-    update_database = UPDATE_DATABASES['create_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{update_database}.field_#{data_or_revision}_field_#{name}_name (entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_#{name}_name_value, field_#{name}_name_format)
     SELECT 'user', 
@@ -319,9 +317,8 @@ class AccountSync < ActiveRecord::Base
     query  
   end
 
-  def create_authmap_insert_query      
+  def create_authmap_insert_query(update_database)      
     person = self.person
-    update_database = UPDATE_DATABASES['create_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{update_database}.authmap (aid,uid,authname,module)
     SELECT #{person.id},
