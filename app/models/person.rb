@@ -331,20 +331,30 @@ class Person < ActiveRecord::Base
   end
 
   def self.check_idstring_for_openid(idstring)
-    idstring.strip!
     if(/^(http|https):\/\/people.extension.org\/([a-zA-Z]+[a-zA-Z0-9]+)$/ =~ idstring)
-      returnid = $2
+      $2
     elsif(/^people.extension.org\/([a-zA-Z]+[a-zA-Z0-9]+)$/ =~ idstring)
-      returnid = $1
+      $1
     else
-      returnid = nil
+      nil
     end
-    return returnid
   end
 
+  def self.check_idstring_for_extensionorg(idstring)
+    if(%r{(\w+)\@extension\.org$} =~ idstring)
+      $1
+    else
+      nil
+    end
+  end
+
+
   def self.authenticate(idstring,password)
+    idstring.strip!
     if(checkid = check_idstring_for_openid(idstring))
       check_person = self.where(idstring: checkid).first
+    elsif(checkid = check_idstring_for_extensionorg(idstring))
+      check_person = self.where(idstring: checkid).first      
     else
       check_person = self.where("idstring = ? OR email = ?",idstring,idstring).first
     end
