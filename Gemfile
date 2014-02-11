@@ -20,7 +20,7 @@ group :assets do
   gem 'sass-rails',   '~> 3.2.3'
   gem 'coffee-rails', '~> 3.2.1'
   # files for bootstrap-in-asset-pipeline integration
-  gem 'anjlab-bootstrap-rails', '~> 2.0', :require => 'bootstrap-rails'
+  gem 'bootstrap-sass', '~> 2.3.2.2'
   gem 'font-awesome-sass-rails'
   gem 'jquery-ui-rails'
   gem 'extension-html5shiv-rails', :require => 'html5shiv-rails'

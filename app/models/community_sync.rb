@@ -2,7 +2,7 @@
 #  Copyright (c) North Carolina State University
 #  Developed with funding for the National eXtension Initiative.
 # === LICENSE:
-#  BSD(-compatible)
+#
 #  see LICENSE file
 
 class CommunitySync < ActiveRecord::Base
@@ -10,7 +10,7 @@ class CommunitySync < ActiveRecord::Base
   attr_accessible :success, :errors
   attr_accessible :community, :community_id, :processed, :process_on_create
 
-  UPDATE_DATABASES = {'create_database' => Settings.create_database,
+  UPDATE_DATABASES = {'create_databases' => [Settings.create_database, Settings.create_bootcamp_database]
                       'www_database' => Settings.www_database}
 
   after_create  :queue_update
