@@ -19,11 +19,14 @@ gem 'uglifier', '>= 1.0.3'
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'
   gem 'coffee-rails', '~> 3.2.1'
+  gem 'jquery-ui-rails'
   # files for bootstrap-in-asset-pipeline integration
   gem 'bootstrap-sass', '~> 2.3.2.2'
-  gem 'font-awesome-sass-rails'
-  gem 'jquery-ui-rails'
+  # extension's packaging of html5shiv for the asset pipeline
   gem 'extension-html5shiv-rails', :require => 'html5shiv-rails'
+  # replaces glyphicons
+  gem 'font-awesome-rails'
+  # select2 asset packaging - used for tag and filter interfaces
   gem "select2-rails"
 end
 

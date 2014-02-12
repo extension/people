@@ -32,9 +32,6 @@ GEM
     airbrake (3.1.14)
       builder
       json
-    anjlab-bootstrap-rails (2.3.1.2)
-      railties (>= 3.0)
-      sass (>= 3.2)
     arel (3.0.3)
     auto_strip_attributes (2.0.4)
       activerecord (>= 3.0)
@@ -44,6 +41,8 @@ GEM
       erubis (>= 2.6.6)
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
+    bootstrap-sass (2.3.2.2)
+      sass (~> 3.2)
     breadcrumbs_on_rails (2.3.0)
     builder (3.0.4)
     callsite (0.0.11)
@@ -78,9 +77,8 @@ GEM
     erubis (2.7.0)
     execjs (2.0.2)
     extension-html5shiv-rails (3.6.2.1)
-    font-awesome-sass-rails (3.0.2.2)
-      railties (>= 3.1.1)
-      sass-rails (>= 3.1.1)
+    font-awesome-rails (4.0.3.1)
+      railties (>= 3.2, < 5.0)
     garb (0.9.1)
       activesupport (>= 2.2.0)
       crack (>= 0.1.6)
@@ -254,18 +252,18 @@ PLATFORMS
 
 DEPENDENCIES
   airbrake
-  anjlab-bootstrap-rails (~> 2.0)
   auto_strip_attributes (~> 2.0)
   bcrypt-ruby (~> 3.0.0)
   better_errors
   binding_of_caller
+  bootstrap-sass (~> 2.3.2.2)
   breadcrumbs_on_rails
   capatross
   capistrano (~> 2.15.5)
   coffee-rails (~> 3.2.1)
   csspool
   extension-html5shiv-rails
-  font-awesome-sass-rails
+  font-awesome-rails
   garb
   geocoder
   geoip
