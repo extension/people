@@ -1,7 +1,14 @@
 <%- @page_title = "Find Colleagues" -%>
 
+
+
+
+
+<%- if !@colleagues.blank? -%>
+
 <div class="page-header">
-  <h2><%= @page_title %></h2>
+  <h2>Colleagues</h2>
+  <p>These are the colleagues that matched <i><%= params[:q] %></i></p>
 </div>
 
 <div class="row">
@@ -10,12 +17,38 @@
   </div>
 </div>
 
-<%- if !@colleagues.blank? -%>
 <div class="row">
   <div class="span12">
     <%= page_entries_info @colleagues %>
     <%= paginate(@colleagues) %>
     <%= render(:partial => 'list', locals: {colleagues: @colleagues}) %>
+  </div>
+</div>
+<%- elsif !params[:q].blank? -%>
+
+<div class="page-header">
+  <h2>No colleagues found</h2>
+  <p>No colleagues with an eXtensionID, email address, or name matched <i><%= params[:q] %></i>. If you searched by email, try using the person's name.</p>
+</div>
+
+<div class="row">
+  <div class="span12">
+
+    <%= render(:partial => 'people/find_form') %>
+
+    <p>Colleague still not found? <%= link_to("Invite your colleague to get an eXtensionID", invite_people_path)%>. You just need to know your colleague's email address.  You can also <%= link_to("browse existing invitations", invitations_people_path)%>.</p>
+  </div>
+</div>
+
+<%- else -%>
+
+<div class="page-header">
+  <h2>Find Colleagues</h2>
+</div>
+
+<div class="row">
+  <div class="span12">
+    <%= render(:partial => 'people/find_form') %>
   </div>
 </div>
 <%- end -%>
