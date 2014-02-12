@@ -16,7 +16,7 @@
         <th>Date/Time</th>
         <th>Description</th>
         <%- if(current_person.is_admin? or (!@person.blank? and @person == current_person)) -%>
-          <th><i class='icon-lock'></i> IP Address</th>
+          <th><i class='fa fa-lock'></i> IP Address</th>
         <%- end -%>
         </tr>
       </thead>
@@ -25,7 +25,7 @@
       <%- for activity in @activities -%>
         <tr id="activity_row_<%= activity.id %>">
           <%- if(activity.is_private?) -%>
-            <td><i class='icon-lock'></i></td>
+            <td><i class='fa fa-lock'></i></td>
           <%- else -%>
             <td>&nbsp;</td>
           <%- end -%>

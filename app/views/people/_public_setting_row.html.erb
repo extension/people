@@ -1,9 +1,9 @@
 <%- if setting.is_public? -%>
-  <td><span class="badge badge-success"><i class='icon-globe'></i> Public</span></td>
+  <td><span class="badge badge-success"><i class='fa fa-globe'></i> Public</span></td>
   <td><%= ProfilePublicSetting::ITEM_LABELS[setting.item] -%></td>
   <td><%= link_to('Make Private',change_public_setting_people_path({id: setting.id, is_public: 'no'}), :class => "btn", :remote => true, :method => :post) -%></td>
 <%- else -%>
-  <td><span class="badge"><i class='icon-lock'></i> Private</span></td>
+  <td><span class="badge"><i class='fa fa-lock'></i> Private</span></td>
   <td><%= ProfilePublicSetting::ITEM_LABELS[setting.item] -%></td>
   <td><%= link_to('Make Public',change_public_setting_people_path({id: setting.id, is_public: 'yes'}), :class => "btn", :remote => true, :method => :post) -%></td>
 <%- end -%>

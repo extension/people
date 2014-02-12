@@ -112,27 +112,27 @@ module PeopleHelper
 
   def status_icon(person)
     if(person.is_signup?)
-      icon = "<i class='icon-info-sign'></i>".html_safe
+      icon = "<i class='fa fa-info-circle'></i>".html_safe
       title = 'Pending email confirmation from signup'
       link_to(icon,'#',data: {toggle: "tooltip"},title: title, class: 'status_icon').html_safe
     elsif(person.retired?)
-      icon = "<i class='icon-info-sign'></i>".html_safe
+      icon = "<i class='fa fa-info-circle'></i>".html_safe
       title = 'Retired account.'
       link_to(icon,'#',data: {toggle: "tooltip"},title: title, class: 'status_icon').html_safe
     elsif(person.pendingreview?)
-      icon = "<i class='icon-info-sign'></i>".html_safe
+      icon = "<i class='fa fa-info-circle'></i>".html_safe
       title = 'Pending review.'
       link_to(icon,'#',data: {toggle: "tooltip"},title: title, class: 'status_icon').html_safe
     elsif(!person.email_confirmed?)
-      icon = "<i class='icon-info-sign'></i>".html_safe
+      icon = "<i class='fa fa-info-circle'></i>".html_safe
       title = 'Pending email confirmation from email change'
       link_to(icon,'#',data: {toggle: "tooltip"},title: title, class: 'status_icon').html_safe
     elsif(person.last_activity_at.nil?)    
-      icon = "<i class='icon-time'></i>".html_safe
+      icon = "<i class='fa fa-clock-o'></i>".html_safe
       title = "Has never been active"
       link_to(icon,'#',data: {toggle: "tooltip"},title: title, class: 'status_icon').html_safe
     elsif(person.is_inactive?)
-      icon = "<i class='icon-time'></i>".html_safe
+      icon = "<i class='fa fa-clock-o'></i>".html_safe
       title = "Has not been active since #{person.last_activity_at.strftime("%Y/%m/%d")}"
       link_to(icon,'#',data: {toggle: "tooltip"},title: title, class: 'status_icon').html_safe
     else

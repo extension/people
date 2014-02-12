@@ -2,7 +2,7 @@
 
 <div class="page-header">
   <h2><%= @page_title %></h2>
-    <%= link_to(@showform ? "Filter Options <i class='icon-caret-down'></i>".html_safe : "Filter Options <i class='icon-caret-right'></i>".html_safe, 
+    <%= link_to(@showform ? "Filter Options <i class='fa fa-caret-down'></i>".html_safe : "Filter Options <i class='fa fa-caret-right'></i>".html_safe, 
                 '#',
                 id: 'formtoggler', 
                 data: {toggle: 'collapse', target: '#showform'}) %>
@@ -28,7 +28,7 @@
 <div class="row">
   <div class="span12">
     <p class='pull-right'>
-      <%= link_to("<i class='icon-file-alt'></i> Download this list (.csv)".html_safe,
+      <%= link_to("<i class='fa fa-file-o'></i> Download this list (.csv)".html_safe,
                   browsefile_people_path(filter: (@browse_filter.blank? ? BrowseFilter::ALL : @browse_filter.id)),
                   :class => 'btn') %>
     </p>
@@ -44,11 +44,11 @@
 <script type="text/javascript">
 
 $('#showform').on('show', function () {
-  $('#formtoggler').html("Filter Options <i class='icon-caret-down'></i>");
+  $('#formtoggler').html("Filter Options <i class='fa fa-caret-down'></i>");
 });
 
 $('#showform').on('hide', function () {
-  $('#formtoggler').html("Filter Options <i class='icon-caret-right'></i>");
+  $('#formtoggler').html("Filter Options <i class='fa fa-caret-right'></i>");
 });
 
 $(".status_icon").tooltip();
