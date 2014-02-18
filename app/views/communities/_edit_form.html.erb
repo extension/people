@@ -21,7 +21,6 @@
   <fieldset>
     <legend>Administrative Options:</legend>
     <%= f.input :entrytype, collection: get_communitytypes_for_select, include_blank: false %>
-    <%= f.input :shortname, :hint =>  "Community shortnames are an additional unique identifier for the community.  The shortname can be used to link to the community in People, and it becomes the group name (and email address) for Google Apps if this community is connected to Google Apps." %>
     <%- if !@community.is_institution? -%>
     <%= f.input :publishing_community, :hint =>  "Communities can be associated with public content, and will show up on the public site administration page if you check this setting.  eXtension Communities of Practice are automatically shown regardless of this setting." %>
     <%- end -%>
