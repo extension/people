@@ -399,7 +399,7 @@ class Person < ActiveRecord::Base
   end
 
   def connected_communities
-    self.communities.where("connectiontype IN ('member','leader')")
+    self.communities.where("connectiontype IN ('member','leader')").order("entrytype,name")
   end
 
   def invite_communities
