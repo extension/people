@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 source 'https://engineering.extension.org/rubygems'
 
-gem 'rails', '3.2.17'
+gem 'rails', '3.2.18'
 
 # all things xml
 gem 'nokogiri', '1.5.10'
@@ -46,7 +46,7 @@ gem 'jquery-rails'
 gem 'kaminari'
 
 # Deploy with Capistrano
-gem 'capistrano', '~> 2.15.5' 
+gem 'capistrano', '~> 2.15.5'
 gem 'capatross'
 
 # background jobs
@@ -100,7 +100,7 @@ gem 'geoip'
 
 
 # google analytics retrieval
-gem "garb" # garb for now until it breaks 
+gem "garb" # garb for now until it breaks
 
 # breadcrumbs
 gem "breadcrumbs_on_rails"
