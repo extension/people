@@ -111,6 +111,9 @@ gem "php_serialize"
 # text cleanup
 gem "auto_strip_attributes", "~> 2.0"
 
+# catch rack errors
+gem 'rack-robustness'
+ 
 group :development do
   # require the powder gem
   gem 'powder'
