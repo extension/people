@@ -17,7 +17,7 @@ class GoogleGroup < ActiveRecord::Base
   before_save  :set_values_from_community
   after_save :update_email_alias
 
-  
+
   belongs_to :community
   has_one  :email_alias, :as => :aliasable, :dependent => :destroy
 
@@ -25,9 +25,9 @@ class GoogleGroup < ActiveRecord::Base
     if(!self.email_alias.blank?)
       self.email_alias.update_attribute(:alias_type, EmailAlias::GOOGLEAPPS)
     else
-      self.create_email_alias(:alias_type => EmailAlias::GOOGLEAPPS)            
+      self.create_email_alias(:alias_type => EmailAlias::GOOGLEAPPS)
     end
-  end  
+  end
 
   def forum_url
     "https://groups.google.com/a/extension.org/d/forum/#{self.group_id}?hl=en"
@@ -42,10 +42,10 @@ class GoogleGroup < ActiveRecord::Base
     if(self.connectiontype == 'leaders')
       if(self.community.is_institution?)
         self.group_id = "#{self.community.shortname}-institutional-team"
-        self.group_name = "#{self.community.name} (Institutional Team)"   
+        self.group_name = "#{self.community.name} (Institutional Team)"
       else
         self.group_id = "#{self.community.shortname}-leaders"
-        self.group_name = "#{self.community.name} (Leaders)"     
+        self.group_name = "#{self.community.name} (Leaders)"
       end
     else
       self.group_id = self.community.shortname
@@ -85,10 +85,10 @@ class GoogleGroup < ActiveRecord::Base
   def update_apps_group_members_and_owners
     if(group = update_apps_group_members)
       # no longer setting owners for the time being
-      # update_apps_group_owners
+      update_apps_group_owners
     end
   end
-  
+
   def self.delayed_update_apps_group_members_and_owners(record_id)
     if(record = find_by_id(record_id))
       record.update_apps_group_members_and_owners
@@ -98,11 +98,11 @@ class GoogleGroup < ActiveRecord::Base
 
   def update_apps_group
     self.establish_apps_connection
-    
+
     # check for a group - a little different than the google
     # account check - there's no single group retrieval, so
     # we'll just check for the apps_updated_at timestamp
-    
+
     # create the group if it didn't exist
     if(self.apps_updated_at.blank?)
       begin
@@ -111,7 +111,7 @@ class GoogleGroup < ActiveRecord::Base
         self.update_attributes({:has_error => true, :last_error => e})
         return nil
       end
-    else    
+    else
       # update the group
       begin
         google_group = self.apps_connection.update_group(self.group_id,[self.group_name,self.group_name,self.email_permission])
@@ -121,15 +121,15 @@ class GoogleGroup < ActiveRecord::Base
         return nil
       end
     end
-    
+
     self.update_attributes({has_error: false, last_error: nil, apps_updated_at: Time.now.utc})
     # if we made it here, it must have worked
     return google_group
   end
-  
+
   def update_apps_group_members
     # update the group for good measure
-    
+
     if(!(google_group = self.update_apps_group))
       return nil
     else
@@ -140,23 +140,32 @@ class GoogleGroup < ActiveRecord::Base
         self.update_attributes({:has_error => true, :last_error => e})
         return nil
       end
-      
+
       # map the community members to an array of "blah@extension.org"
       if(self.connectiontype == 'leaders')
-        community_members = self.community.leaders.map{|person| "#{person.idstring}@extension.org"}        
+        community_members = self.community.leaders.map{|person| "#{person.idstring}@extension.org"}
       else
         community_members = self.community.joined.map{|person| "#{person.idstring}@extension.org"}
       end
-      
+
+      # inject the moderator account
+      moderator_account = Person.find(Person::MODERATOR_ACCOUNT)
+      if(community_members)
+        community_members << "#{moderator_account.idstring}@extension.org"
+      else
+        community_members = ["#{moderator_account.idstring}@extension.org"]
+      end
+
+
       adds = community_members - apps_group_members
       removes = apps_group_members - community_members
-      
+
       # add the adds/remove the removes
       begin
         adds.each do |member_id|
           member = self.apps_connection.add_member_to_group(member_id, self.group_id)
         end
-        
+
         removes.each do |member_id|
           member = self.apps_connection.remove_member_from_group(member_id, self.group_id)
         end
@@ -164,11 +173,11 @@ class GoogleGroup < ActiveRecord::Base
         self.update_attributes({:has_error => true, :last_error => e})
         return nil
       end
-      
+
       return google_group
     end
   end
-  
+
   # owners *have* to be a member of the group first, so run this after update_apps_group_members
   def update_apps_group_owners(clear_owners = false)
     self.establish_apps_connection
@@ -180,17 +189,21 @@ class GoogleGroup < ActiveRecord::Base
       self.update_attributes({:has_error => true, :last_error => e})
       return nil
     end
-    
+
     # map the community members to an array of "blah@extension.org"
     if(clear_owners)
       community_owners = []
     else
-      community_owners = self.community.leaders.map{|person| "#{person.idstring}@extension.org"}
+      # Due to a number of training and logistical reasons, we can't set the leaders to be the
+      # moderators for the community - therefore, we'll use the moderator account
+      # community_owners = self.community.leaders.map{|person| "#{person.idstring}@extension.org"}
+      moderator_account = Person.find(Person::MODERATOR_ACCOUNT)
+      community_owners = ["#{moderator_account.idstring}@extension.org"]
     end
-    
+
     adds = community_owners - apps_group_owners
     removes = apps_group_owners - community_owners
-    
+
     results = {:adds => 0, :removes => 0}
     # add the adds/remove the removes
     begin
@@ -198,7 +211,7 @@ class GoogleGroup < ActiveRecord::Base
         owner = self.apps_connection.add_owner_to_group(owner_id, self.group_id)
         results[:adds] += 1
       end
-      
+
       removes.each do |owner_id|
         owner = self.apps_connection.remove_owner_from_group(owner_id, self.group_id)
         results[:removes] += 1
@@ -207,24 +220,24 @@ class GoogleGroup < ActiveRecord::Base
       self.update_attributes({:has_error => true, :last_error => e})
       return nil
     end
-    
+
     results
   end
-      
-    
-  
+
+
+
   def establish_apps_connection(force_reconnect = false)
     if(self.apps_connection.nil? or force_reconnect)
       self.apps_connection = ProvisioningApi.new(Settings.googleapps_account,Settings.googleapps_secret)
     end
   end
-  
+
   def self.retrieve_all_groups
     class_apps_connection = ProvisioningApi.new(Settings.googleapps_account,Settings.googleapps_secret)
     class_apps_connection.retrieve_all_groups
   end
-  
+
   def self.clear_errors
     self.update_all("has_error = 0, last_error = ''","has_error = 1")
-  end  
+  end
 end

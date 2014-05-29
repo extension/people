@@ -16,7 +16,7 @@ class Person < ActiveRecord::Base
   attr_accessible :first_name, :last_name, :email, :title, :phone, :time_zone, :affiliation, :involvement, :biography
   attr_accessible :password, :interest_tags
   attr_accessible :position_id, :position, :location_id, :location, :county_id, :county, :institution_id, :institution
-  attr_accessible :invitation, :invitation_id 
+  attr_accessible :invitation, :invitation_id
   attr_accessible :last_account_reminder, :password_reset
 
   auto_strip_attributes :first_name, :last_name, :email, :title, :affiliation, :squish => true
@@ -25,6 +25,12 @@ class Person < ActiveRecord::Base
   DEFAULT_TIMEZONE = 'America/New_York'
   SYSTEMS_USERS = [1,2,3,4,5,6,7,8]
   RESTRICTED_ACCOUNTS = [116955,116966]
+
+  # Systems accounts used in app
+  MASTER_ACCOUNT = 1
+  MIRROR_ACCOUNT = 2
+  MODERATOR_ACCOUNT = 7
+
 
   # account status
   STATUS_CONTRIBUTOR = 42
@@ -39,14 +45,16 @@ class Person < ActiveRecord::Base
 
   STATUS_OK = 100
 
+  #
+
   ## validations
   validates :first_name, :presence => true
   validates :last_name, :presence => true
-  validates :idstring, :presence => true, :uniqueness => {:case_sensitive => false} 
+  validates :idstring, :presence => true, :uniqueness => {:case_sensitive => false}
   validates :email, :presence => true, :email => true, :uniqueness => {:case_sensitive => false}
   validates :password, :length => { :in => 8..40 }, :presence => true, :on => :create
   validates :involvement, :presence => true, :on => :create
-  
+
   ## filters
   before_create :set_hashed_password
   before_save :check_account_status
@@ -67,11 +75,11 @@ class Person < ActiveRecord::Base
   has_one :retired_account
 
   has_many :community_connections, dependent: :destroy
-  has_many :communities, through: :community_connections, 
-                         select:  "community_connections.connectiontype as connectiontype, 
+  has_many :communities, through: :community_connections,
+                         select:  "community_connections.connectiontype as connectiontype,
                                    community_connections.sendnotifications as sendnotifications,
                                    communities.*"
-  
+
   has_many :email_aliases, as: :aliasable
   has_one :google_account, dependent: :destroy
   has_one :share_account, dependent: :destroy
@@ -82,21 +90,21 @@ class Person < ActiveRecord::Base
   has_many :auth_approvals
   has_many :profile_public_settings, dependent: :destroy
   has_many :social_network_connections, dependent: :destroy
-  has_many :social_networks, through: :social_network_connections, 
+  has_many :social_networks, through: :social_network_connections,
                          select:  "social_network_connections.id as connection_id,
-                                   social_network_connections.custom_network_name as custom_network_name, 
-                                   social_network_connections.accountid as accountid, 
+                                   social_network_connections.custom_network_name as custom_network_name,
+                                   social_network_connections.accountid as accountid,
                                    social_network_connections.accounturl as accounturl,
-                                   social_network_connections.is_public as is_public, 
-                                   social_networks.*"  
+                                   social_network_connections.is_public as is_public,
+                                   social_networks.*"
 
   has_many :account_syncs
   has_many :person_interests
   has_many :interests, through: :person_interests
 
-  ## scopes  
+  ## scopes
   scope :retired, -> {where(retired: true)}
-  scope :validaccounts, where("retired = #{false} and vouched = #{true}") 
+  scope :validaccounts, where("retired = #{false} and vouched = #{true}")
   scope :pendingreview, where("retired = #{false} and vouched = #{false} and account_status != #{STATUS_SIGNUP} && email_confirmed = #{true}")
   scope :not_system, where("people.id NOT IN(#{SYSTEMS_USERS.join(',')})")
   scope :display_accounts, validaccounts.not_system
@@ -104,7 +112,7 @@ class Person < ActiveRecord::Base
   scope :active, lambda{ where('DATE(last_activity_at) >= ?',Date.today - Settings.months_for_inactive_flag.months) }
   scope :reminder_pool, lambda{ display_accounts.inactive.where('(last_account_reminder IS NULL or last_account_reminder <= ?)',Time.now.utc - Settings.months_for_inactive_flag.months) }
 
-  
+
   # duplicated from darmok
   # TODO - sanity check this
   scope :patternsearch, lambda {|searchterm|
@@ -214,7 +222,7 @@ class Person < ActiveRecord::Base
     end
   end
 
-  
+
 
   def signin_allowed?
     if self.retired?
@@ -245,7 +253,7 @@ class Person < ActiveRecord::Base
 
   def is_inactive?
     (self.last_activity_at.nil? or self.last_activity_at  < (Time.zone.now - Settings.months_for_inactive_flag.months))
-  end 
+  end
 
   def expire_password(set_google_random = true)
     if(set_google_random)
@@ -309,21 +317,21 @@ class Person < ActiveRecord::Base
     aes.iv = iv
     encrypted_data = aes.update(data_string) + aes.final
     write_attribute(:password_reset, {iv: iv, encrypted_data: encrypted_data})
-  end    
+  end
 
   # TODO - dump this when or if we can ever let people choose their own idstrings
   def set_idstring(reset=false)
     if(reset or self.idstring.blank?)
       return '' if (self.first_name.blank? or self.last_name.blank?)
       self.base_login_string = (self.first_name + self.last_name[0]).mb_chars.downcase.gsub!(/[^\w]/,'')
-    
+
       # get maximum increment
       if(max = self.class.maximum(:login_increment,:conditions => "base_login_string = '#{self.base_login_string}'"))
         self.login_increment = max + 1
       else
         self.login_increment = 1
       end
-    
+
       # set login
       self.idstring = "#{self.base_login_string}#{self.login_increment.to_s}"
     end
@@ -354,7 +362,7 @@ class Person < ActiveRecord::Base
     if(checkid = check_idstring_for_openid(idstring))
       check_person = self.where(idstring: checkid).first
     elsif(checkid = check_idstring_for_extensionorg(idstring))
-      check_person = self.where(idstring: checkid).first      
+      check_person = self.where(idstring: checkid).first
     else
       check_person = self.where("idstring = ? OR email = ?",idstring,idstring).first
     end
@@ -412,7 +420,7 @@ class Person < ActiveRecord::Base
       end
     end
     invite_communities
-  end    
+  end
 
   def is_community_leader?(community)
     self.connection_with_community(community) == 'leader'
@@ -432,11 +440,11 @@ class Person < ActiveRecord::Base
   def can_edit_community?(community)
     self.is_admin? or self.is_community_leader?(community)
   end
-  
+
   def is_community_member?(community)
     ['leader','member'].include?(self.connection_with_community(community))
   end
-  
+
   def connection_with_community(community)
     if(community = self.connected_community(community))
       community.connectiontype
@@ -447,11 +455,11 @@ class Person < ActiveRecord::Base
 
   def connected_community(community)
     self.communities.where(id: community.id).first
-  end  
+  end
 
   def community_connection(community)
     self.community_connections.where(community_id: community.id).first
-  end  
+  end
 
   def connection_with_community_expanded(community)
     connection = self.connection_with_community(community)
@@ -463,7 +471,7 @@ class Person < ActiveRecord::Base
     else
       locale_key = connection
     end
-    I18n.translate("communities.connections.#{locale_key}")     
+    I18n.translate("communities.connections.#{locale_key}")
   end
 
   def primary_institution
@@ -506,15 +514,15 @@ class Person < ActiveRecord::Base
       end
       if(self.save)
         Activity.log_activity(options.merge({person_id: self.id,
-                                            activitycode: Activity::EMAIL_CHANGE, 
+                                            activitycode: Activity::EMAIL_CHANGE,
                                             additionalinfo: "changed to #{self.email} from #{self.previous_email}",
-                                            colleague_id: options[:colleague_id], 
+                                            colleague_id: options[:colleague_id],
                                             additionaldata: {from: self.previous_email, to: self.email}}))
         Notification.create(:notification_type => Notification::CONFIRM_EMAIL, :notifiable => self)
         return true
       else
         return false
-      end      
+      end
     else
       return false
     end
@@ -526,7 +534,7 @@ class Person < ActiveRecord::Base
     self.account_status = STATUS_OK
 
     if(!self.vouched? and self.has_whitelisted_email?)
-      self.vouched = true 
+      self.vouched = true
       self.vouched_by = self.id
       self.vouched_at = Time.now.utc
     end
@@ -562,7 +570,7 @@ class Person < ActiveRecord::Base
 
   def set_email_forward(options = {})
     return nil if(options[:destination].nil? and options[:googleapps].nil?)
-  
+
     current_forward = self.email_forward
     if(self.email =~ /extension\.org$/i)
       if(options[:googleapps])
@@ -570,7 +578,7 @@ class Person < ActiveRecord::Base
         alias_type = EmailAlias::GOOGLEAPPS
       elsif(options[:destination])
         destination = options[:destination]
-        alias_type = EmailAlias::CUSTOM_FORWARD        
+        alias_type = EmailAlias::CUSTOM_FORWARD
       else
         return nil
       end
@@ -580,10 +588,10 @@ class Person < ActiveRecord::Base
         alias_type = EmailAlias::GOOGLEAPPS
       elsif(options[:destination])
         destination = options[:destination]
-        alias_type = EmailAlias::CUSTOM_FORWARD        
+        alias_type = EmailAlias::CUSTOM_FORWARD
       else
         destination = self.email
-        alias_type = EmailAlias::FORWARD  
+        alias_type = EmailAlias::FORWARD
       end
     end
 
@@ -718,7 +726,7 @@ class Person < ActiveRecord::Base
 
   # goes through and retires all accounts that have been ignored in review for the last 14 days
   #
-  # @param [String] retired_reason Retiring reason     
+  # @param [String] retired_reason Retiring reason
   def self.cleanup_pending_accounts(retired_reason = 'No one vouched for the account within 14 days')
     the_system = Person.system_account
     self.pendingreview.where("email_confirmed_at < ?",Time.now - 14.day).each do |person|
@@ -740,14 +748,14 @@ class Person < ActiveRecord::Base
       # with the google password
       p.expire_password(false)
     end
-  end  
+  end
 
 
   def confirm_signup(options = {})
     now = Time.now.utc
-   
+
     if(self.has_whitelisted_email?)
-      self.vouched = true 
+      self.vouched = true
       self.vouched_by = self.id
       self.vouched_at = now
     end
@@ -755,16 +763,16 @@ class Person < ActiveRecord::Base
     # was this person invited? - even if can self-vouch, this will overwrite vouched_by
     if(invitation = self.invitation)
       invitation.accept(self,now,options)
-      self.vouched = true 
+      self.vouched = true
       self.vouched_by = invitation.person.id
       self.vouched_at = now
     elsif(invitation = Invitation.where(email: self.email).pending.first)
       # is there an unaccepted invitation with this email address in it? - then let's call it an accepted invitation
       invitation.accept(self,now,options)
-      self.vouched = true 
+      self.vouched = true
       self.vouched_by = invitation.person.id
       self.vouched_at = now
-    end  
+    end
 
     # email settings
     self.email_confirmed = true
@@ -794,7 +802,7 @@ class Person < ActiveRecord::Base
   end
 
   def vouch(options = {})
-    voucher = options[:voucher] 
+    voucher = options[:voucher]
     self.vouched = true
     self.vouched_by = voucher.id
     self.vouched_at = Time.now.utc
@@ -815,7 +823,7 @@ class Person < ActiveRecord::Base
     else
       return false
     end
-  end  
+  end
 
   def post_account_review_request(options = {})
     if(self.vouched?)
@@ -919,7 +927,7 @@ class Person < ActiveRecord::Base
       if(options[:nonotify].nil? or !options[:nonotify])
         Notification.create_community_removal(options.merge({person_id: self.id, community_id: community.id, oldconnectiontype: oldconnectiontype}))
       end
-    end    
+    end
     # force cache update
     community.joined_count(force: true)
 
@@ -930,12 +938,12 @@ class Person < ActiveRecord::Base
 
     if(Settings.sync_google and community.connect_to_google_apps?)
       community.update_google_groups(true)
-    end    
+    end
   end
 
 
   def join_community(community,options={})
-    # existing connection? 
+    # existing connection?
     if(connection = self.community_connections.where(community_id: community.id).first)
       case connection.connectiontype
       when 'invitedleader'
@@ -954,7 +962,7 @@ class Person < ActiveRecord::Base
         # no-op
       else
         self.connect_to_community(community,'member',options.merge({connector_id: self.id}))
-      end        
+      end
     end
   end
 
@@ -997,7 +1005,7 @@ class Person < ActiveRecord::Base
 
 
   def retire(options = {})
-    forceretire = options[:force].blank? ? false : options[:force] 
+    forceretire = options[:force].blank? ? false : options[:force]
     return false if(self.retired? and !forceretire)
     colleague = options[:colleague]
     self.retired = true
@@ -1019,18 +1027,18 @@ class Person < ActiveRecord::Base
 
     # log it
     if(options[:nolog].nil? or !options[:nolog])
-      Activity.log_activity(person_id: colleague.id, 
-                            activitycode: Activity::RETIRE_ACCOUNT, 
-                            colleague_id: self.id, 
-                            additionalinfo: options[:explanation], 
+      Activity.log_activity(person_id: colleague.id,
+                            activitycode: Activity::RETIRE_ACCOUNT,
+                            colleague_id: self.id,
+                            additionalinfo: options[:explanation],
                             ip_address: options[:ip_address])
     end
     true
-  end  
+  end
 
   def restore(options={})
-    forcerestore = options[:force].blank? ? false : options[:force] 
-    return false if(!self.retired? and !forcerestore)    
+    forcerestore = options[:force].blank? ? false : options[:force]
+    return false if(!self.retired? and !forcerestore)
     colleague = options[:colleague]
     self.retired = false
     self.save
@@ -1048,10 +1056,10 @@ class Person < ActiveRecord::Base
 
     # log it
     if(options[:nolog].nil? or !options[:nolog])
-      Activity.log_activity(person_id: colleague.id, 
-                            activitycode: Activity::ENABLE_ACCOUNT, 
-                            colleague_id: self.id, 
-                            additionalinfo: options[:explanation], 
+      Activity.log_activity(person_id: colleague.id,
+                            activitycode: Activity::ENABLE_ACCOUNT,
+                            colleague_id: self.id,
+                            additionalinfo: options[:explanation],
                             ip_address: options[:ip_address])
     end
 
@@ -1093,7 +1101,7 @@ class Person < ActiveRecord::Base
         when 'location'
           returnvalues[:profile_attributes]['location'] = (self.location.blank? ? nil : self.location.name)
         when 'county'
-          returnvalues[:profile_attributes]['county'] = (self.county.blank? ? nil : self.county.name)            
+          returnvalues[:profile_attributes]['county'] = (self.county.blank? ? nil : self.county.name)
         when 'institution'
           returnvalues[:profile_attributes]['institution'] = (self.institution.blank? ? nil : self.institution.name)
         when 'interests'
@@ -1170,7 +1178,7 @@ class Person < ActiveRecord::Base
           end
         end
         if(options[:community])
-          headers << 'Community connection'          
+          headers << 'Community connection'
         else
           headers << 'Communities'
         end
@@ -1209,11 +1217,11 @@ class Person < ActiveRecord::Base
               row << person.connection_with_community_expanded(options[:community])
             else
               row << person.communities.where(Community::CONNECTION_CONDITIONS['joined']).map(&:name).join('; ')
-            end            
+            end
             csv << row
           end # person
         end # people group
-      end # csv 
+      end # csv
     end # with_scope
   end
 
@@ -1244,7 +1252,7 @@ class Person < ActiveRecord::Base
   def add_admin_flag_for_application(application,save=true)
     self.admin_flags ||= {}
     self.admin_flags[application] = true
-    if(save)  
+    if(save)
       self.save
     end
   end
@@ -1252,10 +1260,10 @@ class Person < ActiveRecord::Base
   def remove_admin_flag_for_application(application,save=true)
     self.admin_flags ||= {}
     self.admin_flags[application] = false
-    if(save)  
+    if(save)
       self.save
     end
-  end  
+  end
 
 
 
@@ -1274,7 +1282,7 @@ class Person < ActiveRecord::Base
       else
         self.account_status = STATUS_CONTRIBUTOR
       end
-    end  
+    end
   end
 
 end
