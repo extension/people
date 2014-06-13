@@ -496,10 +496,12 @@ class Person < ActiveRecord::Base
 
     # institution check
     if(previous_changes_keys.include?('institution_id'))
-      if(self.institution.blank?)
+      if(self.institution_id.blank?)
         if(institution = Community.find_by_id(self.previous_changes['institution_id'].first))
           self.remove_from_community(institution,options.merge({connector_id: options[:colleague_id]}))
         end
+      elsif(self.communities.institutions.connected_as('joined').include?(self.institution))
+        # already connected, do nothing
       else
         self.connect_to_community(self.institution,'member',options.merge({connector_id: options[:colleague_id]}))
       end
