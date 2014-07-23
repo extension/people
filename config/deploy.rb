@@ -9,7 +9,7 @@ require 'airbrake/capistrano'
 TRUE_VALUES = [true, 1, '1', 't', 'T', 'true', 'TRUE', 'yes','YES','y','Y']
 FALSE_VALUES = [false, 0, '0', 'f', 'F', 'false', 'FALSE','no','NO','n','N']
 
- 
+
 set :application, "people"
 set :repository,  "git@github.com:extension/people.git"
 set :scm, "git"
@@ -24,7 +24,6 @@ before "deploy", "deploy:checks:git_push"
 if(TRUE_VALUES.include?(ENV['MIGRATE']))
   before "deploy", "deploy:web:disable"
   before "deploy", "sidekiq:stop"
-  after "deploy:update_code", "deploy:update_maint_msg"
   after "deploy:update_code", "deploy:link_and_copy_configs"
   after "deploy:update_code", "deploy:cleanup"
   after "deploy:update_code", "deploy:migrate"
@@ -33,7 +32,6 @@ if(TRUE_VALUES.include?(ENV['MIGRATE']))
 else
   before "deploy", "deploy:checks:git_migrations"
   before "deploy", "sidekiq:stop"
-  after "deploy:update_code", "deploy:update_maint_msg"
   after "deploy:update_code", "deploy:link_and_copy_configs"
   after "deploy:update_code", "deploy:cleanup"
   after "deploy", "sidekiq:start"
@@ -42,28 +40,24 @@ end
 
 
 namespace :deploy do
-  
+
   # Override default restart task
   desc "Restart passenger"
   task :restart, :roles => :app do
     run "touch #{current_path}/tmp/restart.txt"
   end
-  
+
   # bundle installation in the system-wide gemset
   desc "runs bundle update"
   task :bundle_install do
     run "cd #{release_path} && bundle install"
   end
-    
-  desc "Update maintenance mode page/graphics (valid after an update code invocation)"
-  task :update_maint_msg, :roles => :app do
-     invoke_command "cp -f #{release_path}/public/maintenancemessage.html #{shared_path}/system/maintenancemessage.html"
-  end
-  
+
+
   # Link up various configs (valid after an update code invocation)
   task :link_and_copy_configs, :roles => :app do
     run <<-CMD
-    rm -rf #{release_path}/config/database.yml && 
+    rm -rf #{release_path}/config/database.yml &&
     ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml &&
     ln -nfs #{shared_path}/config/settings.local.yml #{release_path}/config/settings.local.yml &&
     ln -nfs #{shared_path}/config/robots.txt #{release_path}/public/robots.txt &&
@@ -71,7 +65,7 @@ namespace :deploy do
     ln -nfs #{shared_path}/downloads #{release_path}/tmp/downloads
     CMD
   end
-  
+
   [:start, :stop].each do |t|
     desc "#{t} task is a no-op with mod_rails"
     task t, :roles => :app do ; end
@@ -80,17 +74,17 @@ namespace :deploy do
 
   # Override default web enable/disable tasks
   namespace :web do
-      
+
     desc "Put Apache in maintenancemode by touching the system/maintenancemode file"
     task :disable, :roles => :app do
-      invoke_command "touch #{shared_path}/system/maintenancemode"
+      invoke_command "touch /services/maintenance/#{vhost}.maintenancemode"
     end
-  
+
     desc "Remove Apache from maintenancemode by removing the system/maintenancemode file"
     task :enable, :roles => :app do
-      invoke_command "rm -f #{shared_path}/system/maintenancemode"
+      invoke_command "rm -f /services/maintenance/#{vhost}.maintenancemode"
     end
-    
+
   end
 
   namespace :checks do
@@ -107,7 +101,7 @@ namespace :deploy do
             exit(0)
           end
         end
-      end         
+      end
     end
 
     desc "check to see if there are migrations in origin/branch "
@@ -118,11 +112,11 @@ namespace :deploy do
         diff_files = `git --no-pager diff --summary #{current_revision} #{branch} db/migrate`
         logger.info "Your local #{branch} branch has migration changes and you did not specify MIGRATE=true for this deployment"
         logger.info "#{diff_files}"
-      end         
-    end    
+      end
+    end
   end
 
-end 
+end
 
 
 namespace :sidekiq do
@@ -154,5 +148,4 @@ namespace :sidekiq do
     stop
     start
   end
-end   
-
+end
