@@ -8,7 +8,7 @@
 
 <div class="row">
 
-  <div class="span7"> 
+  <div class="span7">
     <div class="page-header">
       <h2><%= @person.fullname %></h2>
       <ul class='unstyled'>
@@ -22,15 +22,19 @@
     </div>
     <%- end -%>
     <dl class='dl-horizontal dashmodule'>
-      <dt>eXtensionID</dt>
+      <dt>eXtensionID:</dt>
       <dd><%= @person.idstring%></dd>
+      <dt>Google Account:</dt>
+      <dd><%= @person.idstring%>@extension.org<br/>
+        <%= link_to('Learn more about your eXtension Google Account', 'http://create.extension.org/node/98956') %>
+      </dd>
       <dt>Email:</dt>
       <dd><%= @person.email%></dd>
       <%- if @person == current_person or current_person.is_admin? -%>
         <%- if !@person.email_forward.blank? and @person.email_forward.alias_type == EmailAlias::CUSTOM_FORWARD -%>
         <dd>Forwards to: <%= @person.email_forward.destination%></dd>
-        <%- end -%>        
-      <%- end -%>        
+        <%- end -%>
+      <%- end -%>
       <dt>Preferred Phone:</dt>
       <dd><%= (@person.phone.blank?) ? 'n/a' : number_to_phone(@person.phone, :area_code => true)  %></dd>
       <dt>Position:</dt>
@@ -42,7 +46,7 @@
       <dt>Time zone:</dt>
       <dd><%= @person.time_zone %></dd>
       <dt>Contributor Agreement:</dt>
-      <dd><%= agreement_status(@person) %></dd>      
+      <dd><%= agreement_status(@person) %></dd>
       <dt>Interests:</dt>
       <dd>
         <ul class="inline interests">
@@ -59,7 +63,7 @@
   </div>
 
   <div class="span5">
-    
+
     <div class='pull-right'>
      <ul class="nav nav-pills">
         <li><%= link_to('Activity',activity_person_path(@person)) %></li>
@@ -69,7 +73,7 @@
       </ul>
     </div>
 
-    <div class='clearfix'></div> 
+    <div class='clearfix'></div>
 
     <div class="well">
         <h4>Profiles across eXtension</h4>
@@ -81,14 +85,14 @@
           <li><%= link_to("Data Profile","http://data.extension.org/contributors/#{@person.id}") %></li>
           <%- if(learn_id = @person.learn_id) -%>
             <li><%= link_to("Learn Profile","https://learn.extension.org/learners/#{learn_id}/portfolio") %></li>
-          <%- end -%>          
+          <%- end -%>
         </ul>
     </div>
 
     <div class="well">
       <h4>
-        Social Network Connections 
-        <%- if @person == current_person -%>            
+        Social Network Connections
+        <%- if @person == current_person -%>
           <small><%= link_to('change',change_social_networks_people_path) %></small>
         <%- end -%>
       </h4>
@@ -101,7 +105,7 @@
       <%- else -%>
       <p>No social networking connections listed.</p>
       <%- end -%>
-    </div>    
+    </div>
 
     <div class="well">
       <h4>Communities</h4>
@@ -116,5 +120,5 @@
       <%- end -%>
     </div>
   </div>
-    
+
 </div>
