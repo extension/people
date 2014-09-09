@@ -5,7 +5,6 @@ account_review_url: 'https://ask.extension.org/questions/account_review_request'
 airbrake_api_key: 'use_local_settings'
 app_location: 'localdev'
 create_database: 'use_local_settings'
-create_bootcamp_database: 'use_local_settings'
 create_password_string: 'use_local_settings'
 default_display_timezone: 'Eastern Time (US & Canada)'
 downloads_data_dir: 'notset'
@@ -30,5 +29,3 @@ sync_google: false
 token_salt: 'use_local_settings'
 urlwriter_host: 'people.dev'
 www_database: 'use_local_settings'
-
-
