@@ -63,7 +63,7 @@ gem 'jbuilder'
 gem 'bcrypt-ruby', '~> 3.0.0'
 
 # exception handling
-gem 'airbrake'
+gem 'honeybadger'
 
 # caching
 gem 'redis-rails'
@@ -113,7 +113,7 @@ gem "auto_strip_attributes", "~> 2.0"
 
 # catch rack errors
 gem 'rack-robustness'
- 
+
 group :development do
   # require the powder gem
   gem 'powder'

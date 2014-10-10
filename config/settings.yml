@@ -2,7 +2,6 @@ aae_database: 'use_local_settings'
 about_database: 'use_local_settings'
 account_review_key: 'use_local_settings'
 account_review_url: 'https://ask.extension.org/questions/account_review_request'
-airbrake_api_key: 'use_local_settings'
 app_location: 'localdev'
 create_database: 'use_local_settings'
 create_password_string: 'use_local_settings'
@@ -15,6 +14,7 @@ email_test_address: 'people-notify-testing@extension.org'
 googleapps_domain: 'apps.extension.org'
 googleapps_account: "use_local_settings"
 googleapps_secret:  "use_local_settings"
+honeybadger_api_key:  "use_local_settings"
 learn_database: 'use_local_settings'
 max_live_dump_count: 200
 milfam_database: 'use_local_settings'

@@ -29,9 +29,6 @@ GEM
     activesupport (3.2.18)
       i18n (~> 0.6, >= 0.6.4)
       multi_json (~> 1.0)
-    airbrake (3.1.14)
-      builder
-      json
     arel (3.0.3)
     auto_strip_attributes (2.0.4)
       activerecord (>= 3.0)
@@ -90,6 +87,8 @@ GEM
     hashids (0.0.5)
     highline (1.6.21)
     hike (1.2.3)
+    honeybadger (1.16.5)
+      json
     i18n (0.6.9)
     inline-style (0.5.2ex)
       csspool
@@ -251,7 +250,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  airbrake
   auto_strip_attributes (~> 2.0)
   bcrypt-ruby (~> 3.0.0)
   better_errors
@@ -268,6 +266,7 @@ DEPENDENCIES
   geocoder
   geoip
   hashids
+  honeybadger
   inline-style (= 0.5.2ex)
   jbuilder
   jquery-rails
