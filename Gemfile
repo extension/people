@@ -1,10 +1,10 @@
 source 'https://rubygems.org'
 source 'https://engineering.extension.org/rubygems'
 
-gem 'rails', '3.2.18'
+gem 'rails', '3.2.20'
 
 # all things xml
-gem 'nokogiri', '1.5.10'
+gem 'nokogiri'
 
 # data
 gem 'mysql2'
