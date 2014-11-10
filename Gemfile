@@ -1,10 +1,10 @@
 source 'https://rubygems.org'
 source 'https://engineering.extension.org/rubygems'
 
-gem 'rails', '3.2.18'
+gem 'rails', '3.2.20'
 
 # all things xml
-gem 'nokogiri', '1.5.10'
+gem 'nokogiri'
 
 # data
 gem 'mysql2'
@@ -63,7 +63,7 @@ gem 'jbuilder'
 gem 'bcrypt-ruby', '~> 3.0.0'
 
 # exception handling
-gem 'airbrake'
+gem 'honeybadger'
 
 # caching
 gem 'redis-rails'
@@ -113,7 +113,7 @@ gem "auto_strip_attributes", "~> 2.0"
 
 # catch rack errors
 gem 'rack-robustness'
- 
+
 group :development do
   # require the powder gem
   gem 'powder'
