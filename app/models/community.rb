@@ -46,14 +46,14 @@ class Community < ActiveRecord::Base
     'pending' => "connectiontype = 'pending'"
   }
 
-           
+
   CONNECTIONS = {'member' => 'Community Member',
     'leader' => 'Community Leader',
     'pending' => 'Pending Community Review',
     'invitedleader' => 'Community Invitation (Leader)',
     'invitedleader' => 'Community Invitation (Member)'}
 
-  validates :name, :presence => true, :uniqueness => {:case_sensitive => false} 
+  validates :name, :presence => true, :uniqueness => {:case_sensitive => false}
   validates :entrytype, :presence => true
 
   before_save :set_shortname, :flag_attributes_for_approved
@@ -63,9 +63,9 @@ class Community < ActiveRecord::Base
   belongs_to :creator, :class_name => "Person", :foreign_key => "created_by"
   belongs_to :location
   has_many :community_connections, :dependent => :destroy
-  has_many :people, through: :community_connections, 
-                    select:  "community_connections.connectiontype as connectiontype, 
-                              community_connections.sendnotifications as sendnotifications, 
+  has_many :people, through: :community_connections,
+                    select:  "community_connections.connectiontype as connectiontype,
+                              community_connections.sendnotifications as sendnotifications,
                               people.*"
 
   has_many :google_groups
@@ -106,17 +106,17 @@ class Community < ActiveRecord::Base
     else
       tmpshortname = self.shortname.gsub(/[^\w-]/,'').downcase
     end
-    
+
     increment = 0
     checkname = tmpshortname
-    
+
     while(EmailAlias.mail_alias_in_use?(checkname,self.new_record? ? nil : self) or self.class.shortname_in_use?(checkname,self.new_record? ? nil : self))
       increment += 1
       checkname = "#{tmpshortname}_#{increment}"
     end
     self.shortname = checkname
   end
-  
+
   def self.shortname_in_use?(shortname,checkcommunity = nil)
     count_scope = self.where(shortname: shortname)
     if(checkcommunity)
@@ -125,10 +125,10 @@ class Community < ActiveRecord::Base
     count_scope.count > 0
   end
 
-  
+
   def self.check_shortname(checkname,checkcommunity = nil)
     !(EmailAlias.mail_alias_in_use?(checkname,checkcommunity) or Community.shortname_in_use?(checkname,checkcommunity))
-  end     
+  end
 
   def update_google_groups(update_members = false)
     if(self.connect_to_google_apps?)
@@ -136,7 +136,7 @@ class Community < ActiveRecord::Base
         if(update_members)
           self.google_groups.each do |gg|
             gg.queue_members_update
-          end        
+          end
         else
           self.google_groups.each do |gg|
             gg.queue_group_update
@@ -191,24 +191,24 @@ class Community < ActiveRecord::Base
   end
 
   def entrytype_to_s
-    I18n.translate("communities.entrytypes.#{self.entrytype_label}")     
+    I18n.translate("communities.entrytypes.#{self.entrytype_label}")
   end
 
   def entrytype_display_label
     self.is_institution? ? 'institution' : 'community'
   end
-  
+
   def memberfilter_label
     MEMBERFILTER_LABELS[self.memberfilter].present? ? MEMBERFILTER_LABELS[self.memberfilter] : 'unknown'
   end
 
   def memberfilter_to_s
-    I18n.translate("communities.memberfilters.#{self.memberfilter_label}")     
+    I18n.translate("communities.memberfilters.#{self.memberfilter_label}")
   end
 
   def self.connected_counts(connection)
     if(CONNECTION_CONDITIONS[connection])
-      with_scope do 
+      with_scope do
         self.joins(:community_connections).where(CONNECTION_CONDITIONS[connection]).group("#{self.table_name}.id").count('community_connections.id')
       end
     else
@@ -231,9 +231,9 @@ class Community < ActiveRecord::Base
   end
 
   def leader_notification_pool
-    self.notification_pool.where("community_connections.sendnotifications = ?",true)
+    self.notification_pool.where('community_connections.connectiontype = ?',"leader")
   end
-  
+
   def notification_pool
     self.people.validaccounts.where("community_connections.sendnotifications = ?",true)
   end
@@ -270,7 +270,7 @@ class Community < ActiveRecord::Base
   def create_leaders_google_group
     if(self.connect_to_google_apps?)
       if(!(gg = self.leaders_google_group))
-        if(gg = self.google_groups.create(connectiontype: 'leaders'))   
+        if(gg = self.google_groups.create(connectiontype: 'leaders'))
           gg.queue_members_update
         end
       end
@@ -280,7 +280,7 @@ class Community < ActiveRecord::Base
 
   def leaders_google_group
     self.google_groups.where(connectiontype: 'leaders').first
-  end    
+  end
 
 
 
