@@ -66,7 +66,7 @@ class Notification < ActiveRecord::Base
   # Downloads
   COLLEAGUE_DOWNLOAD_AVAILABLE        = 500
 
-  
+
 
   def set_delivery_time
     if(self.delivery_time.blank?)
@@ -93,7 +93,7 @@ class Notification < ActiveRecord::Base
     method_name = self.class.code_to_constant_string(self.notification_type)
     methods = self.class.instance_methods.map{|m| m.to_s}
     if(methods.include?(method_name))
-      begin 
+      begin
         self.send(method_name)
         self.update_attributes({processed: true})
       rescue NotificationError => e
@@ -154,32 +154,32 @@ class Notification < ActiveRecord::Base
     community = Community.find(self.notifiable_id)
     community.leader_notification_pool.each do |recipient|
       CommunityMailer.pending({recipient: recipient, person: @person, community: community, notification: self}).deliver
-    end  
+    end
   end
 
   def community_left
-    validate_community_notification_data    
+    validate_community_notification_data
     self.notifiable.notification_pool.each do |recipient|
       CommunityMailer.leave({recipient: recipient, person: @person, community: self.notifiable, notification: self}).deliver
-    end  
+    end
   end
 
   def community_accept_invitation
-    validate_community_notification_data    
+    validate_community_notification_data
     self.notifiable.notification_pool.each do |recipient|
       CommunityMailer.accept_invitation({recipient: recipient, person: @person, community: self.notifiable, notification: self}).deliver
-    end      
+    end
   end
 
   def community_decline_invitation
-    validate_community_notification_data    
+    validate_community_notification_data
     self.notifiable.notification_pool.each do |recipient|
       CommunityMailer.decline_invitation({recipient: recipient, person: @person, community: self.notifiable, notification: self}).deliver
-    end     
+    end
   end
 
   def community_remove_pending
-    validate_community_notification_data    
+    validate_community_notification_data
     self.notifiable.notification_pool.each do |recipient|
       CommunityMailer.removed({recipient: recipient, person: @person, community: self.notifiable, notification: self, connector: @connector, connectiontype: 'pending'}).deliver
     end
@@ -190,7 +190,7 @@ class Notification < ActiveRecord::Base
   end
 
   def community_invitedasleader
-    validate_community_notification_data    
+    validate_community_notification_data
     # group
     self.notifiable.notification_pool.each do |recipient|
       CommunityMailer.invited({recipient: recipient, person: @person, community: self.notifiable, notification: self, connector: @connector, connectiontype: 'leader'}).deliver
@@ -200,7 +200,7 @@ class Notification < ActiveRecord::Base
   end
 
   def community_invitedasmember
-    validate_community_notification_data    
+    validate_community_notification_data
     self.notifiable.notification_pool.each do |recipient|
       CommunityMailer.invited({recipient: recipient, person: @person, community: self.notifiable, notification: self, connector: @connector, connectiontype: 'member'}).deliver
     end
@@ -209,7 +209,7 @@ class Notification < ActiveRecord::Base
   end
 
   def community_addedasleader
-    validate_community_notification_data    
+    validate_community_notification_data
     self.notifiable.notification_pool.each do |recipient|
       CommunityMailer.added({recipient: recipient, person: @person, community: self.notifiable, notification: self, connector: @connector, connectiontype: 'leader'}).deliver
     end
@@ -219,7 +219,7 @@ class Notification < ActiveRecord::Base
   end
 
   def community_addedasmember
-    validate_community_notification_data    
+    validate_community_notification_data
     self.notifiable.notification_pool.each do |recipient|
       CommunityMailer.added({recipient: recipient, person: @person, community: self.notifiable, notification: self, connector: @connector, connectiontype: 'member'}).deliver
     end
@@ -229,7 +229,7 @@ class Notification < ActiveRecord::Base
   end
 
   def community_removedasleader
-    validate_community_notification_data    
+    validate_community_notification_data
     self.notifiable.notification_pool.each do |recipient|
       CommunityMailer.removed({recipient: recipient, person: @person, community: self.notifiable, notification: self, connector: @connector, connectiontype: 'leader'}).deliver
     end
@@ -239,10 +239,10 @@ class Notification < ActiveRecord::Base
   end
 
   def community_removedasmember
-    validate_community_notification_data    
+    validate_community_notification_data
     self.notifiable.notification_pool.each do |recipient|
       CommunityMailer.removed({recipient: recipient, person: @person, community: self.notifiable, notification: self, connector: @connector, connectiontype: 'member'}).deliver
-    end  
+    end
 
     # person
     CommunityMailer.removed_person({recipient: @person, community: self.notifiable, notification: self, connector: @connector, connectiontype: 'member'}).deliver
@@ -267,7 +267,7 @@ class Notification < ActiveRecord::Base
     if(!(@connector = Person.find(self.additionaldata[:connector_id])))
       raise NotificationError, 'Invalid connector_id in additionaldata'
     end
-  end    
+  end
 
   def invitation_to_extensionid
     AccountMailer.invitation({invitation: self.notifiable, notification: self}).deliver
@@ -299,7 +299,7 @@ class Notification < ActiveRecord::Base
         return c.to_s.downcase
       end
     end
-  
+
     # if we got here?  return nil
     return nil
   end
@@ -327,18 +327,18 @@ class Notification < ActiveRecord::Base
       create_parameters[:notification_type] = ( (options[:person_id] == connector_id) ? COMMUNITY_LEFT : COMMUNITY_REMOVEDASMEMBER )
     when 'invitedleader'
       if((options[:person_id] == connector_id))
-        create_parameters[:notification_type] = COMMUNITY_DECLINE_INVITATION      
+        create_parameters[:notification_type] = COMMUNITY_DECLINE_INVITATION
       else
         return nil
       end
     when 'invitedmember'
       if((options[:person_id] == connector_id))
-        create_parameters[:notification_type] = COMMUNITY_DECLINE_INVITATION      
+        create_parameters[:notification_type] = COMMUNITY_DECLINE_INVITATION
       else
         return nil
       end
     when 'pending'
-      create_parameters[:notification_type] = COMMUNITY_REMOVE_PENDING      
+      create_parameters[:notification_type] = COMMUNITY_REMOVE_PENDING
     else
       return nil
     end
@@ -374,7 +374,7 @@ class Notification < ActiveRecord::Base
       when 'invitedmember'
         create_parameters[:notification_type] = ( (options[:person_id] == connector_id) ? COMMUNITY_ACCEPT_INVITATION : COMMUNITY_ADDEDASMEMBER )
       when 'leader'
-        create_parameters[:notification_type] = COMMUNITY_REMOVEDASLEADER        
+        create_parameters[:notification_type] = COMMUNITY_REMOVEDASLEADER
       else
         create_parameters[:notification_type] = COMMUNITY_ADDEDASMEMBER
       end
@@ -420,9 +420,9 @@ class Notification < ActiveRecord::Base
     else
       return nil
     end
-     
+
     self.create(create_parameters)
   end
-  
-  
+
+
 end
