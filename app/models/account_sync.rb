@@ -203,7 +203,8 @@ class AccountSync < ActiveRecord::Base
         #{update_database}.learners.retired      = #{person.retired},
         #{update_database}.learners.is_admin     = #{person.is_admin_for_application('learn')},
         #{update_database}.learners.email        = #{quoted_value_or_null(person.email)},
-        #{update_database}.learners.time_zone    = #{quoted_value_or_null(person.time_zone(false))}
+        #{update_database}.learners.time_zone    = #{quoted_value_or_null(person.time_zone(false))},
+        #{update_database}.learners.needs_search_update  = 1
     WHERE #{update_database}.learners.darmok_id = #{person.id}
     END_SQL
     query
@@ -218,7 +219,8 @@ class AccountSync < ActiveRecord::Base
         #{update_database}.learners.retired      = #{person.retired},
         #{update_database}.learners.is_admin     = #{person.is_admin_for_application('learn')},
         #{update_database}.learners.email        = #{quoted_value_or_null(person.email)},
-        #{update_database}.learners.time_zone    = #{quoted_value_or_null(person.time_zone(false))}
+        #{update_database}.learners.time_zone    = #{quoted_value_or_null(person.time_zone(false))},
+        #{update_database}.learners.needs_search_update  = 1
     WHERE #{update_database}.learners.email = #{ActiveRecord::Base.quote_value(person.email)}
     AND #{update_database}.learners.darmok_id IS NULL
     END_SQL
@@ -229,13 +231,14 @@ class AccountSync < ActiveRecord::Base
     person = self.person
     update_database = UPDATE_DATABASES['learn_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
-    INSERT INTO #{update_database}.learners (name, email, has_profile, time_zone, darmok_id, is_admin, created_at, updated_at)
+    INSERT INTO #{update_database}.learners (name, email, has_profile, time_zone, darmok_id, is_admin, needs_search_update, created_at, updated_at)
     SELECT  #{quoted_value_or_null(person.fullname)},
             #{quoted_value_or_null(person.email)},
             1,
             #{quoted_value_or_null(person.time_zone(false))},
             #{person.id},
             #{person.is_admin_for_application('learn')},
+            1,
             #{quoted_value_or_null(person.created_at.to_s(:db))},
             NOW()
     END_SQL
