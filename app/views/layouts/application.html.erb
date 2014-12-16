@@ -2,12 +2,12 @@
 <html>
   <head>
     <title><%= @page_title %></title>
-    <meta name="robots" content="noindex" /> 
+    <meta name="robots" content="noindex" />
     <%= stylesheet_link_tag    "application" %>
     <%= javascript_include_tag "application" %>
     <!--[if lt IE 9]>
       <%= javascript_include_tag 'html5shiv' %>
-    <![endif]-->    
+    <![endif]-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <%= csrf_meta_tags %>
     <%= render(partial: 'shared/google_tracking') %>
@@ -18,7 +18,7 @@
   <body id='people'>
 
     <div class="navbar navbar-static-top">
-      <%= javascript_include_tag "https://www.extension.org/javascripts/global_nav_internal.js" %>
+      <%= javascript_include_tag "https://assets.extension.org/javascripts/global_nav_internal.js" %>
     </div>
 
     <%- if current_person and current_person.is_admin? -%>
