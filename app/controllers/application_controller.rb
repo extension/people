@@ -20,6 +20,11 @@ class ApplicationController < ActionController::Base
   before_filter :check_hold_status
   helper_method :current_person
 
+  def append_info_to_payload(payload)
+    super
+    payload[:ip] = request.remote_ip
+    payload[:auth_id] = current_person.id if current_person
+  end
 
   def update_last_activity
     current_person.update_column(:last_activity_at,Time.now.utc) if current_person
