@@ -114,6 +114,9 @@ gem "auto_strip_attributes", "~> 2.0"
 # catch rack errors
 gem 'rack-robustness'
 
+# terse logging
+gem 'lograge'
+
 group :development do
   # require the powder gem
   gem 'powder'
