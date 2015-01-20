@@ -1,16 +1,16 @@
 <%= render(:partial => 'shared_mailer/demo_notice') if is_demo? -%>
 Hi <%= @recipient.first_name %>,
 
-Your eXtension ID gives you access to contributing information on eXtension.org including answering Ask an Expert questions as well as customized alerts about online webinars listed on learn.extension.org and the monthly electronic newsletter Update.
+Welcome to eXtension! We’re glad you’ve chosen to be a part of an exciting group of colleagues throughout the country who will be looking at innovation, strategic opportunities, and professional development. We’re excited to know that you’re willing to collaborate and create with us...all of us...who are a part of eXtension.
 
-It's been a while since there's been activity on your account so we're checking to see if you're still involved with Cooperative Extension. 
+Your eXtension ID gives you access to <%= number_with_delimiter(Person.display_accounts.count) %> colleagues across the country. It allows you to answer Ask an Expert questions and will provide you with customized alerts about online webinars listed on learn.extension.org. We want to be sure you're getting the information and news you need from eXtension. You’ll stay up to date with our monthly electronic newsletter UPDATE.
+
+It's been a while since there's been activity on your account so we're checking to see if you're still involved with Cooperative Extension.
 
 If so, please access your account at:
 
-<%= person_url(@recipient) %> 
+<%= person_url(@recipient) %>
 
-to add a biography, social media accounts and browse through the groups you can join.
-
-We want to be sure you're getting the information and news you need from eXtension.
+We really want to know as much about you as you’d like to share with us and other...so add a biography, share your social media accounts and browse through the many, many user groups you can join.
 
 <%= render(:partial => 'shared_mailer/help_footer') %>
