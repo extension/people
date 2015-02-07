@@ -18,7 +18,7 @@ class PeopleController < ApplicationController
     if(@person != current_person)
       # manual check_hold_status
       return redirect_to home_pending_url if (!current_person.activity_allowed?)
-    end    
+    end
   end
 
   def edit
@@ -34,7 +34,7 @@ class PeopleController < ApplicationController
         flash[:warning] = 'This account is restricted from editing.'
         return redirect_to person_url(@person)
       end
-      
+
     end
   end
 
@@ -69,23 +69,23 @@ class PeopleController < ApplicationController
       @person.check_profile_changes({colleague_id: current_person.id, ip_address: request.remote_ip})
 
       if(current_person == @person)
-        Activity.log_activity(person_id: @person.id, 
-                              activitycode: Activity::UPDATE_PROFILE, 
-                              ip_address: request.remote_ip, 
-                              additionaldata: {what_changed: what_changed})  
+        Activity.log_activity(person_id: @person.id,
+                              activitycode: Activity::UPDATE_PROFILE,
+                              ip_address: request.remote_ip,
+                              additionaldata: {what_changed: what_changed})
       else
         # notification
-        Notification.create(notifiable: @person, 
-                            notification_type: Notification::UPDATE_COLLEAGUE_PROFILE, 
+        Notification.create(notifiable: @person,
+                            notification_type: Notification::UPDATE_COLLEAGUE_PROFILE,
                             additionaldata: {what_changed: what_changed, colleague_id: current_person.id})
 
         # activity log
-        Activity.log_activity(person_id:  current_person.id, 
-                              activitycode: Activity::UPDATE_COLLEAGUE_PROFILE, 
+        Activity.log_activity(person_id:  current_person.id,
+                              activitycode: Activity::UPDATE_COLLEAGUE_PROFILE,
                               ip_address: request.remote_ip,
-                              colleague_id: @person.id, 
+                              colleague_id: @person.id,
                               additionaldata: {what_changed: what_changed})
-      end          
+      end
 
       return redirect_to(@person, :notice => 'Profile was updated.')
     else
@@ -102,7 +102,7 @@ class PeopleController < ApplicationController
         @browse_filter.dump_to_file
         send_file(@browse_filter.filename,
                   :type => 'text/csv; charset=iso-8859-1; header=present',
-                  :disposition => "attachment; filename=#{File.basename(@browse_filter.filename)}")        
+                  :disposition => "attachment; filename=#{File.basename(@browse_filter.filename)}")
       else
         if(@browse_filter.dump_in_progress?)
           @browse_filter.add_to_notifylist(current_person)
@@ -139,7 +139,7 @@ class PeopleController < ApplicationController
 
   def filter
     if(browse_filter = BrowseFilter.find_or_create_by_settings(params,current_person))
-      return redirect_to(browse_people_url(filter: browse_filter.id))      
+      return redirect_to(browse_people_url(filter: browse_filter.id))
     else
       flash[:warning] = 'Invalid filter provided.'
       return redirect_to(browse_people_url)
@@ -149,10 +149,10 @@ class PeopleController < ApplicationController
   def find
     collection_breadcrumbs(['Find colleagues'])
 
-    if (!params[:q].blank?) 
+    if (!params[:q].blank?)
       @colleagues = Person.patternsearch(params[:q]).order('last_name,first_name').page(params[:page])
     end
-  end  
+  end
 
   def pendingreview
     collection_breadcrumbs(['Pending review'])
@@ -168,7 +168,9 @@ class PeopleController < ApplicationController
       flash[:failure] = 'An explanation for vouching for this eXtensionID is required'
       return redirect_to(person_url(@person))
     else
-      if(@person.vouch({voucher: current_person, explanation: params[:explanation], ip_address: request.remote_ip}))
+      # we limited the field to 255 (when it only shows ~54 - but let's truncate it for good measure)
+      explanation = ((params[:explanation].length > 255) ? params[:explanation].truncate(255) : params[:explanation])
+      if(@person.vouch({voucher: current_person, explanation: explanation, ip_address: request.remote_ip}))
         flash[:success] = "Vouched for #{@person.fullname}"
         return redirect_to(person_url(@person))
       else
@@ -266,9 +268,9 @@ class PeopleController < ApplicationController
       else
         @person.password = params[:person][:password]
         if(@person.set_hashed_password(save: true))
-        Activity.log_activity(person_id: @person.id, 
-                              activitycode: Activity::PASSWORD_CHANGE, 
-                              ip_address: request.remote_ip)            
+        Activity.log_activity(person_id: @person.id,
+                              activitycode: Activity::PASSWORD_CHANGE,
+                              ip_address: request.remote_ip)
           flash[:notice] = 'Your password has been changed'
           return redirect_to(person_url(current_person))
         end
@@ -287,7 +289,7 @@ class PeopleController < ApplicationController
       end
     end
   end
-  
+
   def change_social_network_publicity
     @social_network_connection = SocialNetworkConnection.find(params[:id])
     if (@social_network_connection.person == current_person)
@@ -299,14 +301,14 @@ class PeopleController < ApplicationController
     end
     @social_network = current_person.social_networks.where("social_network_connections.id = #{@social_network_connection.id}").first
   end
-  
+
   def public_settings
     @person = Person.find_by_email_or_idstring_or_id(params[:id])
     member_breadcrumbs(['Change public profile settings'])
 
     return redirect_to(person_url(current_person)) if(@person != current_person)
 
-    # this is a bit of an odd way of doing this, but this guarrantees 
+    # this is a bit of an odd way of doing this, but this guarrantees
     # we have a db entry for all the settings for the person.
     @publicsettings = []
     ProfilePublicSetting::KNOWN_ITEMS.each do |item|
@@ -357,11 +359,11 @@ class PeopleController < ApplicationController
         update_attributes = params[:social_network_connection].merge({person_id: current_person.id})
         if(@social_network_connection.update_attributes(update_attributes))
 
-          Activity.log_activity(person_id: current_person.id, 
-                                activitycode: Activity::UPDATE_SOCIAL_NETWORKS, 
-                                ip_address: request.remote_ip, 
-                                additionalinfo: "updated #{@social_network_connection.social_network.name}",  
-                                additionaldata: {updated: @social_network_connection.attributes.to_yaml})   
+          Activity.log_activity(person_id: current_person.id,
+                                activitycode: Activity::UPDATE_SOCIAL_NETWORKS,
+                                ip_address: request.remote_ip,
+                                additionalinfo: "updated #{@social_network_connection.social_network.name}",
+                                additionaldata: {updated: @social_network_connection.attributes.to_yaml})
 
           flash[:success] = 'Social network updated.'
           return redirect_to(change_social_networks_people_url)
@@ -370,17 +372,17 @@ class PeopleController < ApplicationController
         @social_network = SocialNetwork.find(params[:social_network_connection][:social_network_id])
         save_attributes = params[:social_network_connection].merge({person_id: current_person.id, social_network: @social_network})
         if(@social_network_connection = SocialNetworkConnection.create(save_attributes))
-          Activity.log_activity(person_id: current_person.id, 
-                                activitycode: Activity::UPDATE_SOCIAL_NETWORKS, 
+          Activity.log_activity(person_id: current_person.id,
+                                activitycode: Activity::UPDATE_SOCIAL_NETWORKS,
                                 ip_address: request.remote_ip,
-                                additionalinfo: "added #{@social_network_connection.social_network.name}",  
-                                additionaldata: {added: @social_network_connection.attributes.to_yaml})   
+                                additionalinfo: "added #{@social_network_connection.social_network.name}",
+                                additionaldata: {added: @social_network_connection.attributes.to_yaml})
           flash[:success] = 'Social network added.'
           return redirect_to(change_social_networks_people_url)
         end
       else
         flash[:warning] = 'Missing parameters'
-      end    
+      end
 
     end
 
@@ -396,11 +398,11 @@ class PeopleController < ApplicationController
         flash[:warning] = 'Unable to remove this social network connection.'
         return redirect_to(change_social_networks_people_url)
       else
-        Activity.log_activity(person_id: current_person.id, 
-                              activitycode: Activity::UPDATE_SOCIAL_NETWORKS, 
+        Activity.log_activity(person_id: current_person.id,
+                              activitycode: Activity::UPDATE_SOCIAL_NETWORKS,
                               ip_address: request.remote_ip,
-                              additionalinfo: "deleted #{@social_network_connection.social_network.name}", 
-                              additionaldata: {removed: @social_network_connection.attributes.to_yaml})          
+                              additionalinfo: "deleted #{@social_network_connection.social_network.name}",
+                              additionaldata: {removed: @social_network_connection.attributes.to_yaml})
         @social_network_connection.destroy
         flash[:success] = 'Social network removed.'
         return redirect_to(change_social_networks_people_url)
@@ -415,7 +417,7 @@ class PeopleController < ApplicationController
     if(params[:id])
       @person = Person.find_by_email_or_idstring_or_id(params[:id])
       member_breadcrumbs(['Activity'])
-      
+
       if(@person == current_person or current_person.is_admin?)
         @activities = Activity.related_to_person(@person).order('created_at DESC').page(params[:page])
       else
@@ -426,14 +428,14 @@ class PeopleController < ApplicationController
 
       if(current_person.is_admin?)
         if(params[:ip])
-          @activities = Activity.where(ip_address: params[:ip]).order('created_at DESC').page(params[:page])          
+          @activities = Activity.where(ip_address: params[:ip]).order('created_at DESC').page(params[:page])
         else
           @activities = Activity.order('created_at DESC').page(params[:page])
         end
       else
         @activities = Activity.public_activity.order('created_at DESC').page(params[:page])
       end
-    end        
+    end
   end
 
   private
@@ -443,7 +445,7 @@ class PeopleController < ApplicationController
     add_breadcrumb("#{@person.fullname}", person_path(@person))
     if(!endpoints.blank?)
       endpoints.each do |endpoint|
-        if(endpoint.is_a?(Array))  
+        if(endpoint.is_a?(Array))
           add_breadcrumb(endpoint[0],endpoint[1])
         else
           add_breadcrumb(endpoint)
@@ -456,7 +458,7 @@ class PeopleController < ApplicationController
     add_breadcrumb("People", :people_path)
     if(!endpoints.blank?)
       endpoints.each do |endpoint|
-        if(endpoint.is_a?(Array))  
+        if(endpoint.is_a?(Array))
           add_breadcrumb(endpoint[0],endpoint[1])
         else
           add_breadcrumb(endpoint)
@@ -472,4 +474,3 @@ class PeopleController < ApplicationController
 
 
 end
-
