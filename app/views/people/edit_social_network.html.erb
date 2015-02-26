@@ -20,22 +20,22 @@
         <%= f.hidden_field :social_network_id, value: @social_network_connection.social_network.id %>
       <%- else -%>
         <%= hidden_field_tag('social_network_connection_id',@social_network_connection.id) %>
-      <%- end -%>        
+      <%- end -%>
 
       <fieldset>
         <%- if @social_network_connection.social_network.is_other? -%>
           <%= f.input :custom_network_name, label: 'Network Name', hint: 'The name for this social network' %>
         <%- end -%>
-        <%= f.input :accountid, label: 'Account Name', hint: 'Your account name or unique public identifier for this social network' %>
-        <%= f.input :accounturl, label: 'Profile URL', hint: 'A unique URL for your profile (if this social network gives you a direct link for your profile).', :input_html => { :class => 'span6' } %>        
+        <%= f.input :accountid, label: 'Account Name', hint: 'Your account name or unique public identifier for this social network', input_html: { maxlength: 96 } %>
+        <%= f.input :accounturl, label: 'Profile URL', hint: 'A unique URL for your profile (if this social network gives you a direct link for your profile).', :input_html => { :class => 'span6', maxlength: 255 } %>
       </fieldset>
 
       <p>
         <%- if @social_network_connection.new_record? -%>
-          <%= submit_tag 'Add', :class => "btn btn-primary" %> 
+          <%= submit_tag 'Add', :class => "btn btn-primary" %>
           <%= link_to "Cancel", change_social_networks_people_path, :class => "btn" %>
         <%- else -%>
-          <%= submit_tag 'Update', :class => "btn btn-primary" %> 
+          <%= submit_tag 'Update', :class => "btn btn-primary" %>
           <%= link_to "Cancel", change_social_networks_people_path, :class => "btn" %>
         <%- end -%>
       </p>
