@@ -974,15 +974,18 @@ class Person < ActiveRecord::Base
 
 
   def create_admin_account
-    admin_account = Person.new
-    admin_account.attributes = self.attributes
+    admin_attributes = self.attributes.dup
+    admin_attributes[:id] = nil
+    admin_attributes[:password] = SecureRandom.hex(16)
+    admin_attributes[:password_reset] = admin_attributes[:password]
+    admin_account = Person.new(admin_attributes, :without_protection => true)
     admin_account.last_name = "#{self.last_name} Admin Account"
-    admin_account.login = "#{self.login}-admin"
+    admin_account.idstring = "#{self.idstring}-admin"
     admin_account.is_admin = true
-    admin_account.email = "#{admin_user.login}@extension.org"
+    admin_account.email = "#{admin_account.idstring}@extension.org"
     admin_account.primary_account_id = self.id
-    admin_account.password = ''
     admin_account.save
+    admin_account.expire_password
     admin_account
   end
 
