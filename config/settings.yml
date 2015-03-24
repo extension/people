@@ -14,6 +14,8 @@ email_test_address: 'people-notify-testing@extension.org'
 googleapps_domain: 'apps.extension.org'
 googleapps_account: "use_local_settings"
 googleapps_secret:  "use_local_settings"
+googleapps_service_account: 'use_local_settings'
+googleapps_key_secret: 'use_local_settings'
 honeybadger_api_key:  "use_local_settings"
 learn_database: 'use_local_settings'
 max_live_dump_count: 200

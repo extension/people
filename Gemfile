@@ -98,10 +98,6 @@ gem 'useragent'
 gem 'geocoder'
 gem 'geoip'
 
-
-# google analytics retrieval
-gem "garb" # garb for now until it breaks
-
 # breadcrumbs
 gem "breadcrumbs_on_rails"
 
@@ -117,10 +113,13 @@ gem 'rack-robustness'
 # terse logging
 gem 'lograge'
 
+# google api
+gem 'google-api-client'
+
 group :development do
   # require the powder gem
   gem 'powder'
-  gem 'net-http-spy'
+  gem 'httplog'
   gem 'pry'
 
   # footnotes

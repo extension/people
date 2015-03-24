@@ -24,6 +24,8 @@
 /capatross_logs
 /config/capatross.local.yml
 /config/geoip
+/config/googleapi
+
 
 # ignore openid dir - it's symlinked on deploy
 /openid
