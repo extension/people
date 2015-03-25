@@ -67,13 +67,7 @@ class GoogleDirectoryApi
       password = SecureRandom.hex(16)
     end
 
-    # TODO: we do have the potential of associating the
-    # google account back to the people ID. No idea why
-    # that might be useful at the moment, but it's worth
-    # mentioning.  Ton of other directory data at:
-    # https://developers.google.com/admin-sdk/directory/v1/guides/manage-users#create_user
-
-    account_data = @directory_api.users.insert.request_schema.new({
+    create_parameters = {
       'primaryEmail' => "#{google_account.username}@extension.org",
       "name" => {
         "givenName" => google_account.given_name,
@@ -82,7 +76,9 @@ class GoogleDirectoryApi
       "suspended" => (google_account.suspended? ? "true" : "false"),
       "password" =>  password,
       "hashFunction" => "SHA-1"
-    })
+    }
+
+    account_data = @directory_api.users.insert.request_schema.new(create_parameters)
 
     api_method = lambda do
       @apps_connection.execute(
@@ -97,6 +93,44 @@ class GoogleDirectoryApi
     else
       nil
     end
+  end
+
+  def update_account(google_account)
+    if(!(password = google_account.person.password_reset))
+      password = SecureRandom.hex(16)
+    end
+
+    update_parameters = {
+      'primaryEmail' => "#{google_account.username}@extension.org",
+      "name" => {
+        "givenName" => google_account.given_name,
+        "familyName" => google_account.family_name
+      },
+      "suspended" => (google_account.suspended? ? "true" : "false"),
+    }
+
+    if(password = google_account.person.password_reset)
+      update_parameters["password"] = password
+      update_parameters["hashFunction"] = "SHA-1"
+    end
+
+    account_data = @directory_api.users.insert.request_schema.new(update_parameters)
+
+    api_method = lambda do
+      @apps_connection.execute(
+        :api_method => @directory_api.users.update,
+        :parameters => {'userKey' => "#{google_account.username}@extension.org"},
+        :body_object => account_data
+      )
+    end
+
+    result = api_method.call()
+    if(result.status == 200)
+      result.data.to_hash
+    else
+      nil
+    end
+
   end
 
 
