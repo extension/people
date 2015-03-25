@@ -47,11 +47,11 @@ class GoogleDirectoryApi
 
   end
 
-  def retrieve_account(account)
+  def retrieve_account(google_account)
     api_method = lambda do
     @apps_connection.execute(
       :api_method => @directory_api.users.get,
-      :parameters => {'userKey' => "#{account}@extension.org"}
+      :parameters => {'userKey' => "#{google_account.username}@extension.org"}
     )
     end
     result = api_method.call()
@@ -61,4 +61,43 @@ class GoogleDirectoryApi
       nil
     end
   end
+
+  def create_account(google_account)
+    if(!(password = google_account.person.password_reset))
+      password = SecureRandom.hex(16)
+    end
+
+    # TODO: we do have the potential of associating the
+    # google account back to the people ID. No idea why
+    # that might be useful at the moment, but it's worth
+    # mentioning.  Ton of other directory data at:
+    # https://developers.google.com/admin-sdk/directory/v1/guides/manage-users#create_user
+
+    account_data = @directory_api.users.insert.request_schema.new({
+      'primaryEmail' => "#{google_account.username}@extension.org",
+      "name" => {
+        "givenName" => google_account.given_name,
+        "familyName" => google_account.family_name
+      },
+      "suspended" => (google_account.suspended? ? "true" : "false"),
+      "password" =>  password,
+      "hashFunction" => "SHA-1"
+    })
+
+    api_method = lambda do
+      @apps_connection.execute(
+        :api_method => @directory_api.users.insert,
+        :body_object => account_data
+      )
+    end
+
+    result = api_method.call()
+    if(result.status == 200)
+      result.data.to_hash
+    else
+      nil
+    end
+  end
+
+
 end
