@@ -142,11 +142,11 @@ class GoogleDirectoryApi
   end
 
 
-  def retrieve_group(google_group)
+  def retrieve_group(group_idstring)
     api_method = lambda do
     @apps_connection.execute(
       :api_method => @directory_api.groups.get,
-      :parameters => {'groupKey' => "#{google_group.group_id}@extension.org"}
+      :parameters => {'groupKey' => "#{group_idstring}@extension.org"}
     )
     end
 
@@ -154,11 +154,11 @@ class GoogleDirectoryApi
     return (@last_result.status == 200)
   end
 
-  def create_group(google_group)
+  def create_group(group_idstring, create_options = {})
     create_parameters = {
-      'email' => "#{google_group.group_id}@extension.org",
-      "description" => google_group.group_name,
-      "name" => google_group.group_name
+      'email' => "#{group_idstring}@extension.org",
+      "description" => create_options[:description],
+      "name" => create_options[:name]
     }
 
     group_data = @directory_api.groups.insert.request_schema.new(create_parameters)
@@ -174,14 +174,14 @@ class GoogleDirectoryApi
     return (@last_result.status == 200)
   end
 
-  def update_group(google_group)
+  def update_group(group_idstring, update_options = {})
     update_parameters = {
-      'email' => "#{google_group.group_id}@extension.org",
-      "description" => google_group.group_name,
-      "name" => google_group.group_name
+      'email' => "#{group_idstring}@extension.org",
+      "description" => update_options[:description],
+      "name" => update_options[:name]
     }
 
-    group_data = @directory_api.groups.update.request_schema.new(create_parameters)
+    group_data = @directory_api.groups.update.request_schema.new(update_parameters)
 
     api_method = lambda do
       @apps_connection.execute(

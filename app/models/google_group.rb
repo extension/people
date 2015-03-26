@@ -97,18 +97,18 @@ class GoogleGroup < ActiveRecord::Base
 
     # load GoogleDirectoryApi
     gda = GoogleDirectoryApi.new
-    found_group = gda.retrieve_group(self)
+    found_group = gda.retrieve_group(self.group_id)
 
     # create the account if it didn't exist
     if(!found_group)
-      created_group = gda.create_group(self)
+      created_group = gda.create_group(self.group_id, {description: self.group_name, name: self.group_name})
 
       if(!created_account)
         self.update_attributes({:has_error => true, :last_error => gda.last_result})
         return nil
       end
     else
-      updated_group = gda.update_group(self)
+      updated_group = gda.update_group(self.group_id, {description: self.group_name, name: self.group_name})
 
       if(!updated_group)
         self.update_attributes({:has_error => true, :last_error => gda.last_result})
