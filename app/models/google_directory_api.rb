@@ -47,6 +47,18 @@ class GoogleDirectoryApi
 
   end
 
+  def last_result
+    if(!@last_result.nil?)
+      @last_result.data.to_hash
+    else
+      nil
+    end
+  end
+
+  def last_raw_result
+    @last_result
+  end
+
   def retrieve_account(google_account)
     api_method = lambda do
     @apps_connection.execute(
@@ -54,12 +66,9 @@ class GoogleDirectoryApi
       :parameters => {'userKey' => "#{google_account.username}@extension.org"}
     )
     end
-    result = api_method.call()
-    if(result.status == 200)
-      result.data.to_hash
-    else
-      nil
-    end
+
+    @last_result = api_method.call()
+    return (@last_result.status == 200)
   end
 
   def create_account(google_account)
@@ -87,12 +96,8 @@ class GoogleDirectoryApi
       )
     end
 
-    result = api_method.call()
-    if(result.status == 200)
-      result.data.to_hash
-    else
-      nil
-    end
+    @last_result = api_method.call()
+    return (@last_result.status == 200)
   end
 
   def update_account(google_account)
@@ -124,14 +129,12 @@ class GoogleDirectoryApi
       )
     end
 
-    result = api_method.call()
-    if(result.status == 200)
-      result.data.to_hash
-    else
-      nil
-    end
-
+    @last_result = api_method.call()
+    return (@last_result.status == 200)
   end
+
+
+
 
 
 end
