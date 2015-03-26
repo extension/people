@@ -122,7 +122,7 @@ class GoogleDirectoryApi
       update_parameters["hashFunction"] = "SHA-1"
     end
 
-    account_data = @directory_api.users.insert.request_schema.new(update_parameters)
+    account_data = @directory_api.users.update.request_schema.new(update_parameters)
 
     api_method = lambda do
       @apps_connection.execute(
@@ -169,7 +169,25 @@ class GoogleDirectoryApi
     return (@last_result.status == 200)
   end
 
+  def update_group(google_group)
+    update_parameters = {
+      'email' => "#{google_group.group_id}@extension.org",
+      "description" => google_group.group_name,
+      "name" => google_group.group_name
+    }
 
+    group_data = @directory_api.groups.update.request_schema.new(create_parameters)
+
+    api_method = lambda do
+      @apps_connection.execute(
+        :api_method => @directory_api.groups.update,
+        :body_object => group_data
+      )
+    end
+
+    @last_result = api_method.call()
+    return (@last_result.status == 200)
+  end
 
 
 
