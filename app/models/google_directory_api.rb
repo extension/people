@@ -6,6 +6,11 @@
 #  see LICENSE file
 require 'google/api_client'
 
+# This is kind of a stupid class because it has domain
+# knowledge of both the GoogleAccount and GoogleGroup
+# models - but you know, sometimes you make it work
+# and refactor it later (or never).
+
 class GoogleDirectoryApi
 
   DIRECTORY_API = 'directory_v1'
