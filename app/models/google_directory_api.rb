@@ -6,11 +6,6 @@
 #  see LICENSE file
 require 'google/api_client'
 
-# This is kind of a stupid class because it has domain
-# knowledge of both the GoogleAccount and GoogleGroup
-# models - but you know, sometimes you make it work
-# and refactor it later (or never).
-
 class GoogleDirectoryApi
 
   DIRECTORY_API = 'directory_v1'
@@ -67,64 +62,64 @@ class GoogleDirectoryApi
     @last_result
   end
 
-  def retrieve_account(google_account)
-    @last_result = @apps_connection.execute(
-      :api_method => @directory_api.users.get,
-      :parameters => {'userKey' => "#{google_account.username}@extension.org"}
+  def retrieve_account(account_idstring)
+    @last_result = self.api_request(
+      {:api_method => @directory_api.users.get,
+      :parameters => {'userKey' => "#{account_idstring}@extension.org"}},
+      {account_id: account_idstring}
     )
     return (@last_result.status == 200)
   end
 
-  def create_account(google_account)
-    if(!(password = google_account.person.password_reset))
+  def create_account(account_idstring,account_options)
+    if(!(password = account_options[:password]))
       password = SecureRandom.hex(16)
     end
 
     create_parameters = {
-      'primaryEmail' => "#{google_account.username}@extension.org",
+      'primaryEmail' => "#{account_idstring}@extension.org",
       "name" => {
-        "givenName" => google_account.given_name,
-        "familyName" => google_account.family_name
+        "givenName" => account_options[:given_name],
+        "familyName" => account_options[:family_name]
       },
-      "suspended" => (google_account.suspended? ? "true" : "false"),
+      "suspended" => (account_options[:suspended] ? "true" : "false"),
       "password" =>  password,
       "hashFunction" => "SHA-1"
     }
 
     account_data = @directory_api.users.insert.request_schema.new(create_parameters)
 
-    @last_result = @apps_connection.execute(
-      :api_method => @directory_api.users.insert,
-      :body_object => account_data
+    @last_result =  self.api_request(
+      {:api_method => @directory_api.users.insert,
+      :body_object => account_data},
+      {account_id: account_idstring}
     )
     return (@last_result.status == 200)
   end
 
   def update_account(google_account)
-    if(!(password = google_account.person.password_reset))
-      password = SecureRandom.hex(16)
-    end
 
     update_parameters = {
-      'primaryEmail' => "#{google_account.username}@extension.org",
+      'primaryEmail' => "#{account_idstring}@extension.org",
       "name" => {
-        "givenName" => google_account.given_name,
-        "familyName" => google_account.family_name
+        "givenName" => account_options[:given_name],
+        "familyName" => account_options[:family_name]
       },
-      "suspended" => (google_account.suspended? ? "true" : "false"),
+      "suspended" => (account_options[:suspended] ? "true" : "false"),
     }
 
-    if(password = google_account.person.password_reset)
+    if(password = account_options[:password])
       update_parameters["password"] = password
       update_parameters["hashFunction"] = "SHA-1"
     end
 
     account_data = @directory_api.users.update.request_schema.new(update_parameters)
 
-    @last_result = @apps_connection.execute(
-      :api_method => @directory_api.users.update,
-      :parameters => {'userKey' => "#{google_account.username}@extension.org"},
-      :body_object => account_data
+    @last_result = self.api_request(
+      {:api_method => @directory_api.users.update,
+      :parameters => {'userKey' => "#{account_idstring}@extension.org"},
+      :body_object => account_data},
+      {account_id: account_idstring}
     )
     return (@last_result.status == 200)
   end
