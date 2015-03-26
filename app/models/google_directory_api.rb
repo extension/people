@@ -131,9 +131,10 @@ class GoogleDirectoryApi
 
 
   def retrieve_group(group_idstring)
-    @last_result = @apps_connection.execute(
+    @last_result = self.api_request({
       :api_method => @directory_api.groups.get,
       :parameters => {'groupKey' => "#{group_idstring}@extension.org"}
+    },{group_id: group_idstring}
     )
     return (@last_result.status == 200)
   end
@@ -147,9 +148,10 @@ class GoogleDirectoryApi
 
     group_data = @directory_api.groups.insert.request_schema.new(create_parameters)
 
-    @last_result = @apps_connection.execute(
-      :api_method => @directory_api.groups.insert,
-      :body_object => group_data
+    @last_result = self.api_request(
+      {:api_method => @directory_api.groups.insert,
+        :body_object => group_data},
+      {group_id: group_idstring}
     )
     return (@last_result.status == 200)
   end
@@ -163,9 +165,10 @@ class GoogleDirectoryApi
 
     group_data = @directory_api.groups.update.request_schema.new(update_parameters)
 
-    @last_result = @apps_connection.execute(
-      :api_method => @directory_api.groups.update,
-      :body_object => group_data
+    @last_result = self.api_request(
+      {:api_method => @directory_api.groups.update,
+      :body_object => group_data},
+      {group_id: group_idstring}
     )
     return (@last_result.status == 200)
   end
@@ -189,9 +192,10 @@ class GoogleDirectoryApi
         request_parameters['pageToken'] = nil
       end
 
-      @last_result = @apps_connection.execute(
-        :api_method => @directory_api.members.list,
-        :parameters => request_parameters
+      @last_result =  self.api_request(
+        {:api_method => @directory_api.members.list,
+        :parameters => request_parameters},
+        {group_id: group_idstring}
       )
       last_result_data = @last_result.data.to_hash
 
@@ -220,6 +224,19 @@ class GoogleDirectoryApi
     end
 
     returnmembers
+  end
+
+  def api_request(api_data, log_options)
+    result = @apps_connection.execute(api_data)
+    request_options = {}
+    request_options[:api_method] = api_data[:api_method].id
+    request_options[:resultcode] = result.status
+    if(result.status != 200)
+      request_options[:errordata] = result.data.to_hash
+    end
+    request_options.merge!(log_options)
+    GoogleApiLog.log_request(request_options)
+    result
   end
 
 end
