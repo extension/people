@@ -68,14 +68,10 @@ class GoogleDirectoryApi
   end
 
   def retrieve_account(google_account)
-    api_method = lambda do
-    @apps_connection.execute(
+    @last_result = @apps_connection.execute(
       :api_method => @directory_api.users.get,
       :parameters => {'userKey' => "#{google_account.username}@extension.org"}
     )
-    end
-
-    @last_result = api_method.call()
     return (@last_result.status == 200)
   end
 
@@ -97,14 +93,10 @@ class GoogleDirectoryApi
 
     account_data = @directory_api.users.insert.request_schema.new(create_parameters)
 
-    api_method = lambda do
-      @apps_connection.execute(
-        :api_method => @directory_api.users.insert,
-        :body_object => account_data
-      )
-    end
-
-    @last_result = api_method.call()
+    @last_result = @apps_connection.execute(
+      :api_method => @directory_api.users.insert,
+      :body_object => account_data
+    )
     return (@last_result.status == 200)
   end
 
@@ -129,28 +121,20 @@ class GoogleDirectoryApi
 
     account_data = @directory_api.users.update.request_schema.new(update_parameters)
 
-    api_method = lambda do
-      @apps_connection.execute(
-        :api_method => @directory_api.users.update,
-        :parameters => {'userKey' => "#{google_account.username}@extension.org"},
-        :body_object => account_data
-      )
-    end
-
-    @last_result = api_method.call()
+    @last_result = @apps_connection.execute(
+      :api_method => @directory_api.users.update,
+      :parameters => {'userKey' => "#{google_account.username}@extension.org"},
+      :body_object => account_data
+    )
     return (@last_result.status == 200)
   end
 
 
   def retrieve_group(group_idstring)
-    api_method = lambda do
-    @apps_connection.execute(
+    @last_result = @apps_connection.execute(
       :api_method => @directory_api.groups.get,
       :parameters => {'groupKey' => "#{group_idstring}@extension.org"}
     )
-    end
-
-    @last_result = api_method.call()
     return (@last_result.status == 200)
   end
 
@@ -163,14 +147,10 @@ class GoogleDirectoryApi
 
     group_data = @directory_api.groups.insert.request_schema.new(create_parameters)
 
-    api_method = lambda do
-      @apps_connection.execute(
-        :api_method => @directory_api.groups.insert,
-        :body_object => group_data
-      )
-    end
-
-    @last_result = api_method.call()
+    @last_result = @apps_connection.execute(
+      :api_method => @directory_api.groups.insert,
+      :body_object => group_data
+    )
     return (@last_result.status == 200)
   end
 
