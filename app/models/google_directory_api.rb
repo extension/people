@@ -163,19 +163,63 @@ class GoogleDirectoryApi
 
     group_data = @directory_api.groups.update.request_schema.new(update_parameters)
 
-    api_method = lambda do
-      @apps_connection.execute(
-        :api_method => @directory_api.groups.update,
-        :body_object => group_data
-      )
-    end
-
-    @last_result = api_method.call()
+    @last_result = @apps_connection.execute(
+      :api_method => @directory_api.groups.update,
+      :body_object => group_data
+    )
     return (@last_result.status == 200)
   end
 
+  def retrieve_group_members(group_idstring)
+    if(!self.retrieve_group(group_idstring))
+      return nil
+    end
+
+    request_parameters = {'groupKey' => "#{group_idstring}@extension.org"}
+
+    # group membership requests are limited to 200 members
+    # so like Pokémon, we gotta catch them all
+    did_we_catch_them_all = false
+    pagination_token = nil
+    returnmembers = []
+    while(!did_we_catch_them_all)
+      if(!pagination_token.nil?)
+        request_parameters['pageToken'] = pagination_token
+      else
+        request_parameters['pageToken'] = nil
+      end
+
+      @last_result = @apps_connection.execute(
+        :api_method => @directory_api.members.list,
+        :parameters => request_parameters
+      )
+      last_result_data = @last_result.data.to_hash
+
+      if(last_result_data['nextPageToken'])
+        pagination_token = last_result_data['nextPageToken']
+        did_we_catch_them_all = false
+      else
+        did_we_catch_them_all = true
+        pagination_token = nil
+      end
 
 
+      if(@last_result.status == 200)
+        members = last_result_data['members']
+        if(!members.nil?)
+          members.each do |member_resource|
+            returnmembers << member_resource['email']
+          end
+        end
+      else
+        # yes potentially breaking out of the loop
+        # but if the request fails, I want to get
+        # that error
+        return nil
+      end
+    end
 
+    returnmembers
+  end
 
 end
