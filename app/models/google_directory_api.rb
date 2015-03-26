@@ -22,7 +22,7 @@ class GoogleDirectoryApi
     @apps_connection.authorization = Signet::OAuth2::Client.new(
       :token_credential_uri => 'https://accounts.google.com/o/oauth2/token',
       :audience => 'https://accounts.google.com/o/oauth2/token',
-      :scope => 'https://www.googleapis.com/auth/admin.directory.user',
+      :scope => ['https://www.googleapis.com/auth/admin.directory.user','https://www.googleapis.com/auth/admin.directory.group'],
       :issuer => Settings.googleapps_service_account,
       :signing_key => signing_key,
       :person => Settings.googleapps_account)
@@ -44,7 +44,10 @@ class GoogleDirectoryApi
     end
 
     self
+  end
 
+  def directory_api_object
+    @directory_api
   end
 
   def last_result
@@ -132,6 +135,41 @@ class GoogleDirectoryApi
     @last_result = api_method.call()
     return (@last_result.status == 200)
   end
+
+
+  def retrieve_group(google_group)
+    api_method = lambda do
+    @apps_connection.execute(
+      :api_method => @directory_api.groups.get,
+      :parameters => {'groupKey' => "#{google_group.group_id}@extension.org"}
+    )
+    end
+
+    @last_result = api_method.call()
+    return (@last_result.status == 200)
+  end
+
+  def create_group(google_group)
+    create_parameters = {
+      'email' => "#{google_group.group_id}@extension.org",
+      "description" => google_group.group_name,
+      "name" => google_group.group_name
+    }
+
+    group_data = @directory_api.groups.insert.request_schema.new(create_parameters)
+
+    api_method = lambda do
+      @apps_connection.execute(
+        :api_method => @directory_api.groups.insert,
+        :body_object => group_data
+      )
+    end
+
+    @last_result = api_method.call()
+    return (@last_result.status == 200)
+  end
+
+
 
 
 
