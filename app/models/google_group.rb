@@ -8,11 +8,8 @@ require 'gappsprovisioning/provisioningapi'
 include GAppsProvisioning
 
 class GoogleGroup < ActiveRecord::Base
-  attr_accessor :apps_connection
   serialize :last_error
   attr_accessible :community, :community_id, :group_id, :group_name, :email_permission, :apps_updated_at, :has_error, :last_error, :connectiontype, :lists_alias
-
-  GDATA_ERROR_ENTRYDOESNOTEXIST = 1301
 
   before_save  :set_values_from_community
   after_save :update_email_alias
@@ -97,34 +94,30 @@ class GoogleGroup < ActiveRecord::Base
 
 
   def update_apps_group
-    self.establish_apps_connection
 
-    # check for a group - a little different than the google
-    # account check - there's no single group retrieval, so
-    # we'll just check for the apps_updated_at timestamp
+    # load GoogleDirectoryApi
+    gda = GoogleDirectoryApi.new
+    found_group = gda.retrieve_group(self)
 
-    # create the group if it didn't exist
-    if(self.apps_updated_at.blank?)
-      begin
-        google_group = self.apps_connection.create_group(self.group_id,[self.group_name,self.group_name,self.email_permission])
-      rescue GDataError => e
-        self.update_attributes({:has_error => true, :last_error => e})
+    # create the account if it didn't exist
+    if(!found_group)
+      created_group = gda.create_group(self)
+
+      if(!created_account)
+        self.update_attributes({:has_error => true, :last_error => gda.last_result})
         return nil
       end
     else
-      # update the group
-      begin
-        google_group = self.apps_connection.update_group(self.group_id,[self.group_name,self.group_name,self.email_permission])
+      updated_group = gda.update_group(self)
 
-      rescue GDataError => e
-        self.update_attributes({:has_error => true, :last_error => e})
+      if(!updated_group)
+        self.update_attributes({:has_error => true, :last_error => gda.last_result})
         return nil
       end
     end
 
     self.update_attributes({has_error: false, last_error: nil, apps_updated_at: Time.now.utc})
-    # if we made it here, it must have worked
-    return google_group
+    return self
   end
 
   def update_apps_group_members
@@ -224,18 +217,6 @@ class GoogleGroup < ActiveRecord::Base
     results
   end
 
-
-
-  def establish_apps_connection(force_reconnect = false)
-    if(self.apps_connection.nil? or force_reconnect)
-      self.apps_connection = ProvisioningApi.new(Settings.googleapps_account,Settings.googleapps_secret)
-    end
-  end
-
-  def self.retrieve_all_groups
-    class_apps_connection = ProvisioningApi.new(Settings.googleapps_account,Settings.googleapps_secret)
-    class_apps_connection.retrieve_all_groups
-  end
 
   def self.clear_errors
     self.update_all("has_error = 0, last_error = ''","has_error = 1")
