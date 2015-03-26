@@ -8,13 +8,8 @@
 class GoogleAccount < ActiveRecord::Base
   serialize :last_error
   attr_accessible :person, :person_id, :given_name, :family_name, :is_admin, :suspended, :apps_updated_at, :has_error, :last_error
-
-  GDATA_ERROR_ENTRYDOESNOTEXIST = 1301
-
-  before_save  :set_values_from_person
-
   belongs_to :person
-
+  before_save  :set_values_from_person
 
   def set_values_from_person
     self.username = self.person.idstring.downcase
@@ -41,60 +36,33 @@ class GoogleAccount < ActiveRecord::Base
   end
 
   def update_apps_account
-    self.establish_apps_connection
-
-    # check for an account
-    begin
-      google_account = self.apps_connection.retrieve_user(self.username)
-    rescue GDataError => e
-      if(e.code.to_i != GDATA_ERROR_ENTRYDOESNOTEXIST)
-        self.update_attributes({:has_error => true, :last_error => e})
-        return nil
-      end
-    end
+    # load GoogleDirectoryApi
+    gda = GoogleDirectoryApi.new
+    google_account_data = gda.retrieve_account(self)
 
     # create the account if it didn't exist
-    if(!google_account)
-      begin
-        if(!(password = self.person.password_reset))
-          password = SecureRandom.hex(16)
-        end
-        google_account = self.apps_connection.create_user(self.username,self.given_name,self.family_name,password,"SHA-1")
-      rescue GDataError => e
-        self.update_attributes({:has_error => true, :last_error => e})
+    if(!google_account_data)
+      google_account_data = gda.create_account(self)
+
+      if(!google_account_data)
+        # not logging the error for now
+        self.update_attributes({:has_error => true})
         return nil
       end
-    end
+    else
+      google_account_data = gda.update_account(self)
 
-
-    # update the account
-    begin
-      if(password = self.person.password_reset)
-        google_account = self.apps_connection.update_user(self.username,
-                                                                self.given_name,
-                                                                self.family_name,
-                                                                password,"SHA-1",
-                                                                self.is_admin? ? "true" : "false",
-                                                                self.suspended? ? "true" : "false",
-                                                                "false")
-      else
-        google_account = self.apps_connection.update_user(self.username,
-                                                                self.given_name,
-                                                                self.family_name,
-                                                                nil,nil,
-                                                                self.is_admin? ? "true" : "false",
-                                                                self.suspended? ? "true" : "false",
-                                                                "false")
+      if(!google_account_data)
+        # not logging the error for now
+        self.update_attributes({:has_error => true})
+        return nil
       end
-    rescue GDataError => e
-      self.update_attributes({:has_error => true, :last_error => e})
-      return nil
     end
 
     self.touch(:apps_updated_at)
     # if we made it here, it must have worked
     self.person.clear_password_reset
-    return google_account
+    return google_account_data
   end
 
   def self.clear_errors
