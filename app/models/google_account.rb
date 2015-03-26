@@ -38,20 +38,20 @@ class GoogleAccount < ActiveRecord::Base
   def update_apps_account
     # load GoogleDirectoryApi
     gda = GoogleDirectoryApi.new
-    found_account? = gda.retrieve_account(self)
+    found_account = gda.retrieve_account(self)
 
     # create the account if it didn't exist
-    if(!found_account?)
-      created_account? = gda.create_account(self)
+    if(!found_account)
+      created_account = gda.create_account(self)
 
-      if(!created_account?)
+      if(!created_account)
         self.update_attributes({:has_error => true, :last_error => gda.last_result})
         return nil
       end
     else
-      updated_account? = gda.update_account(self)
+      updated_account = gda.update_account(self)
 
-      if(!updated_account?)
+      if(!updated_account)
         self.update_attributes({:has_error => true, :last_error => gda.last_result})
         return nil
       end
