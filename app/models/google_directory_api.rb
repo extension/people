@@ -258,7 +258,7 @@ class GoogleDirectoryApi
                       'groupKey' => "#{group_idstring}@extension.org"}},
                       {group_id: group_idstring, account_id: account_idstring}
     )
-    return (@last_result.status == 200)
+    return (@last_result.status == 204)
   end
 
 
@@ -266,10 +266,16 @@ class GoogleDirectoryApi
   def api_request(api_data, log_options)
     result = @apps_connection.execute(api_data)
     request_options = {}
-    request_options[:api_method] = api_data[:api_method].id
+    api_method_string = api_data[:api_method].id
+    request_options[:api_method] = api_method_string
     request_options[:resultcode] = result.status
-    if(result.status != 200)
-      request_options[:errordata] = result.data.to_hash
+    if(api_method_string == 'directory.members.delete')
+      success_status = 204
+    else
+      success_status = 200
+    end
+    if(result.status != success_status)
+      request_options[:errordata] = result.data.to_hash if result.data
     end
     request_options.merge!(log_options)
     GoogleApiLog.log_request(request_options)
