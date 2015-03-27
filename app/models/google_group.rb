@@ -80,10 +80,7 @@ class GoogleGroup < ActiveRecord::Base
 
 
   def update_apps_group_members_and_owners
-    if(group = update_apps_group_members)
-      # no longer setting owners for the time being
-      update_apps_group_owners
-    end
+    group = update_apps_group_members
   end
 
   def self.delayed_update_apps_group_members_and_owners(record_id)
@@ -99,11 +96,11 @@ class GoogleGroup < ActiveRecord::Base
     gda = GoogleDirectoryApi.new
     found_group = gda.retrieve_group(self.group_id)
 
-    # create the account if it didn't exist
+    # create the group if it doesnt't exist
     if(!found_group)
       created_group = gda.create_group(self.group_id, {description: self.group_name, name: self.group_name})
 
-      if(!created_account)
+      if(!created_group)
         self.update_attributes({:has_error => true, :last_error => gda.last_result})
         return nil
       end
@@ -121,101 +118,46 @@ class GoogleGroup < ActiveRecord::Base
   end
 
   def update_apps_group_members
-    # update the group for good measure
+    # load GoogleDirectoryApi
+    gda = GoogleDirectoryApi.new
 
-    if(!(google_group = self.update_apps_group))
+    apps_group_members = gda.retrieve_group_members(self.group_id)
+    if(apps_group_members.nil?)
+      self.update_attributes({:has_error => true, :last_error => gda.last_result})
       return nil
-    else
-      # get the members @google
-      begin
-        apps_group_members = self.apps_connection.retrieve_all_members(self.group_id).map(&:member_id)
-      rescue GDataError => e
-        self.update_attributes({:has_error => true, :last_error => e})
-        return nil
-      end
-
-      # map the community members to an array of "blah@extension.org"
-      if(self.connectiontype == 'leaders')
-        community_members = self.community.leaders.map{|person| "#{person.idstring}@extension.org"}
-      else
-        community_members = self.community.joined.map{|person| "#{person.idstring}@extension.org"}
-      end
-
-      # inject the moderator account
-      moderator_account = Person.find(Person::MODERATOR_ACCOUNT)
-      if(community_members)
-        community_members << "#{moderator_account.idstring}@extension.org"
-      else
-        community_members = ["#{moderator_account.idstring}@extension.org"]
-      end
-
-
-      adds = community_members - apps_group_members
-      removes = apps_group_members - community_members
-
-      # add the adds/remove the removes
-      begin
-        adds.each do |member_id|
-          member = self.apps_connection.add_member_to_group(member_id, self.group_id)
-        end
-
-        removes.each do |member_id|
-          member = self.apps_connection.remove_member_from_group(member_id, self.group_id)
-        end
-      rescue
-        self.update_attributes({:has_error => true, :last_error => e})
-        return nil
-      end
-
-      return google_group
     end
+
+    # map the community members to an array of idstrings
+    if(self.connectiontype == 'leaders')
+      community_members = self.community.leaders.map{|person| "#{person.idstring}"}
+    else
+      community_members = self.community.joined.map{|person| "#{person.idstring}"}
+    end
+
+    # inject the moderator account
+    moderator_account = Person.find(Person::MODERATOR_ACCOUNT)
+    if(community_members)
+      community_members << moderator_account.idstring
+    else
+      community_members = [moderator_account.idstring]
+    end
+
+    adds = community_members - apps_group_members
+    removes = apps_group_members - community_members
+
+    adds.each do |member_id|
+      # split the id string back out
+      gda.add_member_to_group(member_id, self.group_id)
+    end
+
+    removes.each do |member_id|
+      gda.remove_member_from_group(member_id, self.group_id)
+    end
+
+    return self
   end
 
-  # owners *have* to be a member of the group first, so run this after update_apps_group_members
-  def update_apps_group_owners(clear_owners = false)
-    self.establish_apps_connection
 
-    # get the owners @google
-    begin
-      apps_group_owners = self.apps_connection.retrieve_all_owners(self.group_id).map(&:owner_id)
-    rescue GDataError => e
-      self.update_attributes({:has_error => true, :last_error => e})
-      return nil
-    end
-
-    # map the community members to an array of "blah@extension.org"
-    if(clear_owners)
-      community_owners = []
-    else
-      # Due to a number of training and logistical reasons, we can't set the leaders to be the
-      # moderators for the community - therefore, we'll use the moderator account
-      # community_owners = self.community.leaders.map{|person| "#{person.idstring}@extension.org"}
-      moderator_account = Person.find(Person::MODERATOR_ACCOUNT)
-      community_owners = ["#{moderator_account.idstring}@extension.org"]
-    end
-
-    adds = community_owners - apps_group_owners
-    removes = apps_group_owners - community_owners
-
-    results = {:adds => 0, :removes => 0}
-    # add the adds/remove the removes
-    begin
-      adds.each do |owner_id|
-        owner = self.apps_connection.add_owner_to_group(owner_id, self.group_id)
-        results[:adds] += 1
-      end
-
-      removes.each do |owner_id|
-        owner = self.apps_connection.remove_owner_from_group(owner_id, self.group_id)
-        results[:removes] += 1
-      end
-    rescue
-      self.update_attributes({:has_error => true, :last_error => e})
-      return nil
-    end
-
-    results
-  end
 
 
   def self.clear_errors
