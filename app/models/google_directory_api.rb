@@ -224,6 +224,45 @@ class GoogleDirectoryApi
     returnmembers
   end
 
+  def add_member_to_group(account_idstring,group_idstring)
+    add_parameters = {
+      'email' => "#{account_idstring}@extension.org"
+    }
+
+    # hardcoded role of member or owner depending
+    # on whether this is the moderator account
+
+    if(account_idstring == 'systemsmoderator')
+      add_parameters['role'] = 'OWNER'
+    else
+      add_parameters['role'] = 'MEMBER'
+    end
+
+    member_data = @directory_api.members.insert.request_schema.new(add_parameters)
+
+    @last_result = self.api_request(
+      {:api_method => @directory_api.members.insert,
+      :parameters => {'groupKey' => "#{group_idstring}@extension.org"},
+      :body_object => member_data},
+      {group_id: group_idstring, account_id: account_idstring}
+    )
+    return (@last_result.status == 200)
+
+  end
+
+
+  def remove_member_from_group(account_idstring,group_idstring)
+    @last_result = self.api_request(
+      {:api_method => @directory_api.members.delete,
+      :parameters => {'memberKey' => "#{account_idstring}@extension.org",
+                      'groupKey' => "#{group_idstring}@extension.org"}},
+                      {group_id: group_idstring, account_id: account_idstring}
+    )
+    return (@last_result.status == 200)
+  end
+
+
+
   def api_request(api_data, log_options)
     result = @apps_connection.execute(api_data)
     request_options = {}
