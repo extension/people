@@ -62,7 +62,7 @@ class GoogleGroup < ActiveRecord::Base
   def queue_members_update
     if(Settings.sync_google)
       if(Settings.redis_enabled)
-        self.class.delay_for(5.seconds).delayed_update_apps_group_members_and_owners(self.id)
+        self.class.delay_for(90.seconds).delayed_update_apps_group_members_and_owners(self.id)
       else
         self.update_apps_group_members_and_owners
       end
