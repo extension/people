@@ -208,7 +208,7 @@ class GoogleDirectoryApi
         members = last_result_data['members']
         if(!members.nil?)
           members.each do |member_resource|
-            if(%r{(\w+)\@extension\.org$} =~ member_resource['email'])
+            if(%r{([\w-]+)\@extension\.org$} =~ member_resource['email'])
               returnmembers << $1
             end
           end
