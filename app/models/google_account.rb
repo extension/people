@@ -53,7 +53,7 @@ class GoogleAccount < ActiveRecord::Base
         return nil
       end
     else
-      updated_account = gda.update_account((self.username,
+      updated_account = gda.update_account(self.username,
                                            {given_name: self.given_name,
                                             family_name: self.family_name,
                                             password: self.person.password_reset,
@@ -68,7 +68,7 @@ class GoogleAccount < ActiveRecord::Base
     self.touch(:apps_updated_at)
     # if we made it here, it must have worked
     self.person.clear_password_reset
-    return google_account_data
+    return self
   end
 
   def self.clear_errors
