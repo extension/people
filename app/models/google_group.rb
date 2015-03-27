@@ -4,9 +4,6 @@
 # === LICENSE:
 #
 #  see LICENSE file
-require 'gappsprovisioning/provisioningapi'
-include GAppsProvisioning
-
 class GoogleGroup < ActiveRecord::Base
   serialize :last_error
   attr_accessible :community, :community_id, :group_id, :group_name, :email_permission, :apps_updated_at, :has_error, :last_error, :connectiontype, :lists_alias
