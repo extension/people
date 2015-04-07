@@ -9,7 +9,7 @@ require 'google/api_client'
 class GoogleDirectoryApi
 
   DIRECTORY_API = 'directory_v1'
-  CACHED_DIRECTORY_API_FILE = "#{Rails.root}/config/googleapi/#{DIRECTORY_API}.cached.json"
+  CACHED_DIRECTORY_API_FILE = "#{Rails.root}/tmp/cache/#{DIRECTORY_API}.cached.json"
 
   def initialize
     # establish the connection and get an access token
