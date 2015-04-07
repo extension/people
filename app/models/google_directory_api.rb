@@ -37,7 +37,7 @@ class GoogleDirectoryApi
         @directory_api = Marshal.load(file)
       end
     else
-      @directory_api = self.apps_connection.discovered_api('admin', DIRECTORY_API)
+      @directory_api = @apps_connection.discovered_api('admin', DIRECTORY_API)
       File.open(CACHED_DIRECTORY_API_FILE, 'w') do |file|
         Marshal.dump(@directory_api, file)
       end
