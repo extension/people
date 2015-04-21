@@ -28,7 +28,7 @@ class BlogsUser < ActiveRecord::Base
 
     # administrator/editor privs
     if(bum = self.blogs_usermetas.where(meta_key: capability_key).first)
-      bum.update_attribute(meta_value: capability_string)
+      bum.update_attribute(:meta_value,capability_string)
     else
       bum = self.blogs_usermetas.create(meta_key: capability_key, meta_value: capability_string)
     end
