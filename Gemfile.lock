@@ -222,6 +222,9 @@ GEM
     rest-client (1.6.7)
       mime-types (>= 1.16)
     retriable (1.4.1)
+    robust_params_parser (0.0.4)
+      multi_json
+      rails (~> 3.2.8)
     ruby-openid (2.2.3)
     safe_attributes (1.0.10)
       activerecord (>= 3.0.0)
@@ -317,6 +320,7 @@ DEPENDENCIES
   rails_config
   redis-rails
   rest-client
+  robust_params_parser
   ruby-openid
   safe_attributes
   sass-rails (~> 3.2.3)
