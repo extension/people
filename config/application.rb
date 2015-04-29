@@ -61,6 +61,10 @@ module People
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
 
+    # https://github.com/infopark/robust_params_parser
+    # http://stackoverflow.com/questions/25274125
+    config.middleware.swap ActionDispatch::ParamsParser, ::RobustParamsParser, {}
+
     # see https://github.com/rack/rack/issues/337
     config.middleware.use ::Rack::Robustness do |g|
       g.no_catch_all

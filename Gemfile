@@ -116,6 +116,9 @@ gem 'lograge'
 # google api
 gem 'google-api-client'
 
+# backport of handling json parser errors
+gem 'robust_params_parser'
+
 group :development do
   # require the powder gem
   gem 'powder'
