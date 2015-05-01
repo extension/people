@@ -43,7 +43,7 @@ GEM
       erubis (>= 2.6.6)
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
-    bootstrap-sass (2.3.2.2)
+    bootstrap-sass (3.1.1.1)
       sass (~> 3.2)
     breadcrumbs_on_rails (2.3.0)
     builder (3.0.4)
@@ -286,7 +286,7 @@ DEPENDENCIES
   bcrypt-ruby (~> 3.0.0)
   better_errors
   binding_of_caller
-  bootstrap-sass (~> 2.3.2.2)
+  bootstrap-sass (~> 3.1.1.1)
   breadcrumbs_on_rails
   capatross
   capistrano (~> 2.15.5)
@@ -323,7 +323,7 @@ DEPENDENCIES
   robust_params_parser
   ruby-openid
   safe_attributes
-  sass-rails (~> 3.2.3)
+  sass-rails (~> 3.2.4)
   select2-rails
   sidekiq
   simple_form (~> 2.1.0)
