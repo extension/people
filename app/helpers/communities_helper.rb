@@ -74,7 +74,7 @@ module CommunitiesHelper
         displaytext = 'Your membership in this community is pending approval.'
       end
     end
-    
+
     if(displaytext)
       "<p>#{displaytext}</p>".html_safe
     end
@@ -91,11 +91,11 @@ module CommunitiesHelper
   end
 
   def join_community_link(community)
-    link_to(join_community_text(@community),join_community_path, :class => "btn btn-small", :remote => true, :method => :post).html_safe
+    link_to(join_community_text(@community),join_community_path, :class => "btn btn-default btn-sm", :remote => true, :method => :post).html_safe
   end
 
   def leave_community_link(community)
-    link_to(leave_community_text(@community),leave_community_path, :class => "btn btn-small", :remote => true, :method => :post).html_safe
+    link_to(leave_community_text(@community),leave_community_path, :class => "btn btn-default btn-sm", :remote => true, :method => :post).html_safe
   end
 
   def change_connection_link(community,person,connectiontype)
@@ -111,11 +111,11 @@ module CommunitiesHelper
     else
       return ''
     end
-    link_to(label,change_connection_community_path(id: community.id, person_id: person.id, connectiontype: connectiontype), class: 'btn btn-small', remote: true, method: :post).html_safe   
+    link_to(label,change_connection_community_path(id: community.id, person_id: person.id, connectiontype: connectiontype), class: 'btn btn-default btn-sm', remote: true, method: :post).html_safe
   end
 
   def remove_connection_link(community,person)
-    link_to('remove',remove_connection_community_path(id: community.id, person_id: person.id), class: 'btn btn-small', remote: true, method: :post).html_safe   
+    link_to('remove',remove_connection_community_path(id: community.id, person_id: person.id), class: 'btn btn-default btn-sm', remote: true, method: :post).html_safe
   end
 
   def get_communitytypes_for_select

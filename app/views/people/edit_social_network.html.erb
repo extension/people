@@ -32,10 +32,10 @@
 
       <p>
         <%- if @social_network_connection.new_record? -%>
-          <%= submit_tag 'Add', :class => "btn btn-primary" %>
+          <%= submit_tag 'Add', :class => "btn btn-default btn-primary" %>
           <%= link_to "Cancel", change_social_networks_people_path, :class => "btn" %>
         <%- else -%>
-          <%= submit_tag 'Update', :class => "btn btn-primary" %>
+          <%= submit_tag 'Update', :class => "btn btn-default btn-primary" %>
           <%= link_to "Cancel", change_social_networks_people_path, :class => "btn" %>
         <%- end -%>
       </p>
