@@ -5,7 +5,7 @@
 </div>
 
 <div class="row">
-  <div class="span4">
+  <div class="col-md-4">
 
     <%= form_tag(signin_path, class: '') do -%>
     <%- if is_mobile_device? -%>
@@ -20,15 +20,14 @@
       <%= link_to('Forgot Password?', accounts_reset_password_path) %>
     </p>
     <%- end -%>
-  </div> 
+  </div>
 </div>
 
 <div class="row">
-  <div class="span4">
+  <div class="col-md-4">
     <%- if !session[:last_opierequest] -%>
       <p>This is the eXtension Account Management site. You can use it to update your eXtension profile, find Extension colleagues, or manage your eXtensionID and password.</p>
     <%- end -%>
     <p>If you don't already have an eXtensionID, please <%= link_to("signup for your eXtensionID", signup_path) %></p>
   </div>
 </div>
-

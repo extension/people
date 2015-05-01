@@ -5,7 +5,7 @@
 </div>
 
 <div class="row">
-  <div class="span8">
+  <div class="col-md-8">
 
     <%= simple_form_for(@invitation, url: invite_people_path, :html => { :class => 'form-horizontal' }) do |f| -%>
 
@@ -44,7 +44,7 @@
     <%- end # end form -%> 
   </div>
 
-      <div class="span4">
+      <div class="col-md-4">
         <div class="well">
         <h4>About Invitations</h4>
         <p>Please enter the email address of a colleague that you would like to invite to have an eXtensionID.  They'll be sent an email inviting them to sign up for an eXtensionID and their account will be automatically vouched after signup and email confirmation if they do not have a .edu or .gov email address.</p>

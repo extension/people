@@ -46,7 +46,7 @@
       <%- end -%>
 
       <div class="row">
-        <div class='span12'>
+        <div class="col-md-12">
         <div id="flash">
           <%= render(partial: 'shared/flashmessages') %>
         </div>
@@ -55,7 +55,7 @@
 
       <%- if !breadcrumbs.blank? -%>
       <div class="row">
-        <div class='span12'>
+        <div class="col-md-12">
           <%= render_breadcrumbs :builder => ::BootstrapBreadcrumbsBuilder %>
         </div>
       </div>

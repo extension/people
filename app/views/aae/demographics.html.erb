@@ -16,7 +16,7 @@
 -%>
 
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <h3><%= dq.prompt %> <small>Response rate: <%= response_rate(response_data) %></small></h3>
     <%= render(partial: 'shared/bar_chart', locals: {:data => response_data[:counts], labels: response_data[:labels], :datalabel => "demographic_#{dq.id}"})%>
   </div>

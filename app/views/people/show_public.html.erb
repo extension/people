@@ -2,20 +2,20 @@
 
 <%- if !@person.validaccount? -%>
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <h2>Closed profile.</h2>
   </div>
 </div>
 <%- elsif @person.public_attributes[:profile_attributes].blank? -%>
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <h2>Private profile.</h2>
   </div>
 </div>
 <%- else -%>
 
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <div class="page-header">
       <h2><%= @person.fullname %></h2>
       <ul class='unstyled'>

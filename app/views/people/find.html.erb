@@ -12,13 +12,13 @@
 </div>
 
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <%= render(:partial => 'people/find_form') %>
   </div>
 </div>
 
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <%= page_entries_info @colleagues %>
     <%= paginate(@colleagues) %>
     <%= render(:partial => 'list', locals: {colleagues: @colleagues}) %>
@@ -32,7 +32,7 @@
 </div>
 
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
 
     <%= render(:partial => 'people/find_form') %>
 
@@ -47,7 +47,7 @@
 </div>
 
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <%= render(:partial => 'people/find_form') %>
   </div>
 </div>

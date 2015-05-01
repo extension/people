@@ -5,7 +5,7 @@
 </div>
 
 <div class="row">
-  <div class="span8">
+  <div class="col-md-8">
     <table class='table'>
       <tbody>
         <%- current_person.social_networks.each do |network| -%>
@@ -45,7 +45,7 @@
 
 <div class="row">
   <%- @socialnetworks.in_groups(3,false) do |group| -%>   
-    <div class="span4">
+    <div class="col-md-4">
       <ul class="unstyled">
       <%- group.each do |network| -%>
         <li>

@@ -5,7 +5,7 @@
 </div>
 
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <h3>Find people</h3>
     <%= render(:partial => 'people/find_form') %>
   </div>
@@ -13,7 +13,7 @@
 
 
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <h3>Browse directory</h3>
     <p>You can <%= link_to("browse the directory", browse_people_path())%> of <span class='mednumber'><%= number_with_delimiter(Person.display_accounts.count) %></span> accounts and 
     <%= link_to("filter the list by communities, locations, positions, and social networks", browse_people_path(showform: true))%></p>
@@ -22,7 +22,7 @@
 
 
 <div class="row">
-  <div class="span8">
+  <div class="col-md-8">
     <% if(Person.pendingreview.count >= 1) %>
     <h3>Colleague waiting on review?</h3>
     <p><%= link_to("Browse the list of colleagues pending review.", pendingreview_people_path())%> If you know that a colleague has signed up for an eXtensionID and is waiting for review, you can vouch for them.</p>

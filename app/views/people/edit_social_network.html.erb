@@ -6,7 +6,7 @@
 </div>
 
 <div class="row">
-  <div class="span8">
+  <div class="col-md-8">
     <%= simple_form_for(@social_network_connection, url: edit_social_network_people_path,  :html => { :class => 'form-horizontal' }, method: 'post') do |f| -%>
 
       <%- if notification = f.error_notification -%>

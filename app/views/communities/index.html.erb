@@ -5,7 +5,7 @@
 </div>
 
 <div class="row">
-  <div class="span6">
+  <div class="col-md-6">
     <%= render(:partial => 'communities/find_form') %>
     <p>Can't find a community? <%= link_to("Create a new one",new_community_path)%>.</p>
 
@@ -61,7 +61,7 @@
     <p><%= link_to("More...",newest_communities_path)%></p>
   </div>
 
-  <div class="span6">
+  <div class="col-md-6">
     <h3>eXtension Communities of Practice</h3>
     <ul class='unstyled'>
       <%- Community.approved.order('name ASC').each do |community| -%>
