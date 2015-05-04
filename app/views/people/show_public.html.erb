@@ -18,7 +18,7 @@
   <div class="col-md-12">
     <div class="page-header">
       <h2><%= @person.fullname %></h2>
-      <ul class='unstyled'>
+      <ul class='list-unstyled'>
         <%- if @person.public_attributes[:profile_attributes]['title'] -%>
           <li><%= @person.title %></li>
         <%- end -%>
@@ -73,7 +73,7 @@
     <%- if @person.social_networks.where('is_public = ?',true).count > 0 -%>
     <div class='dashmodule'>
       <h4>Social Network Connections</h4>
-      <ul class="unstyled">
+      <ul class="list-unstyled">
         <%- @person.social_networks.where('is_public = ?',true).each do |network| -%>
           <li><%= social_network_link(network) %></li>
         <%- end -%>

@@ -9,12 +9,12 @@
 
     <%= form_tag(signin_path, class: '') do -%>
     <%- if is_mobile_device? -%>
-    <p><%= email_field_tag('email', params[:email], {class: 'span4', placeholder: 'Email'}) %></p>
+    <p><%= email_field_tag('email', params[:email], {class: 'form-control', placeholder: 'Email'}) %></p>
     <%- else -%>
-    <p><%= text_field_tag('email', params[:email], {class: 'span4', placeholder: 'Email'}) %></p>
+    <p><%= text_field_tag('email', params[:email], {class: 'form-control', placeholder: 'Email'}) %></p>
     <%- end -%>
 
-    <p><%= password_field_tag('password', '', {class: 'span4', placeholder: 'Password'}) %></p>
+    <p><%= password_field_tag('password', '', {class: 'form-control', placeholder: 'Password'}) %></p>
     <p>
       <%= button_tag('Sign in',{class: 'btn btn-default btn-primary'}) %>
       <%= link_to('Forgot Password?', accounts_reset_password_path) %>

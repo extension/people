@@ -45,7 +45,7 @@
                 data: {toggle: 'collapse', target: "#showdetails_#{activity.id}"}) %>
 
           <div id="showdetails_<%= activity.id %>" class="collapse">
-            <ul class='unstyled'>
+            <ul class='list-unstyled'>
               <%- profile_changes(activity.additionaldata[:what_changed]).each do |change| -%>
                 <li><%= change %></li>
               <%- end -%>

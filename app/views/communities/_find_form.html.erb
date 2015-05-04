@@ -1,5 +1,10 @@
-<%= form_tag(find_communities_path, class: 'form-inline') do -%>
+<%= form_tag(find_communities_path) do -%>
   <fieldset>
-    <%= text_field_tag("q","", class: 'span3', :placeholder => 'name or description', )%> <%= submit_tag('Search', class: 'btn') %>
+    <div class="input-group">
+      <%= text_field_tag("q","", class: 'form-control', :placeholder => 'name or description', )%>
+      <span class="input-group-btn">
+        <%= submit_tag('Search', class: 'btn btn-default') %>
+      </span>
+    </div>
   </fieldset>
 <%- end -%>

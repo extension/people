@@ -30,13 +30,13 @@
 
   <p>
     <%- if @community.new_record? -%>
-      <%= submit_tag 'Create', :class => "btn btn-default btn-primary" %> 
+      <%= submit_tag 'Create', :class => "btn btn-default btn-primary" %>
       <%= link_to "Cancel", communities_path, :class => "btn" %>
     <%- else -%>
-      <%= submit_tag 'Update', :class => "btn btn-default btn-primary" %> 
+      <%= submit_tag 'Update', :class => "btn btn-default btn-primary" %>
       <%= link_to "Cancel", community_path(@community), :class => "btn" %>
     <%- end -%>
   </p>
 
 
-<%- end # end form -%> 
+<%- end # end form -%>

@@ -11,7 +11,7 @@
 
     <%- if current_person.invited_communities.count > 0 -%>
     <h3>Pending Invitations</h3>
-    <ul class="unstyled">
+    <ul class="list-unstyled">
       <% current_person.community_invitations.each do |community|%>
         <li>
           <%= community_icon(community) %>
@@ -24,7 +24,7 @@
 
     <%- if current_person.pending_communities.count > 0 -%>
     <h3>Pending Approvals</h3>
-     <ul class="unstyled">
+     <ul class="list-unstyled">
       <% current_person.pending_communities.each do |community|%>
         <li>
           <%= link_to(community.name,community_url(community)) %> 
@@ -37,7 +37,7 @@
     <h3>Your Communities and Institutions</h3>
     <%- if current_person.connected_communities.count > 0 -%>
 
-      <ul class="unstyled">
+      <ul class="list-unstyled">
         <%- current_person.connected_communities.each do |community| -%>
           <li>
             <%= community_icon(community) %>
@@ -63,7 +63,7 @@
 
   <div class="col-md-6">
     <h3>eXtension Communities of Practice</h3>
-    <ul class='unstyled'>
+    <ul class='list-unstyled'>
       <%- Community.approved.order('name ASC').each do |community| -%>
       <li class='community'>
         <span><%= @approved_joined_counts[community.id] || 0 %> joined</span>

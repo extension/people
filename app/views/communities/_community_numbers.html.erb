@@ -1,4 +1,4 @@
-<ul class="unstyled community_numbers">
+<ul class="list-unstyled community_numbers">
     <li>
         <span class='mednumber'><%= @community.leaders.count %></span>
         <%= link_if_not_zero(@community.leaders.count, (@community.is_institution? ? 'Institutional Team' : 'Leaders') , connections_community_path(@community, :connection => 'leaders')) %>

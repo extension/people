@@ -30,7 +30,7 @@
                     <%- if invitedlist.blank? -%>
                       n/a
                     <%- else -%>
-                      <ul class='unstyled'> 
+                      <ul class='list-unstyled'> 
                       <%- invitation.invitedcommunities.each do |c| -%>
                         <li><%= c.name -%></li>
                       <%- end -%>
