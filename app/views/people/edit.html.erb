@@ -210,7 +210,7 @@
       $.post('<%= locations_counties_path %>', { location: $(this).val() }, function(data) {
         if(!$.isEmptyObject(data)) {
           $("#county_select").show();
-          populateDropdown($("#county_id"), data);
+          populateDropdown($("#person_county_id"), data);
         } else {
           $("#county_select").hide();
         }
