@@ -426,6 +426,10 @@ class Person < ActiveRecord::Base
     self.connection_with_community(community) == 'leader'
   end
 
+  def is_extensionstaff?
+    is_community_member?(Community.find(Community::EXTENSION_STAFF))
+  end
+
   def can_invite_others_to_community?(community)
     connection = self.connection_with_community(community)
     if(self.is_admin? or (connection == 'leader'))

@@ -14,6 +14,7 @@ class Community < ActiveRecord::Base
 
   # hardcoded community ids
   INSTITUTIONAL_TEAMS_COMMUNITY_ID = 80
+  EXTENSION_STAFF = 30
 
   # community types
   APPROVED = 1
