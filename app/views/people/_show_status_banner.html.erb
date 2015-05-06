@@ -38,7 +38,7 @@
 <div class="row">
   <div class="span12">
     <div class='alert alert-warning'>
-      <%- if(!@person.last_account_reminder.blank? && current_person.id == 11) -%>
+      <%- if(!@person.last_account_reminder.blank? && current_person.is_extensionstaff?) -%>
       <div class="pull-right">
         <%= form_tag(retire_person_path(@person)) do -%>
           <fieldset>
@@ -51,8 +51,6 @@
       <h4>This account has been inactive for longer than <%= Settings.months_for_inactive_flag %> months</h4>
       <p><%= @person.first_name %> was last active on <%= display_date(@person.last_activity_at) %>.</p>
     </div>
-  </div>  
+  </div>
 </div>
 <%- end -%>
-
-
