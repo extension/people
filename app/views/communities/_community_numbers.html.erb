@@ -1,3 +1,4 @@
+<div class="dashmodule">
 <ul class="list-unstyled community_numbers">
     <li>
         <span class='mednumber'><%= @community.leaders.count %></span>
@@ -21,3 +22,4 @@
   <%- if (current_person.can_invite_others_to_community?(@community))  -%>
     <p><%= link_to('Invite others to join', invite_community_path(@community), class: 'btn') %></p>
   <%- end -%>
+</div>

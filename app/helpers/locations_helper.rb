@@ -8,7 +8,7 @@ module LocationsHelper
 
   def get_location_options
     locations = Location.find(:all, :order => 'entrytype, name')
-    return [['', '']].concat(locations.map{|l| [l.name, l.id]})
+    return locations.map{|l| [l.name, l.id]}
   end
 
   def get_county_options(provided_location = nil)

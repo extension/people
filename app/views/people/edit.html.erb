@@ -4,20 +4,24 @@
   <h2><%= @page_title %></h2>
 </div>
 
-<!-- #TODO migrate error notifications -->
-<%= simple_form_for(@person, :html => { :class => 'form-horizontal' }) do |f| -%>
-  <%- if notification = f.error_notification -%>
-    <div class="alert alert-error fade in">
-      <a class="close" data-dismiss="alert" href="#">&times;</a>
-      <%= notification %>
-    </div>
-  <%- end -%>
-<%- end # end form -%>
-
 <div class="row">
   <div class="col-md-7">
 
     <%= form_for @person, :html => { :class => 'form-horizontal' } do |f| -%>
+
+    <%- if @person.errors.present? -%>
+      <div class="col-md-offset-4 col-md-8">
+      <div class="alert alert-danger alert-dismissible fade in" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4>Please fix the issue below:</h4>
+        <ul>
+        <% @person.errors.full_messages.each do |error_message| %>
+          <li><%= error_message %></li>
+        <% end %>
+      </ul>
+      </div>
+      </div>
+    <%- end -%>
 
       <%- if(@invitation) -%>
         <%= hidden_field_tag('invite',@invitation.token) %>

@@ -1,6 +1,7 @@
+<div class="dashmodule">
 <%- case @current_person_community_connection -%>
 <%- when 'none' -%>
-  <strong>Make a connection:</strong>
+  <p><strong>Make a connection:</strong></p>
   <%- case @community.memberfilter -%>
   <%- when Community::OPEN -%>
     <p>
@@ -22,48 +23,38 @@
   <%- end -%>
 <%- when 'member' -%>
   <%- if @community.is_institution? -%>
-    <strong>You are a member of this institution.</strong>
+    <p><strong>You are a member of this institution.</strong></p>
   <%- else -%>
-    <strong>You are a member of this community</strong>
+    <p><strong>You are a member of this community</strong></p>
   <%- end -%>
-    <p>
-      <%= leave_community_link(@community) %>
-    </p>
+    <p><%= leave_community_link(@community) %></p>
 <%- when 'leader' -%>
   <%- if @community.is_institution? -%>
-    <strong>You are a member of the institutional team at this institution.</strong>
+    <p><strong>You are a member of the institutional team at this institution.</strong></p>
   <%- else -%>
-    <strong>You are a leader of this community</strong>
+    <p><strong>You are a leader of this community</strong></p>
   <%- end -%>
-      <p>
-      <%= leave_community_link(@community) %>
-    </p>
+    <p><%= leave_community_link(@community) %></p>
 <%- when 'pending' -%>
   <%- if @community.is_institution? -%>
-    <strong>Your membership in this institution is pending review</strong>
+    <p><strong>Your membership in this institution is pending review</strong></p>
   <%- else -%>
-    <strong>Your membership in this community is pending review</strong>
+    <p><strong>Your membership in this community is pending review</strong></p>
   <%- end -%>
-    <p>
-      <%= leave_community_link(@community) %>
-    </p>
+    <p><%= leave_community_link(@community) %></p>
 <%- when 'invitedleader' -%>
   <%- if @community.is_institution? -%>
-    <strong>You have been invited to join the institutional team</strong>
+    <p><strong>You have been invited to join the institutional team</strong></p>
   <%- else -%>
-    <strong>You have been invited to join the leadership of this community</strong>
+    <p><strong>You have been invited to join the leadership of this community</strong></p>
   <%- end -%>
-    <p>
-      <%= join_community_link(@community) %>
-    </p>  
+    <p><%= join_community_link(@community) %></p>
 <%- when 'invitedmember' -%>
   <%- if @community.is_institution? -%>
-
-    <strong>You have been invited to join this institution</strong>
+    <p><strong>You have been invited to join this institution</strong></p>
   <%- else -%>
-    <strong>You have been invited to join this community</strong>
+    <p><strong>You have been invited to join this community</strong></p>
   <%- end -%>
-    <p>
-      <%= join_community_link(@community) %>
-    </p>
+    <p><%= join_community_link(@community) %></p>
 <%- end #case -%>
+</div>

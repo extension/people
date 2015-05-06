@@ -91,7 +91,7 @@ module CommunitiesHelper
   end
 
   def join_community_link(community)
-    link_to(join_community_text(@community),join_community_path, :class => "btn btn-default btn-sm", :remote => true, :method => :post).html_safe
+    link_to(join_community_text(@community),join_community_path, :class => "btn btn-default btn-primary btn-sm", :remote => true, :method => :post).html_safe
   end
 
   def leave_community_link(community)

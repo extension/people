@@ -1,92 +1,90 @@
 <%- @page_title = "#{@community.name} - Community Information" -%>
 
-
-<div class='row'>
-  <div class="col-md-9">
-  <h2><%= community_icon(@community) %> <%= @community.name%></h2>
-      <%= description_for_community(@community) -%>
-  </div>
-  <div id="connectiontocommunity" class="span2 dashmodule text-center">
-    <%= render :partial => 'make_connection' %>
-  </div>  
-</div>
-
 <div class="row">
-  <div class="col-md-6">
-      <h3>People and Activity</h3>
-      <div class="row">
-        <div id="communitynumbers" class="dashmodule span2">
-         <%= render(:partial => 'community_numbers') -%>
-         </div>
+  <div class="col-md-10 col-md-offset-1">
+    <h2><%= community_icon(@community) %> <%= @community.name%></h2>
 
-        <div class="dashmodule span3 text-center">
-          <p><%= link_to("View connection activity", activity_community_path(@community), class: '') -%></p>
-          <div id="notifications" class="text-center">
+    <div class="row">
+      <div class="col-md-8">
+        <%= description_for_community(@community) -%>
+      </div>
+      <div id="connectiontocommunity" class="col-md-3 col-md-offset-1">
+        <%= render :partial => 'make_connection' %>
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="col-md-7">
+        <h3>People and Activity</h3>
+
+        <div class="row">
+          <div id="communitynumbers" class="col-md-6">
+            <%= render(:partial => 'community_numbers') -%>
+          </div>
+
+          <div id="notifications" class="col-md-6">
             <%= render :partial => 'notifications' %>
           </div>
         </div>
-      </div>
 
-      <h3>
-        <%= @community.entrytype_display_label.capitalize -%> Attributes
-        <%- if(current_person.can_edit_community?(@community)) -%>
-          <small><%= link_to 'edit settings', edit_community_path(@community) -%></small>
-        <%- end -%>
-      </h3>
-      
+        <h3>
+          <%= @community.entrytype_display_label.capitalize -%> Attributes
+          <%- if(current_person.can_edit_community?(@community)) -%>
+            <small><%= link_to 'edit settings', edit_community_path(@community) -%></small>
+          <%- end -%>
+        </h3>
 
-      
-      <div class="dashmodule">
-        <p class="lead"><%= @community.entrytype_to_s -%></p>
-        <dl>
-          <dt>Membership:</dt>
-          <dd><%= @community.memberfilter_to_s -%></dd>
-          <dt>Created by:</dt>
-          <dd><%= link_to_person(@community.creator) -%></dd>
-          <dt>Created:</dt>
-          <dd><%= display_time(@community.created_at) -%></dd>
-        </dl>
-      </div>
-
-  </div>
-
-
-  <div class="col-md-6">
-
-
-    <%- if (@community.connect_to_drupal? and @community.drupal_node_id) or @community.is_launched? -%>
-    <h3>Elsewhere in eXtension</h3>
-    <div class="dashmodule">
-      <p><em>Links to information for this community in other eXtension applications</em></p>
-      <dl>
-      <%- if (@community.connect_to_drupal? and @community.drupal_node_id) -%>
-        <dt>create.extension.org</dt>
-        <dd><a href="http://create.extension.org/node/<%= @community.drupal_node_id %>">Community Dashboard</a></dd>
-      <%- end -%>
-      <%- if  @community.is_launched? -%>
-        <dt>data.extension.org</dt>
-        <dd><a href="http://data.extension.org/groups/<%= @community.id %>">Group Information</a></dd>
-      <%- end -%>
-      </dl>
-    </div>
-    <%- end -%>
-
-    <div id="communityforums">
-      <%- if(@community.connect_to_google_apps? and gg = @community.joined_google_group and (current_person.is_community_member?(@community) or current_person.is_admin?)) -%>
-      <h3>Community Forums</h3>      
         <div class="dashmodule">
+          <p class="lead"><%= @community.entrytype_to_s -%></p>
           <dl>
-            <dt><%= link_to('Community Forum (Google Group)',gg.forum_url) %></dt>
-            <dd>Post to forum by email: <%= link_to(gg.group_email_address, "mailto:#{gg.group_email_address}") %></dd>
-              <%- if(lg = @community.leaders_google_group) -%>
-              <dt><%= link_to('Community Leader Forum (Google Group)',lg.forum_url) %></dt>
-              <dd>Post to leader forum by email: <%= link_to(lg.group_email_address, "mailto:#{lg.group_email_address}") %></dd>
-              <%- end -%>
+            <dt>Membership:</dt>
+            <dd><%= @community.memberfilter_to_s -%></dd>
+            <dt>Created by:</dt>
+            <dd><%= link_to_person(@community.creator) -%></dd>
+            <dt>Created:</dt>
+            <dd><%= display_time(@community.created_at) -%></dd>
           </dl>
-      </div>
-      <%- end -%>
-    </div>
+        </div>
 
+      </div>
+
+      <div class="col-md-5">
+
+        <%- if (@community.connect_to_drupal? and @community.drupal_node_id) or @community.is_launched? -%>
+          <h3>Elsewhere in eXtension</h3>
+          <div class="dashmodule">
+            <p><em>Links to information for this community in other eXtension applications</em></p>
+            <dl>
+            <%- if (@community.connect_to_drupal? and @community.drupal_node_id) -%>
+              <dt>create.extension.org</dt>
+              <dd><a href="http://create.extension.org/node/<%= @community.drupal_node_id %>">Community Dashboard</a></dd>
+            <%- end -%>
+            <%- if  @community.is_launched? -%>
+              <dt>data.extension.org</dt>
+              <dd><a href="http://data.extension.org/groups/<%= @community.id %>">Group Information</a></dd>
+            <%- end -%>
+            </dl>
+          </div>
+        <%- end -%>
+
+        <div id="communityforums">
+          <%- if(@community.connect_to_google_apps? and gg = @community.joined_google_group and (current_person.is_community_member?(@community) or current_person.is_admin?)) -%>
+            <h3>Community Forums</h3>
+            <div class="dashmodule">
+              <dl>
+                <dt><%= link_to('Community Forum (Google Group)',gg.forum_url) %></dt>
+                <dd>Post to forum by email: <%= link_to(gg.group_email_address, "mailto:#{gg.group_email_address}") %></dd>
+                <%- if(lg = @community.leaders_google_group) -%>
+                  <dt><%= link_to('Community Leader Forum (Google Group)',lg.forum_url) %></dt>
+                  <dd>Post to leader forum by email: <%= link_to(lg.group_email_address, "mailto:#{lg.group_email_address}") %></dd>
+                <%- end -%>
+              </dl>
+            </div>
+          <%- end -%>
+        </div>
+
+      </div>
+    </div>
   </div>
 </div>
-
