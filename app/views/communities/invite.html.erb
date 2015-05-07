@@ -2,21 +2,22 @@
 
 <div class="page-header">
   <h2><%= @page_title %></h2>
-  <p>This search form will find colleagues that already have an eXtension account. You can <%= link_to("invite your colleague to get an eXtensionID", invite_people_path)%> if they do not already have an account.</p>
 </div>
 
 <div class="row">
-  <div class="col-md-12">
+  <div class="col-md-6">
     <h3>Find Colleagues</h3>
     <%= form_tag(:action=> "invite") do -%>
-        <fieldset class="search">
-            <p>
-                <label for="searchterm">search by eXtensionID, email address, first name, or last name:</label>
-                <%= text_field_tag("q","",:size => 25)%>
-                <%= submit_tag 'Find Colleagues' %>
-            </p>
-        </fieldset>
+      <fieldset>
+        <div class="input-group">
+          <%= text_field_tag("q","", class: 'form-control input-lg', :placeholder => 'Search by eXtensionID, email, first or last name', )%>
+          <span class="input-group-btn">
+            <%= submit_tag('Search', class: 'btn btn-default btn-primary input-lg') %>
+          </span>
+        </div>
+      </fieldset>
     <%- end -%>
+    <span class="help-block">This search form will find colleagues that already have an eXtension account. You can <%= link_to("invite your colleague to get an eXtensionID", invite_people_path)%> if they do not already have an account.</span>
   </div>
 </div>
 
@@ -29,7 +30,7 @@
       <%= render(:partial => 'institution_connections_table') %>
     <%- else -%>
       <%= render(:partial => 'community_connections_table') %>
-    <%- end -%>    
+    <%- end -%>
   </div>
 </div>
 <%- end -%>

@@ -6,7 +6,9 @@
 
     <div class="row">
       <div class="col-md-8">
-        <%= description_for_community(@community) -%>
+        <div class="community-description">
+          <%= description_for_community(@community) -%>
+        </div>
       </div>
       <div id="connectiontocommunity" class="col-md-3 col-md-offset-1">
         <%= render :partial => 'make_connection' %>

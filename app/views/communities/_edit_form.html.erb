@@ -1,42 +1,93 @@
-<%= simple_form_for(@community, :html => { :class => 'form-horizontal' }) do |f| -%>
+<%= form_for @community, :html => { :class => 'form-horizontal' } do |f| -%>
 
-  <%- if notification = f.error_notification -%>
-    <div class="alert alert-error fade in">
-      <a class="close" data-dismiss="alert" href="#">&times;</a>
-      <%= notification %>
+  <%- if @community.errors.present? -%>
+    <div class="col-md-offset-4 col-md-8">
+      <div class="alert alert-danger alert-dismissible fade in" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4>Please fix the issue below:</h4>
+        <ul>
+        <% @community.errors.full_messages.each do |error_message| %>
+          <li><%= error_message %></li>
+        <% end %>
+      </ul>
+      </div>
     </div>
   <%- end -%>
 
-  <p><span class="help-block">Fields marked with an asterisk (<em class="required">*</em>) are required</span></p>
+  <div class="form-group">
+    <label for="name" class="col-md-4 control-label">* Name</label>
+    <div class="col-md-8">
+      <%= f.text_field :name, :class => "form-control input-lg", :placeholder => 'Name' %>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="description" class="col-md-4 control-label">Description</label>
+    <div class="col-md-8">
+      <%= f.text_area :description, :class => "form-control", :rows => "7" %>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="location" class="col-md-4 control-label">Location</label>
+    <div class="col-md-5">
+      <%= f.select(:location_id, options_for_select(get_location_options, @community.location.present? ? @community.location.id : nil), {:include_blank => true}, {:class => "form-control"}) %>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="memberfilter" class="col-md-4 control-label">Member filter</label>
+    <div class="col-md-5">
+      <%= f.select(:memberfilter, options_for_select(Community::MEMBERFILTER_LABELS.invert, @community.memberfilter), {}, {:class => "form-control"}) %>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="connect_to_drupal" class="col-md-4 control-label">CMS integration</label>
+    <div class="col-md-8">
+      <div class="checkbox">
+        <label>
+          <%= check_box_tag('connect_to_drupal','1', @community.connect_to_drupal, {class: ''}) %> <strong>Connect to Drupal</strong>
+        </label>
+      </div>
+      <span class="help-block">Add this community as a group to the eXtension Drupal CMS. eXtension Communities of Practice are automatically connected regardless of this setting.</span>
+    </div>
+  </div>
 
   <fieldset>
-    <%= f.input :name %>
-    <%= f.input :description, :input_html => { :rows => 5, :class => 'span6' } %>
-    <%= f.association :location, collection: Location.order('entrytype,name'), include_blank: true %>
-    <%= f.input :memberfilter, collection: Community::MEMBERFILTER_LABELS.invert, include_blank: false %>
-    <%= f.input :connect_to_drupal, :hint =>  "Communities can be added as groups within the eXtension Drupal CMS if you check this setting.  eXtension Communities of Practice are automatically connected regardless of this setting." %>
-  </fieldset>
+    <div class="col-md-offset-4 col-md-8">
+      <legend>Administrative Options:</legend>
+    </div>
+    <div class="form-group">
+      <label for="entrytype" class="col-md-4 control-label">Community type</label>
+      <div class="col-md-5">
+        <%= f.select(:entrytype, options_for_select(get_communitytypes_for_select, @community.entrytype), {}, {:class => "form-control"}) %>
+      </div>
+    </div>
 
-  <%- if current_person.is_admin? -%>
-  <fieldset>
-    <legend>Administrative Options:</legend>
-    <%= f.input :entrytype, collection: get_communitytypes_for_select, include_blank: false %>
-    <%- if !@community.is_institution? -%>
-    <%= f.input :publishing_community, :hint =>  "Communities can be associated with public content, and will show up on the public site administration page if you check this setting.  eXtension Communities of Practice are automatically shown regardless of this setting." %>
-    <%- end -%>
-  </fieldset>
-  <%- end -%>
+    <div class="form-group">
+      <label for="connect_to_drupal" class="col-md-4 control-label">Public content</label>
+      <div class="col-md-8">
+        <div class="checkbox">
+          <label>
+            <%= check_box_tag('connect_to_drupal','1', @community.connect_to_drupal, {class: ''}) %> <strong>This is a publishing community</strong>
+          </label>
+        </div>
+        <span class="help-block">Communities can be associated with public content, and will show up on the public site administration page. eXtension Communities of Practice are automatically shown regardless of this setting.</span>
+      </div>
+    </div>
+</fieldset>
 
 
-  <p>
-    <%- if @community.new_record? -%>
-      <%= submit_tag 'Create', :class => "btn btn-default btn-primary" %>
-      <%= link_to "Cancel", communities_path, :class => "btn" %>
-    <%- else -%>
-      <%= submit_tag 'Update', :class => "btn btn-default btn-primary" %>
-      <%= link_to "Cancel", community_path(@community), :class => "btn" %>
-    <%- end -%>
-  </p>
+  <div class="form-group">
+    <div class="col-md-offset-4 col-md-8">
+      <%- if @community.new_record? -%>
+        <p><%= f.submit "Create", :class => "btn btn-default btn-primary" %> <%= link_to "Cancel", communities_path, :class => "btn btn-link" %></p>
+      <%- else -%>
+      <p><%= f.submit "Update", :class => "btn btn-default btn-primary" %> <%= link_to "Cancel", community_path(@community), :class => "btn btn-link" %></p>
+      <%- end -%>
+    </div>
+  </div>
 
 
 <%- end # end form -%>
