@@ -36,7 +36,7 @@
   </div>
 
   <div class="form-group">
-    <label for="memberfilter" class="col-md-4 control-label">Member filter</label>
+    <label for="memberfilter" class="col-md-4 control-label">Membership</label>
     <div class="col-md-5">
       <%= f.select(:memberfilter, options_for_select(Community::MEMBERFILTER_LABELS.invert, @community.memberfilter), {}, {:class => "form-control"}) %>
     </div>
