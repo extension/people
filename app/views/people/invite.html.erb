@@ -4,53 +4,78 @@
   <h2><%= @page_title %></h2>
 </div>
 
+
 <div class="row">
-  <div class="col-md-8">
+  <div class="col-md-7">
 
-    <%= simple_form_for(@invitation, url: invite_people_path, :html => { :class => 'form-horizontal' }) do |f| -%>
+    <%= form_for @invitation, url: invite_people_path, :method => 'post', :html => { :class => 'form-horizontal' } do |f| -%>
 
-      <%- if notification = f.error_notification -%>
-        <div class="alert alert-error fade in">
-          <a class="close" data-dismiss="alert" href="#">&times;</a>
-          <%= notification %>
-          <%= f.error :base %>
-
+      <%- if @invitation.errors.present? -%>
+        <div class="col-md-offset-4 col-md-8">
+          <div class="alert alert-danger alert-dismissible fade in" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4>Please fix the issue below:</h4>
+            <ul>
+            <% @invitation.errors.full_messages.each do |error_message| %>
+              <li><%= error_message %></li>
+            <% end %>
+          </ul>
+          </div>
         </div>
       <%- end -%>
 
-    
-      <fieldset>
-       <%= f.input :email, :input_html => {:class => 'span4' },
-        :label => "Your colleague's email address:",
-        :hint =>  "Double-check that you have the correct address. We don't have an automated means of detecting invalid email addresses for invitations." %>
- 
-       <%= f.input :message, :input_html => {rows: 4, :class => 'span4' },
-        :label => "Message for your colleague:",
-        :hint =>  "You can include a personal message in the invitation (text only, html will be removed)." %>
-      </fieldset>
+      <div class="form-group">
+        <label for="email" class="col-md-4 control-label">* Your colleague's email</label>
+        <div class="col-md-8">
+          <%= f.text_field :email, :class => "form-control input-lg", :placeholder => 'Email address' %>
+          <span class="help-block">Double-check that you have the correct address. We don't have an automated means of detecting invalid email addresses.</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="message" class="col-md-4 control-label">Message</label>
+        <div class="col-md-8">
+          <%= f.text_area :message, :class => "form-control", :rows => "4" %>
+          <span class="help-block">You can include a personal message to your colleague (text only, html will be removed.)</span>
+        </div>
+      </div>
 
       <%- if !@invite_communities.blank? -%>
-      <fieldset>
-        <legend>Communities</legend>
-        <p><span class="help-block">Invite your colleague to join one or more of the following communities after they've accepted your invitation</p>
-        <%= f.input :invitedcommunities, :collection => @invite_communities, :value_method => :id, :label_method => :name, :as => :check_boxes, 
-        :label => ''
-        %>
-      </fieldset>
+        <fieldset>
+          <div class="col-md-offset-4 col-md-8">
+            <legend>Communities</legend>
+            <p><span class="help-block">Include an invitation for your colleague to join one or more of the following communities.</p>
+          </div>
+
+          <div class="form-group">
+            <div class="col-md-8 col-md-offset-4">
+              <% @invite_communities.each do |community| %>
+                <div class="checkbox">
+                  <label>
+                    <%= check_box_tag("invitation[invitedcommunities][]",community.id, nil, {:id => "invitation_invitedcommunities_#{community.id}"}) %> <%= community.name %>
+                  </label>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </fieldset>
       <%- end -%>
 
-      <p><%= submit_tag "Invite Colleague", :class => "btn btn-default btn-primary" %> <%= link_to "Cancel", people_path, :class => "btn" %></p>
+      <div class="form-group">
+        <div class="col-md-offset-4 col-md-8">
+          <p><%= f.submit "Invite Colleague", :class => "btn btn-default btn-primary" %> <%= link_to "Cancel", people_path, :class => "btn btn-link" %></p>
+        </div>
+      </div>
 
-    <%- end # end form -%> 
+    <%- end # end form -%>
+
   </div>
 
-      <div class="col-md-4">
-        <div class="well">
-        <h4>About Invitations</h4>
-        <p>Please enter the email address of a colleague that you would like to invite to have an eXtensionID.  They'll be sent an email inviting them to sign up for an eXtensionID and their account will be automatically vouched after signup and email confirmation if they do not have a .edu or .gov email address.</p>
-        </div>
+  <div class="col-md-4 col-md-offset-1">
+    <div class="well">
+      <h4>About Invitations</h4>
+      <p>Please enter the email address of a colleague that you would like to invite to have an eXtensionID.  They'll be sent an email inviting them to sign up for an eXtensionID and their account will be automatically vouched after signup and email confirmation if they do not have a .edu or .gov email address.</p>
     </div>
   </div>
 
-
-
+</div>

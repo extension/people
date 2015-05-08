@@ -24,10 +24,6 @@
         </div>
       <%- end -%>
 
-      <div class="col-md-offset-4 col-md-7">
-        <p><span class="help-block">Fields marked with an asterisk (<em class="required">*</em>) are required</span></p>
-      </div>
-
       <%- if(@invitation) -%>
         <%= hidden_field_tag('invite',@invitation.token) %>
       <%- end -%>
@@ -47,7 +43,7 @@
       </div>
 
       <div class="form-group">
-        <label for="email" class="col-md-4 control-label">Email</label>
+        <label for="email" class="col-md-4 control-label">* Email</label>
         <div class="col-md-6">
           <%= f.text_field :email, :class => "form-control", :placeholder => 'Email' %>
           <span class="help-block">Using a .edu or .gov email address if you have one will speed up account review.</span>
@@ -55,7 +51,7 @@
       </div>
 
       <div class="form-group">
-        <label for="password" class="col-md-4 control-label">Password</label>
+        <label for="password" class="col-md-4 control-label">* Password</label>
         <div class="col-md-6">
           <%= f.password_field :password, :class => "form-control" %>
           <span class="help-block">Minimum 8 characters.</span>
@@ -63,7 +59,7 @@
       </div>
 
       <div class="form-group">
-        <label for="involvement" class="col-md-4 control-label">Connection with Extension</label>
+        <label for="involvement" class="col-md-4 control-label">* Connection with Extension</label>
         <div class="col-md-8">
           <%= f.text_area :involvement, :class => "form-control", :rows => "3" %>
           <span class="help-block">Please list someone in Extension with whom you have a connection, and tell us how you would like to be involved with eXtension.</span>
@@ -140,6 +136,10 @@
         <div class="col-md-offset-4 col-md-8">
           <p><%= f.submit "Sign up", :class => "btn btn-default btn-primary" %> <%= link_to "Cancel", root_path, :class => "btn btn-default btn-link" %></p>
         </div>
+      </div>
+
+      <div class="col-md-offset-4 col-md-7">
+        <p><span class="help-block">Fields marked with an asterisk (<em class="required">*</em>) are required</span></p>
       </div>
     <%- end # end form -%>
 
