@@ -2,21 +2,23 @@
 
 <div class="page-header">
   <h2><%= @page_title %></h2>
-    <%= link_to(@showform ? "Filter Options <i class='fa fa-caret-down'></i>".html_safe : "Filter Options <i class='fa fa-caret-right'></i>".html_safe, 
+  <p>
+    <%= link_to("<i class='fa fa-search'></i> Search options".html_safe,
                 '#',
-                id: 'formtoggler', 
+                id: 'formtoggler',
+                class: 'btn btn-default',
                 data: {toggle: 'collapse', target: '#showform'}) %>
-
-    <div id="showform" class="<%= (@showform ? 'collapse in' : 'collapse') -%>">
-      <%= render(:partial => 'people/browse_filter_form') %>
-    </div>
-</div>  
+  </p>
+  <div id="showform" class="<%= (@showform ? 'collapse in' : 'collapse') -%>">
+    <%= render(:partial => 'people/browse_filter_form') %>
+  </div>
+</div>
 
 <div class="row">
   <div class="col-md-12">
     <%- if @browse_filter -%>
-    <div class='well'>
-      <p>Filtering results by:</p>
+    <div class='alert alert-info'>
+      <h4>Filtering results by:</h4>
       <p><%= filter_text(@browse_filter_objects) %></p>
     </div>
     <%- end -%>
@@ -30,7 +32,7 @@
     <p class='pull-right'>
       <%= link_to("<i class='fa fa-file-o'></i> Download this list (.csv)".html_safe,
                   browsefile_people_path(filter: (@browse_filter.blank? ? BrowseFilter::ALL : @browse_filter.id)),
-                  :class => 'btn') %>
+                  :class => 'btn btn-default') %>
     </p>
     <%= page_entries_info @colleagues %>
     <%= paginate(@colleagues) %>

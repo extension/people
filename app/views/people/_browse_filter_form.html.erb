@@ -1,53 +1,66 @@
 <div class="row">
   <div class="col-md-12">
-
+  <div class="well">
     <%= form_tag(filter_people_path, class: 'form-horizontal') do -%>
 
-    <fieldset>
-      <legend>Filter list by:</legend>
-      <p><em>Searches within a filter typle are 'or' searches. Searches between filter types are an 'and' search. For example, specifying Communities: 'eXtension Staff' 'North Carolina State University' and Positions: 'Master Gardener' will search for ('eXtension Staff' OR 'North Carolina State University') AND ('Master Gardener')</em></p>
-
-      <div class="control-group">
-        <%= label_tag('communities', 'Communities/Institutions', :class => 'control-label') -%>
-        <div class="controls">
-          <%= text_field_tag("communities","", class: 'span8' ) -%> 
+      <div class="form-group">
+        <div class="col-md-offset-3 col-md-8">
+          <legend>Filter list by:</legend>
         </div>
       </div>
 
-      <div class="control-group">
-        <%= label_tag('locations', 'Locations', :class => 'control-label') -%>
-        <div class="controls">
-          <%= text_field_tag("locations","", class: 'span8' ) -%> 
+      <div class="form-group">
+        <%= label_tag('communities', 'Communities/Institutions', :class => 'col-md-3 control-label') -%>
+        <div class="col-md-6">
+          <%= text_field_tag("communities","", class: 'form-control' ) -%>
         </div>
       </div>
 
-      <div class="control-group">
-        <%= label_tag('positions', 'Positions', :class => 'control-label') -%>
-        <div class="controls">
-          <%= text_field_tag("positions","", class: 'span8' ) -%> 
+      <div class="form-group">
+        <%= label_tag('locations', 'Locations', :class => 'col-md-3 control-label') -%>
+        <div class="col-md-6">
+          <%= text_field_tag("locations","", class: 'form-control' ) -%>
         </div>
       </div>
 
-      <div class="control-group">
-        <%= label_tag('social_networks', 'Social Networks', :class => 'control-label') -%>
-        <div class="controls">
-          <%= text_field_tag("social_networks","", class: 'span8' ) -%> 
+      <div class="form-group">
+        <%= label_tag('positions', 'Positions', :class => 'col-md-3 control-label') -%>
+        <div class="col-md-6">
+          <%= text_field_tag("positions","", class: 'form-control' ) -%>
         </div>
-      </div>            
+      </div>
 
-      <div class="control-group">
-        <%= label_tag('interests', 'Interests', :class => 'control-label') -%>
-        <div class="controls">
-          <%= text_field_tag("interests","", class: 'span8' ) -%> 
+      <div class="form-group">
+        <%= label_tag('social_networks', 'Social Networks', :class => 'col-md-3 control-label') -%>
+        <div class="col-md-6">
+          <%= text_field_tag("social_networks","", class: 'form-control' ) -%>
         </div>
-      </div>          
+      </div>
 
-    </fieldset>
+      <div class="form-group">
+        <%= label_tag('interests', 'Interests', :class => 'col-md-3 control-label') -%>
+        <div class="col-md-6">
+          <%= text_field_tag("interests","", class: 'form-control' ) -%>
+        </div>
+      </div>
 
-      <p><%= submit_tag "Filter", :class => "btn btn-default btn-primary" %> <%= link_to "cancel", '#', :class => "btn", :id => 'cancel_button' %></p>
+      <div class="form-group">
+        <div class="col-md-offset-3 col-md-8">
+          <p>
+            <%= submit_tag "Apply Filter", :class => "btn btn-default btn-primary" %>
+            <%= link_to "cancel", '#', :class => "btn btn-default", :id => 'cancel_button' %>
+          </p>
+        </div>
+      </div>
 
-    <%- end -%>  
+      <div class="form-group">
+        <div class="col-md-offset-3 col-md-8">
+          <p><span class="help-block">Searches within a filter type are 'or' searches. Searches between filter types are an 'and' search. For example, specifying Communities: 'eXtension Staff' 'North Carolina State University' and Positions: 'Master Gardener' will search for ('eXtension Staff' OR 'North Carolina State University') AND ('Master Gardener').</span></p>
+        </div>
+      </div>
 
+    <%- end # end form -%>
+  </div>
   </div>
 </div>
 
@@ -105,7 +118,7 @@
     <%- end -%>
 
    });
-   
+
     $(function () {
       $('#positions').select2({
         minimumInputLength: 2,
@@ -126,9 +139,9 @@
 
     <%- if (@browse_filter_objects && @browse_filter_objects['positions']) -%>
       $('#positions').select2('data', <%= @browse_filter_objects['positions'].map{|p|  {id: p.id, text: p.name}}.to_json.html_safe %>);
-    <%- end -%>     
+    <%- end -%>
    });
-   
+
     $(function () {
       $('#social_networks').select2({
         minimumInputLength: 2,
@@ -149,7 +162,7 @@
 
     <%- if (@browse_filter_objects && @browse_filter_objects['social_networks']) -%>
       $('#social_networks').select2('data', <%= @browse_filter_objects['social_networks'].map{|sn|  {id: sn.id, text: sn.display_name}}.to_json.html_safe %>);
-    <%- end -%>          
+    <%- end -%>
    });
 
     $(function () {
@@ -174,5 +187,5 @@
       $('#interests').select2('data', <%= @browse_filter_objects['interests'].map{|c|  {id: c.id, text: c.name}}.to_json.html_safe %>);
     <%- end -%>
    });
-        
+
  </script>
