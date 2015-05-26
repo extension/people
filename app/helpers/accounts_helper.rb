@@ -38,26 +38,26 @@ module AccountsHelper
     when Person::STATUS_REVIEW
       explanation = "<p>Your account is pending review. #{link_to('Learn more about account reviews',accounts_review_path)}</p>"
     when Person::STATUS_SIGNUP
-      explanation = "<p>You need to confirm your email address. #{link_to('Learn more about email confirmation',accounts_pending_confirmation_path)}</p>"
+      explanation = "<h4>You need to confirm your email address.</h4> <p>#{link_to('Learn how',accounts_pending_confirmation_path, class: 'btn btn-default btn-primary')}</p>"
     when Person::STATUS_CONFIRM_EMAIL
       explanation = "<p>You need to confirm your email address. #{link_to('Learn more about email confirmation',accounts_pending_confirmation_path)}</p>"
     when Person::STATUS_RETIRED
       explanation = "<p>Your account has been retired. #{link_to('Contact us for more information.',help_path)}</p>"
     when Person::STATUS_INVALIDEMAIL
       explanation = "<p>Your email is invalid. #{link_to('Learn more about email confirmation',accounts_pending_confirmation_path)}</p>"
-    when Person::STATUS_CONTRIBUTOR 
+    when Person::STATUS_CONTRIBUTOR
       # just for debugging - should never see in normal operation
-      explanation = "<p>Your current account status is: <span class='label label-info'>Person</span></p>"     
+      explanation = "<p>Your current account status is: <span class='label label-info'>Person</span></p>"
     when Person::STATUS_REVIEWAGREEMENT
-      # just for debugging - should never see in normal operation 
-      explanation = "<p>Your current account status is: <span class='label label-info'>Pending Agreement Review</span></p>"     
+      # just for debugging - should never see in normal operation
+      explanation = "<p>Your current account status is: <span class='label label-info'>Pending Agreement Review</span></p>"
      when Person::STATUS_PARTICIPANT
       # just for debugging - should never see in normal operation
-      explanation = "<p>Your current account status is: <span class='label label-info'>Participant</span></p>"          
+      explanation = "<p>Your current account status is: <span class='label label-info'>Participant</span></p>"
     else
       explanation = "<p>Unknown account status.</p>"
     end
     return explanation.html_safe
   end
-  
+
 end
