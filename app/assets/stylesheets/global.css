@@ -37,3 +37,6 @@ a:hover.status_icon {color:#0088cc;}
 .badge-success {background-color:#5cb85c;}
 .badge-warning {background-color:#f0ad4e;}
 .badge-lg {font-size: 14px; font-weight: normal;}
+
+.color-light-gray {color:#bbb;}
+.mono {font-family: Menlo, Monaco, Consolas, "Courier New", monospace;}

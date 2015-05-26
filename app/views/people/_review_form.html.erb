@@ -1,13 +1,19 @@
-<h4>Can you vouch for <%= person.fullname%>?</h4>
+<h2>Can you vouch for <%= person.fullname%>?</h2>
 
-<p>If you know <%= person.first_name%> and can verify that <%= person.first_name%> is affiliated with Cooperative Extension or working with you and others in your Communities of Practice or in Cooperative Extension in general, you can vouch for <%= person.first_name%>'s eXtension account.</p>
+<p>If you know <%= person.first_name%> and can verify they are affiliated with Cooperative Extension, or working with you and others in your Communities of Practice or in Cooperative Extension in general, you may vouch for their eXtension account.</p>
 
-<h5>More information about <%= person.first_name %>:</h5>
-<p><%= person.cleanup_html(person.involvement).html_safe %></p>
+<h3>This is how <%= person.first_name %> described their connection with Extension:</h3>
 
-<%= form_tag(vouch_person_path(person), class: 'form-inline') do -%>
-  <fieldset>
-    <span class="help-block">Please briefly describe how you know <%= person.first_name%></span>
-    <%= text_field_tag("explanation","", class: 'span4', maxlength: 255 )%> <%= submit_tag('Vouch', class: 'btn') %>
-  </fieldset>
+<blockquote>
+  <i class='fa fa-quote-left color-light-gray'></i> <em><%= person.cleanup_html(person.involvement).html_safe %></em> <i class='fa fa-quote-right color-light-gray'></i>
+</blockquote>
+
+<%= form_tag(vouch_person_path(person)) do -%>
+  <div class="form-group">
+    <label for="exampleInputEmail1">Please briefly describe how you know <%= person.first_name%></label>
+    <%= text_field_tag("explanation","", class: "form-control", maxlength: 255 )%>
+  </div>
+  <p>
+    <%= submit_tag('Vouch for this eXtension account', class: 'btn btn-default btn-primary') %>
+  </p>
 <%- end -%>

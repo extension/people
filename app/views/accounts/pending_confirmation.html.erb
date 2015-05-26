@@ -1,16 +1,32 @@
 <%- @page_title = "eXtension - Pending Email Confirmation" -%>
 
 <div class="row">
-  <div class="col-md-12">
-    <h2>Pending Email Confirmation</h2>
-    <p>In order to confirm your email address, we have sent an email to: <code class="email"><%= current_person.email %></code></p>
-    <p><span class="help">(Incorrect address? Please <%= link_to('fix it in your profile', edit_person_path(current_person))%>)</span></p>
-    <p>This email contains a link with a special "code" to validate the email address on your account.  </p>
-  </div>
-</div>
+  <div class="col-md-10 col-md-offset-1">
 
-<div class="row">
-  <div class="col-md-12">
-  <%= render(:partial => 'email_help_notice') %>
+    <div class="row">
+      <div class="col-md-12">
+        <h1>Pending Email Confirmation</h1>
+
+        <div class="alert alert-info">
+        <p>In order to confirm your email address, we have sent an email to: <strong class="mono"><%= current_person.email %></strong> (<%= link_to('edit', edit_person_path(current_person))%>)</p>
+        <p>You need to click the link in the email to validate your email address.</p>
+
+        <p><%= link_to("Send another confirmation email", accounts_resend_confirmation_path, class: 'btn btn-default btn-primary' ) %> or <%= link_to("contact us", help_path) %> for more information.</p>
+      </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <%= render(:partial => 'email_help_notice') %>
+      </div>
+
+      <div class="col-md-6">
+        <h4>While you are waiting...</h4>
+        <p><%= link_to('View your Profile',person_path(current_person), class: 'btn btn-default btn-lg') -%></p>
+      </div>
+    </div>
+
+
   </div>
 </div>

@@ -1,17 +1,30 @@
 <%- @page_title = "eXtension Sign up - Thank you" -%>
 
 <div class="row">
-  <div class="col-md-12">
-    <h2>Thanks for signing up!</h2>
-    <p>In order to confirm your email address, we've just sent an email to: <code class="email"><%= current_person.email %></code></p>
-    <p><span class="help">(Incorrect address? Please <%= link_to('fix it in your profile', edit_person_path(current_person))%>)</span></p>
-    <p>The email should arrive within a few minutes. Once you receive it, click the "Confirm my email address" link in the email to finish the process.</p>
+  <div class="col-md-10 col-md-offset-1">
+
+    <div class="row">
+      <div class="col-md-12">
+        <h1>Thanks for signing up!</h1>
+
+        <div class="alert alert-info">
+        <h3>Please check your email and confirm your address</h3>
+        <p>We just sent an email to: <strong class="mono"><%= current_person.email %></strong> (<%= link_to('edit', edit_person_path(current_person))%>).</p>
+        <p>Please follow the instructions to confirm your email address.</p>
+      </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <%= render(:partial => 'email_help_notice') %>
+      </div>
+
+      <div class="col-md-6">
+        <h4>While you are waiting...</h4>
+        <p><%= link_to('View your Profile',person_path(current_person), class: 'btn btn-default btn-lg') -%></p>
+      </div>
+    </div>
+
   </div>
 </div>
-
-<div class="row">
-  <div class="col-md-12">
-  <%= render(:partial => 'email_help_notice') %>
-  </div>
-</div>
-

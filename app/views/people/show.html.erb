@@ -125,10 +125,6 @@
           </ul>
           <%- else -%>
           <p>No community connections.</p>
-
-          <li><%= link_to("Create Profile","http://create.extension.org/user/#{@person.id}") %></li>
-          <%- if(learn_id = @person.learn_id) -%>
-            <li><%= link_to("Learn Profile","https://learn.extension.org/learners/#{learn_id}/portfolio") %></li>
           <%- end -%>
         </div>
       </div>
