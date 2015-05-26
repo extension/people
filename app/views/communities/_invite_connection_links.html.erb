@@ -1,13 +1,13 @@
 <%- if(person.connection_with_community(community) == 'none') -%>
-<ul class='unstyled'>
+<ul class='list-unstyled'>
 <li><%= change_connection_link(community,person,'invitedmember') %></li>
 </ul>
 <%- elsif(person.connection_with_community(community) == 'invitedmember') -%>
-<ul class='unstyled'>
+<ul class='list-unstyled'>
 <li><%= remove_connection_link(community,person) %></li>
 </ul>
 <%- else -%>
-<ul class='unstyled'>
+<ul class='list-unstyled'>
 <li>&nbsp;</li>
 </ul>
 <%- end -%>

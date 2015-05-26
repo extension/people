@@ -12,9 +12,9 @@
  *= require bootstrap
  *= require font-awesome
  *= require bootstrap_overrides
- *= require bootstrap-responsive
  *= require media_pagination
  *= require select2
+ *= require select2-bootstrap
  *= require global
  *= require communities
  *= require people

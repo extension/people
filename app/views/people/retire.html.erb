@@ -5,7 +5,7 @@
 </div>
 
 <div class="row">
-  <div class="span8">
+  <div class="col-md-8">
 <%- if current_person == @person -%>
   <h4>Retired?</h4>
   <p>We're sorry to see you go, but congratulations on your new opportunities!</p>
@@ -13,7 +13,7 @@
     <fieldset>
       <p><span class="help-block">Let us know why you are retiring your account.</span>
       <%= text_field_tag("explanation","", class: 'span4' )%></p>       
-    <p><%= submit_tag "Retire my account", :class => "btn btn-primary" %> <%= link_to "Cancel", person_path(@person), :class => "btn" %></p>
+    <p><%= submit_tag "Retire my account", :class => "btn btn-default btn-primary" %> <%= link_to "Cancel", person_path(@person), :class => "btn" %></p>
     </fieldset>
 
   <%- end -%>
@@ -27,7 +27,7 @@
     <fieldset>
       <p><span class="help-block">Please tell us why you are retiring the account for <%= @person.first_name%></span>
       <%= text_field_tag("explanation","", class: 'span4' )%></p>
-    <p><%= submit_tag "Retire this account", :class => "btn btn-primary" %> <%= link_to "Cancel", person_path(@person), :class => "btn" %></p>
+    <p><%= submit_tag "Retire this account", :class => "btn btn-default btn-primary" %> <%= link_to "Cancel", person_path(@person), :class => "btn" %></p>
     </fieldset>
 
   <%- end -%>  

@@ -21,7 +21,7 @@
 </div>
 
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <table class='table table-bordered'>
       <tbody>
         <tr>
@@ -80,7 +80,7 @@
 </div>
 
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <%= render(partial: 'shared/bar_chart', locals: {:data => response_data[:counts], labels: response_data[:labels], :datalabel => "evaluation_#{eq.id}"})%>
   </div>
 </div>

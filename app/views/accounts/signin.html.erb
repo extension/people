@@ -5,30 +5,29 @@
 </div>
 
 <div class="row">
-  <div class="span4">
+  <div class="col-md-4">
 
     <%= form_tag(signin_path, class: '') do -%>
     <%- if is_mobile_device? -%>
-    <p><%= email_field_tag('email', params[:email], {class: 'span4', placeholder: 'Email'}) %></p>
+    <p><%= email_field_tag('email', params[:email], {class: 'form-control', placeholder: 'Email'}) %></p>
     <%- else -%>
-    <p><%= text_field_tag('email', params[:email], {class: 'span4', placeholder: 'Email'}) %></p>
+    <p><%= text_field_tag('email', params[:email], {class: 'form-control', placeholder: 'Email'}) %></p>
     <%- end -%>
 
-    <p><%= password_field_tag('password', '', {class: 'span4', placeholder: 'Password'}) %></p>
+    <p><%= password_field_tag('password', '', {class: 'form-control', placeholder: 'Password'}) %></p>
     <p>
-      <%= button_tag('Sign in',{class: 'btn btn-primary'}) %>
+      <%= button_tag('Sign in',{class: 'btn btn-default btn-primary'}) %>
       <%= link_to('Forgot Password?', accounts_reset_password_path) %>
     </p>
     <%- end -%>
-  </div> 
+  </div>
 </div>
 
 <div class="row">
-  <div class="span4">
+  <div class="col-md-4">
     <%- if !session[:last_opierequest] -%>
       <p>This is the eXtension Account Management site. You can use it to update your eXtension profile, find Extension colleagues, or manage your eXtensionID and password.</p>
     <%- end -%>
     <p>If you don't already have an eXtensionID, please <%= link_to("signup for your eXtensionID", signup_path) %></p>
   </div>
 </div>
-

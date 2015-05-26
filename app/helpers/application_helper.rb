@@ -10,8 +10,12 @@ module ApplicationHelper
     case type
     when :alert
       "#{baseclass} alert-warning"
+    when :warning
+      "#{baseclass} alert-warning"
     when :error
-      "#{baseclass} alert-error"
+      "#{baseclass} alert-danger"
+    when :failure
+      "#{baseclass} alert-warning"
     when :notice
       "#{baseclass} alert-info"
     when :success

@@ -2,11 +2,11 @@
 
 <div class="page-header">
   <h2><%= @page_title %></h2>
-</div> 
+</div>
 
 <%- if !@activities.blank? -%>
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <%= page_entries_info @activities %>
     <%= paginate(@activities) %>
     <table class="table">
@@ -33,32 +33,32 @@
 
           <td>
           <%- if(@person and activity.person_id == @person.id) -%>
-            <%= activity_to_s(activity, {hide_person_text: true}) %>        
+            <%= activity_to_s(activity, {hide_person_text: true}) %>
           <%- else -%>
             <%= activity_to_s(activity) %>
           <%- end -%>
 
           <%- if [Activity::UPDATE_PROFILE,Activity::UPDATE_COLLEAGUE_PROFILE].include?(activity.activitycode) and activity.additionaldata and activity.additionaldata[:what_changed] -%>
-               <%= link_to("(details)".html_safe, 
+               <%= link_to("(details)".html_safe,
                 '#',
-                id: "detailstoggler_#{activity.id}", 
+                id: "detailstoggler_#{activity.id}",
                 data: {toggle: 'collapse', target: "#showdetails_#{activity.id}"}) %>
 
           <div id="showdetails_<%= activity.id %>" class="collapse">
-            <ul class='unstyled'>
+            <ul class='list-unstyled'>
               <%- profile_changes(activity.additionaldata[:what_changed]).each do |change| -%>
                 <li><%= change %></li>
               <%- end -%>
             </ul>
           </div>
-          <%- end -%> 
+          <%- end -%>
           </td>
 
           <%- if(current_person.is_admin?) -%>
             <td><%= link_to(activity.ip_address,activity_people_path(ip: activity.ip_address)) %></td>
           <%- elsif(!@person.blank? and @person == current_person) -%>
             <td><%= activity.ip_address %></td>
-          <%- end -%>          
+          <%- end -%>
         </tr>
       <%- end -%>
       </tbody>
@@ -66,7 +66,3 @@
   </div>
 </div>
 <%- end -%>
-
-
-
-

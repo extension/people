@@ -5,7 +5,7 @@
 </div>
 
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
   <%- if !@invitations.blank? -%>
 
       <%= page_entries_info @invitations %>
@@ -30,7 +30,7 @@
                     <%- if invitedlist.blank? -%>
                       n/a
                     <%- else -%>
-                      <ul class='unstyled'> 
+                      <ul class='list-unstyled'> 
                       <%- invitation.invitedcommunities.each do |c| -%>
                         <li><%= c.name -%></li>
                       <%- end -%>

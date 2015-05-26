@@ -1,123 +1,138 @@
 <% @page_title = "Profile for #{@person.fullname}" %>
 
-<%- if current_person != @person -%>
-  <%= render(:partial => 'show_status_banner', locals: {person: @person}) %>
-<%- else -%>
-  <%= render(:partial => 'show_personal_status_banner') %>
-<%- end -%>
+
 
 <div class="row">
+  <div class="col-md-10 col-md-offset-1">
 
-  <div class="span7">
-    <div class="page-header">
-      <h2><%= @person.fullname %></h2>
-      <ul class='unstyled'>
-        <li><%= @person.title %></li>
-        <li><%= institution_text(@person) %></li>
-      </ul>
-    </div>
-    <%- if(!@person.biography.blank?) -%>
-    <div class='biography'>
-      <%= @person.biography.html_safe %>
-    </div>
+    <%- if current_person != @person -%>
+      <%= render(:partial => 'show_status_banner', locals: {person: @person}) %>
+    <%- else -%>
+      <%= render(:partial => 'show_personal_status_banner') %>
     <%- end -%>
-    <dl class='dl-horizontal dashmodule'>
-      <dt>eXtensionID:</dt>
-      <dd><%= @person.idstring%></dd>
-      <dt>Google Account:</dt>
-      <dd><%= @person.idstring%>@extension.org<br/>
-        <%= link_to('Learn more about your eXtension Google Account', 'http://create.extension.org/node/98956') %>
-      </dd>
-      <dt>Email:</dt>
-      <dd><%= @person.email%></dd>
-      <%- if @person == current_person or current_person.is_admin? -%>
-        <%- if !@person.email_forward.blank? and @person.email_forward.alias_type == EmailAlias::CUSTOM_FORWARD -%>
-        <dd>Forwards to: <%= @person.email_forward.destination%></dd>
+
+
+    <div class="row">
+
+      <div class="col-md-7">
+        <div class="page-header">
+          <h2><%= @person.fullname %></h2>
+          <ul class='list-unstyled'>
+            <li><%= @person.title %></li>
+            <li><%= institution_text(@person) %></li>
+          </ul>
+        </div>
+
+        <%- if(!@person.biography.blank?) -%>
+          <div class='person-biograhy'>
+            <%= @person.biography.html_safe %>
+          </div>
         <%- end -%>
-      <%- end -%>
-      <dt>Preferred Phone:</dt>
-      <dd><%= (@person.phone.blank?) ? 'n/a' : number_to_phone(@person.phone, :area_code => true)  %></dd>
-      <dt>Position:</dt>
-      <dd><%= (@person.position.blank?) ? 'n/a' : @person.position.name %></span>
-      <dt>Location:</dt>
-      <dd><%= (@person.location.blank?) ? 'n/a' : @person.location.name %></span>
-      <dt>County:</dt>
-      <dd><%= (@person.county.blank?) ? 'n/a' : @person.county.name %></span>
-      <dt>Time zone:</dt>
-      <dd><%= @person.time_zone %></dd>
-      <dt>Contributor Agreement:</dt>
-      <dd><%= agreement_status(@person) %></dd>
-      <dt>Interests:</dt>
-      <dd>
-        <ul class="inline interests">
-          <%- @person.interests.order('name').each do |i| -%>
-            <li><%= link_to(i.name,filter_people_path(interests: i.id)) -%></li>
+
+        <dl class='dl-horizontal dashmodule'>
+          <dt>eXtensionID:</dt>
+          <dd><%= @person.idstring%></dd>
+          <dt>Google Account:</dt>
+          <dd><%= @person.idstring%>@extension.org<br/>
+            <%= link_to('Learn more about your eXtension Google Account', 'http://create.extension.org/node/98956') %>
+          </dd>
+          <dt>Email:</dt>
+          <dd><%= @person.email%></dd>
+          <%- if @person == current_person or current_person.is_admin? -%>
+            <%- if !@person.email_forward.blank? and @person.email_forward.alias_type == EmailAlias::CUSTOM_FORWARD -%>
+            <dd>Forwards to: <%= @person.email_forward.destination%></dd>
+            <%- end -%>
           <%- end -%>
-        </ul>
-      </dd>
-      <dt>Last Active At:</dt>
-      <dd><%= display_time(@person.last_activity_at) %></dd>
-    </dl>
+          <dt>Preferred Phone:</dt>
+          <dd><%= (@person.phone.blank?) ? 'n/a' : number_to_phone(@person.phone, :area_code => true)  %></dd>
+          <dt>Position:</dt>
+          <dd><%= (@person.position.blank?) ? 'n/a' : @person.position.name %></span>
+          <dt>Location:</dt>
+          <dd><%= (@person.location.blank?) ? 'n/a' : @person.location.name %></span>
+          <dt>County:</dt>
+          <dd><%= (@person.county.blank?) ? 'n/a' : @person.county.name %></span>
+          <dt>Time zone:</dt>
+          <dd><%= @person.time_zone %></dd>
+          <dt>Contributor Agreement:</dt>
+          <dd><%= agreement_status(@person) %></dd>
+          <dt>Interests:</dt>
+          <dd>
+            <ul class="list-inline interests">
+              <%- @person.interests.order('name').each do |i| -%>
+                <li><%= link_to(i.name,filter_people_path(interests: i.id)) -%></li>
+              <%- end -%>
+            </ul>
+          </dd>
+          <dt>Last Active At:</dt>
+          <dd><%= display_time(@person.last_activity_at) %></dd>
+        </dl>
+
+
+      </div>
+
+      <div class="col-md-5">
+
+        <div class='pull-right'>
+         <ul class="nav nav-pills">
+            <li><%= link_to('Activity',activity_person_path(@person)) %></li>
+            <%- if(@person == current_person or !Person::RESTRICTED_ACCOUNTS.include?(@person.id)) -%>
+              <li><%= link_to('Edit profile',edit_person_path(@person)) %></li>
+            <%- end -%>
+          </ul>
+        </div>
+
+        <div class='clearfix'></div>
+
+        <div class="well">
+            <h4>Profiles across eXtension</h4>
+            <ul class="list-unstyled">
+              <%- if(aae_id = @person.aae_id) -%>
+                <li><%= link_to("Ask an Expert Profile","https://ask.extension.org/expert/users/#{aae_id}") %></li>
+              <%- end -%>
+              <li><%= link_to("Create Profile","http://create.extension.org/user/#{@person.id}") %></li>
+              <%- if(learn_id = @person.learn_id) -%>
+                <li><%= link_to("Learn Profile","https://learn.extension.org/learners/#{learn_id}/portfolio") %></li>
+              <%- end -%>
+            </ul>
+        </div>
+
+        <div class="well">
+          <h4>
+            Social Network Connections
+            <%- if @person == current_person -%>
+              <small><%= link_to('change',change_social_networks_people_path) %></small>
+            <%- end -%>
+          </h4>
+          <%- if(@person.social_networks.count > 0) %>
+          <ul class="list-unstyled">
+            <%- @person.social_networks.each do |network| -%>
+              <li><%= social_network_link(network) %></li>
+            <%- end -%>
+          </ul>
+          <%- else -%>
+          <p>No social networking connections listed.</p>
+          <%- end -%>
+
+        </div>
+
+        <div class="well">
+          <h4>Communities</h4>
+          <%- if(@person.communities.count > 0) %>
+          <ul class="list-unstyled">
+            <%- @person.communities.order(:name).each do |community| -%>
+              <li><%= link_to(community.name, community) %> <small><%= @person.connection_with_community_expanded(community) %></small></li>
+            <%- end -%>
+          </ul>
+          <%- else -%>
+          <p>No community connections.</p>
+          <%- end -%>
+        </div>
+      </div>
+
+    </div>
+
+
 
 
   </div>
-
-  <div class="span5">
-
-    <div class='pull-right'>
-     <ul class="nav nav-pills">
-        <li><%= link_to('Activity',activity_person_path(@person)) %></li>
-        <%- if(@person == current_person or !Person::RESTRICTED_ACCOUNTS.include?(@person.id)) -%>
-          <li><%= link_to('Edit profile',edit_person_path(@person)) %></li>
-        <%- end -%>
-      </ul>
-    </div>
-
-    <div class='clearfix'></div>
-
-    <div class="well">
-        <h4>Profiles across eXtension</h4>
-        <ul class="unstyled">
-          <%- if(aae_id = @person.aae_id) -%>
-            <li><%= link_to("Ask an Expert Profile","https://ask.extension.org/expert/users/#{aae_id}") %></li>
-          <%- end -%>
-          <li><%= link_to("Create Profile","http://create.extension.org/user/#{@person.id}") %></li>
-          <%- if(learn_id = @person.learn_id) -%>
-            <li><%= link_to("Learn Profile","https://learn.extension.org/learners/#{learn_id}/portfolio") %></li>
-          <%- end -%>
-        </ul>
-    </div>
-
-    <div class="well">
-      <h4>
-        Social Network Connections
-        <%- if @person == current_person -%>
-          <small><%= link_to('change',change_social_networks_people_path) %></small>
-        <%- end -%>
-      </h4>
-      <%- if(@person.social_networks.count > 0) %>
-      <ul class="unstyled">
-        <%- @person.social_networks.each do |network| -%>
-          <li><%= social_network_link(network) %></li>
-        <%- end -%>
-      </ul>
-      <%- else -%>
-      <p>No social networking connections listed.</p>
-      <%- end -%>
-    </div>
-
-    <div class="well">
-      <h4>Communities</h4>
-      <%- if(@person.communities.count > 0) %>
-      <ul class="unstyled">
-        <%- @person.communities.order(:name).each do |community| -%>
-          <li><%= link_to(community.name, community) %> <small><%= @person.connection_with_community_expanded(community) %></small></li>
-        <%- end -%>
-      </ul>
-      <%- else -%>
-      <p>No community connections.</p>
-      <%- end -%>
-    </div>
-  </div>
-
 </div>

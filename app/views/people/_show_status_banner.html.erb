@@ -1,6 +1,6 @@
 <%- if @person.is_signup? -%>
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <div class='alert alert-warning'>
      <h4>This account is waiting email confirmation.</h4>
      <p><%= @person.first_name %> has not yet confirmed their email address from signup. They'll need to confirm their email address to use eXtension sites and services.</p>
@@ -9,13 +9,13 @@
 </div>
 <%- elsif @person.retired? -%>
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <%= render(partial: 'retired_notice', locals: {person: @person, retired_account: @person.retired_account}) %>
   </div>
 </div>
 <%- elsif @person.pendingreview? -%>
 <div class='row'>
-  <div class='span12'>
+  <div class="col-md-12">
     <div class='well'>
       <%= render(partial: 'review_form', locals: {person: @person}) -%>
     </div>
@@ -23,7 +23,7 @@
 </div>
 <%- elsif(!@person.email_confirmed?) -%>
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <div class='alert alert-warning'>
      <h4>This account is waiting email confirmation.</h4>
      <%- if !@person.previous_email.blank? -%>
@@ -36,14 +36,14 @@
 </div>
 <%- elsif(@person.last_activity_at < (Time.zone.now - Settings.months_for_inactive_flag.months)) -%>
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <div class='alert alert-warning'>
       <%- if(!@person.last_account_reminder.blank? && current_person.is_extensionstaff?) -%>
       <div class="pull-right">
         <%= form_tag(retire_person_path(@person)) do -%>
           <fieldset>
           <%= hidden_field_tag('explanation','Account reminder bounced') %>
-          <p><%= submit_tag "Account Reminder Bounced", :class => "btn" %> </p>
+          <p><%= submit_tag "Account Reminder Bounced", :class => "btn btn-default" %> </p>
           </fieldset>
         <%- end -%>
       </div>

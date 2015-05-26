@@ -2,29 +2,29 @@
 
 <%- if !@person.validaccount? -%>
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <h2>Closed profile.</h2>
   </div>
 </div>
 <%- elsif @person.public_attributes[:profile_attributes].blank? -%>
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <h2>Private profile.</h2>
   </div>
 </div>
 <%- else -%>
 
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <div class="page-header">
       <h2><%= @person.fullname %></h2>
-      <ul class='unstyled'>
+      <ul class='list-unstyled'>
         <%- if @person.public_attributes[:profile_attributes]['title'] -%>
           <li><%= @person.title %></li>
         <%- end -%>
         <%- if @person.public_attributes[:profile_attributes]['institution'] -%>
           <li><%= institution_text(@person) %></li>
-        <%- end -%>         
+        <%- end -%>
       </ul>
     </div>
 
@@ -34,52 +34,52 @@
     </div>
     <%- end -%>
     <dl class='dl-horizontal dashmodule'>
-      <%- if(@person.public_attributes[:profile_attributes]['email']) -%>      
+      <%- if(@person.public_attributes[:profile_attributes]['email']) -%>
         <dt>Email:</dt>
-        <dd><%= @person.email%></dd>    
-      <%- end -%>        
-      <%- if(@person.public_attributes[:profile_attributes]['phone']) -%>      
+        <dd><%= @person.email%></dd>
+      <%- end -%>
+      <%- if(@person.public_attributes[:profile_attributes]['phone']) -%>
       <dt>Preferred Phone:</dt>
       <dd><%= (@person.phone.blank?) ? 'n/a' : number_to_phone(@person.phone, :area_code => true)  %></dd>
-      <%- end -%>        
-      <%- if(@person.public_attributes[:profile_attributes]['position']) -%>             
+      <%- end -%>
+      <%- if(@person.public_attributes[:profile_attributes]['position']) -%>
       <dt>Position:</dt>
       <dd><%= (@person.position.blank?) ? 'n/a' : @person.position.name %></span>
-      <%- end -%>        
-      <%- if(@person.public_attributes[:profile_attributes]['location']) -%>               
+      <%- end -%>
+      <%- if(@person.public_attributes[:profile_attributes]['location']) -%>
       <dt>Location:</dt>
       <dd><%= (@person.location.blank?) ? 'n/a' : @person.location.name %></span>
-      <%- end -%>        
-      <%- if(@person.public_attributes[:profile_attributes]['county']) -%>               
+      <%- end -%>
+      <%- if(@person.public_attributes[:profile_attributes]['county']) -%>
       <dt>County:</dt>
       <dd><%= (@person.county.blank?) ? 'n/a' : @person.county.name %></span>
-      <%- end -%>        
-      <%- if(@person.public_attributes[:profile_attributes]['time_zone']) -%>               
+      <%- end -%>
+      <%- if(@person.public_attributes[:profile_attributes]['time_zone']) -%>
       <dt>Time zone:</dt>
       <dd><%= @person.time_zone %></span>
       <%- end -%>
-      <%- if(@person.public_attributes[:profile_attributes]['interests']) -%>               
+      <%- if(@person.public_attributes[:profile_attributes]['interests']) -%>
       <dt>Interests:</dt>
       <dd>
-        <ul class="inline">
+        <ul class="list-inline interests">
           <%- @person.interests.order('name').each do |i| -%>
             <li><%= i.name -%></li>
           <%- end -%>
         </ul>
       </dd>
-      <%- end -%>      
-    </dl>       
+      <%- end -%>
+    </dl>
 
     <%- if @person.social_networks.where('is_public = ?',true).count > 0 -%>
     <div class='dashmodule'>
       <h4>Social Network Connections</h4>
-      <ul class="unstyled">
+      <ul class="list-unstyled">
         <%- @person.social_networks.where('is_public = ?',true).each do |network| -%>
           <li><%= social_network_link(network) %></li>
         <%- end -%>
       </ul>
     </div>
     <%- end -%>
-  </div>   
+  </div>
 </div>
 <%- end -%>

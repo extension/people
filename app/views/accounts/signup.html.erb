@@ -5,69 +5,150 @@
 </div>
 
 
-
 <div class="row">
-  <div class="span8">
+  <div class="col-md-7">
 
-    <%= simple_form_for(@person, url: accounts_create_path, :html => { :class => 'form-horizontal' }) do |f| -%>
+    <%= form_for @person, url: accounts_create_path, :html => { :class => 'form-horizontal' } do |f| -%>
 
-      <%- if notification = f.error_notification -%>
-        <div class="alert alert-error fade in">
-          <a class="close" data-dismiss="alert" href="#">&times;</a>
-          <%= notification %>
+      <%- if @person.errors.present? -%>
+        <div class="col-md-offset-4 col-md-8">
+        <div class="alert alert-danger alert-dismissible fade in" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4>Please fix the issue below:</h4>
+          <ul>
+          <% @person.errors.full_messages.each do |error_message| %>
+            <li><%= error_message %></li>
+          <% end %>
+        </ul>
+        </div>
         </div>
       <%- end -%>
-    
-      <p><span class="help-block">Fields marked with an asterisk (<em class="required">*</em>) are required</span></p>
 
       <%- if(@invitation) -%>
         <%= hidden_field_tag('invite',@invitation.token) %>
       <%- end -%>
 
-      <fieldset>
-        <%= f.input :first_name %>
-        <%= f.input :last_name %>
-        <%= f.input :email, :input_html => { :class => 'span4' }, :hint =>  "Using a .edu or .gov email address if you have one will speed up account review." %>
-        <%= f.input :password, :hint =>  "Minimum 8 characters." %>
+      <div class="form-group">
+        <label for="first_name" class="col-md-4 control-label">* First name</label>
+        <div class="col-md-6">
+          <%= f.text_field :first_name, :class => "form-control", :placeholder => 'First name' %>
+        </div>
+      </div>
 
-       <%= f.input :involvement, :input_html => { :rows => 3, :class => 'span4' },
-        :label => 'Connection with Extension',
-        :hint =>  "Please list someone in Extension with whom you have a connection, and tell us how you would like to be involved with eXtension." %>
- 
-        <%= f.input :phone, :label => 'Phone number' %>
-        <%= f.input :title %>
+      <div class="form-group">
+        <label for="last_name" class="col-md-4 control-label">* Last name</label>
+        <div class="col-md-6">
+          <%= f.text_field :last_name, :class => "form-control", :placeholder => 'Last name' %>
+        </div>
+      </div>
 
-        <%= f.input :time_zone, priority: /US/, :input_html => { :class => 'span4' } %>
-        <%= f.association :position, collection: Position.order('name'), :as => :radio_buttons %>
-        <%= f.association :location, collection: Location.order('entrytype,name'), include_blank: true %>
-        <%= f.association :county, 
-                          collection: (@person.location.blank? ? [] : @person.location.counties.order("name")), 
-                          include_blank: true, 
-                          wrapper_html: { id: 'county_select', style: @person.location.blank? ? 'display:none;' : '' } %>
-        <%= f.association :institution, 
-                  collection: (@person.location.blank? ? Community.institutions.order("name") : @person.location.communities.institutions.order("name")), 
-                  include_blank: true, 
-                  wrapper_html: { id: 'institution_select'},
-                  input_html: {class: 'span4'} %>
+      <div class="form-group">
+        <label for="email" class="col-md-4 control-label">* Email</label>
+        <div class="col-md-6">
+          <%= f.text_field :email, :class => "form-control", :placeholder => 'Email' %>
+          <span class="help-block">Using a .edu or .gov email address if you have one will speed up account review.</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="col-md-4 control-label">* Password</label>
+        <div class="col-md-6">
+          <%= f.password_field :password, :class => "form-control" %>
+          <span class="help-block">Minimum 8 characters.</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="involvement" class="col-md-4 control-label">* Connection with Extension</label>
+        <div class="col-md-8">
+          <%= f.text_area :involvement, :class => "form-control", :rows => "3" %>
+          <span class="help-block">Please list someone in Extension with whom you have a connection, and tell us how you would like to be involved with eXtension.</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="phone" class="col-md-4 control-label">Phone number</label>
+        <div class="col-md-4">
+          <%= f.text_field :phone, :class => "form-control", :placeholder => 'Phone number' %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="title" class="col-md-4 control-label">Title</label>
+        <div class="col-md-6">
+          <%= f.text_field :title, :class => "form-control", :placeholder => 'Title' %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="time_zone" class="col-md-4 control-label">Time zone</label>
+        <div class="col-md-8">
+          <%= time_zone_select(:person, :time_zone, ActiveSupport::TimeZone.us_zones, {}, {:class => "form-control"}) %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="position" class="col-md-4 control-label">Position</label>
+        <div class="col-md-8">
+          <% Position.find(:all, :order => 'name').each do |p| %>
+            <div class="radio">
+              <label>
+                <%= f.radio_button :position_id, p.id, :checked => (p.id == @person.position_id ?  true : false) %> <%= p.name %>
+              </label>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="location" class="col-md-4 control-label">Location</label>
+        <div class="col-md-8">
+          <%= f.select(:location_id, options_for_select(get_location_options, @person.location.present? ? @person.location.id : nil), {:include_blank => true}, {:class => "form-control"}) %>
+        </div>
+      </div>
 
 
-<%= f.input :affiliation, 
-            :input_html => { :class => 'span4' }, 
-            :hint =>  "Department or other affiliation at your institution or another institution if yours was not listed." %>
+      <div id="county_select" class="form-group" style="<%= @person.location.blank? ? 'display:none;' : '' %>">
+        <label for="county" class="col-md-4 control-label">County</label>
+        <div class="col-md-8">
 
-      </fieldset>
+            <%= f.select(:county_id, options_from_collection_for_select(@person.location.blank? ? [] : @person.location.counties.order("name"), :id, :name, @person.county.present? ? @person.county.id : nil), {:include_blank => true}, {:class => "form-control"}) %>
 
+        </div>
+      </div>
 
-      <p><%= submit_tag "Sign up", :class => "btn btn-primary" %> <%= link_to "Cancel", root_path, :class => "btn" %></p>
+      <div class="form-group">
+        <label for="institution" class="col-md-4 control-label">Institution</label>
+        <div class="col-md-8">
+          <%= f.select(:institution_id, options_from_collection_for_select(institution_collection_for_edit(@person), :id, :name, @person.institution_id), {:include_blank => true}, {:class => "form-control"}) %>
+        </div>
+      </div>
 
+      <div class="form-group">
+        <label for="affiliation" class="col-md-4 control-label">Affiliation</label>
+        <div class="col-md-6">
+          <%= f.text_field :affiliation, :class => "form-control", :placeholder => 'Department or affiliation' %>
+          <span class="help-block">Department or other affiliation at your institution or another institution if yours was not listed.</span>
+        </div>
+      </div>
 
-    <%- end # end form -%> 
+      <div class="form-group">
+        <div class="col-md-offset-4 col-md-8">
+          <p><%= f.submit "Sign up", :class => "btn btn-default btn-primary" %> <%= link_to "Cancel", root_path, :class => "btn btn-default btn-link" %></p>
+        </div>
+      </div>
+
+      <div class="col-md-offset-4 col-md-7">
+        <p><span class="help-block">Fields marked with an asterisk (<em class="required">*</em>) are required</span></p>
+      </div>
+    <%- end # end form -%>
+
   </div>
 
-      <div class="span4">
+    <div class="col-md-offset-1 col-md-4">
         <div class="well">
         <h4>Registration Help</h4>
-        <p><%= link_to('I forgot my password', '#') %></p>
+        <p><%= link_to('I forgot my password?', accounts_reset_password_path) %></p>
         <p>Already registered? <%= link_to('Sign-in', signin_path) %></p>
         </div>
     </div>
@@ -95,13 +176,12 @@
       });
 
     });
- 
+
     function populateDropdown(select, data) {
         select.html('');
         select.append($('<option></option>').val('').html(''));
         $.each(data, function(id, option) {
             select.append($('<option></option>').val(option.id).html(option.name));
-        });       
+        });
     }
 </script>
-

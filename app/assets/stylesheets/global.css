@@ -31,3 +31,12 @@ footer ul li a:hover {color:#000;}
 a.status_icon {color:#000;}
 a:hover.status_icon {color:#0088cc;}
 
+#shared-navtabs {margin-bottom:20px;}
+
+/* reimpliment badge colors. Add size.  */
+.badge-success {background-color:#5cb85c;}
+.badge-warning {background-color:#f0ad4e;}
+.badge-lg {font-size: 14px; font-weight: normal;}
+
+.color-light-gray {color:#bbb;}
+.mono {font-family: Menlo, Monaco, Consolas, "Courier New", monospace;}

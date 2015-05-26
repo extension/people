@@ -1,9 +1,9 @@
 <%- if social_network.is_public? -%>
-  <td><span class="badge badge-success"><i class='fa fa-globe'></i> Public</span></td>
+  <td><span class="badge badge-success badge-lg"><i class='fa fa-globe'></i> Public</span></td>
   <td><%= social_network_link(social_network) %> (<%= social_network.display_name %>)</td>
   <td><%= link_to('Make Private',change_social_network_publicity_people_path({id: social_network.connection_id, is_public: 'no'}), :class => "btn", :remote => true, :method => :post) -%></td>
 <%- else -%>
-  <td><span class="badge"><i class='fa fa-lock'></i> Private</span></td>
+  <td><span class="badge badge-lg"><i class='fa fa-lock'></i> Private</span></td>
   <td><%= social_network_link(social_network) %> (<%= social_network.display_name %>)</td>
   <td><%= link_to('Make Public',change_social_network_publicity_people_path({id: social_network.connection_id, is_public: 'yes'}), :class => "btn", :remote => true, :method => :post) -%>
 <%- end -%>

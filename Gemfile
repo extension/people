@@ -17,11 +17,11 @@ gem 'turbo-sprockets-rails3'
 gem 'uglifier', '>= 1.0.3'
 
 group :assets do
-  gem 'sass-rails',   '~> 3.2.3'
+  gem 'sass-rails',   '~> 3.2.4'
   gem 'coffee-rails', '~> 3.2.1'
   gem 'jquery-ui-rails'
   # files for bootstrap-in-asset-pipeline integration
-  gem 'bootstrap-sass', '~> 2.3.2.2'
+  gem 'bootstrap-sass', '~> 3.1.1.1'
   # extension's packaging of html5shiv for the asset pipeline
   gem 'extension-html5shiv-rails', :require => 'html5shiv-rails'
   # replaces glyphicons
@@ -67,9 +67,6 @@ gem 'honeybadger'
 
 # caching
 gem 'redis-rails'
-
-# forms
-gem 'simple_form', "~> 2.1.0"
 
 # openid
 gem "ruby-openid", :require => 'openid'

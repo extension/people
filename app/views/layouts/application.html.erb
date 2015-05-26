@@ -40,13 +40,15 @@
       </div>
 
       <%- if current_person and !@no_show_navtabs -%>
-      <div class="row">
-        <%= render(partial: 'shared/navtabs') %>
+      <div class="row" id="shared-navtabs">
+        <div class="col-md-12">
+          <%= render(partial: 'shared/navtabs') %>
+        </div>
       </div>
       <%- end -%>
 
       <div class="row">
-        <div class='span12'>
+        <div class="col-md-12">
         <div id="flash">
           <%= render(partial: 'shared/flashmessages') %>
         </div>
@@ -55,7 +57,7 @@
 
       <%- if !breadcrumbs.blank? -%>
       <div class="row">
-        <div class='span12'>
+        <div class="col-md-12">
           <%= render_breadcrumbs :builder => ::BootstrapBreadcrumbsBuilder %>
         </div>
       </div>
@@ -66,7 +68,7 @@
 
 
     <footer class="container footer">
-      <ul class="inline">
+      <ul class="list-inline">
           <li><%= link_to "Contact Us", help_path %></li>
           <li><%= link_to("Privacy","http://www.extension.org/main/privacy")%></li>
           <li><%= link_to("Terms of Use","http://www.extension.org/main/termsofuse")%></li>

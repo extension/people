@@ -11,3 +11,5 @@ tr.inactive {color: #000000;}
 
 .interests li a {text-decoration:none; background:#f2f2f2;}
 .interests li a:hover {text-decoration:none; background:#003ba1; color:#fff;}
+
+.person-biograhy {font-size:1.1em; margin-bottom:20px;}

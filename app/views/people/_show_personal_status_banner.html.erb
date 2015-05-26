@@ -1,6 +1,6 @@
 <%- if current_person.is_signup? -%>
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <div class='alert alert-warning'>
      <h4>Your account is waiting email confirmation.</h4>
      <p>You have not yet confirmed your email address from signup. You'll need to confirm your email address to use eXtension sites and services.</p>
@@ -10,7 +10,7 @@
 </div>
 <%- elsif current_person.pendingreview? -%>
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <div class='alert alert-warning'>
      <h4>Your account is pending review.</h4>
      <p><%= link_to('Learn more about account reviews',accounts_review_path) -%></p>
@@ -19,7 +19,7 @@
 </div>
 <%- elsif(!current_person.email_confirmed?) -%>
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <div class='alert alert-warning'>
      <h4>Your account is waiting email confirmation.</h4>
      <%- if !current_person.previous_email.blank? -%>
@@ -32,5 +32,3 @@
   </div>
 </div>
 <%- end -%>
-
-

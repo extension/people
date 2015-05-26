@@ -26,7 +26,7 @@
       <%- if @browse_filter_objects and @browse_filter_objects['social_networks'] -%>
         <%- sn_id_list = @browse_filter_objects['social_networks'].map(&:id) -%>
         <td class='social_network_link'>
-          <ul class='unstyled'>
+          <ul class='list-unstyled'>
           <%- person.social_networks.each do |network| -%>
             <%- if sn_id_list.include?(network.id) -%>
               <li><%= social_network_link(network) -%></li>
