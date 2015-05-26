@@ -90,7 +90,6 @@
                 <li><%= link_to("Ask an Expert Profile","https://ask.extension.org/expert/users/#{aae_id}") %></li>
               <%- end -%>
               <li><%= link_to("Create Profile","http://create.extension.org/user/#{@person.id}") %></li>
-              <li><%= link_to("Data Profile","http://data.extension.org/contributors/#{@person.id}") %></li>
               <%- if(learn_id = @person.learn_id) -%>
                 <li><%= link_to("Learn Profile","https://learn.extension.org/learners/#{learn_id}/portfolio") %></li>
               <%- end -%>
@@ -113,6 +112,7 @@
           <%- else -%>
           <p>No social networking connections listed.</p>
           <%- end -%>
+
         </div>
 
         <div class="well">
@@ -125,6 +125,10 @@
           </ul>
           <%- else -%>
           <p>No community connections.</p>
+
+          <li><%= link_to("Create Profile","http://create.extension.org/user/#{@person.id}") %></li>
+          <%- if(learn_id = @person.learn_id) -%>
+            <li><%= link_to("Learn Profile","https://learn.extension.org/learners/#{learn_id}/portfolio") %></li>
           <%- end -%>
         </div>
       </div>
