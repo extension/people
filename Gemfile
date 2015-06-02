@@ -5,6 +5,9 @@ source 'https://rubygems.org'
 
 gem 'rails', '4.2.1'
 
+# data
+gem 'mysql2'
+
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets
@@ -20,6 +23,9 @@ gem 'jquery-rails'
 gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
+
+# server settings
+gem "rails_config"
 
 # TDB - not sure about these
 # group :development, :test do
@@ -39,8 +45,7 @@ gem 'jbuilder', '~> 2.0'
 # # all things xml
 # gem 'nokogiri'
 #
-# # data
-# gem 'mysql2'
+
 #
 # group :assets do
 #   gem 'sass-rails',   '~> 3.2.4'
@@ -148,8 +153,6 @@ gem 'jbuilder', '~> 2.0'
 #   gem 'httplog'
 #   gem 'pry'
 #
-#   # footnotes
-#   #gem 'rails-footnotes', '>= 3.7.5.rc4'
 #   gem 'quiet_assets'
 #
 #   gem 'better_errors'
