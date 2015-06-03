@@ -2,23 +2,23 @@ source 'https://rubygems.org'
 # deal with this specifically to stop bundler errors
 # source 'https://engineering.extension.org/rubygems'
 
-
+# [core]
 gem 'rails', '4.2.1'
 
 # data
 gem 'mysql2'
 
-# Use SCSS for stylesheets
+# [core] Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
-# Use Uglifier as compressor for JavaScript assets
+# [core] Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
-# Use CoffeeScript for .coffee assets and views
+# [core] Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.1.0'
-# Use jquery as the JavaScript library
+# [core] Use jquery as the JavaScript library
 gem 'jquery-rails'
-# Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
+# [core] Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
-# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
+# [core] Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
 
 
@@ -36,6 +36,25 @@ gem 'extension-html5shiv-rails', :require => 'html5shiv-rails', :source => 'http
 
 # server settings
 gem "rails_config"
+
+# caching
+gem 'redis-rails'
+
+# exception handling
+gem 'honeybadger'
+
+# terse logging
+gem 'lograge'
+
+# background jobs
+gem 'sidekiq'
+gem 'sinatra'
+
+# pagination
+gem 'kaminari'
+
+# command line tools
+gem 'thor'
 
 # TDB - not sure about these
 # group :development, :test do
@@ -62,32 +81,23 @@ gem "rails_config"
 #
 
 #
-# # pagination
-# gem 'kaminari'
+
 #
 # # Deploy with Capistrano
 # gem 'capistrano', '~> 2.15.5'
 # gem 'capatross'
 #
-# # background jobs
-# gem 'sidekiq'
-# gem 'sinatra'
+
 #
-# # command line tools
-# gem 'thor'
+
 #
-# # To use Jbuilder templates for JSON
-# gem 'jbuilder'
 #
 # # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
 #
-# # exception handling
-# gem 'honeybadger'
+
 #
-# # caching
-# gem 'redis-rails'
-#
+
 # # openid
 # gem "ruby-openid", :require => 'openid'
 #
@@ -127,8 +137,7 @@ gem "rails_config"
 # # catch rack errors
 # gem 'rack-robustness'
 #
-# # terse logging
-# gem 'lograge'
+
 #
 # # google api
 # gem 'google-api-client'
