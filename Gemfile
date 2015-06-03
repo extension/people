@@ -14,15 +14,25 @@ gem 'sass-rails', '~> 5.0'
 gem 'uglifier', '>= 1.3.0'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.1.0'
-# See https://github.com/rails/execjs#readme for more supported runtimes
-# gem 'therubyracer', platforms: :ruby
-
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
+
+
+# add in jquery-ui
+gem 'jquery-ui-rails'
+
+# replaces glyphicons
+gem 'font-awesome-rails'
+# select2 asset packaging - used for tag and filter interfaces
+gem "select2-rails"
+# files for bootstrap-in-asset-pipeline integration
+gem 'bootstrap-sass'
+# extension's packaging of html5shiv for the asset pipeline
+gem 'extension-html5shiv-rails', :require => 'html5shiv-rails', :source => 'https://engineering.extension.org/rubygems/'
 
 # server settings
 gem "rails_config"
@@ -42,24 +52,7 @@ gem "rails_config"
 
 
 
-# # all things xml
-# gem 'nokogiri'
-#
 
-#
-# group :assets do
-#   gem 'sass-rails',   '~> 3.2.4'
-#   gem 'coffee-rails', '~> 3.2.1'
-#   gem 'jquery-ui-rails'
-#   # files for bootstrap-in-asset-pipeline integration
-#   gem 'bootstrap-sass', '~> 3.1.1.1'
-#   # extension's packaging of html5shiv for the asset pipeline
-#   gem 'extension-html5shiv-rails', :require => 'html5shiv-rails'
-#   # replaces glyphicons
-#   gem 'font-awesome-rails'
-#   # select2 asset packaging - used for tag and filter interfaces
-#   gem "select2-rails"
-# end
 #
 # # legacy data support
 # gem 'safe_attributes'
@@ -67,11 +60,7 @@ gem "rails_config"
 # # mobile device detection
 # gem 'mobile-fu'
 #
-# # server settings
-# gem "rails_config"
-#
-# # jquery magick
-# gem 'jquery-rails'
+
 #
 # # pagination
 # gem 'kaminari'
