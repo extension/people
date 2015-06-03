@@ -438,6 +438,18 @@ class PeopleController < ApplicationController
     end
   end
 
+  def authsummary
+    @person = Person.find_by_email_or_idstring_or_id(params[:id])
+    member_breadcrumbs(['Authentication Summary'])
+
+    if(@person == current_person or current_person.is_admin?)
+      @authsummary = @person.activities.authsummary
+    else
+      @authsummary = @person.activities.public_activity.authsummary
+    end
+
+  end
+
   private
 
   def member_breadcrumbs(endpoints = [])
