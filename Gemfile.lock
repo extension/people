@@ -297,7 +297,7 @@ DEPENDENCIES
   hashids
   honeybadger
   httplog
-  inline-style (= 0.5.2ex)
+  inline-style (= 0.5.2ex)!
   jbuilder
   jquery-rails
   jquery-ui-rails
@@ -329,3 +329,6 @@ DEPENDENCIES
   uglifier (>= 1.0.3)
   useragent
   valid_email
+
+BUNDLED WITH
+   1.10.3
