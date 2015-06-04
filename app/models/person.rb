@@ -24,7 +24,7 @@ class Person < ActiveRecord::Base
   ## constants
   DEFAULT_TIMEZONE = 'America/New_York'
   SYSTEMS_USERS = [1,2,3,4,5,6,7,8]
-  RESTRICTED_ACCOUNTS = [116955,116966]
+  RESTRICTED_ACCOUNTS = [116955]
 
   # Systems accounts used in app
   MASTER_ACCOUNT = 1
