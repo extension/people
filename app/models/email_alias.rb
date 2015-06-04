@@ -22,10 +22,13 @@ class EmailAlias < ActiveRecord::Base
   GOOGLEAPPS      = 3
   ALIAS           = 4
   NOWHERE         = 5
+  RENAME_ALIAS    = 6
 
   # LEGACY
   SYSTEM_FORWARD             = 201
   SYSTEM_ALIAS               = 202
+
+  scope :renames, ->{where(alias_type: RENAME_ALIAS)}
 
 
   def self.mail_alias_in_use?(mail_alias,checkobject=nil)
