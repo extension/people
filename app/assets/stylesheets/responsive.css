@@ -2,7 +2,7 @@
   .people-logo {height: 80px;}
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 767px) {
   .people-logo {margin-left:10px; margin-top:10px;}
   .people-header {background:#fff;}
   #shared-navtabs .nav > li > a {padding: 10px 5px;}
