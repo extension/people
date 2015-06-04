@@ -54,6 +54,8 @@ class Person < ActiveRecord::Base
   validates :email, :presence => true, :email => true, :uniqueness => {:case_sensitive => false}
   validates :password, :length => { :in => 8..40 }, :presence => true, :on => :create
   validates :involvement, :presence => true, :on => :create
+  validate :check_idstring_emailalias_conflicts
+  validate :check_for_prior_rename, :on => :update
 
   ## filters
   before_create :set_hashed_password
@@ -148,6 +150,33 @@ class Person < ActiveRecord::Base
     end
     {:conditions => conditions}
   }
+
+  # runs as validation
+  def check_idstring_emailalias_conflicts
+    if self.new_record?
+      if(existing_alias = EmaiAlias.where(mail_alias: self.idstring).first)
+        # this message will obviously need to change if people can pick their own id again
+        errors.add(:base, "An error has occurred creating your account. Please use the 'Contact Us' link and contact us for assistance.")
+      end
+    elsif(self.idstring_changed?)
+      if(existing_alias = EmaiAlias.where(mail_alias: self.idstring).first)
+        if(existing_alias.aliasable_type != 'Person')
+          errors.add(:idstring, "That eXtensionID idstring is already in use by a group")
+        elsif(existing_alias.aliasable_id != self.id)
+          errors.add(:idstring, "That eXtensionID idstring is already in use by a colleague or existing email alias")
+        end
+      end
+    end
+  end
+
+  # runs as validation
+  def check_for_prior_rename
+    if(self.idstring_changed?)
+      if(existing_alias = self.email_aliases.renames.where(mail_alias: self.idstring).first)
+        errors.add(:idstring, "That eXtensionID idstring has already been used. Renames can not be reverted.")
+      end
+    end
+  end
 
   def openid_url
     "#{Settings.openid_host}/#{self.idstring}"
@@ -620,7 +649,7 @@ class Person < ActiveRecord::Base
   def synchronize_accounts
     if(Settings.sync_accounts)
       if((self.validaccount? or self.retired?) and !self.is_systems_account?)
-        if(as = self.account_syncs.create)
+        if(as = self.account_syncs.create(is_rename: self.previous_changes_keys.include?(:idstring)))
           as.queue_update
         end
       end
