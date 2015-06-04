@@ -66,8 +66,9 @@ People::Application.routes.draw do
       get  :password
       post :password
       get :public_settings
+      get :authsummary
     end
-    
+
     collection do
       get :activity
       get :browse
@@ -90,7 +91,7 @@ People::Application.routes.draw do
     end
   end
 
-  resources :communities do 
+  resources :communities do
     collection do
       get :activity
       get :newest
@@ -117,7 +118,7 @@ People::Application.routes.draw do
       get :reminders
     end
   end
-  
+
   # json data endpoints
   controller :locations do
     simple_named_route 'counties', via: [:post]
@@ -131,7 +132,7 @@ People::Application.routes.draw do
     simple_named_route 'positions', via: [:get]
     simple_named_route 'social_networks', via: [:get]
     simple_named_route 'interests', via: [:get]
-  end  
+  end
 
   controller :debug do
     simple_named_route 'session_information', via: [:get,:post]
@@ -166,10 +167,9 @@ People::Application.routes.draw do
   match 'openid/xrds', to: 'opie#idp_xrds'
   match 'opie/delegate/:extensionid', to: 'opie#delegate'
   match 'opie/:action', to: 'opie'
-  
+
   match '/:extensionid', to: 'opie#person', as: 'public_profile'
   match '/:extensionid/xrds', to: 'opie#person_xrds'
 
 
 end
-
