@@ -1,0 +1,19 @@
+// $grid-float-breakpoint: 992px;
+// $screen-lg-min: 900px;
+// $screen-md-min: 800px;
+// $screen-sm-min: 800px;
+@import "bootstrap";
+
+
+
+body#people {
+  padding-bottom: 40px;
+  background: #1d4fa9;
+}
+
+.sidebar-nav {
+  padding: 9px 0;
+}
+
+
+form {margin-bottom:20px;}
