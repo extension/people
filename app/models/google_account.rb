@@ -53,7 +53,9 @@ class GoogleAccount < ActiveRecord::Base
         return nil
       end
     else
-      updated_account = gda.update_account(self.username,
+      user_key = gda.last_result["id"]
+      updated_account = gda.update_account(user_key,
+                                           self.username,
                                            {given_name: self.given_name,
                                             family_name: self.family_name,
                                             password: self.person.password_reset,
