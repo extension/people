@@ -1,0 +1,22 @@
+@media screen and (min-width: 900px) {
+  .people-logo {height: 80px;}
+}
+
+@media screen and (max-width: 767px) {
+  .people-logo {margin-left:10px; margin-top:10px;}
+  .people-header {background:#fff;}
+  #shared-navtabs .nav > li > a {padding: 10px 5px;}
+  .page-header {margin-top:20px;}
+  .people-header .navbar-nav > li > a {background: #eee;}
+  .people-header .navbar-nav > li > a:hover  {background: #e2e2e2;}
+}
+
+
+@media screen and (min-width: 768px) {
+  .people-header .navbar-nav {background:#000; text-align:center;padding:5px;}
+  .people-header .navbar-nav {width: 100%;}
+  .people-header .navbar-nav > li {float:none; display:inline;}
+  .people-header .navbar-nav > li > a {color: #999; padding-top:5px; padding-bottom:5px; display:inline;}
+  .people-header .navbar-nav > li > a:hover  {color:#fff; background: #000;}
+  .header-navbar-collapse {margin-left: -14px !important; margin-right:-14px !important;}
+}

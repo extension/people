@@ -1,0 +1,31 @@
+<%- @page_title = "Authentication Summary for #{@person.fullname}"-%>
+
+<div class="page-header">
+  <h2><%= @page_title %></h2>
+</div>
+
+<%- if !@authsummary.blank? -%>
+<div class="row">
+  <div class="col-md-12">
+    <table class="table">
+      <thead>
+        <tr>
+        <th>Site</th>
+        <th>Login Count</th>
+        <th>Last Authentication At</th>
+        </tr>
+      </thead>
+
+      <tbody>
+      <%- @authsummary.each do |site,information| -%>
+        <tr>
+          <td><%= site -%></td>
+          <td><%= number_with_delimiter(information[:login_count]) -%>
+          <td><%= display_time(information[:last_login_at]) %></td>
+        </tr>
+      <%- end -%>
+      </tbody>
+    </table>
+  </div>
+</div>
+<%- end -%>

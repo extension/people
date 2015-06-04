@@ -1,8 +1,8 @@
-<div class="col-md-4">
-  <%= link_to(image_tag('people_logo.png').html_safe,root_path) %>
-</div>
+<div class="col-md-12">
+  <%= link_to(image_tag('people_logo.png', {class: "people-logo hidden-xs"}).html_safe,root_path) %>
+
 <%- if current_person -%>
-<div class="span4 offset4">
+
   <div class="pull-right">
     <ul class="nav nav-pills">
       <li class="dropdown">
@@ -20,5 +20,6 @@
       </li>
     </ul>
   </div>
-</div>
+
 <%- end -%>
+</div>
