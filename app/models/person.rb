@@ -17,7 +17,8 @@ class Person < ActiveRecord::Base
   attr_accessible :password, :interest_tags
   attr_accessible :position_id, :position, :location_id, :location, :county_id, :county, :institution_id, :institution
   attr_accessible :invitation, :invitation_id
-  attr_accessible :last_account_reminder, :password_reset
+  attr_accessible :last_account_reminder, :password_reset, :google_apps_email, :email_forward
+
 
   auto_strip_attributes :first_name, :last_name, :email, :title, :affiliation, :squish => true
 
@@ -62,11 +63,12 @@ class Person < ActiveRecord::Base
   before_save :check_account_status
   before_validation :set_idstring
 
-  after_create :create_email_forward
-  after_update :update_email_forward
+  after_create :create_or_update_forwarding_email_alias
+  after_update :create_or_update_forwarding_email_alias
   after_update :synchronize_accounts
   after_update :update_google_account
-  after_save :update_email_aliases
+  after_update :create_rename_alias
+  after_save   :update_nonforwarding_email_aliases
 
   ## associations
   belongs_to :county
@@ -85,6 +87,7 @@ class Person < ActiveRecord::Base
   has_many :email_aliases, as: :aliasable
   has_one :google_account, dependent: :destroy
   has_one :share_account, dependent: :destroy
+  belongs_to :primary_account, class_name: 'Person'
 
 
   belongs_to :invitation
@@ -154,12 +157,12 @@ class Person < ActiveRecord::Base
   # runs as validation
   def check_idstring_emailalias_conflicts
     if self.new_record?
-      if(existing_alias = EmaiAlias.where(mail_alias: self.idstring).first)
+      if(existing_alias = EmailAlias.where(mail_alias: self.idstring).first)
         # this message will obviously need to change if people can pick their own id again
         errors.add(:base, "An error has occurred creating your account. Please use the 'Contact Us' link and contact us for assistance.")
       end
     elsif(self.idstring_changed?)
-      if(existing_alias = EmaiAlias.where(mail_alias: self.idstring).first)
+      if(existing_alias = EmailAlias.where(mail_alias: self.idstring).first)
         if(existing_alias.aliasable_type != 'Person')
           errors.add(:idstring, "That eXtensionID idstring is already in use by a group")
         elsif(existing_alias.aliasable_id != self.id)
@@ -176,6 +179,12 @@ class Person < ActiveRecord::Base
         errors.add(:idstring, "That eXtensionID idstring has already been used. Renames can not be reverted.")
       end
     end
+  end
+
+
+  def change_idstring_to(newidstring)
+    self.idstring = newidstring
+    return self.save
   end
 
   def openid_url
@@ -515,8 +524,19 @@ class Person < ActiveRecord::Base
    Notification.create(notifiable: self, notification_type: Notification::CONFIRM_SIGNUP)
   end
 
+  # override email_forward to return something on null
   def email_forward
-    self.email_aliases.where(mail_alias: self.idstring).first
+    if(self.email =~ /extension\.org$/i)
+      if(self.google_apps_email?)
+        "#{self.idstring}@apps.extension.org"
+      elsif(forwarding_address = read_attribute(:email_forward))
+        forwarding_address
+      else
+        EmailAlias::NOWHERE_LOCATION
+      end
+    else
+      self.email
+    end
   end
 
   def resend_confirmation
@@ -525,10 +545,8 @@ class Person < ActiveRecord::Base
 
 
   def check_profile_changes(options = {})
-    previous_changes_keys = self.previous_changes.keys.dup
-
     # institution check
-    if(previous_changes_keys.include?('institution_id'))
+    if(self.previous_changes.keys.include?('institution_id'))
       if(self.institution_id.blank?)
         if(institution = Community.find_by_id(self.previous_changes['institution_id'].first))
           self.remove_from_community(institution,options.merge({connector_id: options[:colleague_id]}))
@@ -540,7 +558,7 @@ class Person < ActiveRecord::Base
       end
     end
 
-    if(previous_changes_keys.include?('email'))
+    if(self.previous_changes.keys.include?('email'))
       self.previous_email = self.previous_changes['email'][0]
       self.email_confirmed = false
       self.email_confirmed_at = nil
@@ -582,74 +600,41 @@ class Person < ActiveRecord::Base
     end
   end
 
-
-  def create_email_forward
-    self.set_email_forward(googleapps: false)
+  def current_forwarding_email_alias
+    self.email_aliases.forwards.first
   end
 
-
-  def update_email_forward
-
-    # do nothing if the email isn't confirmed
-    # "true" because this runs as a callback
-    return true if(!self.email_confirmed?)
-
-    current_forward = self.email_forward
-    if(current_forward and current_forward.alias_type == EmailAlias::FORWARD)
-      current_forward.update_attributes({destination: self.email})
-      true
-    else
-      false
+  def create_rename_alias
+    if(changes.keys.include?('idstring'))
+      previous_idstring = changes['idstring'][0]
+      self.email_aliases.create({mail_alias: previous_idstring, destination: self.idstring, alias_type: EmailAlias::RENAME_ALIAS, disabled: !self.validaccount?})
     end
+    true
   end
 
-  def set_email_forward(options = {})
-    return nil if(options[:destination].nil? and options[:googleapps].nil?)
-
-    current_forward = self.email_forward
-    if(self.email =~ /extension\.org$/i)
-      if(options[:googleapps])
-        destination = "#{self.idstring}@apps.extension.org"
-        alias_type = EmailAlias::GOOGLEAPPS
-      elsif(options[:destination])
-        destination = options[:destination]
-        alias_type = EmailAlias::CUSTOM_FORWARD
+  def create_or_update_forwarding_email_alias
+    if(cfea = current_forwarding_email_alias)
+      # if the email changed and it's not confirmed yet, do nothing
+      if(self.changes.keys.include?('email') and !self.email_confirmed?)
+        # do nothing
       else
-        return nil
+        cfea.update_attributes({mail_alias: self.idstring, destination: self.email_forward, disabled: !self.validaccount?})
       end
     else
-      if(options[:googleapps])
-        destination = "#{self.idstring}@apps.extension.org"
-        alias_type = EmailAlias::GOOGLEAPPS
-      elsif(options[:destination])
-        destination = options[:destination]
-        alias_type = EmailAlias::CUSTOM_FORWARD
-      else
-        destination = self.email
-        alias_type = EmailAlias::FORWARD
-      end
+      self.email_aliases.create({mail_alias: self.idstring, destination: self.email_forward, alias_type: EmailAlias::FORWARD, disabled: !self.validaccount?})
     end
-
-    if(current_forward)
-      current_forward.update_attributes({destination: destination, alias_type: alias_type, disabled: !self.email_confirmed?})
-    else
-      self.email_aliases.create({mail_alias: self.idstring, destination: destination, alias_type: alias_type, disabled: !self.email_confirmed?})
-    end
+    true
   end
 
-  def update_email_aliases
-    if(!self.validaccount?)
-      self.email_aliases.update_all(disabled: true)
-    else
-      self.email_aliases.update_all(disabled: false)
-    end
+  def update_nonforwarding_email_aliases
+    self.email_aliases.notforwards.update_all(disabled: !self.validaccount?,destination: self.idstring)
     true
   end
 
   def synchronize_accounts
     if(Settings.sync_accounts)
       if((self.validaccount? or self.retired?) and !self.is_systems_account?)
-        if(as = self.account_syncs.create(is_rename: self.previous_changes_keys.include?(:idstring)))
+        if(as = self.account_syncs.create({is_rename: self.changes.keys.include?('idstring')}))
           as.queue_update
         end
       end
