@@ -6,29 +6,34 @@
 #  see LICENSE file
 
 class EmailAlias < ActiveRecord::Base
-  attr_accessible :aliasable, :aliasable_type, :aliasable_id, :alias_type, :mail_alias, :destination, :disabled
+  attr_accessible :aliasable, :aliasable_type, :aliasable_id, :alias_type, :mail_alias, :destination, :disabled, :is_rename
 
   before_validation  :set_values_from_aliasable
   before_save  :set_values_from_aliasable
+  before_save  :check_road_to_nowhere
 
   validates_presence_of :alias_type, :mail_alias, :destination
 
   belongs_to :aliasable, polymorphic: true
 
+  # the road to nowhere
+  NOWHERE_LOCATION = 'nowhere'
 
   # alias_types
   FORWARD         = 1
-  CUSTOM_FORWARD  = 2
   GOOGLEAPPS      = 3
   ALIAS           = 4
-  NOWHERE         = 5
-  RENAME_ALIAS    = 6
+  RENAME_ALIAS    = 5
 
   # LEGACY
   SYSTEM_FORWARD             = 201
   SYSTEM_ALIAS               = 202
 
   scope :renames, ->{where(alias_type: RENAME_ALIAS)}
+  scope :forwards, ->{where(alias_type: FORWARD)}
+  scope :notforwards, ->{ where("alias_type != #{FORWARD}") }
+
+
 
 
   def self.mail_alias_in_use?(mail_alias,checkobject=nil)
@@ -41,8 +46,16 @@ class EmailAlias < ActiveRecord::Base
     count_scope.count > 0
   end
 
+  def check_road_to_nowhere
+    # override disabled flag if on the road to nowhere
+    if(self.destination == NOWHERE_LOCATION)
+      self.disabled = true
+    end
+  end
+
 
   def set_values_from_aliasable
+
     # Person aliasable settings handled in person
 
     if(self.aliasable.is_a?(GoogleGroup))
