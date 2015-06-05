@@ -7,8 +7,7 @@
 
 class AccountSync < ActiveRecord::Base
   serialize :errors
-  attr_accessible :success, :errors
-  attr_accessible :person, :person_id, :processed, :process_on_create
+  attr_accessible :success, :errors, :person, :person_id, :processed, :process_on_create, :is_rename
 
   CREATE_ADMIN_ROLE = 3
   UPDATE_DATABASES = {'aae_database' => Settings.aae_database,
