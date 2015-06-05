@@ -80,7 +80,7 @@ gem 'valid_email'
 
 # used to post-process mail to convert styles to inline
 gem "csspool"
-gem "inline-style", "0.5.2ex"
+gem "inline-style", "0.5.2ex", :source => 'https://engineering.extension.org/rubygems/'
 
 # tokens and such
 gem 'hashids'
