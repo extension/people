@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150326223828) do
+ActiveRecord::Schema.define(:version => 20150604154103) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -21,6 +21,7 @@ ActiveRecord::Schema.define(:version => 20150326223828) do
     t.text     "errors"
     t.datetime "created_at",                           :null => false
     t.datetime "updated_at",                           :null => false
+    t.boolean  "is_rename",         :default => false
   end
 
   add_index "account_syncs", ["person_id"], :name => "person_ndx"
@@ -155,21 +156,22 @@ ActiveRecord::Schema.define(:version => 20150326223828) do
     t.datetime "updated_at",                                      :null => false
   end
 
-  add_index "email_aliases", ["aliasable_type", "aliasable_id", "alias_type"], :name => "alisable_ndx"
+  add_index "email_aliases", ["aliasable_type", "aliasable_id", "alias_type", "mail_alias", "destination"], :name => "alias_ndx", :unique => true
   add_index "email_aliases", ["mail_alias", "destination", "disabled"], :name => "postfix_select_ndx"
 
   create_table "google_accounts", :force => true do |t|
-    t.integer  "person_id",       :default => 0,     :null => false
-    t.string   "username",                           :null => false
-    t.string   "given_name",                         :null => false
-    t.string   "family_name",                        :null => false
-    t.boolean  "is_admin",        :default => false
-    t.boolean  "suspended",       :default => false
+    t.integer  "person_id",             :default => 0,     :null => false
+    t.string   "username",                                 :null => false
+    t.string   "given_name",                               :null => false
+    t.string   "family_name",                              :null => false
+    t.boolean  "is_admin",              :default => false
+    t.boolean  "suspended",             :default => false
     t.datetime "apps_updated_at"
-    t.boolean  "has_error",       :default => false
+    t.boolean  "has_error",             :default => false
     t.text     "last_error"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "renamed_from_username"
   end
 
   add_index "google_accounts", ["person_id"], :name => "person_ndx", :unique => true
@@ -291,6 +293,8 @@ ActiveRecord::Schema.define(:version => 20150326223828) do
     t.integer  "learn_id"
     t.datetime "created_at",                                                :null => false
     t.datetime "updated_at",                                                :null => false
+    t.boolean  "google_apps_email",                      :default => false
+    t.string   "email_forward"
   end
 
   add_index "people", ["email"], :name => "email_ndx", :unique => true
