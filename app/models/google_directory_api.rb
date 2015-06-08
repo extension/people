@@ -97,7 +97,7 @@ class GoogleDirectoryApi
     return (@last_result.status == 200)
   end
 
-  def update_account(account_idstring, account_options)
+  def update_account(user_key,account_idstring, account_options)
 
     update_parameters = {
       'primaryEmail' => "#{account_idstring}@extension.org",
@@ -117,7 +117,7 @@ class GoogleDirectoryApi
 
     @last_result = self.api_request(
       {:api_method => @directory_api.users.update,
-      :parameters => {'userKey' => "#{account_idstring}@extension.org"},
+      :parameters => {'userKey' => user_key},
       :body_object => account_data},
       {account_id: account_idstring}
     )

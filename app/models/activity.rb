@@ -400,5 +400,18 @@ class Activity < ActiveRecord::Base
     returndata
   end
 
+  def self.authsummary
+    results = []
+    returnhash = {}
+    with_scope do
+      results = where("activitycode IN (#{AUTH_LOCAL_SUCCESS},#{AUTH_REMOTE_SUCCESS})")
+                .select("site,max(activities.created_at) as last_login_at,count(activities.id) as login_count")
+                .order('max(activities.created_at) DESC').group(:site)
+    end
+    results.each do |grouped_object|
+      returnhash[grouped_object.site] = {:last_login_at => grouped_object.last_login_at, :login_count => grouped_object.login_count}
+    end
+    returnhash
+  end
 
 end

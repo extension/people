@@ -7,8 +7,7 @@
 
 class AccountSync < ActiveRecord::Base
   serialize :errors
-  attr_accessible :success, :errors
-  attr_accessible :person, :person_id, :processed, :process_on_create
+  attr_accessible :success, :errors, :person, :person_id, :processed, :process_on_create, :is_rename
 
   CREATE_ADMIN_ROLE = 3
   UPDATE_DATABASES = {'aae_database' => Settings.aae_database,
@@ -68,6 +67,10 @@ class AccountSync < ActiveRecord::Base
       self.connection.execute(aae_insert_query)
     end
     self.connection.execute(aae_authmap_insert_query)
+    if(self.is_rename?)
+      self.connection.execute(aae_authmap_delete_query)
+    end
+
   end
 
   def learn_database
@@ -79,6 +82,9 @@ class AccountSync < ActiveRecord::Base
       self.connection.execute(learn_insert_query)
     end
     self.connection.execute(learn_authmap_insert_query)
+    if(self.is_rename?)
+      self.connection.execute(learn_authmap_delete_query)
+    end
   end
 
   def create_databases
@@ -194,6 +200,20 @@ class AccountSync < ActiveRecord::Base
     query
   end
 
+  def aae_authmap_delete_query
+    person = self.person
+    update_database = UPDATE_DATABASES['aae_database']
+    query = <<-END_SQL.gsub(/\s+/, " ").strip
+    DELETE #{update_database}.authmaps.* FROM #{update_database}.authmaps,#{update_database}.users
+    WHERE #{update_database}.authmaps.user_id = #{update_database}.users.id
+          AND #{update_database}.authmaps.authname != CONCAT('https://people.extension.org/',#{update_database}.users.login)
+          AND #{update_database}.authmaps.source = 'people'
+          AND #{update_database}.users.darmok_id = #{person.id}
+    END_SQL
+    query
+  end
+
+
   def learn_update_query
     person = self.person
     update_database = UPDATE_DATABASES['learn_database']
@@ -257,6 +277,19 @@ class AccountSync < ActiveRecord::Base
            NOW()
     FROM #{update_database}.learners
     WHERE #{update_database}.learners.darmok_id = #{person.id}
+    END_SQL
+    query
+  end
+
+  def learn_authmap_delete_query
+    person = self.person
+    update_database = UPDATE_DATABASES['learn_database']
+    query = <<-END_SQL.gsub(/\s+/, " ").strip
+    DELETE #{update_database}.authmaps.* FROM #{update_database}.authmaps,#{update_database}.learners
+    WHERE #{update_database}.authmaps.learner_id = #{update_database}.learners.id
+          AND #{update_database}.authmaps.authname != CONCAT('https://people.extension.org/',#{ActiveRecord::Base.quote_value(person.idstring)})
+          AND #{update_database}.authmaps.source = 'people'
+          AND #{update_database}.learners.darmok_id = #{person.id}
     END_SQL
     query
   end
