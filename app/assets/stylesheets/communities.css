@@ -1,7 +1,7 @@
 li.community {margin-bottom: .65em; border-bottom:1px solid #eee;}
 li.community span {color:#999;float:right;font-size:.95em;}
 
-ul.community_numbers li {margin:0 0 .5em;clear:both;}
+ul.community_numbers li {margin:0 0 .5em;clear:both; line-height:1.5em;}
 ul.community_numbers li span {text-align:right; width:2em; display:block; float:left; padding-right:.5em;}
 
 dl.community dd.type {font-style: italic; color: #777; margin-bottom: .25em;}
