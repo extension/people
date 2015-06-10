@@ -79,10 +79,9 @@ class Person < ActiveRecord::Base
   has_one :retired_account
 
   has_many :community_connections, dependent: :destroy
-  has_many :communities, through: :community_connections,
-                         select:  "community_connections.connectiontype as connectiontype,
+  has_many :communities, -> {select("community_connections.connectiontype as connectiontype,
                                    community_connections.sendnotifications as sendnotifications,
-                                   communities.*"
+                                   communities.*") }, through: :community_connections
 
   has_many :email_aliases, as: :aliasable
   has_one :google_account, dependent: :destroy
@@ -95,13 +94,13 @@ class Person < ActiveRecord::Base
   has_many :auth_approvals
   has_many :profile_public_settings, dependent: :destroy
   has_many :social_network_connections, dependent: :destroy
-  has_many :social_networks, through: :social_network_connections,
-                         select:  "social_network_connections.id as connection_id,
-                                   social_network_connections.custom_network_name as custom_network_name,
-                                   social_network_connections.accountid as accountid,
-                                   social_network_connections.accounturl as accounturl,
-                                   social_network_connections.is_public as is_public,
-                                   social_networks.*"
+  # has_many :social_networks, through: :social_network_connections,
+  #                        select:  "social_network_connections.id as connection_id,
+  #                                  social_network_connections.custom_network_name as custom_network_name,
+  #                                  social_network_connections.accountid as accountid,
+  #                                  social_network_connections.accounturl as accounturl,
+  #                                  social_network_connections.is_public as is_public,
+  #                                  social_networks.*"
 
   has_many :account_syncs
   has_many :person_interests
@@ -109,13 +108,13 @@ class Person < ActiveRecord::Base
 
   ## scopes
   scope :retired, -> {where(retired: true)}
-  scope :validaccounts, where("retired = #{false} and vouched = #{true}")
-  scope :pendingreview, where("retired = #{false} and vouched = #{false} and account_status != #{STATUS_SIGNUP} && email_confirmed = #{true}")
-  scope :not_system, where("people.id NOT IN(#{SYSTEMS_USERS.join(',')})")
-  scope :display_accounts, validaccounts.not_system
-  scope :inactive, lambda{ where('DATE(last_activity_at) < ?',Date.today - Settings.months_for_inactive_flag.months) }
-  scope :active, lambda{ where('DATE(last_activity_at) >= ?',Date.today - Settings.months_for_inactive_flag.months) }
-  scope :reminder_pool, lambda{ display_accounts.inactive.where('(last_account_reminder IS NULL or last_account_reminder <= ?)',Time.now.utc - Settings.months_for_inactive_flag.months).limit(Settings.inactive_limit) }
+  scope :validaccounts, -> {where("retired = #{false} and vouched = #{true}")}
+  scope :pendingreview,-> {where("retired = #{false} and vouched = #{false} and account_status != #{STATUS_SIGNUP} && email_confirmed = #{true}")}
+  scope :not_system,-> {where("people.id NOT IN(#{SYSTEMS_USERS.join(',')})")}
+  scope :display_accounts,-> {validaccounts.not_system}
+  scope :inactive, -> { where('DATE(last_activity_at) < ?',Date.today - Settings.months_for_inactive_flag.months) }
+  scope :active, -> { where('DATE(last_activity_at) >= ?',Date.today - Settings.months_for_inactive_flag.months) }
+  scope :reminder_pool, -> { display_accounts.inactive.where('(last_account_reminder IS NULL or last_account_reminder <= ?)',Time.now.utc - Settings.months_for_inactive_flag.months).limit(Settings.inactive_limit) }
 
 
   # duplicated from darmok

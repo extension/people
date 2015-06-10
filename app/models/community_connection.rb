@@ -10,7 +10,7 @@ class CommunityConnection < ActiveRecord::Base
 
   belongs_to :community
   belongs_to :person
- 
-  scope :approved_community, joins(:community).where("communities.entrytype = #{Community::APPROVED}")
+
+  scope :approved_community, -> { joins(:community).where("communities.entrytype = #{Community::APPROVED}") }
 
 end

@@ -52,7 +52,7 @@ class Community < ActiveRecord::Base
     'leader' => 'Community Leader',
     'pending' => 'Pending Community Review',
     'invitedleader' => 'Community Invitation (Leader)',
-    'invitedleader' => 'Community Invitation (Member)'}
+    'invitedmember' => 'Community Invitation (Member)'}
 
   validates :name, :presence => true, :uniqueness => {:case_sensitive => false}
   validates :entrytype, :presence => true
@@ -64,22 +64,22 @@ class Community < ActiveRecord::Base
   belongs_to :creator, :class_name => "Person", :foreign_key => "created_by"
   belongs_to :location
   has_many :community_connections, :dependent => :destroy
-  has_many :people, through: :community_connections,
-                    select:  "community_connections.connectiontype as connectiontype,
-                              community_connections.sendnotifications as sendnotifications,
-                              people.*"
+  has_many :people, -> { select("community_connections.connectiontype as connectiontype,
+                                 community_connections.sendnotifications as sendnotifications,
+                                 people.*")}, through: :community_connections
+
 
   has_many :google_groups
   has_many :activities
   has_many :community_syncs
 
-  scope :approved, where(entrytype: APPROVED)
-  scope :institutions, where(entrytype: INSTITUTION)
-  scope :contributed, where(entrytype: USERCONTRIBUTED)
+  scope :approved, -> {where(entrytype: APPROVED)}
+  scope :institutions, -> {where(entrytype: INSTITUTION)}
+  scope :contributed, -> {where(entrytype: USERCONTRIBUTED)}
 
-  scope :connected_as, lambda{|connectiontype| where(CONNECTION_CONDITIONS[connectiontype])}
+  scope :connected_as, -> (connectiontype) { where(CONNECTION_CONDITIONS[connectiontype])}
 
-  scope :publishing, ->{where(publishing_community: true)}
+  scope :publishing, -> {where(publishing_community: true)}
 
 
   def sync_communities
