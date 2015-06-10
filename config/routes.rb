@@ -15,11 +15,11 @@ People::Application.routes.draw do
   root :to => 'home#index'
 
   # straight up redirects
-  match "/account/new_password", to: redirect("/accounts/reset_password")
-  match "/profile/edit", to: redirect("/people/personal_edit")
-  match "invite/:token", to: redirect("/signup/%{token}")
-  match "/colleagues", to: redirect("/people")
-  match "colleagues/showuser/:idstring", to: redirect("/people/%{idstring}")
+  get "/account/new_password", to: redirect("/accounts/reset_password")
+  get "/profile/edit", to: redirect("/people/personal_edit")
+  get "invite/:token", to: redirect("/signup/%{token}")
+  get "/colleagues", to: redirect("/people")
+  get "colleagues/showuser/:idstring", to: redirect("/people/%{idstring}")
 
 
   controller :redirection do
@@ -144,8 +144,8 @@ People::Application.routes.draw do
   end
 
   controller :webmail do
-    match "/webmail/:mailer_cache_id/logo" => "webmail#logo", :as => 'webmail_logo'
-    match "/webmail/view/:hashvalue" => "webmail#view", :as => 'webmail_view'
+    get "/webmail/:mailer_cache_id/logo" => "webmail#logo", :as => 'webmail_logo'
+    get "/webmail/view/:hashvalue" => "webmail#view", :as => 'webmail_view'
   end
 
   # data routes
@@ -164,12 +164,12 @@ People::Application.routes.draw do
 
   # openid related routing
   match 'opie', to: 'opie#index', via: [:get,:post]
-  match 'openid/xrds', to: 'opie#idp_xrds'
-  match 'opie/delegate/:extensionid', to: 'opie#delegate'
-  match 'opie/:action', to: 'opie'
+  get 'openid/xrds', to: 'opie#idp_xrds'
+  get 'opie/delegate/:extensionid', to: 'opie#delegate'
+  get 'opie/:action', to: 'opie'
 
-  match '/:extensionid', to: 'opie#person', as: 'public_profile'
-  match '/:extensionid/xrds', to: 'opie#person_xrds'
+  get '/:extensionid', to: 'opie#person', as: 'public_profile'
+  get '/:extensionid/xrds', to: 'opie#person_xrds'
 
 
 end
