@@ -17,7 +17,7 @@ class CommunitySync < ActiveRecord::Base
 
   belongs_to :community
 
-  scope :not_processed, lambda{ where(processed: false)}
+  scope :not_processed, -> { where(processed: false)}
 
   def queue_update
     if(self.process_on_create? or !Settings.redis_enabled)

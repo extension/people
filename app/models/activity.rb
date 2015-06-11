@@ -131,9 +131,9 @@ class Activity < ActiveRecord::Base
   belongs_to :community
 
   ## scopes
-  scope :related_to_person, lambda{|person| where("person_id = ? or colleague_id = ?",person.id,person.id)}
-  scope :public_activity, lambda{where(is_private: false)}
-  scope :community, where("activitycode >= ? and activitycode <= ?",COMMUNITY_RANGE.first, COMMUNITY_RANGE.last)
+  scope :related_to_person, -> (person) {where("person_id = ? or colleague_id = ?",person.id,person.id)}
+  scope :public_activity, -> {where(is_private: false)}
+  scope :community, -> {where("activitycode >= ? and activitycode <= ?",COMMUNITY_RANGE.first, COMMUNITY_RANGE.last)}
 
   def check_privacy_flag
     if(PRIVATE_ACTIVITIES.include?(self.activitycode))

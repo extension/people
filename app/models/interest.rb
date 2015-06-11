@@ -11,8 +11,10 @@ class Interest < ActiveRecord::Base
   has_many :person_interests
   has_many :people, through: :person_interests
 
-  scope :used, joins(:person_interests).select("#{self.table_name}.*, COUNT(person_interests.id) AS interest_count").group("#{self.table_name}.id").having("interest_count > 0")
-  
+  scope :used, -> {joins(:person_interests)
+                   .select("#{self.table_name}.*, COUNT(person_interests.id) AS interest_count")
+                   .group("#{self.table_name}.id")
+                   .having("interest_count > 0")}  
   def name=(name)
     write_attribute(:name, self.class.normalizename(name))
   end

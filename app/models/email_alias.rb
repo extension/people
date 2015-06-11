@@ -29,9 +29,9 @@ class EmailAlias < ActiveRecord::Base
   SYSTEM_FORWARD             = 201
   SYSTEM_ALIAS               = 202
 
-  scope :renames, ->{where(alias_type: RENAME_ALIAS)}
-  scope :forwards, ->{where(alias_type: FORWARD)}
-  scope :notforwards, ->{ where("alias_type != #{FORWARD}") }
+  scope :renames, -> {where(alias_type: RENAME_ALIAS)}
+  scope :forwards, -> {where(alias_type: FORWARD)}
+  scope :notforwards, -> { where("alias_type != #{FORWARD}") }
 
 
 

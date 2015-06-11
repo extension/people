@@ -17,7 +17,7 @@ class CommunityMemberSync < ActiveRecord::Base
   belongs_to :community
   belongs_to :person
 
-  scope :not_processed, lambda{ where(processed: false)}
+  scope :not_processed, -> { where(processed: false)}
 
 
   def self.create_with_pending_check(options)

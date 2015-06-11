@@ -18,7 +18,7 @@ class AccountSync < ActiveRecord::Base
 
   belongs_to :person
 
-  scope :not_processed, lambda{ where(processed: false)}
+  scope :not_processed, -> { where(processed: false)}
 
   def admin_application_label_for_wordpress_database(database)
     case database

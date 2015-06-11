@@ -23,10 +23,10 @@ class ProfilePublicSetting < ActiveRecord::Base
                   'interests' => 'Interests',
                   'time_zone' => 'Time zone',
                   'biography' => 'Biography'}
-                        
-  scope :is_public, where(is_public: true)
-                        
-  def self.find_or_create_by_person_and_item(person,item,is_public = false)  
+
+  scope :is_public, -> {where(is_public: true)}
+
+  def self.find_or_create_by_person_and_item(person,item,is_public = false)
     if(setting = self.where(person_id: person.id).where(item: item).first)
       return setting
     else

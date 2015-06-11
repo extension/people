@@ -15,8 +15,8 @@ class Location < ActiveRecord::Base
   has_many :people
   has_many :counties
   has_many :communities
-  
-  scope :states, where(entrytype: STATE)
+
+  scope :states, -> {where(entrytype: STATE)}
 
   # the spec says leading 0 is required
   # but the R maps package leaves it as numeric, so I'm doing that
