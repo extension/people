@@ -9,10 +9,10 @@ class ProfilePublicSetting < ActiveRecord::Base
   attr_accessible :person, :person_id, :item, :is_public
 
   belongs_to :person
-  
-  
+
+
   KNOWN_ITEMS = ['email','phone','title','position','institution','location','county','interests','time_zone','biography']
-  
+
   ITEM_LABELS =  {'email' => 'Email Address',
                   'phone' => 'Phone Number',
                   'title' => 'Title',
@@ -33,7 +33,7 @@ class ProfilePublicSetting < ActiveRecord::Base
       return self.create(person_id: person.id, item: item, is_public: is_public)
     end
   end
-      
-  
+
+
 
 end
