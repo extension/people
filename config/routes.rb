@@ -156,17 +156,17 @@ People::Application.routes.draw do
   end
 
   # email example routing
-  match "/email_examples/:action", to: "email_examples", via: [:get]
+  match "/email_examples/:action", controller: "email_examples", via: [:get]
 
   # wildcard
-  match "debug/:action", to: "debug", :via => [:get]
+  match "debug/:action", controller: "debug", :via => [:get]
 
 
   # openid related routing
   match 'opie', to: 'opie#index', via: [:get,:post]
   get 'openid/xrds', to: 'opie#idp_xrds'
   get 'opie/delegate/:extensionid', to: 'opie#delegate'
-  get 'opie/:action', to: 'opie'
+  get 'opie/:action', controller: 'opie'
 
   get '/:extensionid', to: 'opie#person', as: 'public_profile'
   get '/:extensionid/xrds', to: 'opie#person_xrds'
