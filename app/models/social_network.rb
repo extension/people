@@ -24,7 +24,17 @@ class SocialNetwork < ActiveRecord::Base
 
   ## scopes
 
-  scope :active, where(active: true)
+  scope :active, -> {where(active: true)}
+
+  scope :with_connection_attributes, -> {joins(:social_network_connections)
+                                         .select("DISTINCT(social_networks.id),
+                                         social_networks.*,
+                                         social_network_connections.id as connection_id,
+                                         social_network_connections.custom_network_name as custom_network_name,
+                                         social_network_connections.accountid as accountid,
+                                         social_network_connections.accounturl as accounturl,
+                                         social_network_connections.is_public as is_public" )}
+
 
   def is_other?
     (self.id == OTHER_NETWORK)

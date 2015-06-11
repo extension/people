@@ -64,9 +64,7 @@ class Community < ActiveRecord::Base
   belongs_to :creator, :class_name => "Person", :foreign_key => "created_by"
   belongs_to :location
   has_many :community_connections, :dependent => :destroy
-  has_many :people, -> { select("community_connections.connectiontype as connectiontype,
-                                 community_connections.sendnotifications as sendnotifications,
-                                 people.*")}, through: :community_connections
+  has_many :people, through: :community_connections
 
 
   has_many :google_groups
@@ -81,6 +79,15 @@ class Community < ActiveRecord::Base
 
   scope :publishing, -> {where(publishing_community: true)}
 
+  scope :with_connection_attributes, -> {joins(:community_connections)
+                                        .select("DISTINCT(communities.id),
+                                                 communities.*,
+                                                 community_connections.connectiontype as connectiontype,
+                                                 community_connections.sendnotifications as sendnotifications") }
+
+  def people_plus
+    people.with_community_connection_attributes
+  end
 
   def sync_communities
     if(Settings.sync_communities)

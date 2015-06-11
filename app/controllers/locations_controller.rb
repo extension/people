@@ -36,7 +36,7 @@ class LocationsController < ApplicationController
     end
 
     if(location)
-      institutions = location.communities.institutions.order(:name).map{|institution| Hash[id: institution.id, name: institution.name]}
+      institutions = location.communities_plus.institutions.order(:name).map{|institution| Hash[id: institution.id, name: institution.name]}
     else
       institutions = {}
     end

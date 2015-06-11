@@ -32,7 +32,7 @@ class DataController < ApplicationController
 
     public_attributes = @person.public_attributes
     social_networks = []
-    @person.social_networks.where('is_public = ?',true).each do |network|
+    @person.social_networks_plus.where('is_public = ?',true).each do |network|
       social_networks << {:accountid => network.accountid, :network => network.name, :displayname => network.display_name, :accounturl => network.accounturl}
     end
 
@@ -62,7 +62,7 @@ class DataController < ApplicationController
     @community.joined.each do |person|
       public_attributes = person.public_attributes
       social_networks = []
-      person.social_networks.where('is_public = ?',true).each do |network|
+      person.social_networks_plus.where('is_public = ?',true).each do |network|
         social_networks << {:accountid => network.accountid, :network => network.name, :displayname => network.display_name, :accounturl => network.accounturl}
       end
       if(!public_attributes[:profile_attributes].blank?)

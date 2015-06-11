@@ -299,7 +299,7 @@ class PeopleController < ApplicationController
         @social_network_connection.update_attributes({:is_public => false})
       end
     end
-    @social_network = current_person.social_networks.where("social_network_connections.id = #{@social_network_connection.id}").first
+    @social_network = current_person.social_networks_plus.where("social_network_connections.id = #{@social_network_connection.id}").first
   end
 
   def public_settings

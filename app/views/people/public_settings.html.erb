@@ -39,7 +39,7 @@
     <%- if current_person.social_networks.count > 0 -%>
     <table class="table">
       <tbody>
-        <%- current_person.social_networks.each do |social_network| -%>
+        <%- current_person.social_networks_plus.each do |social_network| -%>
           <tr id="social_network_publicity_row_<%= social_network.connection_id %>">
             <%= render(partial: 'social_network_publicity_row', locals: {social_network: social_network}) -%>
           </tr>

@@ -55,8 +55,8 @@ module PeopleHelper
   end
 
   def institution_collection_for_edit(person)
-    institutions = person.communities.institutions.connected_as('joined').order("name")
-    institutions += (@person.location.blank? ? Community.institutions.order("name") : @person.location.communities.institutions.order("name"))
+    institutions = person.communities_plus.institutions.connected_as('joined').order("name")
+    institutions += (@person.location.blank? ? Community.institutions.order("name") : @person.location.communities_plus.institutions.order("name"))
     institutions.uniq
   end
 

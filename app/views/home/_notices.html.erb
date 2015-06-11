@@ -22,7 +22,7 @@
       </div>
     <%- end -%>
 
-    <%- if((current_person.communities.institutions.nil?) or (current_person.position.nil?) or (current_person.location.nil?)) -%>
+    <%- if((current_person.communities_plus.institutions.nil?) or (current_person.position.nil?) or (current_person.location.nil?)) -%>
       <div class='alert'>
         <a class='close' data-dismiss="alert" href='#'>×</a>
          <h4>You haven't told us about your institution, location, and position.</h4>

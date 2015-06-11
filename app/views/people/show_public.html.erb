@@ -70,11 +70,11 @@
       <%- end -%>
     </dl>
 
-    <%- if @person.social_networks.where('is_public = ?',true).count > 0 -%>
+    <%- if @person.social_networks_plus.where('is_public = ?',true).count > 0 -%>
     <div class='dashmodule'>
       <h4>Social Network Connections</h4>
       <ul class="list-unstyled">
-        <%- @person.social_networks.where('is_public = ?',true).each do |network| -%>
+        <%- @person.social_networks_plus.where('is_public = ?',true).each do |network| -%>
           <li><%= social_network_link(network) %></li>
         <%- end -%>
       </ul>

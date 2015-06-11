@@ -79,9 +79,7 @@ class Person < ActiveRecord::Base
   has_one :retired_account
 
   has_many :community_connections, dependent: :destroy
-  has_many :communities, -> {select("community_connections.connectiontype as connectiontype,
-                                   community_connections.sendnotifications as sendnotifications,
-                                   communities.*") }, through: :community_connections
+  has_many :communities, through: :community_connections
 
   has_many :email_aliases, as: :aliasable
   has_one :google_account, dependent: :destroy
@@ -94,13 +92,7 @@ class Person < ActiveRecord::Base
   has_many :auth_approvals
   has_many :profile_public_settings, dependent: :destroy
   has_many :social_network_connections, dependent: :destroy
-  # has_many :social_networks, through: :social_network_connections,
-  #                        select:  "social_network_connections.id as connection_id,
-  #                                  social_network_connections.custom_network_name as custom_network_name,
-  #                                  social_network_connections.accountid as accountid,
-  #                                  social_network_connections.accounturl as accounturl,
-  #                                  social_network_connections.is_public as is_public,
-  #                                  social_networks.*"
+  has_many :social_networks, through: :social_network_connections
 
   has_many :account_syncs
   has_many :person_interests
@@ -115,11 +107,27 @@ class Person < ActiveRecord::Base
   scope :inactive, -> { where('DATE(last_activity_at) < ?',Date.today - Settings.months_for_inactive_flag.months) }
   scope :active, -> { where('DATE(last_activity_at) >= ?',Date.today - Settings.months_for_inactive_flag.months) }
   scope :reminder_pool, -> { display_accounts.inactive.where('(last_account_reminder IS NULL or last_account_reminder <= ?)',Time.now.utc - Settings.months_for_inactive_flag.months).limit(Settings.inactive_limit) }
+  scope :with_community_connection_attributes, -> {joins(:community_connections)
+                                                   .select("DISTINCT(people.id),
+                                                            people.*,
+                                                            community_connections.connectiontype as connectiontype,
+                                                            community_connections.sendnotifications as sendnotifications")}
+
+
+  def social_networks_plus
+    social_networks.with_connection_attributes
+  end
+
+  def communities_plus
+    communities.with_connection_attributes
+  end
+
+
 
 
   # duplicated from darmok
   # TODO - sanity check this
-  scope :patternsearch, lambda {|searchterm|
+  scope :patternsearch, -> (searchterm) {
     # remove any leading * to avoid borking mysql
     # remove any '\' characters because it's WAAAAY too close to the return key
     # strip '+' characters because it's causing a repitition search error
@@ -436,15 +444,15 @@ class Person < ActiveRecord::Base
   end
 
   def invited_communities
-    self.communities.where("connectiontype = 'invited'")
+    self.communities_plus.where("connectiontype = 'invited'")
   end
 
   def pending_communities
-    self.communities.where("connectiontype = 'pending'")
+    self.communities_plus.where("connectiontype = 'pending'")
   end
 
   def connected_communities
-    self.communities.where("connectiontype IN ('member','leader')").order(:name)
+    self.communities_plus.where("connectiontype IN ('member','leader')").order(:name)
   end
 
   def invite_communities
@@ -495,7 +503,7 @@ class Person < ActiveRecord::Base
   end
 
   def connected_community(community)
-    self.communities.where(id: community.id).first
+    self.communities_plus.where(id: community.id).first
   end
 
   def community_connection(community)
@@ -516,7 +524,7 @@ class Person < ActiveRecord::Base
   end
 
   def primary_institution
-    self.communities.institutions.where(id: self.institution_id).first
+    self.communities_plus.institutions.where(id: self.institution_id).first
   end
 
   def send_signup_confirmation
@@ -550,7 +558,7 @@ class Person < ActiveRecord::Base
         if(institution = Community.find_by_id(self.previous_changes['institution_id'].first))
           self.remove_from_community(institution,options.merge({connector_id: options[:colleague_id]}))
         end
-      elsif(self.communities.institutions.connected_as('joined').include?(self.institution))
+      elsif(self.communities_plus.institutions.connected_as('joined').include?(self.institution))
         # already connected, do nothing
       else
         self.connect_to_community(self.institution,'member',options.merge({connector_id: options[:colleague_id]}))
@@ -1036,14 +1044,14 @@ class Person < ActiveRecord::Base
     self.save
 
     communities = {}
-    self.communities.map{|c| communities[c.id] = c.connectiontype}
+    self.communities_plus.map{|c| communities[c.id] = c.connectiontype}
     if(!self.retired_account)
       self.create_retired_account(retiring_colleague_id: colleague.id, explanation: options[:explanation], communities: communities)
     end
 
 
     # drop community connections
-    self.communities.each do |c|
+    self.communities_plus.each do |c|
       self.remove_from_community(c,{:nonotify => true, :connector_id => colleague.id, :ip_address => options[:ip_address]})
     end
 
@@ -1066,8 +1074,8 @@ class Person < ActiveRecord::Base
     self.save
 
     if(self.retired_account)
-      if(self.retired_account.communities)
-        self.retired_account.communities.each do |community_id,connectiontype|
+      if(self.retired_account.communities_plus)
+        self.retired_account.communities_plus.each do |community_id,connectiontype|
           if(community = Community.find_by_id(community_id))
             self.connect_to_community(community,connectiontype,{:connector_id => colleague.id, :nonotify => true, :ip_address => options[:ip_address]})
           end
@@ -1227,7 +1235,7 @@ class Person < ActiveRecord::Base
               filter_objects = options[:browse_filter].settings_to_objects
               if(filter_objects['social_networks'])
                 filter_objects['social_networks'].each do |network|
-                  if(sn = person.social_networks.where('social_networks.id = ?',network.id).first)
+                  if(sn = person.social_networks_plus.where('social_networks.id = ?',network.id).first)
                     row << sn.accountid
                   else
                     row << nil
@@ -1238,7 +1246,7 @@ class Person < ActiveRecord::Base
             if(options[:community])
               row << person.connection_with_community_expanded(options[:community])
             else
-              row << person.communities.where(Community::CONNECTION_CONDITIONS['joined']).map(&:name).join('; ')
+              row << person.communities_plus.where(Community::CONNECTION_CONDITIONS['joined']).map(&:name).join('; ')
             end
             csv << row
           end # person
