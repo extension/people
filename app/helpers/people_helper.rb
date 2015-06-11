@@ -64,8 +64,8 @@ module PeopleHelper
     string_array = []
     filter_hash.each do |filter_key,items|
       if(filter_key == 'social_networks')
-        string_array << "<strong>Social Networks</strong>: #{items.map(&:display_name).join(' or ')}"        
-      else  
+        string_array << "<strong>Social Networks</strong>: #{items.map(&:display_name).join(' or ')}"
+      else
         string_array << "<strong>#{filter_key.capitalize}</strong>: #{items.map(&:name).join(' or ')}"
       end
     end
@@ -81,7 +81,7 @@ module PeopleHelper
     text_macro_options = {}
 
     # note space on the end of link - required in string formatting
-  
+
     if(activity.person_id.blank? and activity.activitycode == Activity::AUTH_LOCAL_FAILURE)
       # special case of showing additional information for authentication failures
       text_macro_options[:persontext]  = hide_person_text ? '' : "#{activity.additionalinfo} (unknown account) "
@@ -104,7 +104,7 @@ module PeopleHelper
     if(activity.activitycode == Activity::EMAIL_CHANGE)
       text_macro_options[:current_email] =  (activity.person.email || 'unknown')
       text_macro_options[:previous_email] =  (activity.person.previous_email || 'unknown')
-    end    
+    end
 
     I18n.translate("activity.#{activity.activitycode_to_s}",text_macro_options).html_safe
 
@@ -127,7 +127,7 @@ module PeopleHelper
       icon = "<i class='fa fa-info-circle'></i>".html_safe
       title = 'Pending email confirmation from email change'
       link_to(icon,'#',data: {toggle: "tooltip"},title: title, class: 'status_icon').html_safe
-    elsif(person.last_activity_at.nil?)    
+    elsif(person.last_activity_at.nil?)
       icon = "<i class='fa fa-clock-o'></i>".html_safe
       title = "Has never been active"
       link_to(icon,'#',data: {toggle: "tooltip"},title: title, class: 'status_icon').html_safe
