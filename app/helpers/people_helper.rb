@@ -51,7 +51,7 @@ module PeopleHelper
   end
 
   def network_icon(network_name)
-    image_tag("/assets/socialnetworks/#{network_name}.png").html_safe
+    image_tag("socialnetworks/#{network_name}.png").html_safe
   end
 
   def institution_collection_for_edit(person)
