@@ -57,7 +57,8 @@ class Community < ActiveRecord::Base
   validates :name, :presence => true, :uniqueness => {:case_sensitive => false}
   validates :entrytype, :presence => true
 
-  before_save :set_shortname, :flag_attributes_for_approved
+  before_save :set_shortname
+  before_save :flag_attributes_for_approved
   after_save :update_google_groups
   after_save :sync_communities
 
@@ -86,6 +87,7 @@ class Community < ActiveRecord::Base
     if(Settings.sync_communities)
       self.community_syncs.create
     end
+    true
   end
 
   # attr_writer override for response to scrub html
@@ -98,6 +100,7 @@ class Community < ActiveRecord::Base
       self.publishing_community = true
       self.connect_to_drupal = true
     end
+    true
   end
 
 
@@ -116,6 +119,7 @@ class Community < ActiveRecord::Base
       checkname = "#{tmpshortname}_#{increment}"
     end
     self.shortname = checkname
+    true
   end
 
   def self.shortname_in_use?(shortname,checkcommunity = nil)
