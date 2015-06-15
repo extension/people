@@ -12,7 +12,7 @@ class CommunitiesController < ApplicationController
   end
 
   def show
-    # will raise ActiveRecord::RecordNotFound on not found 
+    # will raise ActiveRecord::RecordNotFound on not found
     @community = Community.find_by_shortname_or_id(params[:id])
     member_breadcrumbs
     @current_person_community_connection = current_person.connection_with_community(@community)
@@ -88,7 +88,7 @@ class CommunitiesController < ApplicationController
     else
       return render(:action => "new")
     end
-  end  
+  end
 
   def newest
     collection_breadcrumbs(['List (by creation time)'])
@@ -96,7 +96,7 @@ class CommunitiesController < ApplicationController
   end
 
   def connectionsfile
-    # will raise ActiveRecord::RecordNotFound on not found 
+    # will raise ActiveRecord::RecordNotFound on not found
     @community = Community.find_by_shortname_or_id(params[:id])
     filename = "#{Settings.downloads_data_dir}/community_#{@community.id}_connections.csv"
     @community.people.display_accounts.dump_to_csv(filename,{community: @community})
@@ -106,7 +106,7 @@ class CommunitiesController < ApplicationController
   end
 
   def connections
-    # will raise ActiveRecord::RecordNotFound on not found 
+    # will raise ActiveRecord::RecordNotFound on not found
     @community = Community.find_by_shortname_or_id(params[:id])
     allowed_connections = Community::CONNECTION_CONDITIONS.keys
     if(params[:connection] and allowed_connections.include?(params[:connection]))
@@ -128,13 +128,13 @@ class CommunitiesController < ApplicationController
     @community = Community.find_by_shortname_or_id(params[:id])
     member_breadcrumbs(['Invite colleagues'])
 
-    if (!params[:q].blank?) 
+    if (!params[:q].blank?)
       @connections = Person.display_accounts.patternsearch(params[:q]).order('last_name,first_name').page(params[:page])
       if @connections.blank?
         flash[:warning] = "No colleagues were found that matched your search term"
       end
     end
-    
+
   end
 
 
@@ -151,21 +151,21 @@ class CommunitiesController < ApplicationController
     current_person.leave_community(@community,{ip_address: request.remote_ip})
     @current_person_community_connection = current_person.connection_with_community(@community)
     @thisconnection = current_person.community_connection(@community)
-    render(template: 'communities/connect')   
+    render(template: 'communities/connect')
   end
 
   def change_connection
     @community = Community.find_by_shortname_or_id(params[:id])
     @person = Person.find(params[:person_id])
     @person.connect_to_community(@community,params[:connectiontype],{connector_id: current_person.id, ip_address: request.remote_ip})
-    render(template: 'communities/connection_table_change')    
+    render(template: 'communities/connection_table_change')
   end
 
   def remove_connection
     @community = Community.find_by_shortname_or_id(params[:id])
     @person = Person.find(params[:person_id])
     @person.remove_from_community(@community,{connector_id: current_person.id, ip_address: request.remote_ip})
-    render(template: 'communities/connection_table_change')       
+    render(template: 'communities/connection_table_change')
   end
 
   def find
@@ -190,8 +190,8 @@ class CommunitiesController < ApplicationController
     else
       collection_breadcrumbs(['Activity'])
       @activities = Activity.community.order('created_at DESC').page(params[:page])
-    end         
-  end    
+    end
+  end
 
 
   def change_notification
@@ -213,7 +213,7 @@ class CommunitiesController < ApplicationController
     add_breadcrumb("#{@community.name}", community_path(@community))
     if(!endpoints.blank?)
       endpoints.each do |endpoint|
-        if(endpoint.is_a?(Array))  
+        if(endpoint.is_a?(Array))
           add_breadcrumb(endpoint[0],endpoint[1])
         else
           add_breadcrumb(endpoint)
@@ -226,14 +226,14 @@ class CommunitiesController < ApplicationController
     add_breadcrumb("Communities", :communities_path)
     if(!endpoints.blank?)
       endpoints.each do |endpoint|
-        if(endpoint.is_a?(Array))  
+        if(endpoint.is_a?(Array))
           add_breadcrumb(endpoint[0],endpoint[1])
         else
           add_breadcrumb(endpoint)
         end
       end
     end
-  end  
+  end
 
   def set_tab
     @selected_tab = 'communities'
