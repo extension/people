@@ -54,6 +54,7 @@
     </div>
   </div>
 
+  <%- if current_person.is_admin? -%>
   <fieldset>
     <div class="col-md-offset-4 col-md-8">
       <legend>Administrative Options:</legend>
@@ -76,7 +77,8 @@
         <span class="help-block">Communities can be associated with public content, and will show up on the public site administration page. eXtension Communities of Practice are automatically shown regardless of this setting.</span>
       </div>
     </div>
-</fieldset>
+  </fieldset>
+<%- end -%>
 
 
   <div class="form-group">
