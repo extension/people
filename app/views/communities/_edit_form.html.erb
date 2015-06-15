@@ -47,7 +47,7 @@
     <div class="col-md-8">
       <div class="checkbox">
         <label>
-          <%= check_box_tag('connect_to_drupal','1', @community.connect_to_drupal, {class: ''}) %> <strong>Connect to Create</strong>
+          <%= f.check_box(:connect_to_drupal, {class: ''}) %> <strong>Connect to Create</strong>
         </label>
       </div>
       <span class="help-block">Add this community as a group to the eXtension Create (create.extension.org) CMS. eXtension Communities of Practice are automatically connected regardless of this setting.</span>
@@ -72,7 +72,7 @@
       <div class="col-md-8">
         <div class="checkbox">
           <label>
-            <%= check_box_tag('publishing_community','1', @community.publishing_community, {class: ''}) %> <strong>This is a publishing community</strong>
+            <%= f.check_box(:publishing_community, {class: ''}) %> <strong>This is a publishing community</strong>
           </label>
         </div>
         <span class="help-block">Communities can be associated with public content, and will show up on the public site administration page. eXtension Communities of Practice are automatically shown regardless of this setting.</span>
