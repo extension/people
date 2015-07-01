@@ -111,7 +111,8 @@ class AccountSync < ActiveRecord::Base
     UPDATE_DATABASES['wordpress_databases'].each do |update_database|
       self.connection.execute(wordpress_user_replace_query(update_database))
       self.connection.execute(wordpress_openid_replace_query(update_database))
-      self.connection.execute(wordpress_usermeta_insert_update_query(update_database))
+      self.connection.execute(wordpress_usermeta_role_insert_update_query(update_database))
+      self.connection.execute(wordpress_usermeta_wysiwyg_insert_query(update_database))
     end
   end
 
@@ -419,7 +420,7 @@ class AccountSync < ActiveRecord::Base
     query
   end
 
-  def wordpress_usermeta_insert_update_query(update_database)
+  def wordpress_usermeta_role_insert_update_query(update_database)
     admin_label = self.admin_application_label_for_wordpress_database(update_database)
     person = self.person
     if(person.retired?)
@@ -445,6 +446,23 @@ class AccountSync < ActiveRecord::Base
       UPDATE #{update_database}.wp_usermeta
       SET meta_value = #{ActiveRecord::Base.quote_value(capability_string)}
       WHERE user_id = #{person.id} AND meta_key = 'wp_capabilities'
+      END_SQL
+    end
+    query
+  end
+
+  def wordpress_usermeta_wysiwyg_insert_query(update_database)
+    admin_label = self.admin_application_label_for_wordpress_database(update_database)
+    person = self.person
+
+    # does a row exist? then ignore, else insert
+    result = self.connection.execute("SELECT * from #{update_database}.wp_usermeta WHERE user_id = #{person.id} and meta_key = 'rich_editing'")
+    if(result.first.blank?)
+      query = <<-END_SQL.gsub(/\s+/, " ").strip
+      INSERT INTO #{update_database}.wp_usermeta (user_id,meta_key,meta_value)
+      SELECT #{person.id},
+             'rich_editing',
+             'true'
       END_SQL
     end
     query
