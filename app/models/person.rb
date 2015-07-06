@@ -159,14 +159,14 @@ class Person < ActiveRecord::Base
     if self.new_record?
       if(existing_alias = EmailAlias.where(mail_alias: self.idstring).first)
         # this message will obviously need to change if people can pick their own id again
-        errors.add(:base, "An error has occurred creating your account. Please use the 'Contact Us' link and contact us for assistance.")
+        errors.add(:base, "Your assigned idstring: #{self.idstring} is already an email alias in eXtension. Please use the 'Contact Us' link and contact us for assistance.")
       end
     elsif(self.idstring_changed?)
       if(existing_alias = EmailAlias.where(mail_alias: self.idstring).first)
         if(existing_alias.aliasable_type != 'Person')
-          errors.add(:idstring, "That eXtensionID idstring is already in use by a group")
+          errors.add(:idstring, "That eXtensionID idstring: #{self.idstring} is already in use by a group")
         elsif(existing_alias.aliasable_id != self.id)
-          errors.add(:idstring, "That eXtensionID idstring is already in use by a colleague or existing email alias")
+          errors.add(:idstring, "That eXtensionID idstring: #{self.idstring} is already in use by a colleague or existing email alias")
         end
       end
     end
