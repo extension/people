@@ -329,6 +329,3 @@ DEPENDENCIES
   uglifier (>= 1.0.3)
   useragent
   valid_email
-
-BUNDLED WITH
-   1.10.3
