@@ -25,7 +25,7 @@ class Person < ActiveRecord::Base
   ## constants
   DEFAULT_TIMEZONE = 'America/New_York'
   SYSTEMS_USERS = [1,2,3,4,5,6,7,8]
-  RESTRICTED_ACCOUNTS = [116955]
+  RESTRICTED_ACCOUNTS = [116955,169230]
 
   # Systems accounts used in app
   MASTER_ACCOUNT = 1
@@ -522,6 +522,14 @@ class Person < ActiveRecord::Base
 
   def send_signup_confirmation
    Notification.create(notifiable: self, notification_type: Notification::CONFIRM_SIGNUP)
+  end
+
+  def rename_account_to(new_idstring)
+    self.update_attribute(:idstring, new_idstring)
+  end
+
+  def change_to_google_apps_email
+    self.update_attributes(email: "#{self.idstring}@extension.org", google_apps_email: true)
   end
 
   # override email_forward to return something on null
