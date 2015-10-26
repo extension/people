@@ -6,6 +6,7 @@
 class PeopleController < ApplicationController
   skip_before_filter :check_hold_status, except: [:browsefile, :browse, :index, :vouch, :pendingreview, :invitations, :invite]
   before_filter :set_tab
+  before_filter :admin_required, only: [:admins]
 
   def personal_edit
     return redirect_to edit_person_url(current_person)
@@ -448,6 +449,17 @@ class PeopleController < ApplicationController
       @authsummary = @person.activities.public_activity.authsummary
     end
 
+  end
+
+  def admins
+    @admins_by_application = {}
+    AdminRole.includes(:person).order(:applabel).each do |ar|
+      if(@admins_by_application[ar.applabel])
+        @admins_by_application[ar.applabel] << ar.person
+      else
+        @admins_by_application[ar.applabel] = [ar.person]
+      end
+    end
   end
 
   private

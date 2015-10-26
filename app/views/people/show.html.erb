@@ -32,6 +32,12 @@
         <dl class='dl-horizontal dashmodule'>
           <dt>eXtensionID:</dt>
           <dd><%= @person.idstring%></dd>
+          <%- if @person == current_person or current_person.is_admin? and @person.admin_roles.count >= 1-%>
+            <dt>Administrative Roles:</dt>
+            <%- @person.admin_roles.order('applabel').each do |ar| -%>
+              <dd><%= ar.applabel.capitalize %></dd>
+            <%- end -%>
+          <%- end -%>
           <dt>Google Account:</dt>
           <dd><%= @person.idstring%>@extension.org<br/>
             <%= link_to('Learn more about your eXtension Google Account', 'http://create.extension.org/node/98956') %>

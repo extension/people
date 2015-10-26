@@ -70,6 +70,7 @@ People::Application.routes.draw do
     end
 
     collection do
+      get :admins
       get :activity
       get :browse
       get :browsefile
