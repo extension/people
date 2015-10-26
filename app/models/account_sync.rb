@@ -23,7 +23,7 @@ class AccountSync < ActiveRecord::Base
   def admin_application_label_for_wordpress_database(database)
     case database
     when Settings.about_database
-      'about'
+      'homepage'
     when Settings.milfam_database
       'milfam'
     else
@@ -389,7 +389,7 @@ class AccountSync < ActiveRecord::Base
            first_name=#{quoted_value_or_null(person.first_name)},
            last_name=#{quoted_value_or_null(person.last_name)},
            retired=#{person.retired},
-           is_admin=#{person.is_admin_for_application('www')},
+           is_admin=#{person.is_admin_for_application('articles')},
            updated_at=NOW()
     END_SQL
     query

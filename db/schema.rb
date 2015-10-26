@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150604154103) do
+ActiveRecord::Schema.define(:version => 20151026150620) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -43,6 +43,14 @@ ActiveRecord::Schema.define(:version => 20150604154103) do
 
   add_index "activities", ["created_at", "person_id", "activityclass", "activitycode", "reasoncode", "community_id"], :name => "recordsignature"
   add_index "activities", ["ip_address"], :name => "ip_ndx"
+
+  create_table "admin_roles", :force => true do |t|
+    t.integer  "person_id"
+    t.string   "applabel"
+    t.datetime "created_at"
+  end
+
+  add_index "admin_roles", ["person_id", "applabel"], :name => "admin_ndx", :unique => true
 
   create_table "auth_approvals", :force => true do |t|
     t.integer  "person_id",  :default => 0, :null => false
@@ -278,7 +286,6 @@ ActiveRecord::Schema.define(:version => 20150604154103) do
     t.datetime "vouched_at"
     t.boolean  "email_confirmed",                        :default => false
     t.boolean  "is_admin",                               :default => false
-    t.text     "admin_flags"
     t.boolean  "announcements",                          :default => true
     t.boolean  "retired",                                :default => false
     t.string   "base_login_string"

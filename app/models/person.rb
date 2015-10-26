@@ -106,6 +106,7 @@ class Person < ActiveRecord::Base
   has_many :account_syncs
   has_many :person_interests
   has_many :interests, through: :person_interests
+  has_many :admin_roles
 
   ## scopes
   scope :retired, -> {where(retired: true)}
@@ -1272,28 +1273,23 @@ class Person < ActiveRecord::Base
     true
   end
 
-  def is_admin_for_application(application)
-    if(!self.admin_flags.blank? and self.admin_flags[application])
-      true
-    else
-      false
-    end
+  def is_admin_for_application(applabel)
+    return (self.admin_roles.where(applabel: applabel).count == 1)
   end
 
-  def add_admin_flag_for_application(application,save=true)
-    self.admin_flags ||= {}
-    self.admin_flags[application] = true
-    if(save)
-      self.save
+  def add_admin_role_for_application(applabel)
+    if(!(admin_role = self.admin_roles.where(applabel: applabel).first))
+      self.admin_roles.create(applabel: applabel)
     end
+    self.synchronize_accounts
   end
 
-  def remove_admin_flag_for_application(application,save=true)
-    self.admin_flags ||= {}
-    self.admin_flags[application] = false
-    if(save)
-      self.save
+
+  def remove_admin_role_for_application(applabel)
+    if(admin_role = self.admin_roles.where(applabel: applabel).first)
+      admin_role.destroy
     end
+    self.synchronize_accounts
   end
 
   def update_blogs_user
