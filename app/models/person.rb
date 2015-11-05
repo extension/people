@@ -106,7 +106,8 @@ class Person < ActiveRecord::Base
   has_many :account_syncs
   has_many :person_interests
   has_many :interests, through: :person_interests
-  has_many :admin_roles
+  has_many :site_roles, as: :permissable
+
 
   ## scopes
   scope :retired, -> {where(retired: true)}
@@ -933,6 +934,9 @@ class Person < ActiveRecord::Base
     if(Settings.sync_google and community.connect_to_google_apps? and ['leader','member'].include?(connectiontype))
       community.update_google_groups(true)
     end
+
+    # sync myself
+    self.synchronize_accounts
   end
 
   def remove_from_community(community,options={})
@@ -968,6 +972,9 @@ class Person < ActiveRecord::Base
     if(Settings.sync_google and community.connect_to_google_apps?)
       community.update_google_groups(true)
     end
+
+    # sync myself
+    self.synchronize_accounts
   end
 
 
@@ -1273,20 +1280,32 @@ class Person < ActiveRecord::Base
     true
   end
 
-  def is_admin_for_application(applabel)
-    return (self.admin_roles.where(applabel: applabel).count == 1)
+
+  def role_for_site(site)
+    connected_community_ids = self.connected_communities.pluck(:id)
+    group_clause = "permissable_type = 'Community' and permissable_id IN (#{connected_community_ids.join(',')})"
+    individual_clause = "permissable_type = 'Person' and permissable_id = #{self.id}"
+    role = SiteRole.where(site_id: site.id)
+                       .where("(#{individual_clause}) or (#{group_clause})")
+                       .minimum(:permission)
+    role or site.default_role
   end
 
-  def add_admin_role_for_application(applabel)
-    if(!(admin_role = self.admin_roles.where(applabel: applabel).first))
-      self.admin_roles.create(applabel: applabel)
+
+  def is_admin_for_site(site)
+    return (self.role_for_site(site) == SiteRole::ADMINISTRATOR)
+  end
+
+  def add_admin_role_for_site(site)
+    if(!(is_admin_for_site(site)))
+      self.site_roles.create(site: site, permission: SiteRole::ADMINISTRATOR)
     end
     self.synchronize_accounts
   end
 
 
-  def remove_admin_role_for_application(applabel)
-    if(admin_role = self.admin_roles.where(applabel: applabel).first)
+  def remove_admin_role_for_site(site)
+    if(is_admin_for_site(site) and admin_role = self.site_roles.where(site_id: site.id).where(permission: SiteRole::ADMINISTRATOR).first)
       admin_role.destroy
     end
     self.synchronize_accounts
