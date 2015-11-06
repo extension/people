@@ -1282,11 +1282,16 @@ class Person < ActiveRecord::Base
 
 
   def role_for_site(site)
-    connected_community_ids = self.connected_communities.pluck(:id)
-    group_clause = "permissable_type = 'Community' and permissable_id IN (#{connected_community_ids.join(',')})"
     individual_clause = "permissable_type = 'Person' and permissable_id = #{self.id}"
+    connected_community_ids = self.connected_communities.pluck(:id)
+    if(!connected_community_ids.blank?)
+      group_clause = "permissable_type = 'Community' and permissable_id IN (#{connected_community_ids.join(',')})"
+      find_clause = "(#{individual_clause}) or (#{group_clause})"
+    else
+      find_clause = individual_clause
+    end
     role = SiteRole.where(site_id: site.id)
-                       .where("(#{individual_clause}) or (#{group_clause})")
+                       .where(find_clause)
                        .minimum(:permission)
     role or site.default_role
   end
