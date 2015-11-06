@@ -6,9 +6,9 @@
 
 <div class="row">
   <div class="col-md-12">
-    <%- AdminRole.order(:applabel).group(:applabel).count.keys.each do |applabel| -%>
-      <h3><%= applabel.capitalize %></h3>
-      <%- personlist = Person.joins(:admin_roles).where("admin_roles.applabel = ?",applabel).order(:last_name) -%>
+    <%- Site.order(:label).all.each do |site| -%>
+      <h3><%= site.label.capitalize %></h3>
+      <%- personlist = Person.joins(:site_roles).where("site_id = ?",site.id).order(:last_name) -%>
       <table class="table table-striped">
       <%- personlist.each do |p| -%>
         <tr><td><%= link_to_person(p) -%></td></tr>
