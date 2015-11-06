@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20151026150620) do
+ActiveRecord::Schema.define(:version => 20151104123943) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -368,6 +368,30 @@ ActiveRecord::Schema.define(:version => 20151026150620) do
   end
 
   add_index "share_accounts", ["person_id"], :name => "person_ndx", :unique => true
+
+  create_table "site_roles", :force => true do |t|
+    t.integer  "permissable_id"
+    t.string   "permissable_type"
+    t.integer  "site_id"
+    t.integer  "permission"
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
+  end
+
+  add_index "site_roles", ["permissable_id", "permissable_type", "site_id"], :name => "role_ndx", :unique => true
+
+  create_table "sites", :force => true do |t|
+    t.string   "label"
+    t.string   "uri"
+    t.string   "dev_uri"
+    t.string   "database"
+    t.string   "dev_database"
+    t.string   "apptype"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
+
+  add_index "sites", ["label"], :name => "site_ndx", :unique => true
 
   create_table "social_network_connections", :force => true do |t|
     t.integer  "person_id"

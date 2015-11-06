@@ -20,17 +20,6 @@ class AccountSync < ActiveRecord::Base
 
   scope :not_processed, lambda{ where(processed: false)}
 
-  def admin_application_label_for_wordpress_database(database)
-    case database
-    when Settings.about_database
-      'homepage'
-    when Settings.milfam_database
-      'milfam'
-    else
-      nil
-    end
-  end
-
   def queue_update
     if(self.process_on_create or !Settings.redis_enabled)
       self.update_accounts
@@ -48,85 +37,93 @@ class AccountSync < ActiveRecord::Base
   def update_accounts
     if(!self.processed?)
       begin
-        UPDATE_DATABASES.keys.each do |sync_target|
-          self.send(sync_target)
+        Site.all.each do |site|
+          sync_method = "sync_#{site.label}"
+          self.send(sync_method,site)
         end
         self.update_attributes({processed: true, success: true})
       rescue StandardError => e
-        self.update_attributes({processed: true, success: false, errors: e.message})
+        # self.update_attributes({processed: true, success: false, errors: e.message})
       end
     end
   end
 
-  def aae_database
+  def sync_ask(site)
+    update_database = site.sync_database
     if(aae_user = AaeUser.find_by_darmok_id(self.person_id))
-      self.connection.execute(aae_update_query)
+      self.connection.execute(aae_update_query(site))
     elsif(aae_user = AaeUser.find_by_email(self.person.email))
-      self.connection.execute(aae_conversion_query)
+      self.connection.execute(aae_conversion_query(site))
     else
-      self.connection.execute(aae_insert_query)
+      self.connection.execute(aae_insert_query(site))
     end
-    self.connection.execute(aae_authmap_insert_query)
+    self.connection.execute(aae_authmap_insert_query(site))
     if(self.is_rename?)
-      self.connection.execute(aae_authmap_delete_query)
+      self.connection.execute(aae_authmap_delete_query(site))
     end
-
   end
 
-  def learn_database
+  def sync_learn(site)
+    update_database = site.sync_database
     if(learn_learner = LearnLearner.find_by_darmok_id(self.person_id))
-      self.connection.execute(learn_update_query)
+      self.connection.execute(learn_update_query(site))
     elsif(learn_learner = LearnLearner.find_by_email(self.person.email))
-      self.connection.execute(learn_conversion_query)
+      self.connection.execute(learn_conversion_query(site))
     else
-      self.connection.execute(learn_insert_query)
+      self.connection.execute(learn_insert_query(site))
     end
-    self.connection.execute(learn_authmap_insert_query)
+    self.connection.execute(learn_authmap_insert_query(site))
     if(self.is_rename?)
-      self.connection.execute(learn_authmap_delete_query)
+      self.connection.execute(learn_authmap_delete_query(site))
     end
   end
 
-  def create_databases
-    UPDATE_DATABASES['create_databases'].each do |update_database|
-      self.connection.execute(create_insert_update_query(update_database))
-      self.connection.execute(create_admin_roles_deletion_query(update_database))
-      if(self.person.is_admin_for_application('create'))
-        self.connection.execute(create_admin_roles_query(update_database))
+  def sync_create(site)
+    update_database = site.sync_database
+    self.connection.execute(create_insert_update_query(site))
+    self.connection.execute(create_admin_roles_deletion_query(site))
+    if(self.person.is_admin_for_site(site))
+      self.connection.execute(create_admin_roles_query(site))
+    end
+    ['first','last'].each do |name|
+      ['data','revision'].each do |data_or_revision|
+        self.connection.execute(create_names_update_query(site,name,data_or_revision))
       end
-      ['first','last'].each do |name|
-        ['data','revision'].each do |data_or_revision|
-          self.connection.execute(create_names_update_query(update_database,name,data_or_revision))
-        end
-      end
-      self.connection.execute(create_authmap_insert_query(update_database))
     end
+    self.connection.execute(create_authmap_insert_query(site))
   end
 
-  def www_database
-    self.connection.execute(www_insert_update_query)
+  def sync_articles(site)
+    update_database = site.sync_database
+    self.connection.execute(www_insert_update_query(site))
   end
 
-  def wordpress_databases
-    UPDATE_DATABASES['wordpress_databases'].each do |update_database|
-      self.connection.execute(wordpress_user_replace_query(update_database))
-      self.connection.execute(wordpress_openid_replace_query(update_database))
-      self.connection.execute(wordpress_usermeta_role_insert_update_query(update_database))
-      self.connection.execute(wordpress_usermeta_wysiwyg_insert_query(update_database))
-    end
+  def sync_homepage(site)
+    update_database = site.sync_database
+    self.connection.execute(wordpress_user_replace_query(site))
+    self.connection.execute(wordpress_openid_replace_query(site))
+    self.connection.execute(wordpress_usermeta_role_insert_update_query(site))
+    self.connection.execute(wordpress_usermeta_wysiwyg_insert_query(site))
   end
 
+  def sync_milfam(site)
+    update_database = site.sync_database
+    self.connection.execute(wordpress_user_replace_query(site))
+    self.connection.execute(wordpress_openid_replace_query(site))
+    self.connection.execute(wordpress_usermeta_role_insert_update_query(site))
+    self.connection.execute(wordpress_usermeta_wysiwyg_insert_query(site))
+  end
 
-  def aae_update_query
+  def aae_update_query(site)
+    update_database = site.sync_database
     person = self.person
-    update_database = UPDATE_DATABASES['aae_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     UPDATE #{update_database}.users
     SET #{update_database}.users.login                = #{quoted_value_or_null(person.idstring)},
         #{update_database}.users.first_name           = #{quoted_value_or_null(person.first_name)},
         #{update_database}.users.last_name            = #{quoted_value_or_null(person.last_name)},
         #{update_database}.users.retired              = #{person.retired},
-        #{update_database}.users.is_admin             = #{person.is_admin_for_application('aae')},
+        #{update_database}.users.is_admin             = #{person.is_admin_for_site(site)},
         #{update_database}.users.email                = #{quoted_value_or_null(person.email)},
         #{update_database}.users.time_zone            = #{quoted_value_or_null(person.time_zone(false))},
         #{update_database}.users.location_id          = #{value_or_null(person.location_id)},
@@ -139,9 +136,9 @@ class AccountSync < ActiveRecord::Base
     query
   end
 
-  def aae_conversion_query
+  def aae_conversion_query(site)
+    update_database = site.sync_database
     person = self.person
-    update_database = UPDATE_DATABASES['aae_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     UPDATE #{update_database}.users
     SET #{update_database}.users.kind                 = 'User',
@@ -150,7 +147,7 @@ class AccountSync < ActiveRecord::Base
         #{update_database}.users.first_name           = #{quoted_value_or_null(person.first_name)},
         #{update_database}.users.last_name            = #{quoted_value_or_null(person.last_name)},
         #{update_database}.users.retired              = #{person.retired},
-        #{update_database}.users.is_admin             = #{person.is_admin_for_application('aae')},
+        #{update_database}.users.is_admin             = #{person.is_admin_for_site(site)},
         #{update_database}.users.time_zone            = #{quoted_value_or_null(person.time_zone(false))},
         #{update_database}.users.location_id          = #{value_or_null(person.location_id)},
         #{update_database}.users.county_id            = #{value_or_null(person.county_id)},
@@ -162,9 +159,9 @@ class AccountSync < ActiveRecord::Base
     query
   end
 
-  def aae_insert_query
+  def aae_insert_query(site)
+    update_database = site.sync_database
     person = self.person
-    update_database = UPDATE_DATABASES['aae_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{update_database}.users (login, first_name, last_name, kind, email, time_zone, darmok_id, is_admin, location_id, county_id, title, needs_search_update, created_at, updated_at)
     SELECT  #{quoted_value_or_null(person.idstring)},
@@ -174,7 +171,7 @@ class AccountSync < ActiveRecord::Base
             #{quoted_value_or_null(person.email)},
             #{quoted_value_or_null(person.time_zone(false))},
             #{person.id},
-            #{person.is_admin_for_application('aae')},
+            #{person.is_admin_for_site(site)},
             #{value_or_null(person.location_id)},
             #{value_or_null(person.county_id)},
             #{quoted_value_or_null(person.title)},
@@ -185,9 +182,9 @@ class AccountSync < ActiveRecord::Base
     query
   end
 
-  def aae_authmap_insert_query
+  def aae_authmap_insert_query(site)
+    update_database = site.sync_database
     person = self.person
-    update_database = UPDATE_DATABASES['aae_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT IGNORE INTO #{update_database}.authmaps (user_id, authname, source, created_at, updated_at)
     SELECT #{update_database}.users.id,
@@ -201,9 +198,9 @@ class AccountSync < ActiveRecord::Base
     query
   end
 
-  def aae_authmap_delete_query
+  def aae_authmap_delete_query(site)
+    update_database = site.sync_database
     person = self.person
-    update_database = UPDATE_DATABASES['aae_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     DELETE #{update_database}.authmaps.* FROM #{update_database}.authmaps,#{update_database}.users
     WHERE #{update_database}.authmaps.user_id = #{update_database}.users.id
@@ -215,14 +212,14 @@ class AccountSync < ActiveRecord::Base
   end
 
 
-  def learn_update_query
+  def learn_update_query(site)
+    update_database = site.sync_database
     person = self.person
-    update_database = UPDATE_DATABASES['learn_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     UPDATE #{update_database}.learners
     SET #{update_database}.learners.name         = #{quoted_value_or_null(person.fullname)},
         #{update_database}.learners.retired      = #{person.retired},
-        #{update_database}.learners.is_admin     = #{person.is_admin_for_application('learn')},
+        #{update_database}.learners.is_admin     = #{person.is_admin_for_site(site)},
         #{update_database}.learners.email        = #{quoted_value_or_null(person.email)},
         #{update_database}.learners.time_zone    = #{quoted_value_or_null(person.time_zone(false))},
         #{update_database}.learners.needs_search_update  = 1
@@ -231,14 +228,14 @@ class AccountSync < ActiveRecord::Base
     query
   end
 
-  def learn_conversion_query
+  def learn_conversion_query(site)
+    update_database = site.sync_database
     person = self.person
-    update_database = UPDATE_DATABASES['learn_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     UPDATE #{update_database}.learners
     SET #{update_database}.learners.name         = #{quoted_value_or_null(person.fullname)},
         #{update_database}.learners.retired      = #{person.retired},
-        #{update_database}.learners.is_admin     = #{person.is_admin_for_application('learn')},
+        #{update_database}.learners.is_admin     = #{person.is_admin_for_site(site)},
         #{update_database}.learners.email        = #{quoted_value_or_null(person.email)},
         #{update_database}.learners.time_zone    = #{quoted_value_or_null(person.time_zone(false))},
         #{update_database}.learners.needs_search_update  = 1
@@ -248,9 +245,9 @@ class AccountSync < ActiveRecord::Base
     query
   end
 
-  def learn_insert_query
+  def learn_insert_query(site)
+    update_database = site.sync_database
     person = self.person
-    update_database = UPDATE_DATABASES['learn_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{update_database}.learners (name, email, has_profile, time_zone, darmok_id, is_admin, needs_search_update, created_at, updated_at)
     SELECT  #{quoted_value_or_null(person.fullname)},
@@ -258,7 +255,7 @@ class AccountSync < ActiveRecord::Base
             1,
             #{quoted_value_or_null(person.time_zone(false))},
             #{person.id},
-            #{person.is_admin_for_application('learn')},
+            #{person.is_admin_for_site(site)},
             1,
             #{quoted_value_or_null(person.created_at.to_s(:db))},
             NOW()
@@ -266,9 +263,9 @@ class AccountSync < ActiveRecord::Base
     query
   end
 
-  def learn_authmap_insert_query
+  def learn_authmap_insert_query(site)
+    update_database = site.sync_database
     person = self.person
-    update_database = UPDATE_DATABASES['learn_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT IGNORE INTO #{update_database}.authmaps (learner_id, authname, source, created_at, updated_at)
     SELECT #{update_database}.learners.id,
@@ -282,9 +279,9 @@ class AccountSync < ActiveRecord::Base
     query
   end
 
-  def learn_authmap_delete_query
+  def learn_authmap_delete_query(site)
+    update_database = site.sync_database
     person = self.person
-    update_database = UPDATE_DATABASES['learn_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     DELETE #{update_database}.authmaps.* FROM #{update_database}.authmaps,#{update_database}.learners
     WHERE #{update_database}.authmaps.learner_id = #{update_database}.learners.id
@@ -296,7 +293,8 @@ class AccountSync < ActiveRecord::Base
   end
 
 
-  def create_insert_update_query(update_database)
+  def create_insert_update_query(site)
+    update_database = site.sync_database
     person = self.person
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{update_database}.users (uid,name,pass,mail,created,status)
@@ -317,7 +315,8 @@ class AccountSync < ActiveRecord::Base
   end
 
 
-  def create_admin_roles_deletion_query(update_database)
+  def create_admin_roles_deletion_query(site)
+    update_database = site.sync_database
     person = self.person
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     DELETE FROM #{update_database}.users_roles
@@ -326,7 +325,8 @@ class AccountSync < ActiveRecord::Base
     query
   end
 
-  def create_admin_roles_query(update_database)
+  def create_admin_roles_query(site)
+    update_database = site.sync_database
     person = self.person
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{update_database}.users_roles (uid,rid)
@@ -336,7 +336,8 @@ class AccountSync < ActiveRecord::Base
     query
   end
 
-  def create_names_update_query(update_database,name,data_or_revision)
+  def create_names_update_query(site,name,data_or_revision)
+    update_database = site.sync_database
     person = self.person
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{update_database}.field_#{data_or_revision}_field_#{name}_name (entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_#{name}_name_value, field_#{name}_name_format)
@@ -355,7 +356,8 @@ class AccountSync < ActiveRecord::Base
     query
   end
 
-  def create_authmap_insert_query(update_database)
+  def create_authmap_insert_query(site)
+    update_database = site.sync_database
     person = self.person
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{update_database}.authmap (aid,uid,authname,module)
@@ -371,9 +373,9 @@ class AccountSync < ActiveRecord::Base
   end
 
 
-  def www_insert_update_query
+  def www_insert_update_query(site)
+    update_database = site.sync_database
     person = self.person
-    update_database = UPDATE_DATABASES['www_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{update_database}.people (id,uid,first_name,last_name,is_admin,retired,created_at,updated_at)
     SELECT  #{person.id},
@@ -381,7 +383,7 @@ class AccountSync < ActiveRecord::Base
             #{quoted_value_or_null(person.first_name)},
             #{quoted_value_or_null(person.last_name)},
             #{person.retired},
-            #{person.is_admin_for_application('www')},
+            #{person.is_admin_for_site(site)},
             #{ActiveRecord::Base.quote_value(person.created_at.to_s(:db))},
             #{ActiveRecord::Base.quote_value(person.updated_at.to_s(:db))}
     ON DUPLICATE KEY
@@ -389,13 +391,14 @@ class AccountSync < ActiveRecord::Base
            first_name=#{quoted_value_or_null(person.first_name)},
            last_name=#{quoted_value_or_null(person.last_name)},
            retired=#{person.retired},
-           is_admin=#{person.is_admin_for_application('articles')},
+           is_admin=#{person.is_admin_for_site(site)},
            updated_at=NOW()
     END_SQL
     query
   end
 
-  def wordpress_user_replace_query(update_database)
+  def wordpress_user_replace_query(site)
+    update_database = site.sync_database
     person = self.person
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     REPLACE INTO #{update_database}.wp_users (id,user_login,user_pass,user_email,user_nicename,display_name)
@@ -409,7 +412,8 @@ class AccountSync < ActiveRecord::Base
     query
   end
 
-  def wordpress_openid_replace_query(update_database)
+  def wordpress_openid_replace_query(site)
+    update_database = site.sync_database
     person = self.person
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     REPLACE INTO #{update_database}.wp_openid_identities (uurl_id,user_id,url)
@@ -420,15 +424,14 @@ class AccountSync < ActiveRecord::Base
     query
   end
 
-  def wordpress_usermeta_role_insert_update_query(update_database)
-    admin_label = self.admin_application_label_for_wordpress_database(update_database)
+  def wordpress_usermeta_role_insert_update_query(site)
+    update_database = site.sync_database
     person = self.person
     if(person.retired?)
       capability_string = PHP.serialize({})
-    elsif(admin_label and person.is_admin_for_application(admin_label))
-      capability_string = PHP.serialize({"administrator"=>true})
     else
-      capability_string = PHP.serialize({"editor"=>true})
+      role = SiteRole.wordpress_label(person.role_for_site(site))
+      capability_string = PHP.serialize({"#{role}"=>true})
     end
 
     # does a row exist? then update, else insert
@@ -451,12 +454,12 @@ class AccountSync < ActiveRecord::Base
     query
   end
 
-  def wordpress_usermeta_wysiwyg_insert_query(update_database)
-    admin_label = self.admin_application_label_for_wordpress_database(update_database)
+  def wordpress_usermeta_wysiwyg_insert_query(site)
+    update_database = site.sync_database
     person = self.person
-
     # does a row exist? then ignore, else insert
     result = self.connection.execute("SELECT * from #{update_database}.wp_usermeta WHERE user_id = #{person.id} and meta_key = 'rich_editing'")
+    query = "SELECT 1;"
     if(result.first.blank?)
       query = <<-END_SQL.gsub(/\s+/, " ").strip
       INSERT INTO #{update_database}.wp_usermeta (user_id,meta_key,meta_value)
