@@ -1,0 +1,17 @@
+<%- @page_title = "eXtension Terms of Use Notice" -%>
+
+<div class='row'>
+  <div class="col-md-12">
+    <div class="well">
+    <%= form_tag() do -%>
+      <fieldset>
+        <h3>eXtension.org Terms of Use</h3>
+        <p>Using and contributing to extension.org websites requires that you read and accept the
+          <a href="https://extension.org/terms-of-use" target="_blank">eXtension Terms of Use</a>
+          Continuing ahead indicates that you have read and accept these terms.</p>
+        <p><%= submit_tag "Continue", :class => "btn" %> <%= submit_tag "Deny", :class => "btn" %></p>
+      </fieldset>
+    <%- end -%>
+    </div>
+  </div>
+</div>

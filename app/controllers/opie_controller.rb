@@ -63,6 +63,14 @@ class OpieController < ApplicationController
 
     if opierequest.kind_of?(CheckIDRequest)
       if is_authorized?(opierequest.id_select,opierequest.identity, opierequest.trust_root)
+        if(opierequest.trust_root =~ %r{extension\.org})
+          if(current_person.present_tou_interstitial?)
+            session[:last_opierequest] = opierequest
+            current_person.set_tou_status
+            return render(:template => 'opie/tou_notice', :layout => 'application')
+          end
+        end
+
         if(opierequest.id_select)
           if(opierequest.message.is_openid1)
             response = opierequest.answer(true,server_url,current_person.openid_url)
@@ -157,7 +165,7 @@ class OpieController < ApplicationController
 </xrds:XRDS>
     END
 
-    render(:text => yadis, :content_type => 'application/xrds+xml')    
+    render(:text => yadis, :content_type => 'application/xrds+xml')
   end
 
   def decision
@@ -233,14 +241,14 @@ class OpieController < ApplicationController
   def site_approved?(trust_root)
     if(AuthApproval.find(:first, :conditions => ['person_id = ? and trust_root = ?',current_person.id,trust_root]))
       return true
-    elsif(trust_root =~ %r{extension\.org}) 
+    elsif(trust_root =~ %r{extension\.org})
       # auto-approve extension.org
       current_person.auth_approvals.create(:trust_root => trust_root)
       return true
-    elsif(trust_root =~ %r{lsuagcenter\.com}) 
+    elsif(trust_root =~ %r{lsuagcenter\.com})
       # auto-approve lsuagcenter.com
       current_person.auth_approvals.create(:trust_root => trust_root)
-      return true              
+      return true
     else
       return false
     end
