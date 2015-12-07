@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20151104123943) do
+ActiveRecord::Schema.define(:version => 20151203200008) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -302,6 +302,8 @@ ActiveRecord::Schema.define(:version => 20151104123943) do
     t.datetime "updated_at",                                                :null => false
     t.boolean  "google_apps_email",                      :default => false
     t.string   "email_forward"
+    t.integer  "tou_status",                             :default => 0,     :null => false
+    t.datetime "tou_status_date"
   end
 
   add_index "people", ["email"], :name => "email_ndx", :unique => true

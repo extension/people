@@ -18,6 +18,7 @@ class Person < ActiveRecord::Base
   attr_accessible :position_id, :position, :location_id, :location, :county_id, :county, :institution_id, :institution
   attr_accessible :invitation, :invitation_id
   attr_accessible :last_account_reminder, :password_reset, :google_apps_email, :email_forward
+  attr_accessible :tou_status, :tou_status_date
 
 
   auto_strip_attributes :first_name, :last_name, :email, :title, :affiliation, :squish => true
@@ -46,7 +47,12 @@ class Person < ActiveRecord::Base
 
   STATUS_OK = 100
 
-  #
+  # Terms of Use status
+  TOU_NOT_PRESENTED = 0
+  TOU_PRESENTED = 1
+  TOU_NEXT_LOGIN = 2
+  TOU_HALT = 7
+  TOU_ACCEPTED = 42
 
   ## validations
   validates :first_name, :presence => true
@@ -1354,6 +1360,36 @@ class Person < ActiveRecord::Base
     # insert / update user
     blogsuser = self.update_blogs_user
     blogsuser.add_to_blog(blog, role)
+  end
+
+  def present_tou_interstitial?
+    if(!Settings.limit_tou.blank?)
+      if(!(self.connected_communities.map(&:id) & Settings.limit_tou).blank?)
+        self.tou_status != TOU_ACCEPTED
+      end
+    else
+      self.tou_status != TOU_ACCEPTED
+    end
+  end
+
+  def set_tou_status(status = nil)
+    if(status.blank?)
+      case self.tou_status
+      when TOU_NOT_PRESENTED
+        status = TOU_PRESENTED
+      when TOU_PRESENTED
+        status = TOU_NEXT_LOGIN
+      when TOU_NEXT_LOGIN
+        status = TOU_HALT
+      when TOU_HALT
+        return false
+      when TOU_ACCEPTED
+        return false
+      else
+        return false
+      end
+    end
+    self.update_attributes(tou_status: status, tou_status_date: Time.now)
   end
 
 

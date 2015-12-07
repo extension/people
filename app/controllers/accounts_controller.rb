@@ -84,15 +84,15 @@ class AccountsController < ApplicationController
       elsif(!params[:person][:password] or params[:person][:password].length < 8)
         @person.errors.add(:password, "Your new password must be a minimum of 8 characters".html_safe)
       elsif(!params[:person][:password_confirmation] or (params[:person][:password_confirmation] != params[:person][:password]))
-        @person.errors.add(:password, "Your password confirmation did not match the new password.".html_safe)        
+        @person.errors.add(:password, "Your password confirmation did not match the new password.".html_safe)
       else
         @person.password = params[:person][:password]
         if(@person.set_hashed_password(save: true))
           @person.clear_reset_token
           Notification.create(:notification_type => Notification::PASSWORD_RESET, :notifiable => @person)
-          Activity.log_activity(person_id: @person.id, 
-                                activitycode: Activity::PASSWORD_RESET, 
-                                ip_address: request.remote_ip)            
+          Activity.log_activity(person_id: @person.id,
+                                activitycode: Activity::PASSWORD_RESET,
+                                ip_address: request.remote_ip)
           flash[:notice] = 'Your password has been changed. Please sign-in with your new password.'
           return redirect_to(signin_url)
         end
@@ -107,7 +107,7 @@ class AccountsController < ApplicationController
       return redirect_to(accounts_pending_confirmation_url)
     else
       flash[:notice] = 'No need to resend confirmation, your email address is confirmed.'
-      return redirect_to(root_url)     
+      return redirect_to(root_url)
     end
   end
 
@@ -132,13 +132,13 @@ class AccountsController < ApplicationController
     else
       return render(:template => 'accounts/invalid_token')
     end
-  end    
+  end
 
   def post_signup
   end
 
   def pending_confirmation
-  end  
+  end
 
 
   def signup
@@ -146,7 +146,7 @@ class AccountsController < ApplicationController
     if(!request.post?)
       return render(template: 'accounts/eligibility_notice')
     end
-      
+
     if params[:person]
       @person = Person.new(params[:person])
     else
@@ -156,15 +156,15 @@ class AccountsController < ApplicationController
     if(!params[:invite].nil?)
       @invitation = Invitation.find_by_token(params[:invite])
     end
-    
+
     @locations = Location.order('entrytype,name')
-    if(!(@person.location.nil?))  
+    if(!(@person.location.nil?))
       @countylist = @person.location.counties
     end
-    
+
     # html only
     respond_to do |format|
-      format.html 
+      format.html
     end
   end
 
@@ -175,15 +175,18 @@ class AccountsController < ApplicationController
       return render(:action => "signup")
     end
 
- 
+
     if(!params[:invite].nil? and @invitation = Invitation.find_by_token(params[:invite]))
       @person.invitation = @invitation
     end
 
     # STATUS_SIGNUP
-    @person.account_status = Person::STATUS_SIGNUP    
+    @person.account_status = Person::STATUS_SIGNUP
     @person.last_activity_at = Time.zone.now
-    
+
+    @person.tou_status = Person::TOU_ACCEPTED
+    @person.tou_status_date = Time.zone.now
+
     if(@person.save)
       # automatically log them in
       set_current_person(@person)
@@ -216,7 +219,7 @@ class AccountsController < ApplicationController
         end
       end
       return redirect_to(accounts_contributor_agreement_url)
-    end 
+    end
   end
 
 
@@ -228,7 +231,7 @@ class AccountsController < ApplicationController
       flash[:notice] = "You have already confirmed your email address"
       return redirect_to(root_url)
     end
-    
+
     flash[:notice] = "Thank you for confirming your email address"
     current_person.confirm_signup({ip_address: request.remote_ip})
     if(current_person.vouched?)
@@ -243,11 +246,11 @@ class AccountsController < ApplicationController
       flash[:notice] = "You have already confirmed your email address"
       return redirect_to(root_url)
     end
-    
+
     flash[:notice] = "Thank you for confirming your email address"
     current_person.confirm_email({ip_address: request.remote_ip})
     return redirect_to(root_url)
-  end 
+  end
 
 
   def explain_auth_result(resultcode)

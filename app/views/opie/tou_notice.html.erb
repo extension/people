@@ -1,0 +1,23 @@
+<%- @page_title = "eXtension Terms of Use Notice" -%>
+
+<div class='row'>
+  <div class="col-md-12">
+    <div class="well">
+    <%= form_tag(@tou_url) do -%>
+      <fieldset>
+        <h3>eXtension.org Terms of Use</h3>
+        <p>
+          Using and contributing to extension.org websites requires that you read and accept the
+          <a href="https://extension.org/terms-of-use/" target="_blank">eXtension Terms of Use</a>
+        </p>
+        <p>
+          <%= submit_tag "I accept the Terms of Use", :class => "btn btn-default" %>
+          <%- if ([Person::TOU_NOT_PRESENTED, Person::TOU_PRESENTED].include?(current_person.tou_status)) -%>
+            <%= submit_tag "Remind me next login", :class => "btn btn-link" %>
+          <%- end -%>
+        </p>
+      </fieldset>
+    <%- end -%>
+    </div>
+  </div>
+</div>
