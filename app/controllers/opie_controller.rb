@@ -63,10 +63,11 @@ class OpieController < ApplicationController
 
     if opierequest.kind_of?(CheckIDRequest)
       if is_authorized?(opierequest.id_select,opierequest.identity, opierequest.trust_root)
-        if(opierequest.trust_root =~ %r{extension\.org})
+        if(opierequest.trust_root =~ %r{extension\.org} or opierequest.trust_root =~ %r{\.dev$})
           if(current_person.present_tou_interstitial?)
             session[:last_opierequest] = opierequest
             current_person.set_tou_status
+            @tou_url = url_for(:controller => 'opie', :action => 'tou_notice', :protocol => ((Settings.app_location == 'localdev') ? 'http://': 'https://'))
             return render(:template => 'opie/tou_notice', :layout => 'application')
           end
         end
@@ -89,7 +90,7 @@ class OpieController < ApplicationController
         if (checklogin(opierequest.id_select,opierequest.identity,opierequest.trust_root))
           session[:last_opierequest] = opierequest
           @opierequest = opierequest
-          @desicionurl = url_for(:controller => 'opie', :action => 'decision', :protocol => ((Settings.app_location == 'localdev') ? 'http://': 'https://'))
+          @decisionurl = url_for(:controller => 'opie', :action => 'decision', :protocol => ((Settings.app_location == 'localdev') ? 'http://': 'https://'))
           sregrequest = OpenID::SReg::Request.from_openid_request(opierequest)
           if(!sregrequest.nil?)
             askedfields = (sregrequest.required+sregrequest.optional).uniq
@@ -203,6 +204,44 @@ class OpieController < ApplicationController
       session[:last_opierequest] = nil
       return render_response(response)
     end
+  end
+
+  def tou_notice
+    opierequest = session[:last_opierequest]
+    if(opierequest.nil?)
+      # intentionally crash it
+      return redirect_to(people_welcome_url)
+    end
+
+    if(params[:commit].blank?)
+      session[:last_opierequest] = nil
+      return render(layout: 'application')
+    elsif(params[:commit] == 'Remind me next login')
+      if([Person::TOU_NOT_PRESENTED, Person::TOU_PRESENTED, Person::TOU_NEXT_LOGIN].include?(current_person.tou_status))
+        current_person.set_tou_status
+        # keep going
+      else
+        session[:last_opierequest] = nil
+        return render(layout: 'application')
+      end
+    elsif(params[:commit] == 'Continue')
+      current_person.set_tou_status(Person::TOU_ACCEPTED)
+    end
+
+    server_url = url_for(:action => 'index', :protocol => 'https://')
+    if(opierequest.id_select)
+      if(opierequest.message.is_openid1)
+        response = opierequest.answer(true,server_url,current_person.openid_url)
+      else
+        response = opierequest.answer(true,nil,current_person.openid_url,current_person.openid_url)
+      end
+    else
+      response = opierequest.answer(true)
+    end
+    add_sreg(opierequest, response)
+    Activity.log_remote_auth_success(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip)
+    session[:last_opierequest] = nil
+    return render_response(response)
   end
 
   def idp_xrds

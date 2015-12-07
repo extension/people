@@ -18,6 +18,7 @@ class Person < ActiveRecord::Base
   attr_accessible :position_id, :position, :location_id, :location, :county_id, :county, :institution_id, :institution
   attr_accessible :invitation, :invitation_id
   attr_accessible :last_account_reminder, :password_reset, :google_apps_email, :email_forward
+  attr_accessible :tou_status, :tou_status_date
 
 
   auto_strip_attributes :first_name, :last_name, :email, :title, :affiliation, :squish => true
@@ -51,7 +52,7 @@ class Person < ActiveRecord::Base
   TOU_PRESENTED = 1
   TOU_NEXT_LOGIN = 2
   TOU_HALT = 7
-  TOU_REVIEWED = 42
+  TOU_ACCEPTED = 42
 
   ## validations
   validates :first_name, :presence => true
@@ -1371,7 +1372,7 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def set_tou_status(status)
+  def set_tou_status(status = nil)
     if(status.blank?)
       case self.tou_status
       when TOU_NOT_PRESENTED

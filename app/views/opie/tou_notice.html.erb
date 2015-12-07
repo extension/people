@@ -3,13 +3,20 @@
 <div class='row'>
   <div class="col-md-12">
     <div class="well">
-    <%= form_tag() do -%>
+    <%= form_tag(@tou_url) do -%>
       <fieldset>
         <h3>eXtension.org Terms of Use</h3>
-        <p>Using and contributing to extension.org websites requires that you read and accept the
+        <p>
+          Using and contributing to extension.org websites requires that you read and accept the
           <a href="https://extension.org/terms-of-use" target="_blank">eXtension Terms of Use</a>
-          Continuing ahead indicates that you have read and accept these terms.</p>
-        <p><%= submit_tag "Continue", :class => "btn" %> <%= submit_tag "Deny", :class => "btn" %></p>
+          Continuing ahead indicates that you have read and accept these terms.
+        </p>
+        <p>
+          <%= submit_tag "Continue", :class => "btn btn-default" %>
+          <%- if ([Person::TOU_NOT_PRESENTED, Person::TOU_PRESENTED].include?(current_person.tou_status)) -%>
+            <%= submit_tag "Remind me next login", :class => "btn btn-link" %>
+          <%- end -%>
+        </p>
       </fieldset>
     <%- end -%>
     </div>
