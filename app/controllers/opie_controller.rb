@@ -178,7 +178,7 @@ class OpieController < ApplicationController
       else
         # intentionally crash it
         flash[:failure] = "An error occurred during your OpenID login.  Please return to the site you were using and try again."
-        return redirect_to(people_welcome_url)
+        return redirect_to(root_url)
       end
     end
 
@@ -208,10 +208,10 @@ class OpieController < ApplicationController
 
   def tou_notice
     opierequest = session[:last_opierequest]
-    if(opierequest.nil?)
-      # intentionally crash it
-      return redirect_to(people_welcome_url)
-    end
+    # if(opierequest.nil?)
+    #   # intentionally crash it
+    #   return redirect_to(root_url)
+    # end
 
     if(params[:commit].blank?)
       session[:last_opierequest] = nil
