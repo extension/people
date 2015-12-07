@@ -208,10 +208,10 @@ class OpieController < ApplicationController
 
   def tou_notice
     opierequest = session[:last_opierequest]
-    # if(opierequest.nil?)
-    #   # intentionally crash it
-    #   return redirect_to(root_url)
-    # end
+    if(opierequest.nil? and params[:demoview].blank?)
+      # intentionally crash it
+      return redirect_to(root_url)
+    end
 
     if(params[:commit].blank?)
       session[:last_opierequest] = nil
