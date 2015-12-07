@@ -224,7 +224,7 @@ class OpieController < ApplicationController
         session[:last_opierequest] = nil
         return render(layout: 'application')
       end
-    elsif(params[:commit] == 'Continue')
+    elsif(params[:commit] == 'I accept the Terms of Use')
       current_person.set_tou_status(Person::TOU_ACCEPTED)
     end
 
