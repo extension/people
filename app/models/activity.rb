@@ -55,6 +55,12 @@ class Activity < ActiveRecord::Base
   PASSWORD_RESET_REQUEST              = 120
   PASSWORD_RESET                      = 121
 
+  # TOU ACTIVITY
+  TOU_PRESENTED                       = 131
+  TOU_NEXT_LOGIN                      = 132
+  TOU_HALT                            = 133
+  TOU_ACCEPTED                        = 134
+
   # COMMUNITY
   COMMUNITY_CREATE                    = 200
   COMMUNITY_JOIN                      = 201
@@ -74,7 +80,6 @@ class Activity < ActiveRecord::Base
 
   COMMUNITY_UPDATE_INFORMATION        = 401
   COMMUNITY_CREATED_LIST              = 402
-
 
   # ADMIN
   ENABLE_ACCOUNT                      = 1003
@@ -115,7 +120,12 @@ class Activity < ActiveRecord::Base
   COMMUNITY_UPDATE_INFORMATION        => 'community_update_information',
   COMMUNITY_CREATED_LIST              => 'community_created_list',
   ENABLE_ACCOUNT                      => 'enable_account',
-  RETIRE_ACCOUNT                      => 'retire_account'}
+  RETIRE_ACCOUNT                      => 'retire_account',
+  TOU_PRESENTED                       => 'tou_presented',
+  TOU_NEXT_LOGIN                      => 'tou_next_login',
+  TOU_HALT                            => 'tou_halt',
+  TOU_ACCEPTED                        => 'tou_accepted'}
+
 
   PRIVATE_ACTIVITIES = [AUTH_LOCAL_FAILURE,PASSWORD_RESET_REQUEST,PASSWORD_RESET,PASSWORD_CHANGE]
 
@@ -157,6 +167,30 @@ class Activity < ActiveRecord::Base
     elsif ADMIN_RANGE.include?(self.activitycode)
       self.activityclass = ADMIN
     end
+  end
+
+  def self.log_tou_activity(options = {})
+    person = options[:person]
+    logger.debug(person.tou_status)
+    case person.tou_status
+    when Person::TOU_PRESENTED
+      activitycode = TOU_PRESENTED
+    when Person::TOU_NEXT_LOGIN
+      activitycode = TOU_NEXT_LOGIN
+    when Person::TOU_HALT
+      activitycode = TOU_HALT
+    when Person::TOU_ACCEPTED
+      activitycode = TOU_ACCEPTED
+    else
+      return nil
+    end
+
+    create_parameters = {}
+    create_parameters[:site] = 'local'
+    create_parameters[:person_id] = person.id
+    create_parameters[:activitycode] = activitycode
+    create_parameters[:ip_address] = options[:ip_address] || 'unknown'
+    self.create(create_parameters)
   end
 
   def self.log_activity(options = {})

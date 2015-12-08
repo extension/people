@@ -67,6 +67,7 @@ class OpieController < ApplicationController
           if(current_person.present_tou_interstitial?)
             session[:last_opierequest] = opierequest
             current_person.set_tou_status
+            Activity.log_tou_activity(:person => current_person,:ip_address => request.remote_ip)
             @tou_url = url_for(:controller => 'opie', :action => 'tou_notice', :protocol => ((Settings.app_location == 'localdev') ? 'http://': 'https://'))
             return render(:template => 'opie/tou_notice', :layout => 'application')
           end
@@ -219,13 +220,16 @@ class OpieController < ApplicationController
     elsif(params[:commit] == 'Remind me next login')
       if([Person::TOU_NOT_PRESENTED, Person::TOU_PRESENTED, Person::TOU_NEXT_LOGIN].include?(current_person.tou_status))
         current_person.set_tou_status
+        Activity.log_tou_activity(:person => current_person,:ip_address => request.remote_ip)
         # keep going
       else
+        Activity.log_tou_activity(:person => current_person,:ip_address => request.remote_ip)
         session[:last_opierequest] = nil
         return render(layout: 'application')
       end
     elsif(params[:commit] == 'I accept the Terms of Use')
       current_person.set_tou_status(Person::TOU_ACCEPTED)
+      Activity.log_tou_activity(:person => current_person,:ip_address => request.remote_ip)
     end
 
     server_url = url_for(:action => 'index', :protocol => 'https://')

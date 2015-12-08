@@ -25,7 +25,7 @@ en:
       interest: 'Interest'
   email:
     subjects:
-      email_confirmation: 'eXtension: Please confirm your email address' 
+      email_confirmation: 'eXtension: Please confirm your email address'
   activity:
     auth_local_success: "%{persontext}signed in to People"
     auth_local_failure: "%{persontext}was unable to sign in to People"
@@ -58,12 +58,16 @@ en:
     community_invitedasleader: "%{persontext}invited %{colleaguetext} to join the %{communitytext} as a leader"
     community_invitedasmember: "%{persontext}invited %{colleaguetext} to join the %{communitytext} as a member"
     community_addedasleader: "%{persontext}added %{colleaguetext} to the %{communitytext} as a leader"
-    community_addedasmember: "%{persontext}added %{colleaguetext} to the %{communitytext} as a member"  
+    community_addedasmember: "%{persontext}added %{colleaguetext} to the %{communitytext} as a member"
     community_removedasleader: "%{persontext}removed %{colleaguetext} from the leadership of %{communitytext}"
     community_removedasmember: "%{persontext}removed %{colleaguetext} from the membership of %{communitytext}"
     community_rescindinvitation: "%{persontext}rescinded the invitation for %{colleaguetext} to join the %{communitytext}"
-    community_update_information: "%{persontext}updated the community information for the %{communitytext}"    
+    community_update_information: "%{persontext}updated the community information for the %{communitytext}"
     community_created_list:  "%{persontext}created a mailing list for the %{communitytext}"
     enable_account: "%{persontext}enabled the account for %{colleaguetext}"
     retire_account: "%{persontext}retired the account for %{colleaguetext}"
+    tou_presented: "%{persontext}was presented the Terms of Use acceptance"
+    tou_next_login: "%{persontext}deferred Terms of Use acceptance to the next login"
+    tou_halt: "%{persontext}was halted at the Terms of Use acceptance"
+    tou_accepted: "%{persontext}accepted the Terms of Use"
     unknown: "%{persontext}performed an unknown action."
