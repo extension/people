@@ -116,6 +116,12 @@ gem 'google-api-client'
 # backport of handling json parser errors
 gem 'robust_params_parser'
 
+# slack integration
+gem "slack-notifier"
+
+# markdown markup
+gem 'reverse_markdown'
+
 group :development do
   # require the powder gem
   gem 'powder'

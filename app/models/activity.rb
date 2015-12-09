@@ -7,6 +7,8 @@
 
 class Activity < ActiveRecord::Base
   ## includes
+  include Rails.application.routes.url_helpers
+  default_url_options[:host] = Settings.urlwriter_host
 
   ## attributes
   serialize :additionaldata
@@ -55,6 +57,12 @@ class Activity < ActiveRecord::Base
   PASSWORD_RESET_REQUEST              = 120
   PASSWORD_RESET                      = 121
 
+  # TOU ACTIVITY
+  TOU_PRESENTED                       = 131
+  TOU_NEXT_LOGIN                      = 132
+  TOU_HALT                            = 133
+  TOU_ACCEPTED                        = 134
+
   # COMMUNITY
   COMMUNITY_CREATE                    = 200
   COMMUNITY_JOIN                      = 201
@@ -74,7 +82,6 @@ class Activity < ActiveRecord::Base
 
   COMMUNITY_UPDATE_INFORMATION        = 401
   COMMUNITY_CREATED_LIST              = 402
-
 
   # ADMIN
   ENABLE_ACCOUNT                      = 1003
@@ -115,7 +122,12 @@ class Activity < ActiveRecord::Base
   COMMUNITY_UPDATE_INFORMATION        => 'community_update_information',
   COMMUNITY_CREATED_LIST              => 'community_created_list',
   ENABLE_ACCOUNT                      => 'enable_account',
-  RETIRE_ACCOUNT                      => 'retire_account'}
+  RETIRE_ACCOUNT                      => 'retire_account',
+  TOU_PRESENTED                       => 'tou_presented',
+  TOU_NEXT_LOGIN                      => 'tou_next_login',
+  TOU_HALT                            => 'tou_halt',
+  TOU_ACCEPTED                        => 'tou_accepted'}
+
 
   PRIVATE_ACTIVITIES = [AUTH_LOCAL_FAILURE,PASSWORD_RESET_REQUEST,PASSWORD_RESET,PASSWORD_CHANGE]
 
@@ -124,6 +136,7 @@ class Activity < ActiveRecord::Base
   ## filters
   before_save :set_activity_class
   before_save :check_privacy_flag
+  after_create :queue_slack_notification
 
   ## associations
   belongs_to :person
@@ -157,6 +170,30 @@ class Activity < ActiveRecord::Base
     elsif ADMIN_RANGE.include?(self.activitycode)
       self.activityclass = ADMIN
     end
+  end
+
+  def self.log_tou_activity(options = {})
+    person = options[:person]
+    logger.debug(person.tou_status)
+    case person.tou_status
+    when Person::TOU_PRESENTED
+      activitycode = TOU_PRESENTED
+    when Person::TOU_NEXT_LOGIN
+      activitycode = TOU_NEXT_LOGIN
+    when Person::TOU_HALT
+      activitycode = TOU_HALT
+    when Person::TOU_ACCEPTED
+      activitycode = TOU_ACCEPTED
+    else
+      return nil
+    end
+
+    create_parameters = {}
+    create_parameters[:site] = 'local'
+    create_parameters[:person_id] = person.id
+    create_parameters[:activitycode] = activitycode
+    create_parameters[:ip_address] = options[:ip_address] || 'unknown'
+    self.create(create_parameters)
   end
 
   def self.log_activity(options = {})
@@ -412,6 +449,100 @@ class Activity < ActiveRecord::Base
       returnhash[grouped_object.site] = {:last_login_at => grouped_object.last_login_at, :login_count => grouped_object.login_count}
     end
     returnhash
+  end
+
+  def queue_slack_notification
+    if(Settings.sidekiq_enabled)
+      self.class.delay.delayed_slack_notification(self.id)
+    else
+      self.slack_notification
+    end
+  end
+
+  def self.delayed_slack_notification(record_id)
+    if(record = find_by_id(record_id))
+      record.slack_notification
+    end
+  end
+
+  def slack_notification
+    return false if(self.is_private?)
+    post_options = {}
+    post_options[:channel] = Settings.activity_slack_channel
+    if(Settings.app_location == 'production')
+      post_options[:username] = "People Activity Notification"
+    else
+      post_options[:username] = "[Development] People Activity Notification"
+    end
+    post_options[:message] = ReverseMarkdown.convert(self.activity_string)
+    SlackNotification.post(post_options)
+    true
+  end
+
+  def activity_string(options = {})
+
+    hide_community_text = options[:hide_community_text] || false
+    hide_person_text = options[:hide_person_text] || false
+    nolink = options[:nolink] || false
+
+    text_macro_options = {}
+
+    # note space on the end of link - required in string formatting
+
+    if(self.person_id.blank? and self.activitycode == Activity::AUTH_LOCAL_FAILURE)
+      # special case of showing additional information for authentication failures
+      text_macro_options[:persontext]  = hide_person_text ? '' : "#{self.additionalinfo} (unknown account) "
+    else
+      text_macro_options[:persontext]  = hide_person_text ? '' : "#{self.link_to_person(self.person,{nolink: nolink})} "
+    end
+
+    if(self.activitycode == Activity::AUTH_REMOTE_SUCCESS)
+      text_macro_options[:site] =  self.site
+    end
+
+
+    text_macro_options[:communitytext]  = hide_community_text ? 'community' : "#{self.link_to_community(self.community,{nolink: nolink})} community"
+    text_macro_options[:colleaguetext] =  "#{self.link_to_person(self.colleague,{nolink: nolink, show_unknown: true})}"
+
+    if(self.activitycode == Activity::INVITATION)
+      text_macro_options[:emailaddress] =  self.additionalinfo
+    end
+
+    if(self.activitycode == Activity::EMAIL_CHANGE)
+      text_macro_options[:current_email] =  (self.person.email || 'unknown')
+      text_macro_options[:previous_email] =  (self.person.previous_email || 'unknown')
+    end
+
+    I18n.translate("activity.#{self.activitycode_to_s}",text_macro_options).html_safe
+
+  end
+
+  def link_to_person(person,options = {})
+    show_unknown = options[:show_unknown] || false
+    show_systemuser = options[:show_systemuser] || false
+    nolink = options[:nolink] || false
+
+    if person.nil?
+      show_unknown ? 'Unknown' : 'System'
+    elsif(person.id == 1 and !show_systemuser)
+      'System'
+    elsif(nolink)
+      "#{person.fullname}"
+    else
+      ActionController::Base.helpers.link_to(person.fullname,person_url(person),class: 'person').html_safe
+    end
+  end
+
+  def link_to_community(community,options = {})
+    nolink = options[:nolink] || false
+
+    if community.nil?
+      '[unknown community]'
+    elsif(nolink)
+      "#{community.name}"
+    else
+      ActionController::Base.helpers.link_to(community.name,community_path(community)).html_safe
+    end
   end
 
 end

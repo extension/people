@@ -32,3 +32,6 @@ sync_google: false
 token_salt: 'use_local_settings'
 urlwriter_host: 'people.dev'
 www_database: 'use_local_settings'
+slack_webhook: 'use_local_settings'
+default_slack_channel: "use_local_settings"
+activity_slack_channel: "use_local_settings"
