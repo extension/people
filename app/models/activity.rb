@@ -466,10 +466,14 @@ class Activity < ActiveRecord::Base
   end
 
   def slack_notification
-    return false if self.is_private?
+    return false if(self.is_private?)
     post_options = {}
     post_options[:channel] = Settings.activity_slack_channel
-    post_options[:username] = "People Activity Notification"
+    if(Settings.app_location == 'production')
+      post_options[:username] = "People Activity Notification"
+    else
+      post_options[:username] = "[Development] People Activity Notification"
+    end
     post_options[:message] = ReverseMarkdown.convert(self.activity_string)
     SlackNotification.post(post_options)
     true
