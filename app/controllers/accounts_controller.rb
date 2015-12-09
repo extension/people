@@ -171,7 +171,7 @@ class AccountsController < ApplicationController
   def create
     @person = Person.new(params[:person])
     if(@person.email =~ /extension\.org$/i)
-      @person.errors.add(:email, "For technical reasons, signing up with an extension.org email address is not possible.".html_safe)
+      @person.errors.add(:email, "For technical reasons, signing up with an eXtension.org email address is not possible.".html_safe)
       return render(:action => "signup")
     end
 
