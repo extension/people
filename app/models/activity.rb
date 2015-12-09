@@ -474,7 +474,18 @@ class Activity < ActiveRecord::Base
     else
       post_options[:username] = "[Development] People Activity Notification"
     end
-    post_options[:message] = ReverseMarkdown.convert(self.activity_string)
+
+    attachment = { "fallback" => "#{self.activity_string(:nolink => true)}",
+    "mrkdwn_in" => ["fields"],
+    "fields" => [
+      {
+        "value" => "#{Slack::Notifier::LinkFormatter.format(ReverseMarkdown.convert(self.activity_string))}",
+        "short" => false
+      },
+    ],
+    "color" => "good"
+    }
+    post_options[:attachment] = attachment
     SlackNotification.post(post_options)
     true
   end
@@ -541,7 +552,7 @@ class Activity < ActiveRecord::Base
     elsif(nolink)
       "#{community.name}"
     else
-      ActionController::Base.helpers.link_to(community.name,community_path(community)).html_safe
+      ActionController::Base.helpers.link_to(community.name,community_url(community)).html_safe
     end
   end
 
