@@ -18,5 +18,5 @@
   .people-header .navbar-nav > li {float:none; display:inline;}
   .people-header .navbar-nav > li > a {color: #999; padding-top:5px; padding-bottom:5px; display:inline;}
   .people-header .navbar-nav > li > a:hover  {color:#fff; background: #000;}
-  .header-navbar-collapse {margin-left: -14px !important; margin-right:-14px !important;}
+  .header-navbar-collapse {margin-left: -15px !important; margin-right:-15px !important;}
 }
