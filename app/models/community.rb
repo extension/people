@@ -70,9 +70,9 @@ class Community < ActiveRecord::Base
                               community_connections.sendnotifications as sendnotifications,
                               people.*"
 
-  has_many :google_groups
-  has_many :activities
-  has_many :community_syncs
+  has_many :google_groups, :dependent => :destroy
+  has_many :activities, :dependent => :destroy
+  has_many :community_syncs, :dependent => :destroy
 
   scope :approved, where(entrytype: APPROVED)
   scope :institutions, where(entrytype: INSTITUTION)
