@@ -44,10 +44,6 @@ class SlackBot < ActiveRecord::Base
     helptext = "The /people command queries https://people.extension.org for information\n"
     helptext += "Available subcommands are:\n"
     helptext += "/people find [searchterm]  : searches people for the name or idstring\n"
-    helptext += " \n"
-    helptext += "/engbot purpose search_string : searches the server purpose for search_string and returns all matching records\n"
-    helptext += "    e.g. /engbot purpose rails\n"
-    helptext += "/engbot hodor : returns a hodor heartbeat\n"
     return(self.message = helptext)
   end
 
