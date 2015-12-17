@@ -14,6 +14,10 @@ People::Application.routes.draw do
 
   root :to => 'home#index'
 
+  # slackbot
+  match '/slackbot/ask' => 'slackbot#ask'
+
+
   # straight up redirects
   match "/account/new_password", to: redirect("/accounts/reset_password")
   match "/profile/edit", to: redirect("/people/personal_edit")

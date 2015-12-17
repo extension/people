@@ -35,3 +35,4 @@ www_database: 'use_local_settings'
 slack_webhook: 'use_local_settings'
 default_slack_channel: "use_local_settings"
 activity_slack_channel: "use_local_settings"
+slackbot_token: 'use_local_settings'
