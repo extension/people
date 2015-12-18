@@ -1,0 +1,43 @@
+<%- @page_title = "#{@community.name}" -%>
+
+<style media="screen" type="text/css">
+  .community-masthead {
+    background: transparent url(<%= asset_path 'community-masthead-placeholder.png' %>) center 50% no-repeat;
+  }
+</style>
+
+<div class="page-header">
+  <div class="community-masthead">
+    <h2><%= @page_title %></h2>
+  </div>
+  <p class="community-public-description"><%= description_for_community(@community) -%></p>
+</div>
+
+<div class="row">
+  <%- i = 0 -%>
+  <%- for person in @connections -%>
+    <%- i += 1 -%>
+    <div class="col-md-4 col-sm-6 col-xs-6">
+      <div class="person-profile">
+        <div class="person-profile-avatar"><%= image_tag('avatar-placeholder.png') %></div>
+        <h4 class="person-profile-name"><%= link_to("#{person.fullname}", person_path(person)) %></h4>
+        <p class="person-profile-title"><%= person.title %></p>
+
+        <div class="person-profile-social-icons">
+          <span class="fa-stack fa-lg fa-gray">
+            <i class="fa fa-circle fa-stack-2x"></i>
+            <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+          </span>
+          <span class="fa-stack fa-lg fa-gray">
+            <i class="fa fa-circle fa-stack-2x"></i>
+            <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+          </span>
+        </div>
+      </div>
+    </div>
+    <%- if i % 3 == 0 -%>
+    <div class="clearfix visible-lg-block visible-md-block"></div>
+    <% end %>
+    <%- end -%>
+
+</div>

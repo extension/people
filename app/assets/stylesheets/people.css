@@ -13,3 +13,33 @@ tr.inactive {color: #000000;}
 .interests li a:hover {text-decoration:none; background:#003ba1; color:#fff;}
 
 .person-biograhy {font-size:1.1em; margin-bottom:20px;}
+
+.community-masthead {height: 340px; margin-bottom:20px; position:relative;}
+.community-masthead h2 {padding: 20px; position: absolute; bottom: 0;}
+.fa-gray {color: #bbb;}
+/*.community-masthead img {width: 100%;}*/
+.community-public-description {font-size: 17px; color: #888;}
+.person-profile {
+  /*border: 2px solid #eee;*/
+  padding: 10px; margin-bottom:10px;}
+.person-profile-avatar {
+  /*outline:1px solid lime;*/
+  /*padding: 3em;*/
+  margin:10px 3em 20px;
+  text-align:center;
+
+}
+.person-profile-avatar img {
+  width: 100%;
+  max-width: 180px;
+  /*height: 150px;*/
+-moz-border-radius: 50%;
+-webkit-border-radius: 50%;
+/*width: 150px;*/
+}
+.person-profile-name {text-align:center;}
+.person-profile-title {text-align:center;}
+.person-profile-social-icons {text-align: center;}
+/*.public body {background: #fff;}*/
+#public .container {max-width:960px;}
+#public .people-logo {margin-top: 20px;}

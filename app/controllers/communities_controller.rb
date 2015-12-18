@@ -124,6 +124,13 @@ class CommunitiesController < ApplicationController
     @connections = @community.connected(connection).order('people.last_name').page(params[:page])
   end
 
+  def profile
+    @community = Community.find_by_shortname_or_id(params[:id])
+    @connections = @community.people.order('people.last_name')
+    @no_show_navtabs = true
+    return render(layout: 'public')
+  end
+
   def invite
     @community = Community.find_by_shortname_or_id(params[:id])
     member_breadcrumbs(['Invite colleagues'])

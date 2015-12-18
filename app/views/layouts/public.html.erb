@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= @page_title %></title>
+    <meta name="robots" content="noindex" />
+    <%= stylesheet_link_tag    "application" %>
+    <%= javascript_include_tag "application" %>
+    <!--[if lt IE 9]>
+      <%= javascript_include_tag 'html5shiv' %>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <%= csrf_meta_tags %>
+    <%= render(partial: 'shared/google_tracking') %>
+    <%- if !@openidmeta.nil? -%>
+      <%= @openidmeta -%>
+    <%- end -%>
+  </head>
+  <body id='public'>
+
+    <nav class="collapse navbar-collapse header-navbar-collapse">
+      <%= javascript_include_tag "https://assets.extension.org/javascripts/global_shortcuts_bar_public.js" %>
+    </nav>
+
+    <%- if (Settings.app_location == 'demo') || (Settings.app_location == 'dev') -%>
+      <div id="app_location" class="demo">
+        <p class='text-center'>You are viewing the People development/demonstration site. The data on this site is regularly deleted for development purposes.</p>
+      </div>
+    <% end %>
+
+    <div class="container" id="main">
+      <%= link_to(image_tag('people_logo_ithree_tagline.png', {class: "people-logo hidden-xs"}).html_safe,root_path) %>
+
+      <%= yield %>
+    </div>
+
+
+    <footer class="container footer">
+      <ul class="list-inline">
+          <li><%= link_to "Contact Us", help_path %></li>
+          <li><%= link_to("Privacy","http://www.extension.org/main/privacy")%></li>
+          <li><%= link_to("Terms of Use","https://extension.org/terms-of-use/")%></li>
+          <li><%= link_to("Contributor Agreement",accounts_contributor_agreement_path)%></li>
+      </ul>
+    </footer>
+
+  </body>
+</html>
