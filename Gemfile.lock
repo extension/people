@@ -292,7 +292,7 @@ DEPENDENCIES
   capistrano (~> 2.15.5)
   coffee-rails (~> 3.2.1)
   csspool
-  extension-html5shiv-rails
+  extension-html5shiv-rails!
   font-awesome-rails
   geocoder
   geoip
