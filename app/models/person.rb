@@ -9,6 +9,7 @@ class Person < ActiveRecord::Base
   include BCrypt
   include CacheTools
   include MarkupScrubber
+
   serialize :password_reset
   serialize :admin_flags
   attr_accessor :password, :current_password, :password_confirmation, :interest_tags
@@ -19,9 +20,13 @@ class Person < ActiveRecord::Base
   attr_accessible :invitation, :invitation_id
   attr_accessible :last_account_reminder, :password_reset, :google_apps_email, :email_forward
   attr_accessible :tou_status, :tou_status_date
+  attr_accessible :avatar, :avatar_cache, :remove_avatar
 
 
   auto_strip_attributes :first_name, :last_name, :email, :title, :affiliation, :squish => true
+
+  # specify image uploader for carrierwave
+  mount_uploader :avatar, AvatarUploader
 
   ## constants
   DEFAULT_TIMEZONE = 'America/New_York'

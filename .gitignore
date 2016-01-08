@@ -26,6 +26,8 @@
 /config/geoip
 /config/googleapi
 
+# uploads
+public/uploads
 
 # ignore openid dir - it's symlinked on deploy
 /openid

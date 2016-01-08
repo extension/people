@@ -121,6 +121,10 @@ gem "slack-notifier"
 # markdown markup
 gem 'reverse_markdown'
 
+# image upload and processing
+gem 'rmagick'
+gem 'carrierwave', "~> 0.10.0"
+
 group :development do
   # require the powder gem
   gem 'powder'

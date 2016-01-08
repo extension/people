@@ -5,9 +5,9 @@
 </div>
 
 <div class="row">
+  <%= form_for @person, :html => { :class => 'form-horizontal' } do |f| -%>
   <div class="col-md-7">
 
-    <%= form_for @person, :html => { :class => 'form-horizontal' } do |f| -%>
 
     <%- if @person.errors.present? -%>
       <div class="col-md-offset-4 col-md-8">
@@ -47,12 +47,13 @@
 
       <%- if(current_person == @person or current_person.is_admin? ) -%>
       <div class="form-group">
-        <label for="email" class="col-md-4 control-label">Email</label>
+        <label for="email" class="col-md-4 control-label">* Email</label>
         <div class="col-md-6">
           <%= f.text_field :email, :class => "form-control", :placeholder => 'Email' %>
         </div>
       </div>
       <%- end -%>
+
 
       <div class="form-group">
         <label for="phone" class="col-md-4 control-label">Phone number</label>
@@ -142,32 +143,41 @@
         </div>
       </div>
 
-    <% end %>
 
   </div>
 
-      <%- if !Person::RESTRICTED_ACCOUNTS.include?(@person.id) -%>
-      <div class="col-md-offset-1 col-md-4">
-        <%- if(@person.retired?) -%>
-          <%= render(partial: 'retired_notice', locals: {person: @person, retired_account: @person.retired_account}) %>
-          <div class="well">
-            <p><%= link_to('Restore this account',restore_person_path(@person), :class => "btn btn-default", :method => :post) %></p>
-          </div>
-        <%- else -%>
-        <div class="well">
-        <%- if current_person == @person -%>
-          <h4>Retired?</h4>
-          <p>If you are no longer working or associated with Extension, you can retire your account.</p>
-          <p><%= link_to('Retire my account',retire_person_path(@person), :class => "btn btn-default") %></p>
-          <%- else -%>
-          <h4>Retire this account?</h4>
-          <p>If <%= @person.fullname %> is no longer working or associated with Extension, you can retire their account.</p>
-          <p><%= link_to('Retire this account',retire_person_path(@person), :class => "btn btn-default") %></p>
-        <%- end -%>
-        </div>
-        <%- end -%>
-      </div>
+  <div class="col-md-offset-1 col-md-4">
+    <div class="form-group">
+      <legend>Current profile picture</legend>
+
+      <p>
+      <%= person_avatar(@person, {image_size: :medium}) %>
+      </p>
+
+      <%- if @person.avatar.present? -%>
+      <p class="clearing">
+      <label>
+      <%= f.check_box :remove_avatar %>
+      Remove avatar
+      </label>
+      </p>
       <%- end -%>
+
+      <legend>Upload new profile picture</legend>
+
+      <p class="clearing">
+        <%= f.file_field :avatar -%>
+        <%= f.hidden_field :avatar_cache -%>
+      </p>
+
+      <p>
+      <output id="preview_person_avatar"></output>
+      </p>
+    </div>
+  </div>
+  <% end %>
+
+  <!-- end of row -->
   </div>
 
   <script type="text/javascript">
@@ -237,4 +247,32 @@
             select.append($('<option></option>').val(option.id).html(option.name));
         });
     }
+
+    if (window.File && window.FileReader && window.FileList && window.Blob) {
+      function handleFileSelect(evt) {
+        var files = evt.target.files; // FileList object
+        // Loop through the FileList and render image files as thumbnails.
+        for (var i = 0, f; f = files[i]; i++) {
+
+          // Only process image files.
+          if (!f.type.match('image.*')) {
+            continue;
+          }
+
+          var reader = new FileReader();
+
+          // Closure to capture the file information.
+          reader.onload = (function(theFile) {
+            return function(e) {
+              // Render thumbnail.
+              $('#preview_person_avatar').html(['Profile picture preview:<br/><img class="preview_avatar" src="', e.target.result,'" title="', escape(theFile.name), '"/>'].join(''))
+            };
+          })(f);
+
+          // Read in the image file as a data URL.
+          reader.readAsDataURL(f);
+        }
+      }
+    $('#person_avatar').on('change',handleFileSelect);
+  }
 </script>
