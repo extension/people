@@ -63,7 +63,8 @@ namespace :deploy do
     ln -nfs #{shared_path}/config/googleapi #{release_path}/config/googleapi &&
     ln -nfs #{shared_path}/openid #{release_path}/openid &&
     ln -nfs #{shared_path}/tmpcache  #{release_path}/tmp/cache &&
-    ln -nfs #{shared_path}/downloads #{release_path}/tmp/downloads
+    ln -nfs #{shared_path}/downloads #{release_path}/tmp/downloads &&
+    ln -nfs #{shared_path}/uploads #{release_path}/public/uploads
     CMD
   end
 
