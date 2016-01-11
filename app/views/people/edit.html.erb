@@ -54,6 +54,34 @@
       </div>
       <%- end -%>
 
+      <div class="form-group">
+        <legend>Current profile picture</legend>
+
+        <p>
+        <%= person_avatar(@person, {image_size: :medium}) %>
+        </p>
+
+        <%- if @person.avatar.present? -%>
+        <p class="clearing">
+        <label>
+        <%= f.check_box :remove_avatar %>
+        Remove profile picture
+        </label>
+        </p>
+        <%- end -%>
+
+        <legend>Upload new profile picture</legend>
+
+        <p class="clearing">
+          <%= f.file_field :avatar -%>
+          <%= f.hidden_field :avatar_cache -%>
+        </p>
+
+        <p>
+        <output id="preview_person_avatar"></output>
+        </p>
+      </div>
+
 
       <div class="form-group">
         <label for="phone" class="col-md-4 control-label">Phone number</label>
@@ -146,36 +174,7 @@
 
   </div>
 
-  <div class="col-md-offset-1 col-md-4">
-    <div class="form-group">
-      <legend>Current profile picture</legend>
-
-      <p>
-      <%= person_avatar(@person, {image_size: :medium}) %>
-      </p>
-
-      <%- if @person.avatar.present? -%>
-      <p class="clearing">
-      <label>
-      <%= f.check_box :remove_avatar %>
-      Remove profile picture
-      </label>
-      </p>
-      <%- end -%>
-
-      <legend>Upload new profile picture</legend>
-
-      <p class="clearing">
-        <%= f.file_field :avatar -%>
-        <%= f.hidden_field :avatar_cache -%>
-      </p>
-
-      <p>
-      <output id="preview_person_avatar"></output>
-      </p>
-    </div>
-  </div>
-  <% end %>
+  <%- end # form-%>
 
   <!-- end of row -->
   </div>
