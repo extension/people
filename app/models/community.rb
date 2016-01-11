@@ -10,7 +10,7 @@ class Community < ActiveRecord::Base
   include MarkupScrubber
   attr_accessible :creator, :created_by
   attr_accessible :name, :description, :location, :location_id, :memberfilter, :connect_to_drupal
-  attr_accessible :connect_to_google_apps, :entrytype, :shortname, :publishing_community
+  attr_accessible :connect_to_google_apps, :entrytype, :shortname, :publishing_community, :is_public
 
   # hardcoded community ids
   INSTITUTIONAL_TEAMS_COMMUNITY_ID = 80
