@@ -6,6 +6,9 @@
 
 class CommunitiesController < ApplicationController
   before_filter :set_tab
+  skip_before_filter :signin_required, only: [:poster]
+  skip_before_filter :check_hold_status, only: [:poster]
+  before_filter :signin_optional, only: [:poster]
 
   def index
     @approved_joined_counts = Community.approved.connected_counts('joined')
@@ -124,10 +127,16 @@ class CommunitiesController < ApplicationController
     @connections = @community.connected(connection).order('people.last_name').page(params[:page])
   end
 
-  def profile
-    @community = Community.find_by_shortname_or_id(params[:id])
-    @connections = @community.people.order('people.last_name')
+  def poster
     @no_show_navtabs = true
+    @community = Community.find_by_shortname_or_id(params[:id])
+    if(current_person)
+      @connections = @community.connected('joined').order('people.last_name')
+    elsif(@community.is_public)
+      @connections = @community.joined_with_public_avatar.order('people.last_name')
+    else
+      return render(template: 'communities/private_poster', layout: 'public')
+    end
     return render(layout: 'public')
   end
 

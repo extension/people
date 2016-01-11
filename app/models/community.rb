@@ -171,6 +171,14 @@ class Community < ActiveRecord::Base
     end
   end
 
+  def joined_with_public_avatar
+    self.people
+        .joins(:profile_public_settings)
+        .where("profile_public_settings.item = 'avatar'")
+        .where("profile_public_settings.is_public = 1")
+        .validaccounts.where(CONNECTION_CONDITIONS['joined'])
+  end
+
   def leaders
     connected('leaders')
   end
