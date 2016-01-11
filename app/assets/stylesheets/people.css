@@ -12,7 +12,7 @@ tr.inactive {color: #000000;}
 .interests li a {text-decoration:none; background:#f2f2f2;}
 .interests li a:hover {text-decoration:none; background:#003ba1; color:#fff;}
 
-.person-biograhy {font-size:1.1em; margin-bottom:20px;}
+.person-biograhy {font-size:1.1em;}
 
 .community-masthead {height: 340px; margin-bottom:20px; position:relative;}
 .community-masthead h2 {padding: 20px; position: absolute; bottom: 0;}
@@ -29,20 +29,23 @@ tr.inactive {color: #000000;}
   text-align:center;
 
 }
+.person-profile-avatar.show-profile {
+  margin:10px 20px 20px 0;
+  text-align:left;
+  float:left;
+}
 .person-profile-avatar img {
   width: 100%;
   max-width: 180px;
-  /*height: 150px;*/
--moz-border-radius: 50%;
--webkit-border-radius: 50%;
-/*width: 150px;*/
+  max-height: 180px;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
 }
 .person-profile-name {text-align:center;}
 .person-profile-title {text-align:center;}
 .person-profile-social-icons {text-align: center;}
-/*.public body {background: #fff;}*/
 #public .container {max-width:960px;}
 #public .people-logo {margin-top: 20px;}
 
-.avatar {background:#aaa; margin-right:0.6em; float:left; border:1px solid #fff;}
+/*.avatar {background:#aaa; margin-right:0.6em; float:left; border:1px solid #fff;}*/
 .preview_avatar {background:#aaa; margin-right:0.6em; border:1px solid #fff; height:100px; }

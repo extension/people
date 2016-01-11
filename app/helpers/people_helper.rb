@@ -37,6 +37,7 @@ module PeopleHelper
   def person_avatar(person, options = {})
     image_size = options[:image_size] || :thumb
     case image_size
+      when :large     then image_size_in_px = "300x300"
       when :medium    then image_size_in_px = "100x100"
       when :thumb     then image_size_in_px = "50x50"
     end

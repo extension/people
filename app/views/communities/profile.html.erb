@@ -19,7 +19,7 @@
     <%- i += 1 -%>
     <div class="col-md-4 col-sm-6 col-xs-6">
       <div class="person-profile">
-        <div class="person-profile-avatar"><%= person_avatar(person) %></div>
+        <div class="person-profile-avatar"><%= person_avatar(person, {image_size: :large}) %></div>
         <h4 class="person-profile-name"><%= link_to("#{person.fullname}", person_path(person)) %></h4>
         <p class="person-profile-title"><%= person.title %></p>
 
