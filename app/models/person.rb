@@ -1397,6 +1397,13 @@ class Person < ActiveRecord::Base
     self.update_attributes(tou_status: status, tou_status_date: Time.now)
   end
 
+  def facebook_connections
+    self.social_networks.where(name: 'facebook')
+  end
+
+  def twitter_connections
+    self.social_networks.where(name: 'twitter')
+  end
 
   private
 

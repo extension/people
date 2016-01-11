@@ -79,6 +79,27 @@ module PeopleHelper
 
 
 
+  def social_network_url(network_and_connection)
+    if(!network_and_connection.accounturl.blank?)
+      begin
+        accounturi = URI.parse(URI.escape(network_and_connection.accounturl))
+      rescue
+        return nil
+      end
+      if(accounturi.scheme.nil?)
+        uristring = 'http://'+network_and_connection.accounturl
+      else
+        uristring = network_and_connection.accounturl
+      end
+      return uristring
+    else
+      return nil
+    end
+  end
+
+
+
+
   def social_network_link(network_and_connection)
     if(!network_and_connection.accounturl.blank?)
       begin

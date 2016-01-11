@@ -24,14 +24,29 @@
         <p class="person-profile-title"><%= person.title %></p>
 
         <div class="person-profile-social-icons">
-          <span class="fa-stack fa-lg fa-gray">
-            <i class="fa fa-circle fa-stack-2x"></i>
-            <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
-          </span>
-          <span class="fa-stack fa-lg fa-gray">
-            <i class="fa fa-circle fa-stack-2x"></i>
-            <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
-          </span>
+          <%- person.facebook_connections.each do |fbc| -%>
+            <%- if current_person or fbc.is_public? -%>
+              <%- url = social_network_url(fbc) || '#' # this should really be a helper -%>
+              <a href='<%= url -%>' title='<%= fbc.accountid -%>'
+              <span class="fa-stack fa-lg fa-gray">
+                <i class="fa fa-circle fa-stack-2x"></i>
+                <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+              </span>
+              </a>
+            <%- end -%>
+          <%- end -%>
+
+          <%- person.twitter_connections.each do |tc| -%>
+            <%- if current_person or tc.is_public? -%>
+              <%- url = social_network_url(tc) || '#' # this should really be a helper -%>
+              <a href='<%= url -%>' title='<%= tc.accountid -%>'
+                <span class="fa-stack fa-lg fa-gray">
+                  <i class="fa fa-circle fa-stack-2x"></i>
+                  <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                </span>
+              </a>
+            <%- end -%>
+          <%- end -%>
         </div>
       </div>
     </div>
