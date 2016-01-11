@@ -22,11 +22,10 @@
         <div class="person-profile-avatar"><%= person_avatar(person, {image_size: :large}) %></div>
         <h4 class="person-profile-name"><%= link_to("#{person.fullname}", person_path(person)) %></h4>
         <p class="person-profile-title"><%= person.title %></p>
-
         <div class="person-profile-social-icons">
           <%- person.facebook_connections.each do |fbc| -%>
             <%- if current_person or fbc.is_public? -%>
-              <%- url = social_network_url(fbc) || '#' # this should really be a helper -%>
+              <%- url = social_network_url(fbc) || "https://www.facebook.com/public?query=#{fbc.accountid}" # this should really be a helper -%>
               <a href='<%= url -%>' title='<%= fbc.accountid -%>'
               <span class="fa-stack fa-lg fa-gray">
                 <i class="fa fa-circle fa-stack-2x"></i>
@@ -38,7 +37,7 @@
 
           <%- person.twitter_connections.each do |tc| -%>
             <%- if current_person or tc.is_public? -%>
-              <%- url = social_network_url(tc) || '#' # this should really be a helper -%>
+              <%- url = social_network_url(tc) || "https://twitter.com/#{tc.accountid}" # this should really be a helper -%>
               <a href='<%= url -%>' title='<%= tc.accountid -%>'
                 <span class="fa-stack fa-lg fa-gray">
                   <i class="fa fa-circle fa-stack-2x"></i>
