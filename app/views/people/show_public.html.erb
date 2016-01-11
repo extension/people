@@ -2,37 +2,46 @@
 
 <%- if !@person.validaccount? -%>
 <div class="row">
-  <div class="col-md-12">
+  <div class="col-md-10 col-md-offset-1">
     <h2>Closed profile.</h2>
   </div>
 </div>
 <%- elsif @person.public_attributes[:profile_attributes].blank? -%>
 <div class="row">
-  <div class="col-md-12">
-    <h2>Private profile.</h2>
+  <div class="col-md-10 col-md-offset-1">
+    <div class='page-header'>
+    <h2>This is a private profile</h2>
+    <p>If you have an eXtension account, you can sign in <%= link_to("People", person_path(@person)) %> view this person.</p>
+
+    <% if current_person %>
+      <p><%= link_to("You can see this link because you are signed in", person_path(@person), :class => "btn btn-default") %></p>
+    <% end %>
+  </div>
   </div>
 </div>
 <%- else -%>
 
 <div class="row">
-  <div class="col-md-12">
-    <div class="page-header">
+  <div class="col-md-10 col-md-offset-1">
+    <div class="page-header clearfix">
+      <p class="person-profile-avatar show-profile"><%= person_avatar(@person, {image_size: :large}) %></p>
       <h2><%= @person.fullname %></h2>
-      <ul class='list-unstyled'>
+
         <%- if @person.public_attributes[:profile_attributes]['title'] -%>
-          <li><%= @person.title %></li>
+          <h4><%= @person.title %></h4>
         <%- end -%>
         <%- if @person.public_attributes[:profile_attributes]['institution'] -%>
-          <li><%= institution_text(@person) %></li>
+          <h4><%= institution_text(@person) %></h4>
         <%- end -%>
-      </ul>
+
+      <%- if(@person.public_attributes[:profile_attributes]['biography'] and !@person.biography.blank?) -%>
+      <div class='biography'>
+        <%= @person.biography.html_safe %>
+      </div>
+      <%- end -%>
     </div>
 
-    <%- if(@person.public_attributes[:profile_attributes]['biography'] and !@person.biography.blank?) -%>
-    <div class='biography'>
-      <%= @person.biography.html_safe %>
-    </div>
-    <%- end -%>
+
     <dl class='dl-horizontal dashmodule'>
       <%- if(@person.public_attributes[:profile_attributes]['email']) -%>
         <dt>Email:</dt>
