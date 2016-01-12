@@ -23,6 +23,9 @@ footer ul li a:hover {color:#000;}
 #app_location.demo p {font-size:1.1em; color:#000;}
 #app_location.demo p a {color:#000; text-decoration:underline;}
 
+#app-location.dev {background:#FFDC50; padding:.5em 1em .1em; width: 14em; position:absolute; z-index:100;}
+#app-location.dev p {font-size:13px; color:#000;}
+
 #admin_banner {background:#E42020; padding:.5em 1em .1em;}
 #admin_banner p {font-size:1.1em; color:#FFF; text-align: center;}
 #admin_banner p a {color:#FFF; text-decoration:underline;}
