@@ -1136,6 +1136,10 @@ class Person < ActiveRecord::Base
   end
 
 
+  def profile_setting_is_public?(item)
+    self.profile_public_settings.is_public.map(&:item).include?(item)
+  end
+
 
   def public_attributes
     returnvalues = {profile_attributes: {}}

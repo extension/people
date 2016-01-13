@@ -1,27 +1,56 @@
 <%- @page_title = "#{@community.name}" -%>
 
-<style media="screen" type="text/css">
-  .community-masthead {
-    background: transparent url(<%= asset_path 'community-masthead-placeholder.png' %>) center 50% no-repeat;
-  }
-</style>
 
 <div class="page-header">
   <div class="community-masthead">
+    <%= community_masthead(@community, {image_size: :large}) -%>
     <h2><%= @page_title %></h2>
   </div>
+  <%- if(current_person && current_person.can_edit_community?(@community)) -%>
+    <div class="text-center">
+      <p class="btn btn-default btn-xs" data-toggle="modal" data-target="#myModal">change community masthead</p>
+    </div>
+  <%- end -%>
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+          <%= render(:partial => 'community_masthead_form', :locals => {community: @community}) %>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
   <p class="community-public-description"><%= description_for_community(@community) -%></p>
-  <p><%= link_to("View this community", community_path(@community), class: 'btn btn-default btn-sm') %></p>
+  <%- if current_person -%>
+    <p><%= link_to("View more information about this community", community_path(@community), class: 'btn btn-default btn-sm') %></p>
+  <%- else -%>
+    <p>eXtension account holder? You can see more about this community by <%= link_to('signing in with their eXtension account', signin_path) -%> </p>
+  <%- end -%>
 </div>
 
 <div class="row">
+  <%- if !current_person -%>
+    <p>Displaying <%= @connections.size -%> community members with public profiles out of <%= @community.joined_count -%> community members</p>
+  <%- end -%>
+
   <%- i = 0 -%>
   <%- for person in @connections -%>
     <%- i += 1 -%>
     <div class="col-md-4 col-sm-6 col-xs-6">
       <div class="person-profile">
-        <div class="person-profile-avatar"><%= link_to(person_avatar(person, {image_size: :large}), person_path(person)) %></div>
-        <h4 class="person-profile-name"><%= link_to("#{person.fullname}", person_path(person)) %></h4>
+        <div class="person-profile-avatar"><%= link_to_person_avatar(person, {image_size: :large}) -%></div>
+        <%- if(current_person)
+          link_path = person_path(person)
+        else
+          link_path = public_profile_path(person.idstring)
+        end -%>
+        <h4 class="person-profile-name"><%= link_to_person_profile(person) %></h4>
         <p class="person-profile-title"><%= person.title %></p>
         <div class="person-profile-social-icons">
           <%- person.facebook_connections.each do |fbc| -%>

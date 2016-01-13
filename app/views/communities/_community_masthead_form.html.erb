@@ -1,0 +1,57 @@
+<div class="community-masthead">
+  <output id="preview_community_masthead">
+    <%= community_masthead(community, {image_size: :large}) -%>
+  </output>
+</div>
+
+  <%= form_for(community, :url => setmasthead_community_path(id: community.id), html: {id: "masthead_form_for_#{community.id}", :class => 'text-center', method: 'post' })  do |f| -%>
+    <%= f.file_field(:community_masthead, style: 'display: none;', id: 'masthead_file_input') -%>
+    <%- if community.community_masthead.present? -%>
+      <%= link_to('<i class="fa fa-trash-o"></i> Remove'.html_safe,setmasthead_community_path(id: community.id, delete: 'true'), class: 'btn btn-default', method: 'post') %>
+    <%- end -%>
+    <%= button_tag("Select an image...", type: 'button', id: 'masthead_file_browser', class: 'btn btn-default') -%>
+    <%= f.submit "Save", id: 'masthead_save_button', :class => "btn btn-primary", style: 'display: none;' %>
+  <%- end -%>
+
+
+<script class="code" type="text/javascript">
+
+
+  $('#masthead_file_browser').click(function() {
+    $('#masthead_file_input').click();
+  });
+
+    if (window.File && window.FileReader && window.FileList && window.Blob) {
+      function handleFileSelect(evt) {
+        var files = evt.target.files; // FileList object
+        // Loop through the FileList and render image files as thumbnails.
+        for (var i = 0, f; f = files[i]; i++) {
+
+          // Only process image files.
+          if (!f.type.match('image.*')) {
+            continue;
+          }
+
+          var reader = new FileReader();
+
+          // Closure to capture the file information.
+          reader.onload = (function(theFile) {
+            return function(e) {
+              // Render thumbnail.
+              $('#preview_community_masthead').html(['<img src="', e.target.result,'" title="', escape(theFile.name), '"/>'].join(''))
+            };
+          })(f);
+
+          // Read in the image file as a data URL.
+          reader.readAsDataURL(f);
+        }
+      }
+
+      $('#masthead_file_input').change(function(evt) {
+        $('#masthead_save_button').show();
+        handleFileSelect(evt);
+      });
+    }
+
+
+</script>

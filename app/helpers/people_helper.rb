@@ -42,10 +42,10 @@ module PeopleHelper
       when :thumb     then image_size_in_px = "50x50"
     end
 
-    is_private = !current_person and !person.public_attributes[:profile_attributes]['avatar']
+    is_private = (!current_person && !person.profile_setting_is_public?('avatar'))
 
     if(is_private)
-      image_tag("avatar_private.png", :class => 'avatar size' + image_size_in_px, :size => image_size_in_px, :title => 'private profile').html_safe
+      image_tag("avatar_private_w_lock.png", :class => 'avatar size' + image_size_in_px, :size => image_size_in_px, :title => 'private profile').html_safe
     elsif(!person.avatar.present?)
       image_tag("avatar_placeholder.png", :class => 'avatar size' + image_size_in_px, :size => image_size_in_px, :title => person.fullname).html_safe
     else
@@ -54,13 +54,11 @@ module PeopleHelper
   end
 
   def link_to_person_avatar(person, options = {})
-    learner_link = options[:learner_link]
     nolink = options[:nolink] || false
-    case learner_link
-    when 'public'
-      link_path = public_profile_path(person)
-    else
+    if(current_person)
       link_path = person_path(person)
+    else
+      link_path = public_profile_path(person.idstring)
     end
 
     private_name = !@currentperson and person.public_attributes[:profile_attributes].blank?
@@ -74,6 +72,28 @@ module PeopleHelper
       return person_avatar(person,options)
     else
       return link_to(person_avatar(person,options), link_path, :title => link_title).html_safe
+    end
+  end
+
+  def link_to_person_profile(person, options = {})
+    nolink = options[:nolink] || false
+    if(current_person)
+      link_path = person_path(person)
+    else
+      link_path = public_profile_path(person.idstring)
+    end
+
+    private_name = (!current_person && person.public_attributes[:profile_attributes].blank?)
+    if(private_name)
+      link_title = "Private profile"
+    else
+      link_title = person.fullname
+    end
+
+    if(nolink)
+      return person_avatar(person,options)
+    else
+      return link_to(link_title, link_path, :title => link_title).html_safe
     end
   end
 

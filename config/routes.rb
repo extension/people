@@ -117,6 +117,7 @@ People::Application.routes.draw do
       post :leave
       post :change_connection
       post :remove_connection
+      post :setmasthead
     end
   end
 
