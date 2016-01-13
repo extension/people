@@ -12,12 +12,12 @@
       <li class="dropdown">
       <a class="dropdown-toggle" data-toggle="dropdown" href="#"><%= current_person.fullname -%><b class="caret"></b></a>
       <ul class="dropdown-menu pull-right">
-        <li><%= link_to('My Profile',person_path(current_person)) -%></li>
+        <li><%= link_to('My profile',person_path(current_person)) -%></li>
+        <%- if current_person.validaccount? -%>
+          <li><%= link_to('Privacy settings',public_settings_person_path(current_person)) %></li>
+        <%- end -%>
         <li class="divider"></li>
         <li><%= link_to('Change password',password_person_path(current_person)) %></li>
-        <%- if current_person.validaccount? -%>
-          <li><%= link_to('Change public profile settings',public_settings_person_path(current_person)) %></li>
-        <%- end -%>
         <li class="divider"></li>
         <li><%= link_to('Sign out',signout_path) %></li>
       </ul>
