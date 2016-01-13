@@ -132,10 +132,8 @@ class CommunitiesController < ApplicationController
     @community = Community.find_by_shortname_or_id(params[:id])
     if(current_person)
       @connections = @community.connected('joined').order('people.last_name')
-    elsif(@community.is_public)
-      @connections = @community.joined_with_public_avatar.order('people.last_name')
     else
-      return render(template: 'communities/private_poster', layout: 'public')
+      @connections = @community.joined_with_public_avatar.order('people.last_name')
     end
     return render(layout: 'public')
   end

@@ -1,7 +1,7 @@
 class PosterChanges < ActiveRecord::Migration
   def change
     add_column(:people, :avatar, :string)
-    add_column(:communities, :is_public, :boolean, :default => false)
+    add_column(:communities, :community_masthead, :string)
   end
 
 end
