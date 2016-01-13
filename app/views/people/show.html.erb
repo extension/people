@@ -21,7 +21,7 @@
 
           <h2><%= @person.fullname %></h2>
 
-          <%- if current_person == @person -%>
+          <%- if(@person == current_person or !Person::RESTRICTED_ACCOUNTS.include?(@person.id)) -%>
             <p class="btn btn-default btn-xs" data-toggle="modal" data-target="#myModal">change profile picture</p>
           <%- end -%>
           <ul class='list-unstyled'>
