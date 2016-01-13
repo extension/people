@@ -71,6 +71,7 @@ People::Application.routes.draw do
       post :password
       get :public_settings
       get :authsummary
+      post :setavatar
     end
 
     collection do

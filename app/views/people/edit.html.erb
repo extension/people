@@ -54,33 +54,7 @@
       </div>
       <%- end -%>
 
-      <div class="form-group">
-        <legend>Current profile picture</legend>
 
-        <p>
-        <%= person_avatar(@person, {image_size: :medium}) %>
-        </p>
-
-        <%- if @person.avatar.present? -%>
-        <p class="clearing">
-        <label>
-        <%= f.check_box :remove_avatar %>
-        Remove profile picture
-        </label>
-        </p>
-        <%- end -%>
-
-        <legend>Upload new profile picture</legend>
-
-        <p class="clearing">
-          <%= f.file_field :avatar -%>
-          <%= f.hidden_field :avatar_cache -%>
-        </p>
-
-        <p>
-        <output id="preview_person_avatar"></output>
-        </p>
-      </div>
 
 
       <div class="form-group">
@@ -247,31 +221,4 @@
         });
     }
 
-    if (window.File && window.FileReader && window.FileList && window.Blob) {
-      function handleFileSelect(evt) {
-        var files = evt.target.files; // FileList object
-        // Loop through the FileList and render image files as thumbnails.
-        for (var i = 0, f; f = files[i]; i++) {
-
-          // Only process image files.
-          if (!f.type.match('image.*')) {
-            continue;
-          }
-
-          var reader = new FileReader();
-
-          // Closure to capture the file information.
-          reader.onload = (function(theFile) {
-            return function(e) {
-              // Render thumbnail.
-              $('#preview_person_avatar').html(['Profile picture preview:<br/><img class="preview_avatar" src="', e.target.result,'" title="', escape(theFile.name), '"/>'].join(''))
-            };
-          })(f);
-
-          // Read in the image file as a data URL.
-          reader.readAsDataURL(f);
-        }
-      }
-    $('#person_avatar').on('change',handleFileSelect);
-  }
 </script>
