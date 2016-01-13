@@ -99,6 +99,9 @@
             <li><%= link_to('Activity',activity_person_path(@person)) %></li>
             <%- if(@person == current_person or !Person::RESTRICTED_ACCOUNTS.include?(@person.id)) -%>
               <li><%= link_to('Edit profile',edit_person_path(@person)) %></li>
+              <%- if current_person.validaccount? -%>
+                <li><%= link_to('Privacy settings',public_settings_person_path(current_person)) %></li>
+              <%- end -%>
             <%- end -%>
           </ul>
         </div>

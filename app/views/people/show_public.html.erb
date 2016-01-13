@@ -14,7 +14,7 @@
     <p>If you have an eXtension account, you can sign in <%= link_to("People", person_path(@person)) %> view this person.</p>
 
     <% if current_person %>
-      <p><%= link_to("You can see this link because you are signed in", person_path(@person), :class => "btn btn-default") %></p>
+      <p><%= link_to("View this profile", person_path(@person), :class => "btn btn-default") %> (You can see this button because you are signed in)</p>
     <% end %>
   </div>
   </div>
