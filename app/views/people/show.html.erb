@@ -20,7 +20,10 @@
           <p class="person-profile-avatar show-profile"><%= person_avatar(@person, {image_size: :large}) %></p>
 
           <h2><%= @person.fullname %></h2>
-          <p class="btn btn-default btn-xs" data-toggle="modal" data-target="#myModal">change profile picture</p>
+
+          <%- if current_person == @person -%>
+            <p class="btn btn-default btn-xs" data-toggle="modal" data-target="#myModal">change profile picture</p>
+          <%- end -%>
           <ul class='list-unstyled'>
             <li><%= @person.title %></li>
             <li><%= institution_text(@person) %></li>
