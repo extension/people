@@ -12,11 +12,13 @@
     <div class='page-header'>
     <h2>This is a private profile</h2>
     <p>If you have an eXtension account, you can sign in <%= link_to("People", person_path(@person)) %> view this person.</p>
-
-    <% if current_person %>
-      <p><%= link_to("View this profile", person_path(@person), :class => "btn btn-default") %> (You can see this button because you are signed in)</p>
-    <% end %>
   </div>
+  <% if current_person %>
+    <div class="page-section">
+    <p><%= link_to("View this profile", person_path(@person), :class => "btn btn-default") %> (You can see this button because you are signed in)</p>
+  </div>
+  <% end %>
+
   </div>
 </div>
 <%- else -%>

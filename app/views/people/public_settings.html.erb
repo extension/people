@@ -37,6 +37,7 @@
 
 <div class="row">
   <div class="col-md-10 col-md-offset-1">
+    <div class="page-section">
     <h3>Social Networks</h3>
     <%- if current_person.social_networks.count > 0 -%>
     <table class="table">
@@ -49,8 +50,11 @@
       </tbody>
     </table>
     <%- else -%>
-    <p>You haven't yet listed your social network connections.</p>
+    <p class="larger">You haven't yet listed your social network connections.</p>
+    <%- if @person == current_person -%>
+      <p><%= link_to('Update your social media profiles',change_social_networks_people_path, :class => "btn btn-default btn-lg") %></p>
     <%- end -%>
-
+    <%- end -%>
+    </div>
   </div>
 </div>
