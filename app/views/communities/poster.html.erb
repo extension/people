@@ -11,6 +11,7 @@
     <h2><%= @page_title %></h2>
   </div>
   <p class="community-public-description"><%= description_for_community(@community) -%></p>
+  <p><%= link_to("View this community", community_path(@community), class: 'btn btn-default btn-sm') %></p>
 </div>
 
 <div class="row">
