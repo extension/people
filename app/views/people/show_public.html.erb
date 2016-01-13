@@ -26,7 +26,9 @@
 <div class="row">
   <div class="col-md-10 col-md-offset-1">
     <div class="page-header clearfix">
+      <%- if @person.public_attributes[:profile_attributes]['avatar'] -%>
       <p class="person-profile-avatar show-profile"><%= person_avatar(@person, {image_size: :large}) %></p>
+      <%- end -%>
       <h2><%= @person.fullname %></h2>
 
         <%- if @person.public_attributes[:profile_attributes]['title'] -%>
