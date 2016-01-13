@@ -127,7 +127,7 @@ class CommunitiesController < ApplicationController
     @connections = @community.connected(connection).order('people.last_name').page(params[:page])
   end
 
-  def poster
+  def gallery
     @no_show_navtabs = true
     @community = Community.find_by_shortname_or_id(params[:id])
     if(current_person)

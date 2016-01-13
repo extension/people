@@ -110,7 +110,7 @@ People::Application.routes.draw do
       get :activity
       get :connections
       get :connectionsfile
-      get :poster
+      get :gallery
       get :invite
       post :invite
       post :join
