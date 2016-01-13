@@ -178,6 +178,7 @@ class Community < ActiveRecord::Base
         .joins(:profile_public_settings)
         .where("profile_public_settings.item = 'avatar'")
         .where("profile_public_settings.is_public = 1")
+        .where("people.avatar is NOT NULL")
         .validaccounts.where(CONNECTION_CONDITIONS['joined'])
   end
 

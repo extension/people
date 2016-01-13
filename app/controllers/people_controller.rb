@@ -43,6 +43,7 @@ class PeopleController < ApplicationController
     @person = Person.find(params[:id])
     if(params[:delete] and TRUE_VALUES.include?(params[:delete]))
       @person.remove_avatar!
+      @person.save
     else
       update_params = params[:person]
       if(!update_params['avatar'].blank?)
