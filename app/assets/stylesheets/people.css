@@ -52,3 +52,4 @@ tr.inactive {color: #000000;}
 .preview_avatar {background:#aaa; margin-right:0.6em; border:1px solid #fff; height:100px; }
 .footer-shortcuts-header {color:#fff; padding: 30px 20px 10px 20px ; font-size: 20px; background: #888; margin-bottom:0; font-weight:normal;}
 .copyright {color: #888;}
+.mobile-nav-link {display: none;}
