@@ -57,8 +57,8 @@ class DataController < ApplicationController
       returnhash = {:success => false, :errormessage => 'No such community.'}
       return render :text => returnhash.to_json
     end
-   
-    returnhash = {:success => true, :total_joined => @community.joined.count, :has_public_data => 0, :person_list => {}}  
+
+    returnhash = {:success => true, :total_joined => @community.joined.count, :has_public_data => 0, :person_list => {}}
     @community.joined.each do |person|
       public_attributes = person.public_attributes
       social_networks = []
@@ -74,7 +74,7 @@ class DataController < ApplicationController
     # add in the community information
     community_info = {}
     community_info[:name] = @community.name
-    community_info[:entrytype] = @community.entrytype_to_s 
+    community_info[:entrytype] = @community.entrytype_to_s
     if(!@community.shortname.blank?)
       community_info[:shortname] = @community.shortname
     end
@@ -82,7 +82,7 @@ class DataController < ApplicationController
       community_info[:description] = @community.description
     end
     community_info[:publishing_community] = @community.publishing_community?
-    
+
     returnhash[:community_info] = community_info
 
     return render :text => returnhash.to_json
