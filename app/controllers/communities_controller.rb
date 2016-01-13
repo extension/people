@@ -6,9 +6,9 @@
 
 class CommunitiesController < ApplicationController
   before_filter :set_tab
-  skip_before_filter :signin_required, only: [:poster]
-  skip_before_filter :check_hold_status, only: [:poster]
-  before_filter :signin_optional, only: [:poster]
+  skip_before_filter :signin_required, only: [:gallery]
+  skip_before_filter :check_hold_status, only: [:gallery]
+  before_filter :signin_optional, only: [:gallery]
 
   def index
     @approved_joined_counts = Community.approved.connected_counts('joined')
@@ -133,9 +133,24 @@ class CommunitiesController < ApplicationController
     if(current_person)
       @connections = @community.connected('joined').order('people.last_name')
     else
+      store_location
       @connections = @community.joined_with_public_avatar.order('people.last_name')
     end
     return render(layout: 'public')
+  end
+
+  def setmasthead
+    @community = Community.find_by_shortname_or_id(params[:id])
+    if(params[:delete] and TRUE_VALUES.include?(params[:delete]))
+      @community.remove_community_masthead!
+      @person.save
+    else
+      update_params = params[:community]
+      if(!update_params['community_masthead'].blank?)
+        @community.update_attributes(update_params)
+      end
+    end
+    return redirect_to gallery_community_path(@community)
   end
 
   def invite
