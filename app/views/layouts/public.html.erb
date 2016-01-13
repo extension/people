@@ -21,11 +21,12 @@
         <p>This is a development and demonstration site. The data on this site is regularly deleted for development purposes.</p>
       </div>
 
-      <div class="header-shortcuts">
+      <div id="header-shortcuts">
       <%= javascript_include_tag "https://assets.extension.org/javascripts/global_shortcuts_bar_public.js" %>
       </div>
 
     <div class="container" id="main">
+
       <div class="row" id="masthead">
         <%= render(partial: 'shared/masthead') %>
       </div>
@@ -33,7 +34,12 @@
       <%= yield %>
     </div>
 
-    <div class="footer-shortcuts">
+    <div id="footer-shortcuts">
+      <span class="footer-mobile-nav-link">
+        <a href="#header-shortcuts" class="btn btn-text">back to top</a>
+      </span>
+      <h3 class="footer-shortcuts-header">eXtension shortcuts</h3>
+
       <%= javascript_include_tag "https://assets.extension.org/javascripts/global_shortcuts_bar_public.js" %>
     </div>
 
@@ -44,6 +50,7 @@
           <li><%= link_to("Terms of Use","https://extension.org/terms-of-use/")%></li>
           <li><%= link_to("Contributor Agreement",accounts_contributor_agreement_path)%></li>
       </ul>
+      <p class="copyright">&copy; <%= Time.now.utc.year %> eXtension. All rights reserved.</p>
     </footer>
 
   </body>

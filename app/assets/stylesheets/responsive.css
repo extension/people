@@ -3,20 +3,29 @@
 }
 
 @media screen and (max-width: 767px) {
-  .people-logo {margin-left:10px; margin-top:10px;}
   .people-header {background:#fff;}
+  #public .people-logo {margin-top: 0; display:inline !important;}
   #shared-navtabs .nav > li > a {padding: 10px 5px;}
   .page-header {margin-top:20px;}
   .people-header .navbar-nav > li > a {background: #eee;}
   .people-header .navbar-nav > li > a:hover  {background: #e2e2e2;}
   .person-profile-avatar {margin:10px 6px 20px;}
   #app-location.dev {width: 100%; position:relative;}
-  .footer-shortcuts .global_announcement {display:none;}
-  .footer-shortcuts ul.extension_global_nav {display:block; background: #fff}
-  .footer-shortcuts li {display:block !important; background: #fff;}
-  .footer-shortcuts li.nav-name {background: #eee; padding: 4px 10px;}
-  .footer-shortcuts li a {display:block; padding: 10px !important; background: #fff; border-top: 1px solid #eee; border-bottom: 1px solid #eee;}
-  .header-shortcuts ul.extension_global_nav {display:none;}
+  #header-shortcuts ul.extension_global_nav {display:none;}
+  #footer-shortcuts .global_announcement {display:none;}
+  #footer-shortcuts ul.extension_global_nav {display:block; background: #fff; text-align:left; padding:0 20px !important;}
+  #footer-shortcuts li {display:block !important; background: #fff;}
+  #footer-shortcuts li.nav-name {display:none !important;}
+  #footer-shortcuts li a {display:block; padding: 10px !important; background: #fff; border-top: 1px solid #eee; border-bottom: 1px solid #eee; font-size: 14px;}
+  .mobile-nav-link {float: right;}
+  .mobile-nav-link a{display:block;}
+  .footer ul {padding-top: 40px; margin-bottom:0;}
+  .footer ul li {display:block; text-align:left; border-bottom: 2px solid #fff;}
+  .footer ul li a {display:block; text-align:left; padding:20px 30px 10px;}
+  .footer-mobile-nav-link {float:right; padding-top:24px; color: #fff !important;}
+  .footer-mobile-nav-link a {color: #222 !important;}
+  .copyright {padding: 40px 30px 40px; text-align:center; border-top: 1px solid #ddd; background: #ddd; color: #777;}
+  .footer.container {padding:0;}
 }
 
 
@@ -27,5 +36,6 @@
   .people-header .navbar-nav > li > a {color: #999; padding-top:5px; padding-bottom:5px; display:inline;}
   .people-header .navbar-nav > li > a:hover  {color:#fff; background: #000;}
   .header-navbar-collapse {margin-left: -15px !important; margin-right:-15px !important;}
-  .footer-shortcuts {display: none;}
+  #footer-shortcuts {display: none;}
+  .mobile-nav-link {display: none;}
 }
