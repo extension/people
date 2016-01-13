@@ -1,20 +1,17 @@
-<div class="person-profile-avatar show-profile">
+<div class="person-profile-avatar">
   <output id="preview_person_avatar">
     <%= person_avatar(person, {image_size: :large}) -%>
   </output>
-  <%- if person.avatar.present? -%>
-  <%= link_to('<i class="fa fa-trash-o"></i> Remove'.html_safe,setavatar_person_path(id: person.id, delete: 'true'), class: 'btn', method: 'post') %>
-  <%- end -%>
-  <%= form_for(person, :url => setavatar_person_path(id: person.id), html: {id: "avatar_form_for_#{person.id}", :class => 'form-horizontal', method: 'post' })  do |f| -%>
-  <%= f.file_field(:avatar, style: 'display: none;', id: 'avatar_file_input') -%>
-  <%= button_tag("Select...", type: 'button', id: 'avatar_file_browser', class: 'btn') -%>
-  <%= link_to "cancel", person_path(person), :class => "btn btn-default btn-link" %>
-  <%= f.submit "Save", id: 'avatar_save_button', :class => "btn btn-primary", style: 'display: none;' %>
-  <%- end -%>
 </div>
 
-
-
+  <%= form_for(person, :url => setavatar_person_path(id: person.id), html: {id: "avatar_form_for_#{person.id}", :class => 'text-center', method: 'post' })  do |f| -%>
+    <%= f.file_field(:avatar, style: 'display: none;', id: 'avatar_file_input') -%>
+    <%- if person.avatar.present? -%>
+      <%= link_to('<i class="fa fa-trash-o"></i> Remove'.html_safe,setavatar_person_path(id: person.id, delete: 'true'), class: 'btn btn-default', method: 'post') %>
+    <%- end -%>
+    <%= button_tag("Select an image...", type: 'button', id: 'avatar_file_browser', class: 'btn btn-default') -%>
+    <%= f.submit "Save", id: 'avatar_save_button', :class => "btn btn-primary", style: 'display: none;' %>
+  <%- end -%>
 
 
 <script class="code" type="text/javascript">

@@ -16,11 +16,11 @@
 
       <div class="col-md-7">
         <div class="page-header clearfix">
-            <div id='avatar_for_person_<%= @person.id -%>'>
-              <%= render(partial: 'people/large_avatar_profile', locals: {person: @person}) %>
-            </div>
+
+          <p class="person-profile-avatar show-profile"><%= person_avatar(@person, {image_size: :large}) %></p>
 
           <h2><%= @person.fullname %></h2>
+          <p class="btn btn-default btn-xs" data-toggle="modal" data-target="#myModal">change profile picture</p>
           <ul class='list-unstyled'>
             <li><%= @person.title %></li>
             <li><%= institution_text(@person) %></li>
@@ -31,6 +31,20 @@
             </div>
           <%- end -%>
           <br class="clearing" />
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-body">
+                <%= render(:partial => 'profile_picture_form', :locals => {person: @person}) %>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              </div>
+            </div>
+          </div>
         </div>
 
 
@@ -161,9 +175,3 @@
   </div>
   <%- end -%>
 <%- end -%>
-
-<script class="code" type="text/javascript">
-  $('#edit_avatar_for_person_<%= @person.id %>').click(function() {
-    $('#avatar_for_person_<%= @person.id %>').html('<%= escape_javascript(render(partial: "people/profile_picture_form", locals: {person: @person})) %>');
- });
-</script>
