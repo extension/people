@@ -16,7 +16,10 @@
 
       <div class="col-md-7">
         <div class="page-header clearfix">
-          <p class="person-profile-avatar show-profile"><%= person_avatar(@person, {image_size: :large}) %></p>
+            <div id='avatar_for_person_<%= @person.id -%>'>
+              <%= render(partial: 'people/large_avatar_profile', locals: {person: @person}) %>
+            </div>
+
           <h2><%= @person.fullname %></h2>
           <ul class='list-unstyled'>
             <li><%= @person.title %></li>
@@ -158,3 +161,9 @@
   </div>
   <%- end -%>
 <%- end -%>
+
+<script class="code" type="text/javascript">
+  $('#edit_avatar_for_person_<%= @person.id %>').click(function() {
+    $('#avatar_for_person_<%= @person.id %>').html('<%= escape_javascript(render(partial: "people/profile_picture_form", locals: {person: @person})) %>');
+ });
+</script>

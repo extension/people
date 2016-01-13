@@ -39,6 +39,19 @@ class PeopleController < ApplicationController
     end
   end
 
+  def setavatar
+    @person = Person.find(params[:id])
+    if(params[:delete] and TRUE_VALUES.include?(params[:delete]))
+      @person.remove_avatar!
+    else
+      update_params = params[:person]
+      if(!update_params['avatar'].blank?)
+        @person.update_attributes(update_params)
+      end
+    end
+    return redirect_to person_path(@person)
+  end
+
   def update
     @person = Person.find(params[:id])
 
