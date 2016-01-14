@@ -17,13 +17,27 @@ tr.inactive {color: #000000;}
 .person-profile {
   /*border: 2px solid #eee;*/
   padding: 10px; margin-bottom:10px;}
+
 .person-profile-avatar {
-  /*outline:1px solid lime;*/
-  /*padding: 3em;*/
   margin:10px 3em 20px;
   text-align:center;
-
 }
+.person-profile-avatar.person-profile-avatar-preview {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  margin:auto;
+}
+.person-profile-avatar.person-profile-avatar-preview img {
+/*width: 100%;*/
+position: absolute;
+top: -9999px;
+bottom: -9999px;
+left: -9999px;
+right: -9999px;
+margin: auto;
+}
+
 .person-profile-avatar.show-profile {
   margin:10px 20px 20px 0;
   text-align:left;
@@ -51,3 +65,22 @@ tr.inactive {color: #000000;}
 .larger {font-size:16px;}
 .page-section {margin-bottom:80px;}
 .gallery-member-count {text-align:center; }
+
+#preview_person_avatar {
+  -webkit-border-radius: 50%;
+  border: solid lime 1px;
+  position: relative;
+  width: 180px;
+  height: 180px;
+  overflow: hidden;
+  padding: 0;
+}
+
+#preview_person_avatar .person-profile-avatar img {}
+#preview_person_avatar_bg {
+  position:absolute;
+  /*border: 1px solid blue; */
+  width: 180px; height: 180px; background-size: cover; background-position: center;
+background-repeat: no-repeat;
+-webkit-border-radius: 50%;
+z-index: 101;}

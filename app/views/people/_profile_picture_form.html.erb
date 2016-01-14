@@ -1,7 +1,6 @@
-<div class="person-profile-avatar">
-  <output id="preview_person_avatar">
-    <%= person_avatar(person, {image_size: :large}) -%>
-  </output>
+<div class="person-profile-avatar person-profile-avatar-preview">
+  <div id="preview_person_avatar_bg"></div>
+  <%= person_avatar(person, {image_size: :large}) -%>
 </div>
 
   <%= form_for(person, :url => setavatar_person_path(id: person.id), html: {id: "avatar_form_for_#{person.id}", :class => 'text-center', method: 'post' })  do |f| -%>
@@ -38,7 +37,9 @@
           reader.onload = (function(theFile) {
             return function(e) {
               // Render thumbnail.
-              $('#preview_person_avatar').html(['<img src="', e.target.result,'" title="', escape(theFile.name), '"/>'].join(''))
+              // $('#preview_person_avatar').html(['<img src="', e.target.result,'" title="', escape(theFile.name), '"/>'].join(''))
+              document.getElementById("preview_person_avatar_bg").style.backgroundImage = 'url(' + e.target.result + ')';
+
             };
           })(f);
 
