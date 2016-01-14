@@ -80,6 +80,16 @@
                 </span></a>
             <%- end -%>
           <%- end -%>
+
+          <%- person.linkedin_connections.each do |lic| -%>
+            <%- if current_person or lic.is_public? -%>
+              <%- url = social_network_url(lic) || "https://www.linkedin.com/in/#{tc.accountid}" # this should really be a helper -%>
+              <a href='<%= url -%>' title='<%= lic.accountid -%>' ><span class="fa-stack fa-lg">
+                  <i class="fa fa-circle fa-stack-2x"></i>
+                  <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                </span></a>
+            <%- end -%>
+          <%- end -%>
         </div>
       </div>
     </div>

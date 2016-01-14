@@ -150,6 +150,7 @@ class CommunitiesController < ApplicationController
         @community.update_attributes(update_params)
       end
     end
+    Activity.log_activity(person_id: current_person.id, activitycode: Activity::COMMUNITY_UPDATE_INFORMATION, :community => @community, ip_address: request.remote_ip)
     return redirect_to gallery_community_path(@community)
   end
 

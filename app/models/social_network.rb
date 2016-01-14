@@ -19,7 +19,7 @@ class SocialNetwork < ActiveRecord::Base
   ## filters
 
   ## associations
-  has_many :social_network_connections
+  has_many :social_network_connections, dependent: :destroy
   has_many :people, through: :social_network_connections
 
   ## scopes
