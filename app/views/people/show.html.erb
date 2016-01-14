@@ -17,13 +17,30 @@
       <div class="col-md-7">
         <div class="page-header clearfix">
 
-          <p class="person-profile-avatar show-profile"><%= person_avatar(@person, {image_size: :large}) %></p>
+          <div class="modal" id="avatar-detail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-body">
+                  <p class="person-profile-avatar show-detail"><%= person_avatar(@person, {image_size: :large}) %></p>
+                </div>
+                <div class="modal-footer">
+                  <%- if(@person == current_person or !Person::RESTRICTED_ACCOUNTS.include?(@person.id)) -%>
+                    <button id="change-profile-image" class="btn btn-default btn-ms" data-toggle="modal" data-target="#myModal">change profile picture</button>
+                  <%- end -%>
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
 
+          <script class="code" type="text/javascript">
+          $('#change-profile-image').click(function() {
+            $('#avatar-detail').modal('hide')
+          });
+          </script>
+
+          <p data-toggle="modal" data-target="#avatar-detail" class="person-profile-avatar show-profile cursor"><%= person_avatar(@person, {image_size: :large}) %></p>
           <h2><%= @person.fullname %></h2>
-
-          <%- if(@person == current_person or !Person::RESTRICTED_ACCOUNTS.include?(@person.id)) -%>
-            <p class="btn btn-default btn-xs" data-toggle="modal" data-target="#myModal">change profile picture</p>
-          <%- end -%>
           <ul class='list-unstyled'>
             <li><%= @person.title %></li>
             <li><%= institution_text(@person) %></li>
@@ -37,7 +54,7 @@
         </div>
 
         <!-- Modal -->
-        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
           <div class="modal-dialog" role="document">
             <div class="modal-content">
               <div class="modal-body">

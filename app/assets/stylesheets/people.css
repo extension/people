@@ -27,6 +27,7 @@ tr.inactive {color: #000000;}
   width: 180px;
   height: 180px;
   margin:auto;
+  margin-bottom:30px;
 }
 .person-profile-avatar.person-profile-avatar-preview img {
 /*width: 100%;*/
