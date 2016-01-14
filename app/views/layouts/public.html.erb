@@ -17,9 +17,11 @@
   </head>
   <body id='public'>
 
+    <%- if (Settings.app_location == 'demo') || (Settings.app_location == 'dev') -%>
       <div id="app-location" class="dev">
         <p>This is a development and demonstration site. The data on this site is regularly deleted for development purposes.</p>
       </div>
+    <% end %>
 
       <div id="header-shortcuts">
       <%= javascript_include_tag "https://assets.extension.org/javascripts/global_shortcuts_bar_public.js" %>
