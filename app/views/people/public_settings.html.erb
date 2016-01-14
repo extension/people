@@ -19,7 +19,7 @@
 
 <div class="row">
   <div class="col-md-10 col-md-offset-1">
-    <h3>Profile Information</h3>
+    <h3>Profile Information Sharing</h3>
     <table class="table">
       <tbody>
         <%- @publicsettings.each do |setting| -%>
@@ -38,8 +38,9 @@
 <div class="row">
   <div class="col-md-10 col-md-offset-1">
     <div class="page-section">
-    <h3>Social Networks</h3>
+    <h3>Social Networks Sharing</h3>
     <%- if current_person.social_networks.count > 0 -%>
+    <p><%= link_to('Edit your social networks',change_social_networks_people_path) %></p>
     <table class="table">
       <tbody>
         <%- current_person.social_networks.each do |social_network| -%>

@@ -1,9 +1,15 @@
 <%- @page_title = "Profile Edit - #{@person.fullname}" -%>
 
+<div class="row">
+  <div class="col-md-10 col-md-offset-1">
 <div class="page-header">
   <h2><%= @page_title %></h2>
+  <%- if @person == current_person -%>
+    <p><%= link_to('Edit your social networks',change_social_networks_people_path) %></p>
+  <%- end -%>
 </div>
-
+</div>
+</div>
 <div class="row">
   <%= form_for @person, :html => { :class => 'form-horizontal' } do |f| -%>
   <div class="col-md-7">
