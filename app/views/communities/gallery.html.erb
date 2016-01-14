@@ -64,24 +64,20 @@
           <%- person.facebook_connections.each do |fbc| -%>
             <%- if current_person or fbc.is_public? -%>
               <%- url = social_network_url(fbc) || "https://www.facebook.com/public?query=#{fbc.accountid}" # this should really be a helper -%>
-              <a href='<%= url -%>' title='<%= fbc.accountid -%>'>
-              <span class="fa-stack fa-lg fa-gray">
+              <a href='<%= url -%>' title='<%= fbc.accountid -%>' class="fa-gray"><span class="fa-stack fa-lg">
                 <i class="fa fa-circle fa-stack-2x"></i>
                 <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
-              </span>
-              </a>
+              </span></a>
             <%- end -%>
           <%- end -%>
 
           <%- person.twitter_connections.each do |tc| -%>
             <%- if current_person or tc.is_public? -%>
               <%- url = social_network_url(tc) || "https://twitter.com/#{tc.accountid}" # this should really be a helper -%>
-              <a href='<%= url -%>' title='<%= tc.accountid -%>'>
-                <span class="fa-stack fa-lg fa-gray">
+              <a href='<%= url -%>' title='<%= tc.accountid -%>' class="fa-gray"><span class="fa-stack fa-lg">
                   <i class="fa fa-circle fa-stack-2x"></i>
                   <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
-                </span>
-              </a>
+                </span></a>
             <%- end -%>
           <%- end -%>
         </div>
