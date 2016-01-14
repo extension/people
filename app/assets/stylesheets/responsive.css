@@ -27,6 +27,10 @@
   .footer-mobile-nav-link a {color: #222 !important;}
   .copyright {padding: 40px 30px 40px; text-align:center; border-top: 1px solid #ddd; background: #ddd; color: #777;}
   .footer.container {padding:0;}
+  .community-masthead {height: 230px;}
+  .community-masthead img {height: 100%;}
+  .community-masthead h2 {font-size:24px; padding-bottom:10px;}
+  .community-masthead.community-masthead-preview img {height:auto;}
 }
 
 

@@ -6,8 +6,9 @@
     <%= community_masthead(@community, {image_size: :large}) -%>
     <h2><%= @page_title %></h2>
   </div>
+
   <%- if(current_person && current_person.can_edit_community?(@community)) -%>
-    <div class="text-center">
+    <div class="text-right">
       <p class="btn btn-default btn-xs" data-toggle="modal" data-target="#myModal">change community masthead</p>
     </div>
   <%- end -%>
@@ -28,16 +29,23 @@
 
   <p class="community-public-description"><%= description_for_community(@community) -%></p>
   <%- if current_person -%>
-    <p><%= link_to("View more information about this community", community_path(@community), class: 'btn btn-default btn-sm') %></p>
+    <p><%= link_to("View more information about this community", community_path(@community), class: 'btn btn-link btn-sm') %></p>
   <%- else -%>
-    <p>eXtension account holder? You can see more about this community by <%= link_to('signing in with their eXtension account', signin_path) -%> </p>
+    <p>If you have an eXtension account, you can <%= link_to("sign in to view this community", signin_path) %>.</p>
   <%- end -%>
 </div>
 
+<%- if !current_person -%>
+  <div class="gallery-member-count">
+    <p class="color-gray">This community has <%= @community.joined_count -%> members. <%= @connections.size -%> have shared their profiles publicly.</p>
+  </div>
+<%- end -%>
+
+<%- if @connections.size == 0 -%>
+  <div class="page-footer"></div>
+<%- end -%>
+
 <div class="row">
-  <%- if !current_person -%>
-    <p>Displaying <%= @connections.size -%> community members with public profiles out of <%= @community.joined_count -%> community members</p>
-  <%- end -%>
 
   <%- i = 0 -%>
   <%- for person in @connections -%>

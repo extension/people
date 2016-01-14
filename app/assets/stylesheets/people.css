@@ -14,11 +14,6 @@ tr.inactive {color: #000000;}
 
 .person-biograhy {font-size:1.1em;}
 
-.community-masthead {height: 340px; margin-bottom:20px; position:relative;}
-.community-masthead h2 {padding: 20px; position: absolute; bottom: 0;}
-.fa-gray {color: #bbb;}
-/*.community-masthead img {width: 100%;}*/
-.community-public-description {font-size: 17px; color: #888;}
 .person-profile {
   /*border: 2px solid #eee;*/
   padding: 10px; margin-bottom:10px;}
@@ -55,3 +50,4 @@ tr.inactive {color: #000000;}
 .mobile-nav-link {display: none;}
 .larger {font-size:16px;}
 .page-section {margin-bottom:80px;}
+.gallery-member-count {text-align:center; }

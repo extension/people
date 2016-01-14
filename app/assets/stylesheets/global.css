@@ -48,6 +48,7 @@ a:hover.status_icon {color:#0088cc;}
 .people-logo {height: 60px;}
 .color-white {color:#fff;}
 .color-gray {color:#999;}
-
+.fa-gray {color: #bbb;}
 
 .people-header {margin-bottom:0;}
+.page-footer {padding-top:20px;}
