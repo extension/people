@@ -5,7 +5,20 @@
 <div class="page-header">
   <h2><%= @page_title %></h2>
   <%- if @person == current_person -%>
-    <p><%= link_to('Edit your social networks',change_social_networks_people_path) %></p>
+    <p><%= link_to("Edit your social networks".html_safe,change_social_networks_people_path) %>
+      <span class="fa-stack fa-gray">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+      </span>
+      <span class="fa-stack fa-gray">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+      </span>
+      <span class="fa-stack fa-gray">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+      </span>
+      </p>
   <%- end -%>
 </div>
 </div>
