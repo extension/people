@@ -143,7 +143,7 @@ class CommunitiesController < ApplicationController
     @community = Community.find_by_shortname_or_id(params[:id])
     if(params[:delete] and TRUE_VALUES.include?(params[:delete]))
       @community.remove_community_masthead!
-      @person.save
+      @community.save
     else
       update_params = params[:community]
       if(!update_params['community_masthead'].blank?)
