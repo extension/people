@@ -1409,6 +1409,10 @@ class Person < ActiveRecord::Base
     self.social_networks.where(name: 'twitter')
   end
 
+  def linkedin_connections
+    self.social_networks.where(name: 'linkedin')
+  end
+
   private
 
   def check_account_status
