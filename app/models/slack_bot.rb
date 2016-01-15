@@ -76,10 +76,13 @@ class SlackBot < ActiveRecord::Base
     if(searchcount == 0)
       returntext = "No one was found that matches your searchterm #{searchterm}"
     elsif(searchcount >= 10)
+      self.queue_slackpost
       returntext = "I found #{searchcount} people that match your search. That's a lot of people! you may want to narrow your search"
     else
+      self.queue_slackpost
       returntext = "I found #{searchcount} people that match your search. Results coming right up!"
     end
+    return(self.message = returntext)
   end
 
 

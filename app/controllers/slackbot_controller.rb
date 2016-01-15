@@ -3,6 +3,7 @@
 # === LICENSE:
 # see LICENSE file
 class SlackbotController < ApplicationController
+  skip_before_filter :verify_authenticity_token
   skip_before_filter :signin_required, :check_hold_status
 
 
