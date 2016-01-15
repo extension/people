@@ -38,7 +38,14 @@
             <%= activity_to_s(activity) %>
           <%- end -%>
 
-          <%- if [Activity::UPDATE_PROFILE,Activity::UPDATE_COLLEAGUE_PROFILE].include?(activity.activitycode) and activity.additionaldata and activity.additionaldata[:what_changed] -%>
+          <%-
+            begin
+              what_changed = activity.additionaldata[:what_changed]
+            rescue
+              what_changed = nil
+            end
+          -%>
+          <%- if [Activity::UPDATE_PROFILE,Activity::UPDATE_COLLEAGUE_PROFILE].include?(activity.activitycode) and activity.additionaldata and what_changed -%>
                <%= link_to("(details)".html_safe,
                 '#',
                 id: "detailstoggler_#{activity.id}",
@@ -46,7 +53,7 @@
 
           <div id="showdetails_<%= activity.id %>" class="collapse">
             <ul class='list-unstyled'>
-              <%- profile_changes(activity.additionaldata[:what_changed]).each do |change| -%>
+              <%- profile_changes(what_changed).each do |change| -%>
                 <li><%= change %></li>
               <%- end -%>
             </ul>
