@@ -105,7 +105,7 @@ class SlackBot < ActiveRecord::Base
     return true if searchcount == 0
 
     post_options = {}
-    post_options[:channel] = self.slack_channel_name
+    post_options[:channel] = "##{self.slack_channel_name}"
     post_options[:username] = "People Search Results"
     post_options[:icon_emoji] = ':engbot:'
     post_options[:message] = "Hi <@#{self.slack_user_id}|#{self.slack_user_name}>! Here are #{searchcount} people that match #{searchterm}"
