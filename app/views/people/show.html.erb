@@ -41,10 +41,9 @@
 
           <p data-toggle="modal" data-target="#avatar-detail" class="person-profile-avatar show-profile cursor"><%= person_avatar(@person, {image_size: :large}) %></p>
           <h2><%= @person.fullname %></h2>
-          <ul class='list-unstyled'>
-            <li><%= @person.title %></li>
-            <li><%= institution_text(@person) %></li>
-          </ul>
+          <h4><%= @person.title %></h4>
+          <h5><%= institution_text(@person) %></h5>
+
           <%- if(!@person.biography.blank?) -%>
             <div class='person-biograhy'>
               <%= @person.biography.html_safe %>
