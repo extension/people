@@ -29,6 +29,7 @@ tr.inactive {color: #000000;}
   margin:auto;
   margin-bottom:30px;
 }
+/*.person-profile-avatar.jumbo img {max-width: 300px;max-height: 300px;}*/
 .person-profile-avatar.person-profile-avatar-preview img {
 /*width: 100%;*/
 position: absolute;
@@ -85,3 +86,4 @@ margin: auto;
 background-repeat: no-repeat;
 -webkit-border-radius: 50%;
 z-index: 101;}
+.social-network-li {padding: 10px 0; font-size: 16px;}
