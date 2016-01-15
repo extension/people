@@ -71,7 +71,7 @@ class SlackBot < ActiveRecord::Base
     commands = parse_commandtext
     commandterms = commands[:commandterms]
 
-    searchterm = commandterms.join(' ')
+    searchterm = commandterms.reverse.join(' ')
     searchcount = Person.patternsearch(searchterm).validaccounts.count
     if(searchcount == 0)
       returntext = "No one was found that matches your searchterm #{searchterm}"
@@ -99,7 +99,7 @@ class SlackBot < ActiveRecord::Base
   def slackpost_find
     commands = parse_commandtext
     commandterms = commands[:commandterms]
-    searchterm = commandterms.join(' ')
+    searchterm = commandterms.reverse.join(' ')
 
     searchcount = Person.patternsearch(searchterm).validaccounts.count
     return true if searchcount == 0
