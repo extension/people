@@ -114,7 +114,7 @@ class SlackBot < ActiveRecord::Base
     attachments = []
     Person.patternsearch(searchterm).validaccounts.all.each do |person|
       if(person.avatar.present?)
-        avatar_url = person.avatar_url(:medium)
+        avatar_url = "https://#{Settings.urlwriter_host}/#{person.avatar_url(:medium)}"
       else
         avatar_url = ApplicationController.helpers.asset_url('avatar_placeholder.png')
       end
