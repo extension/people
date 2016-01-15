@@ -1,6 +1,10 @@
 <div class="col-md-12">
   <%= link_to(image_tag('people_logo_ithree_tagline.png', {class: "people-logo hidden-xs"}).html_safe,root_path) %>
 
+  <p class="mobile-nav-link">
+    <a href="#footer-shortcuts" class="btn btn-default"><i class="fa fa-align-justify"></i></a>
+  </p>
+
 <%- if current_person -%>
 
   <div class="pull-right">
@@ -8,12 +12,12 @@
       <li class="dropdown">
       <a class="dropdown-toggle" data-toggle="dropdown" href="#"><%= current_person.fullname -%><b class="caret"></b></a>
       <ul class="dropdown-menu pull-right">
-        <li><%= link_to('My Profile',person_path(current_person)) -%></li>
+        <li><%= link_to('My profile',person_path(current_person)) -%></li>
+        <%- if current_person.validaccount? -%>
+          <li><%= link_to('Privacy settings',public_settings_person_path(current_person)) %></li>
+        <%- end -%>
         <li class="divider"></li>
         <li><%= link_to('Change password',password_person_path(current_person)) %></li>
-        <%- if current_person.validaccount? -%>
-          <li><%= link_to('Change public profile settings',public_settings_person_path(current_person)) %></li>
-        <%- end -%>
         <li class="divider"></li>
         <li><%= link_to('Sign out',signout_path) %></li>
       </ul>

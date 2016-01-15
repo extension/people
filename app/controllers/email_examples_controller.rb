@@ -45,13 +45,13 @@ class EmailExamplesController < ApplicationController
   #   @recipient = options[:recipient]
   #   @subject = "eXtension: Your download is now available"
   #   @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
-    
+
   #   if(!@recipient.email.blank?)
   #     return_email = create_mail(to: @recipient.email, subject: @subject, send_in_demo: true)
   #     save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
   #   end
-    
-  #   return_email   
+
+  #   return_email
   # end
 
 
@@ -59,31 +59,31 @@ class EmailExamplesController < ApplicationController
   #   @invitation = options[:invitation]
   #   @subject = "eXtension: You have been invited to join us"
   #   @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
-    
+
   #   if(!@invitation.email.blank?)
   #     mail_options = {to: @invitation.email, subject: @subject}
-  #     mail_options[:cc] = @invitation.person.email if !@invitation.person.email.blank?     
+  #     mail_options[:cc] = @invitation.person.email if !@invitation.person.email.blank?
   #     return_email = create_mail(mail_options)
   #     save_sent_email_for_recipient(return_email,@invitation.email,options) if @save_sent_email
   #   end
-    
-  #   return_email    
+
+  #   return_email
   # end
 
   # def invitation_accepted(options={})
   #   @invitation = options[:invitation]
   #   @subject = "eXtension: Your invitation to eXtension has been accepted"
   #   @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
-    
+
   #   if(!@invitation.person.email.blank?)
   #     mail_options = {to: @invitation.person.email, subject: @subject}
   #     mail_options[:cc] = @invitation.colleague.email if (@invitation.colleague && !@invitation.colleague.email.blank?)
   #     return_email = create_mail(mail_options)
   #     save_sent_email_for_recipient(return_email,@invitation.email,options) if @save_sent_email
   #   end
-    
-  #   return_email    
-  # end  
+
+  #   return_email
+  # end
 
   # def profile_update(options={})
   #   @bycolleague = options[:colleague]
@@ -91,15 +91,15 @@ class EmailExamplesController < ApplicationController
   #   @what_changed = options[:what_changed]
   #   @subject = "eXtension: Your profile was updated by a colleague"
   #   @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
-    
+
   #   if(!@recipient.email.blank?)
   #     mail_options = {to: @recipient.email, subject: @subject}
-  #     mail_options[:cc] = @bycolleague.email if !@bycolleague.email.blank?     
+  #     mail_options[:cc] = @bycolleague.email if !@bycolleague.email.blank?
   #     return_email = create_mail(mail_options)
   #     save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
   #   end
-    
-  #   return_email    
+
+  #   return_email
   # end
 
 
@@ -107,14 +107,14 @@ class EmailExamplesController < ApplicationController
 
 
 
-  
+
   private
-  
+
   def render_mail(mail_message)
     # is this a multipart? then render the first html part by default, unless the text view is requested
     if(mail_message.multipart?)
       if(params[:view] == 'text')
-        @wordwrap = (params[:wordwrap] and params[:wordwrap] == 'no')
+        @wordwrap = (params[:wordwrap] and params[:wordwrap] == 'yes')
         @mailbody = get_first_text_body(mail_message)
         render(:template => 'email_examples/text_email',:layout => false)
       else
@@ -123,13 +123,13 @@ class EmailExamplesController < ApplicationController
         render(:text => inlined_content, :layout => false)
       end
     elsif(mail_message.mime_type == 'text/plain')
-      @wordwrap = (params[:wordwrap] and params[:wordwrap] == 'no')
+      @wordwrap = (params[:wordwrap] and params[:wordwrap] == 'yes')
       @mailbody = get_first_text_body(mail_message)
-      render(:template => 'email_examples/text_email', :layout => false)      
+      render(:template => 'email_examples/text_email', :layout => false)
     elsif(mail_message.mime_type == 'text/html')
       # send it through the inline style processing
       inlined_content = InlineStyle.process(get_first_html_body(mail_message),ignore_linked_stylesheets: true)
-      render(:text => inlined_content, :layout => false)      
+      render(:text => inlined_content, :layout => false)
     else # wtf?
       render(template: 'email_examples/email_error')
     end
@@ -147,7 +147,7 @@ class EmailExamplesController < ApplicationController
     else
       mail_message.parts.each do |part|
         if(part.mime_type == 'text/html')
-          return part
+          return part.body.to_s
         end
       end
     end

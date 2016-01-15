@@ -1,13 +1,32 @@
 <%- @page_title = "Profile Edit - #{@person.fullname}" -%>
 
+<div class="row">
+  <div class="col-md-10 col-md-offset-1">
 <div class="page-header">
   <h2><%= @page_title %></h2>
+  <%- if @person == current_person -%>
+    <p><%= link_to("Edit your social networks".html_safe,change_social_networks_people_path) %>
+      <span class="fa-stack fa-gray">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+      </span>
+      <span class="fa-stack fa-gray">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+      </span>
+      <span class="fa-stack fa-gray">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+      </span>
+      </p>
+  <%- end -%>
 </div>
-
+</div>
+</div>
 <div class="row">
+  <%= form_for @person, :html => { :class => 'form-horizontal' } do |f| -%>
   <div class="col-md-7">
 
-    <%= form_for @person, :html => { :class => 'form-horizontal' } do |f| -%>
 
     <%- if @person.errors.present? -%>
       <div class="col-md-offset-4 col-md-8">
@@ -47,12 +66,15 @@
 
       <%- if(current_person == @person or current_person.is_admin? ) -%>
       <div class="form-group">
-        <label for="email" class="col-md-4 control-label">Email</label>
+        <label for="email" class="col-md-4 control-label">* Email</label>
         <div class="col-md-6">
           <%= f.text_field :email, :class => "form-control", :placeholder => 'Email' %>
         </div>
       </div>
       <%- end -%>
+
+
+
 
       <div class="form-group">
         <label for="phone" class="col-md-4 control-label">Phone number</label>
@@ -142,32 +164,12 @@
         </div>
       </div>
 
-    <% end %>
 
   </div>
 
-      <%- if !Person::RESTRICTED_ACCOUNTS.include?(@person.id) -%>
-      <div class="col-md-offset-1 col-md-4">
-        <%- if(@person.retired?) -%>
-          <%= render(partial: 'retired_notice', locals: {person: @person, retired_account: @person.retired_account}) %>
-          <div class="well">
-            <p><%= link_to('Restore this account',restore_person_path(@person), :class => "btn btn-default", :method => :post) %></p>
-          </div>
-        <%- else -%>
-        <div class="well">
-        <%- if current_person == @person -%>
-          <h4>Retired?</h4>
-          <p>If you are no longer working or associated with Extension, you can retire your account.</p>
-          <p><%= link_to('Retire my account',retire_person_path(@person), :class => "btn btn-default") %></p>
-          <%- else -%>
-          <h4>Retire this account?</h4>
-          <p>If <%= @person.fullname %> is no longer working or associated with Extension, you can retire their account.</p>
-          <p><%= link_to('Retire this account',retire_person_path(@person), :class => "btn btn-default") %></p>
-        <%- end -%>
-        </div>
-        <%- end -%>
-      </div>
-      <%- end -%>
+  <%- end # form-%>
+
+  <!-- end of row -->
   </div>
 
   <script type="text/javascript">
@@ -237,4 +239,5 @@
             select.append($('<option></option>').val(option.id).html(option.name));
         });
     }
+
 </script>

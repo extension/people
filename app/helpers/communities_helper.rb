@@ -4,6 +4,16 @@
 # see LICENSE file
 module CommunitiesHelper
 
+  def community_masthead(community, options = {})
+    image_size = options[:image_size] || :large
+
+    if(!community.community_masthead.present?)
+      image_tag("community-masthead-placeholder.png", :title => community.name).html_safe
+    else
+      image_tag(community.community_masthead_url(image_size), :title => community.name).html_safe
+    end
+  end
+
   def connection_nav_item(label,connection)
     if(!params['connection'] and connection == 'joined')
       list_item_class = " class='active'"

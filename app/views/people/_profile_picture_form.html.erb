@@ -1,0 +1,58 @@
+<div class="person-profile-avatar person-profile-avatar-preview">
+  <div id="preview_person_avatar_bg"></div>
+  <%= person_avatar(person, {image_size: :large}) -%>
+</div>
+
+  <%= form_for(person, :url => setavatar_person_path(id: person.id), html: {id: "avatar_form_for_#{person.id}", :class => 'text-center', method: 'post' })  do |f| -%>
+    <%= f.file_field(:avatar, style: 'display: none;', id: 'avatar_file_input') -%>
+    <%- if person.avatar.present? -%>
+      <%= link_to('<i class="fa fa-trash-o"></i> Remove'.html_safe,setavatar_person_path(id: person.id, delete: 'true'), class: 'btn btn-default', method: 'post') %>
+    <%- end -%>
+    <%= button_tag("Select an image...", type: 'button', id: 'avatar_file_browser', class: 'btn btn-default') -%>
+    <%= f.submit "Save", id: 'avatar_save_button', :class => "btn btn-primary", style: 'display: none;' %>
+  <%- end -%>
+
+
+<script class="code" type="text/javascript">
+
+
+  $('#avatar_file_browser').click(function() {
+    $('#avatar_file_input').click();
+  });
+
+    if (window.File && window.FileReader && window.FileList && window.Blob) {
+      function handleFileSelect(evt) {
+        var files = evt.target.files; // FileList object
+        // Loop through the FileList and render image files as thumbnails.
+        for (var i = 0, f; f = files[i]; i++) {
+
+          // Only process image files.
+          if (!f.type.match('image.*')) {
+            continue;
+          }
+
+          var reader = new FileReader();
+
+          // Closure to capture the file information.
+          reader.onload = (function(theFile) {
+            return function(e) {
+              // Render thumbnail.
+              // $('#preview_person_avatar').html(['<img src="', e.target.result,'" title="', escape(theFile.name), '"/>'].join(''))
+              document.getElementById("preview_person_avatar_bg").style.backgroundImage = 'url(' + e.target.result + ')';
+
+            };
+          })(f);
+
+          // Read in the image file as a data URL.
+          reader.readAsDataURL(f);
+        }
+      }
+
+      $('#avatar_file_input').change(function(evt) {
+        $('#avatar_save_button').show();
+        handleFileSelect(evt);
+      });
+    }
+
+
+</script>

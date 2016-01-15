@@ -1,5 +1,4 @@
 source 'https://rubygems.org'
-source 'https://engineering.extension.org/rubygems'
 
 gem 'rails', '3.2.21'
 
@@ -23,7 +22,7 @@ group :assets do
   # files for bootstrap-in-asset-pipeline integration
   gem 'bootstrap-sass', '~> 3.1.1.1'
   # extension's packaging of html5shiv for the asset pipeline
-  gem 'extension-html5shiv-rails', :require => 'html5shiv-rails'
+  gem 'extension-html5shiv-rails', :require => 'html5shiv-rails', :source => 'https://engineering.extension.org/rubygems/'
   # replaces glyphicons
   gem 'font-awesome-rails'
   # select2 asset packaging - used for tag and filter interfaces
@@ -121,6 +120,10 @@ gem "slack-notifier"
 
 # markdown markup
 gem 'reverse_markdown'
+
+# image upload and processing
+gem 'rmagick'
+gem 'carrierwave', "~> 0.10.0"
 
 group :development do
   # require the powder gem

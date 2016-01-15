@@ -8,6 +8,10 @@
       <h2>Your current networks</h2>
     </div>
 
+    <%- if current_person.social_networks.size == 0 -%>
+      <h3 class="fa-gray">You haven't added any networks yet</h3>
+    <%- end -%>
+
     <div class="row">
       <div class="col-md-12">
         <table class='table'>
@@ -44,7 +48,7 @@
     </div>
 
     <div class="page-header">
-      <h3>Add a new network</h3>
+      <h3>Add a network</h3>
     </div>
 
     <div class="row">
@@ -52,10 +56,10 @@
         <div class="col-md-4">
           <ul class="list-unstyled">
           <%- group.each do |network| -%>
-            <li>
+            <li class="social-network-li">
               <%= network_icon(network.name) %>
               <%= network.display_name %>
-              <%= link_to('add',edit_social_network_people_path(network: network.id)) %>
+              <%= link_to('add',edit_social_network_people_path(network: network.id), class: 'btn btn-default') %>
             </li>
           <%- end -%>
           </ul>

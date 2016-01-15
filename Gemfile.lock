@@ -59,6 +59,11 @@ GEM
       net-sftp (>= 2.0.0)
       net-ssh (>= 2.0.14)
       net-ssh-gateway (>= 1.1.0)
+    carrierwave (0.10.0)
+      activemodel (>= 3.2.0)
+      activesupport (>= 3.2.0)
+      json (>= 1.7)
+      mime-types (>= 1.16)
     celluloid (0.14.1)
       timers (>= 1.0.0)
     coderay (1.1.0)
@@ -224,6 +229,7 @@ GEM
     retriable (1.4.1)
     reverse_markdown (1.0.0)
       nokogiri
+    rmagick (2.15.4)
     robust_params_parser (0.0.4)
       multi_json
       rails (~> 3.2.8)
@@ -290,9 +296,10 @@ DEPENDENCIES
   breadcrumbs_on_rails
   capatross
   capistrano (~> 2.15.5)
+  carrierwave (~> 0.10.0)
   coffee-rails (~> 3.2.1)
   csspool
-  extension-html5shiv-rails
+  extension-html5shiv-rails!
   font-awesome-rails
   geocoder
   geoip
@@ -321,6 +328,7 @@ DEPENDENCIES
   redis-rails
   rest-client
   reverse_markdown
+  rmagick
   robust_params_parser
   ruby-openid
   safe_attributes

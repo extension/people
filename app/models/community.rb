@@ -10,7 +10,10 @@ class Community < ActiveRecord::Base
   include MarkupScrubber
   attr_accessible :creator, :created_by
   attr_accessible :name, :description, :location, :location_id, :memberfilter, :connect_to_drupal
-  attr_accessible :connect_to_google_apps, :entrytype, :shortname, :publishing_community
+  attr_accessible :connect_to_google_apps, :entrytype, :shortname, :publishing_community, :is_public
+  attr_accessible :community_masthead, :community_masthead_cache, :remove_community_masthead
+
+  mount_uploader :community_masthead, CommunityMastheadUploader
 
   # hardcoded community ids
   INSTITUTIONAL_TEAMS_COMMUNITY_ID = 80
@@ -169,6 +172,15 @@ class Community < ActiveRecord::Base
     else
       self.people.where(0)
     end
+  end
+
+  def joined_with_public_avatar
+    self.people
+        .joins(:profile_public_settings)
+        .where("profile_public_settings.item = 'avatar'")
+        .where("profile_public_settings.is_public = 1")
+        .where("people.avatar is NOT NULL")
+        .validaccounts.where(CONNECTION_CONDITIONS['joined'])
   end
 
   def leaders

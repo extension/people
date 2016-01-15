@@ -1,0 +1,101 @@
+<%- @page_title = "#{@community.name}" -%>
+
+
+<div class="page-header">
+  <div class="community-masthead">
+    <%= community_masthead(@community, {image_size: :large}) -%>
+    <h2><%= @page_title %></h2>
+  </div>
+
+  <%- if(current_person && current_person.can_edit_community?(@community)) -%>
+    <div class="text-right">
+      <p class="btn btn-default btn-xs" data-toggle="modal" data-target="#myModal">change community masthead</p>
+    </div>
+  <%- end -%>
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+          <%= render(:partial => 'community_masthead_form', :locals => {community: @community}) %>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <p class="community-public-description"><%= description_for_community(@community) -%></p>
+  <%- if current_person -%>
+    <p><%= link_to("View more information about this community", community_path(@community), class: 'btn btn-link btn-sm') %></p>
+  <%- else -%>
+    <p>If you have an eXtension account, you can <%= link_to("sign in to view this community", signin_path) %>.</p>
+  <%- end -%>
+</div>
+
+<%- if !current_person -%>
+  <div class="gallery-member-count">
+    <p class="color-gray">This community has <%= @community.joined_count -%> members. <%= @connections.size -%> have shared their profiles publicly.</p>
+  </div>
+<%- end -%>
+
+<%- if @connections.size == 0 -%>
+  <div class="page-footer"></div>
+<%- end -%>
+
+<div class="row">
+
+  <%- i = 0 -%>
+  <%- for person in @connections -%>
+    <%- i += 1 -%>
+    <div class="col-md-4 col-sm-6 col-xs-6">
+      <div class="person-profile">
+        <div class="person-profile-avatar"><%= link_to_person_avatar(person, {image_size: :large}) -%></div>
+        <%- if(current_person)
+          link_path = person_path(person)
+        else
+          link_path = public_profile_path(person.idstring)
+        end -%>
+        <h4 class="person-profile-name"><%= link_to_person_profile(person) %></h4>
+        <p class="person-profile-title"><%= person.title %></p>
+        <div class="person-profile-social-icons">
+          <%- person.facebook_connections.each do |fbc| -%>
+            <%- if current_person or fbc.is_public? -%>
+              <%- url = social_network_url(fbc) || "https://www.facebook.com/public?query=#{fbc.accountid}" # this should really be a helper -%>
+              <a href='<%= url -%>' title='<%= fbc.accountid -%>' ><span class="fa-stack fa-lg">
+                <i class="fa fa-circle fa-stack-2x"></i>
+                <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+              </span></a>
+            <%- end -%>
+          <%- end -%>
+
+          <%- person.twitter_connections.each do |tc| -%>
+            <%- if current_person or tc.is_public? -%>
+              <%- url = social_network_url(tc) || "https://twitter.com/#{tc.accountid}" # this should really be a helper -%>
+              <a href='<%= url -%>' title='<%= tc.accountid -%>' ><span class="fa-stack fa-lg">
+                  <i class="fa fa-circle fa-stack-2x"></i>
+                  <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                </span></a>
+            <%- end -%>
+          <%- end -%>
+
+          <%- person.linkedin_connections.each do |lic| -%>
+            <%- if current_person or lic.is_public? -%>
+              <%- url = social_network_url(lic) || "https://www.linkedin.com/in/#{lic.accountid}" # this should really be a helper -%>
+              <a href='<%= url -%>' title='<%= lic.accountid -%>' ><span class="fa-stack fa-lg">
+                  <i class="fa fa-circle fa-stack-2x"></i>
+                  <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                </span></a>
+            <%- end -%>
+          <%- end -%>
+        </div>
+      </div>
+    </div>
+    <%- if i % 3 == 0 -%>
+    <div class="clearfix visible-lg-block visible-md-block"></div>
+    <% end %>
+    <%- end -%>
+
+</div>

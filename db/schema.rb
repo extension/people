@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20151203200008) do
+ActiveRecord::Schema.define(:version => 20160114192356) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -95,6 +95,7 @@ ActiveRecord::Schema.define(:version => 20151203200008) do
     t.boolean  "active",                               :default => true
     t.datetime "created_at",                                              :null => false
     t.datetime "updated_at",                                              :null => false
+    t.string   "community_masthead"
   end
 
   add_index "communities", ["entrytype"], :name => "entrytype_ndx"
@@ -304,6 +305,8 @@ ActiveRecord::Schema.define(:version => 20151203200008) do
     t.string   "email_forward"
     t.integer  "tou_status",                             :default => 0,     :null => false
     t.datetime "tou_status_date"
+    t.string   "slack_user_id"
+    t.string   "avatar"
   end
 
   add_index "people", ["email"], :name => "email_ndx", :unique => true
@@ -394,6 +397,17 @@ ActiveRecord::Schema.define(:version => 20151203200008) do
   end
 
   add_index "sites", ["label"], :name => "site_ndx", :unique => true
+
+  create_table "slack_bots", :force => true do |t|
+    t.integer  "person_id",          :default => 1
+    t.string   "slack_channel_id"
+    t.string   "slack_channel_name"
+    t.string   "slack_user_id"
+    t.string   "slack_user_name"
+    t.string   "command"
+    t.text     "commandtext"
+    t.datetime "created_at"
+  end
 
   create_table "social_network_connections", :force => true do |t|
     t.integer  "person_id"

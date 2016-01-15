@@ -14,6 +14,10 @@ People::Application.routes.draw do
 
   root :to => 'home#index'
 
+  # slackbot
+  match '/slackbot/ask' => 'slackbot#ask'
+
+
   # straight up redirects
   match "/account/new_password", to: redirect("/accounts/reset_password")
   match "/profile/edit", to: redirect("/people/personal_edit")
@@ -67,6 +71,7 @@ People::Application.routes.draw do
       post :password
       get :public_settings
       get :authsummary
+      post :setavatar
     end
 
     collection do
@@ -105,12 +110,14 @@ People::Application.routes.draw do
       get :activity
       get :connections
       get :connectionsfile
+      get :gallery
       get :invite
       post :invite
       post :join
       post :leave
       post :change_connection
       post :remove_connection
+      post :setmasthead
     end
   end
 

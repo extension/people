@@ -16,6 +16,8 @@ module PeopleHelper
     end
     text.join(', ')
   end
+
+
   def link_to_person(person,options = {})
     show_unknown = options[:show_unknown] || false
     show_systemuser = options[:show_systemuser] || false
@@ -31,6 +33,92 @@ module PeopleHelper
       link_to(person.fullname,person_path(person),class: 'person').html_safe
     end
   end
+
+  def person_avatar(person, options = {})
+    image_size = options[:image_size] || :thumb
+    case image_size
+      when :large     then image_size_in_px = "300x300"
+      when :medium    then image_size_in_px = "100x100"
+      when :thumb     then image_size_in_px = "50x50"
+    end
+
+    is_private = (!current_person && !person.profile_setting_is_public?('avatar'))
+
+    if(is_private)
+      image_tag("avatar_private_w_lock.png", :class => 'avatar size' + image_size_in_px, :size => image_size_in_px, :title => 'private profile').html_safe
+    elsif(!person.avatar.present?)
+      image_tag("avatar_placeholder.png", :class => 'avatar size' + image_size_in_px, :size => image_size_in_px, :title => person.fullname).html_safe
+    else
+      image_tag(person.avatar_url(image_size), :class => 'avatar size' + image_size_in_px, :title => person.fullname).html_safe
+    end
+  end
+
+  def link_to_person_avatar(person, options = {})
+    nolink = options[:nolink] || false
+    if(current_person)
+      link_path = person_path(person)
+    else
+      link_path = public_profile_path(person.idstring)
+    end
+
+    private_name = !@currentperson and person.public_attributes[:profile_attributes].blank?
+    if(private_name)
+      link_title = "Private profile"
+    else
+      link_title = person.fullname
+    end
+
+    if(nolink)
+      return person_avatar(person,options)
+    else
+      return link_to(person_avatar(person,options), link_path, :title => link_title).html_safe
+    end
+  end
+
+  def link_to_person_profile(person, options = {})
+    nolink = options[:nolink] || false
+    if(current_person)
+      link_path = person_path(person)
+    else
+      link_path = public_profile_path(person.idstring)
+    end
+
+    private_name = (!current_person && person.public_attributes[:profile_attributes].blank?)
+    if(private_name)
+      link_title = "Private profile"
+    else
+      link_title = person.fullname
+    end
+
+    if(nolink)
+      return person_avatar(person,options)
+    else
+      return link_to(link_title, link_path, :title => link_title).html_safe
+    end
+  end
+
+
+
+  def social_network_url(network_and_connection)
+    if(!network_and_connection.accounturl.blank?)
+      begin
+        accounturi = URI.parse(URI.escape(network_and_connection.accounturl))
+      rescue
+        return nil
+      end
+      if(accounturi.scheme.nil?)
+        uristring = 'http://'+network_and_connection.accounturl
+      else
+        uristring = network_and_connection.accounturl
+      end
+      return uristring
+    else
+      return nil
+    end
+  end
+
+
+
 
   def social_network_link(network_and_connection)
     if(!network_and_connection.accounturl.blank?)
@@ -64,8 +152,8 @@ module PeopleHelper
     string_array = []
     filter_hash.each do |filter_key,items|
       if(filter_key == 'social_networks')
-        string_array << "<strong>Social Networks</strong>: #{items.map(&:display_name).join(' or ')}"        
-      else  
+        string_array << "<strong>Social Networks</strong>: #{items.map(&:display_name).join(' or ')}"
+      else
         string_array << "<strong>#{filter_key.capitalize}</strong>: #{items.map(&:name).join(' or ')}"
       end
     end
@@ -81,7 +169,7 @@ module PeopleHelper
     text_macro_options = {}
 
     # note space on the end of link - required in string formatting
-  
+
     if(activity.person_id.blank? and activity.activitycode == Activity::AUTH_LOCAL_FAILURE)
       # special case of showing additional information for authentication failures
       text_macro_options[:persontext]  = hide_person_text ? '' : "#{activity.additionalinfo} (unknown account) "
@@ -104,7 +192,7 @@ module PeopleHelper
     if(activity.activitycode == Activity::EMAIL_CHANGE)
       text_macro_options[:current_email] =  (activity.person.email || 'unknown')
       text_macro_options[:previous_email] =  (activity.person.previous_email || 'unknown')
-    end    
+    end
 
     I18n.translate("activity.#{activity.activitycode_to_s}",text_macro_options).html_safe
 
@@ -127,7 +215,7 @@ module PeopleHelper
       icon = "<i class='fa fa-info-circle'></i>".html_safe
       title = 'Pending email confirmation from email change'
       link_to(icon,'#',data: {toggle: "tooltip"},title: title, class: 'status_icon').html_safe
-    elsif(person.last_activity_at.nil?)    
+    elsif(person.last_activity_at.nil?)
       icon = "<i class='fa fa-clock-o'></i>".html_safe
       title = "Has never been active"
       link_to(icon,'#',data: {toggle: "tooltip"},title: title, class: 'status_icon').html_safe

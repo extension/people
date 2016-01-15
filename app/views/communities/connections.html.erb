@@ -2,6 +2,7 @@
 
 <div class="page-header">
   <h2><%= @page_title %></h2>
+  <p><%= link_to("View member gallery", gallery_community_path(@community), class: 'btn btn-default btn-sm') %></p>
 </div>
 
 <div class="row">
@@ -12,7 +13,7 @@
                   connectionsfile_community_path(@community,download: 'csv'),
                   :class => 'btn') %>
       </p>
-    </div>    
+    </div>
     <ul class="nav nav-pills">
       <%= connection_nav_item('Joined','joined') %>
       <%- if @community.is_institution? %>
@@ -39,6 +40,6 @@
       <%= render(:partial => 'institution_connections_table') %>
     <%- else -%>
       <%= render(:partial => 'community_connections_table') %>
-    <%- end -%>    
+    <%- end -%>
   </div>
 </div>

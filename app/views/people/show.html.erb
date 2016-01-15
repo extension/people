@@ -15,19 +15,58 @@
     <div class="row">
 
       <div class="col-md-7">
-        <div class="page-header">
+        <div class="page-header clearfix">
+
+          <div class="modal" id="avatar-detail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-body">
+                  <p class="person-profile-avatar show-detail"><%= person_avatar(@person, {image_size: :large}) %></p>
+                </div>
+                <div class="modal-footer">
+                  <%- if(@person == current_person or !Person::RESTRICTED_ACCOUNTS.include?(@person.id)) -%>
+                    <button id="change-profile-image" class="btn btn-default btn-ms" data-toggle="modal" data-target="#myModal">change profile picture</button>
+                  <%- end -%>
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <script class="code" type="text/javascript">
+          $('#change-profile-image').click(function() {
+            $('#avatar-detail').modal('hide')
+          });
+          </script>
+
+          <p data-toggle="modal" data-target="#avatar-detail" class="person-profile-avatar show-profile cursor"><%= person_avatar(@person, {image_size: :large}) %></p>
           <h2><%= @person.fullname %></h2>
-          <ul class='list-unstyled'>
-            <li><%= @person.title %></li>
-            <li><%= institution_text(@person) %></li>
-          </ul>
+          <h4><%= @person.title %></h4>
+          <h5><%= institution_text(@person) %></h5>
+
+          <%- if(!@person.biography.blank?) -%>
+            <div class='person-biograhy'>
+              <%= @person.biography.html_safe %>
+            </div>
+          <%- end -%>
+          <br class="clearing" />
         </div>
 
-        <%- if(!@person.biography.blank?) -%>
-          <div class='person-biograhy'>
-            <%= @person.biography.html_safe %>
+        <!-- Modal -->
+        <div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-body">
+                <%= render(:partial => 'profile_picture_form', :locals => {person: @person}) %>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              </div>
+            </div>
           </div>
-        <%- end -%>
+        </div>
+
+
 
         <dl class='dl-horizontal dashmodule'>
           <dt>eXtensionID:</dt>
@@ -64,9 +103,8 @@
             </ul>
           </dd>
           <dt>Last Active At:</dt>
-          <dd><%= display_time(@person.last_activity_at) %></dd>
+          <dd><%= display_time(@person.last_activity_at) %> <br /><%= link_to('View Activity',activity_person_path(@person), class: "btn btn-default btn-sm") %></dd>
         </dl>
-
 
       </div>
 
@@ -74,7 +112,9 @@
 
         <div class='pull-right'>
          <ul class="nav nav-pills">
-            <li><%= link_to('Activity',activity_person_path(@person)) %></li>
+           <%- if(@person == current_person) -%>
+             <li><%= link_to('Privacy and Sharing',public_settings_person_path(@person)) %></li>
+           <%- end -%>
             <%- if(@person == current_person or !Person::RESTRICTED_ACCOUNTS.include?(@person.id)) -%>
               <li><%= link_to('Edit profile',edit_person_path(@person)) %></li>
             <%- end -%>
@@ -111,6 +151,9 @@
           </ul>
           <%- else -%>
           <p>No social networking connections listed.</p>
+          <%- if @person == current_person -%>
+            <p><%= link_to('Add a social network',change_social_networks_people_path, class: "btn btn-default btn-lg") %></p>
+          <%- end -%>
           <%- end -%>
 
         </div>
@@ -136,3 +179,23 @@
 
   </div>
 </div>
+
+<%- if !Person::RESTRICTED_ACCOUNTS.include?(@person.id) -%>
+  <%- if(!@person.retired?) -%>
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+      <div class="well">
+        <%- if current_person == @person -%>
+          <h4>Retired?</h4>
+          <p>If you are no longer working or associated with Extension, you can retire your account.</p>
+          <p><%= link_to('Retire my account',retire_person_path(@person), :class => "btn btn-default") %></p>
+        <%- else -%>
+          <h4>Retire this account?</h4>
+          <p>If <%= @person.fullname %> is no longer working or associated with Extension, you can retire their account.</p>
+          <p><%= link_to('Retire this account',retire_person_path(@person), :class => "btn btn-default") %></p>
+        <%- end -%>
+      </div>
+    </div>
+  </div>
+  <%- end -%>
+<%- end -%>
