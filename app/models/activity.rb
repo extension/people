@@ -485,7 +485,7 @@ class Activity < ActiveRecord::Base
     ],
     "color" => "good"
     }
-    post_options[:attachment] = attachment
+    post_options[:attachments] = attachment
     SlackNotification.post(post_options)
     true
   end
