@@ -103,7 +103,7 @@
             </ul>
           </dd>
           <dt>Last Active At:</dt>
-          <dd><%= display_time(@person.last_activity_at) %></dd>
+          <dd><%= display_time(@person.last_activity_at) %> <br /><%= link_to('View Activity',activity_person_path(@person), class: "btn btn-default btn-sm") %></dd>
         </dl>
 
       </div>
@@ -115,7 +115,6 @@
            <%- if(@person == current_person) -%>
              <li><%= link_to('Privacy and Sharing',public_settings_person_path(@person)) %></li>
            <%- end -%>
-            <li><%= link_to('Activity',activity_person_path(@person)) %></li>
             <%- if(@person == current_person or !Person::RESTRICTED_ACCOUNTS.include?(@person.id)) -%>
               <li><%= link_to('Edit profile',edit_person_path(@person)) %></li>
             <%- end -%>
