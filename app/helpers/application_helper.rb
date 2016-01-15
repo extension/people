@@ -5,6 +5,11 @@
 # see LICENSE file
 module ApplicationHelper
 
+  # at least until rails4
+  def asset_url(asset)
+    "https://#{Settings.urlwriter_host}/#{asset_path(asset)}"
+  end
+
   def twitter_alert_class(type)
     baseclass = "alert"
     case type

@@ -5,7 +5,7 @@
 
 class SlackNotification
 
-  attr_accessor :message, :attachment, :slack, :icon_emoji
+  attr_accessor :message, :attachments, :slack, :icon_emoji
 
   def initialize(options = {})
     username = options[:username] || "EngBot"
@@ -14,15 +14,17 @@ class SlackNotification
     @slack.username = username
     @slack.channel = channel
     @message = options[:message] || ''
-    @attachment = options[:attachment]
+    @attachments = options[:attachments]
     @icon_emoji = options[:icon_emoji]
     self
   end
 
   def post
     post_parameters = {}
-    if(self.attachment)
-      post_parameters[:attachments] = [self.attachment]
+    if(self.attachments.is_a?(Array))
+      post_parameters[:attachments] = self.attachments
+    else
+      post_parameters[:attachments] = [self.attachments]
     end
 
     if(self.icon_emoji)
