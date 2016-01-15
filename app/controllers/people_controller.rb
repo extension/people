@@ -57,19 +57,19 @@ class PeopleController < ApplicationController
       Activity.log_activity(person_id: @person.id,
                             activitycode: Activity::UPDATE_PROFILE,
                             ip_address: request.remote_ip,
-                            additionaldata: {what_changed: 'avatar'})
+                            additionaldata: {what_changed: what_changed})
     else
       # notification
       Notification.create(notifiable: @person,
                           notification_type: Notification::UPDATE_COLLEAGUE_PROFILE,
-                          additionaldata: {what_changed: 'avatar', colleague_id: current_person.id})
+                          additionaldata: {what_changed: what_changed, colleague_id: current_person.id})
 
       # activity log
       Activity.log_activity(person_id:  current_person.id,
                             activitycode: Activity::UPDATE_COLLEAGUE_PROFILE,
                             ip_address: request.remote_ip,
                             colleague_id: @person.id,
-                            additionaldata: {what_changed: 'avatar'})
+                            additionaldata: {what_changed: what_changed})
     end
 
     return redirect_to person_path(@person)
