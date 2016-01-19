@@ -1,6 +1,6 @@
 <div class="person-nav-wrapper">
 <ul class="nav nav-pills">
-   <li><%= link_to(@person.fullname, person_path(@person)) %></li>
+   <li><%= current_page?(person_path(@person)) ? "<span class='nav-link'>#{@person.fullname}</span".html_safe : link_to(@person.fullname, person_path(@person)) %></li>
   <%- if(@person == current_person) -%>
     <li><%= link_to('Privacy and sharing',public_settings_person_path(@person)) %></li>
   <%- end -%>
