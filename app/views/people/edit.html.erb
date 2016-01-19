@@ -2,26 +2,48 @@
 
 <div class="row">
   <div class="col-md-10 col-md-offset-1">
-<div class="page-header">
-  <h2><%= @page_title %></h2>
-  <%- if @person == current_person -%>
-    <p><%= link_to("Edit your social networks".html_safe,change_social_networks_people_path) %>
-      <span class="fa-stack fa-gray">
-        <i class="fa fa-circle fa-stack-2x"></i>
-        <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
-      </span>
-      <span class="fa-stack fa-gray">
-        <i class="fa fa-circle fa-stack-2x"></i>
-        <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
-      </span>
-      <span class="fa-stack fa-gray">
-        <i class="fa fa-circle fa-stack-2x"></i>
-        <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
-      </span>
-      </p>
-  <%- end -%>
-</div>
-</div>
+    <%= render(:partial => 'person_nav') %>
+
+    <div class="page-header">
+      <h2><%= @page_title %></h2>
+      <%- if @person == current_person -%>
+        <p><%= link_to("Edit your social networks".html_safe,change_social_networks_people_path) %>
+          <span class="fa-stack fa-gray">
+            <i class="fa fa-circle fa-stack-2x"></i>
+            <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+          </span>
+          <span class="fa-stack fa-gray">
+            <i class="fa fa-circle fa-stack-2x"></i>
+            <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+          </span>
+          <span class="fa-stack fa-gray">
+            <i class="fa fa-circle fa-stack-2x"></i>
+            <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+          </span>
+          </p>
+      <%- end -%>
+    </div>
+
+
+    <p data-toggle="modal" data-target="#myModal" class="person-profile-avatar show-profile cursor"><%= person_avatar(@person, {image_size: :large}) %>  <span class="btn btn-default btn-md">edit profile picture</span></p>
+
+    <!-- Modal -->
+    <div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <%= render(:partial => 'profile_picture_form', :locals => {person: @person}) %>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+  </div>
 </div>
 <div class="row">
   <%= form_for @person, :html => { :class => 'form-horizontal' } do |f| -%>

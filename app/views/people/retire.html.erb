@@ -1,18 +1,23 @@
 <%- @page_title = "Retire Account for #{@person.fullname}" -%>
 
-<div class="page-header">
-  <h2><%= @page_title %></h2>
-</div>
+
 
 <div class="row">
-  <div class="col-md-8">
+  <div class="col-md-10 col-md-offset-1">
+
+    <%= render(:partial => 'person_nav') %>
+
+    <div class="page-header">
+      <h2><%= @page_title %></h2>
+    </div>
+    
 <%- if current_person == @person -%>
   <h4>Retired?</h4>
   <p>We're sorry to see you go, but congratulations on your new opportunities!</p>
   <%= form_tag(retire_person_path(@person), class: 'form-inline') do -%>
     <fieldset>
       <p><span class="help-block">Let us know why you are retiring your account.</span>
-      <%= text_field_tag("explanation","", class: 'span4' )%></p>       
+      <%= text_field_tag("explanation","", class: 'span4' )%></p>
     <p><%= submit_tag "Retire my account", :class => "btn btn-default btn-primary" %> <%= link_to "Cancel", person_path(@person), :class => "btn" %></p>
     </fieldset>
 
@@ -30,8 +35,7 @@
     <p><%= submit_tag "Retire this account", :class => "btn btn-default btn-primary" %> <%= link_to "Cancel", person_path(@person), :class => "btn" %></p>
     </fieldset>
 
-  <%- end -%>  
+  <%- end -%>
 <%- end -%>
   </div>
 </div>
-

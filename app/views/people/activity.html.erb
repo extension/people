@@ -1,12 +1,16 @@
 <%- @page_title = @person.blank? ? "Colleague Activity" : "Activity for #{@person.fullname}"-%>
 
-<div class="page-header">
-  <h2><%= @page_title %></h2>
-</div>
+
 
 <%- if !@activities.blank? -%>
 <div class="row">
-  <div class="col-md-12">
+  <div class="col-md-10 col-md-offset-1">
+    <%= render(:partial => 'person_nav') %>
+
+    <div class="page-header">
+      <h2><%= @page_title %></h2>
+    </div>
+    
     <%= page_entries_info @activities %>
     <%= paginate(@activities) %>
     <table class="table">

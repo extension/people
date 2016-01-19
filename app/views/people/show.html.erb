@@ -11,6 +11,7 @@
       <%= render(:partial => 'show_personal_status_banner') %>
     <%- end -%>
 
+    <%= render(:partial => 'person_nav') %>
 
     <div class="row">
 
@@ -21,7 +22,7 @@
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-body">
-                  <p class="person-profile-avatar show-detail"><%= person_avatar(@person, {image_size: :large}) %></p>
+                  <p class="person-profile-avatar show-detail jumbo"><%= person_avatar(@person, {image_size: :large}) %></p>
                 </div>
                 <div class="modal-footer">
                   <%- if(@person == current_person or !Person::RESTRICTED_ACCOUNTS.include?(@person.id)) -%>
@@ -109,17 +110,6 @@
       </div>
 
       <div class="col-md-5">
-
-        <div class='pull-right'>
-         <ul class="nav nav-pills">
-           <%- if(@person == current_person) -%>
-             <li><%= link_to('Privacy and sharing',public_settings_person_path(@person)) %></li>
-           <%- end -%>
-            <%- if(@person == current_person or !Person::RESTRICTED_ACCOUNTS.include?(@person.id)) -%>
-              <li><%= link_to('Edit profile',edit_person_path(@person)) %></li>
-            <%- end -%>
-          </ul>
-        </div>
 
         <div class='clearfix'></div>
 
