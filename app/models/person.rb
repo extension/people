@@ -693,11 +693,6 @@ class Person < ActiveRecord::Base
   end
 
 
-
-
-  end
-
-
   # since we return a default string from timezone, this routine
   # will allow us to check for a null/empty value so we can
   # prompt people to come set one.
