@@ -47,3 +47,7 @@ left: -9999px;
 right: -9999px;
 margin: auto;
 }
+
+.person-profile-name {text-align:center;}
+.person-profile-title {text-align:center; margin-bottom: 6px;}
+.person-profile-institution {text-align:center; font-size: 13px; color: #666; line-height: 1.1em;}
