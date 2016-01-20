@@ -4,7 +4,7 @@
   <%- if(@person == current_person) -%>
     <li><%= link_to('Privacy and sharing',public_settings_person_path(@person)) %></li>
   <%- end -%>
-   <%- if(@person == current_person or !Person::RESTRICTED_ACCOUNTS.include?(@person.id)) -%>
+  <%- if(current_person.can_edit_profile_for?(@person)) -%>
      <li><%= link_to('Edit profile',edit_person_path(@person)) %></li>
    <%- end -%>
  </ul>
