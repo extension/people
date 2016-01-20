@@ -55,7 +55,7 @@ class AccountsController < ApplicationController
 
         if(@person.nil?)
           flash.now[:warning] = "We are not able to find an account registered with that email address"
-        elsif(Person::SYSTEMS_USERS.include?(@person.id))
+        elsif(@person.is_systems_account?)
           flash.now[:warning] = "The password for that account can't be reset"
         elsif(@person.retired?)
           flash.now[:warning] = "Your account has been retired. #{view_context.link_to('Contact us for more information.',help_path)}".html_safe
@@ -86,8 +86,7 @@ class AccountsController < ApplicationController
       elsif(!params[:person][:password_confirmation] or (params[:person][:password_confirmation] != params[:person][:password]))
         @person.errors.add(:password, "Your password confirmation did not match the new password.".html_safe)
       else
-        @person.password = params[:person][:password]
-        if(@person.set_hashed_password(save: true))
+        if(@person.set_account_password(params[:person][:password]))
           @person.clear_reset_token
           Notification.create(:notification_type => Notification::PASSWORD_RESET, :notifiable => @person)
           Activity.log_activity(person_id: @person.id,
