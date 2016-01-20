@@ -1,4 +1,13 @@
-<%- if @person.is_signup? -%>
+<%- if @person.is_systems_account? -%>
+<div class="row">
+  <div class="col-md-12">
+    <div class='alert  alert-info'>
+     <h4>eXtension Systems Account</h4>
+     <p>This account is a special account used in eXtension services and by eXtension staff to facilitate the delivery of our tools.</p>
+    </div>
+  </div>
+</div>
+<%- elsif @person.is_signup? -%>
 <div class="row">
   <div class="col-md-12">
     <div class='alert alert-warning'>

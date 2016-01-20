@@ -44,7 +44,9 @@ module PeopleHelper
 
     is_private = (!current_person && !person.profile_setting_is_public?('avatar'))
 
-    if(is_private)
+    if(person.is_systems_account?)
+      image_tag("engbot.png", :class => 'avatar size' + image_size_in_px, :size => image_size_in_px, :title => 'private profile').html_safe      
+    elsif(is_private)
       image_tag("avatar_private_w_lock.png", :class => 'avatar size' + image_size_in_px, :size => image_size_in_px, :title => 'private profile').html_safe
     elsif(!person.avatar.present?)
       image_tag("avatar_placeholder.png", :class => 'avatar size' + image_size_in_px, :size => image_size_in_px, :title => person.fullname).html_safe

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20160114192356) do
+ActiveRecord::Schema.define(:version => 20160120152459) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -307,6 +307,7 @@ ActiveRecord::Schema.define(:version => 20160114192356) do
     t.datetime "tou_status_date"
     t.string   "slack_user_id"
     t.string   "avatar"
+    t.boolean  "is_systems_account",                     :default => false
   end
 
   add_index "people", ["email"], :name => "email_ndx", :unique => true
