@@ -86,8 +86,7 @@ class AccountsController < ApplicationController
       elsif(!params[:person][:password_confirmation] or (params[:person][:password_confirmation] != params[:person][:password]))
         @person.errors.add(:password, "Your password confirmation did not match the new password.".html_safe)
       else
-        @person.password = params[:person][:password]
-        if(@person.set_hashed_password(save: true))
+        if(@person.set_account_password(params[:person][:password]))
           @person.clear_reset_token
           Notification.create(:notification_type => Notification::PASSWORD_RESET, :notifiable => @person)
           Activity.log_activity(person_id: @person.id,

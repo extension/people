@@ -303,11 +303,10 @@ class PeopleController < ApplicationController
       elsif(!params[:person][:password] or params[:person][:password].length < 8)
         @person.errors.add(:password, "Your new password must be a minimum of 8 characters".html_safe)
       else
-        @person.password = params[:person][:password]
-        if(@person.set_hashed_password(save: true))
-        Activity.log_activity(person_id: @person.id,
-                              activitycode: Activity::PASSWORD_CHANGE,
-                              ip_address: request.remote_ip)
+        if(@person.set_account_password(params[:person][:password]))
+          Activity.log_activity(person_id: @person.id,
+                                activitycode: Activity::PASSWORD_CHANGE,
+                                ip_address: request.remote_ip)
           flash[:notice] = 'Your password has been changed'
           return redirect_to(person_url(current_person))
         end

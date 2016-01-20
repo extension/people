@@ -305,6 +305,12 @@ class Person < ActiveRecord::Base
     (self.last_activity_at.nil? or self.last_activity_at  < (Time.zone.now - Settings.months_for_inactive_flag.months))
   end
 
+  def set_account_password(clear_password_string)
+    self.password = clear_password_string
+    return self.set_hashed_password(save: true)
+  end
+
+
   def expire_password(set_google_random = true)
     if(set_google_random)
       self.password_hash = nil
@@ -316,6 +322,7 @@ class Person < ActiveRecord::Base
       self.update_column(:legacy_password,nil)
     end
   end
+
 
   def set_hashed_password(options = {})
     if(!@password.blank?)
@@ -1048,8 +1055,41 @@ class Person < ActiveRecord::Base
     admin_account
   end
 
+  def self.create_systems_account(options = {})
+    system_account_attributes = {}
+    if(!idstring = options[:idstring])
+      return nil
+    end
+    generated_password = SecureRandom.urlsafe_base64(16)
+    system_account_attributes[:idstring] = idstring
+    system_account_attributes[:password] = generated_password
+    system_account_attributes[:is_systems_account] = true
+    system_account_attributes[:first_name] = 'eXtension'
+    system_account_attributes[:last_name] = idstring.capitalize
+    system_account_attributes[:google_apps_email] = true
+    system_account_attributes[:email] = "#{idstring}@extension.org"
+    system_account_attributes[:involvement] = "Systems Account"
+    system_account_attributes[:contributor_agreement] = true
+    system_account_attributes[:contributor_agreement_at] = Time.zone.now
+    system_account_attributes[:last_activity_at] = Time.zone.now
+    system_account = Person.new(system_account_attributes, :without_protection => true)
+    if(system_account.save)
+      system_account.confirm_signup(nolog: true)
+    end
+    if(!options[:aliases].blank?)
+      options[:aliases].each do |mail_alias|
+        system_account.add_email_alias(mail_alias)
+      end
+    end
+    system_account
+  end
+
   def has_whitelisted_email?
-    (self.email =~ /edu$|gov$|mil$/i) ? true : false
+    if(self.is_systems_account?)
+      true
+    else
+      (self.email =~ /edu$|gov$|mil$/i)
+    end
   end
 
   def status_token
@@ -1426,6 +1466,11 @@ class Person < ActiveRecord::Base
   def linkedin_connections
     self.social_networks.where(name: 'linkedin')
   end
+
+  def add_email_alias(mail_alias)
+    self.email_aliases.create({mail_alias: mail_alias, destination: self.idstring, alias_type: EmailAlias::ALIAS, disabled: !self.validaccount?})
+  end
+
 
   private
 
