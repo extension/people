@@ -30,7 +30,6 @@ class Person < ActiveRecord::Base
 
   ## constants
   DEFAULT_TIMEZONE = 'America/New_York'
-  SYSTEMS_USERS = [1,2,3,4,5,6,7,8]
   RESTRICTED_ACCOUNTS = [116955,169230]
 
   # Systems accounts used in app
@@ -124,7 +123,7 @@ class Person < ActiveRecord::Base
   scope :retired, -> {where(retired: true)}
   scope :validaccounts, where("retired = #{false} and vouched = #{true}")
   scope :pendingreview, where("retired = #{false} and vouched = #{false} and account_status != #{STATUS_SIGNUP} && email_confirmed = #{true}")
-  scope :not_system, where("people.id NOT IN(#{SYSTEMS_USERS.join(',')})")
+  scope :not_system, where("people.is_systems_account = ?",false)
   scope :display_accounts, validaccounts.not_system
   scope :inactive, lambda{ where('DATE(last_activity_at) < ?',Date.today - Settings.months_for_inactive_flag.months) }
   scope :active, lambda{ where('DATE(last_activity_at) >= ?',Date.today - Settings.months_for_inactive_flag.months) }
@@ -278,7 +277,7 @@ class Person < ActiveRecord::Base
   def signin_allowed?
     if self.retired?
       return false
-    elsif SYSTEMS_USERS.include?(self.id)
+    elsif self.is_systems_account?
       return false
     else
       return true
@@ -675,9 +674,29 @@ class Person < ActiveRecord::Base
    return (self.id == 1)
   end
 
-  def is_systems_account?
-    SYSTEMS_USERS.include?(self.id)
+  def is_restricted_account?
+    self.is_systems_account? or RESTRICTED_ACCOUNTS.include?(self.id)
   end
+
+  def can_edit_profile_for?(person)
+    if(self.id == person.id)
+      true
+    elsif(RESTRICTED_ACCOUNTS.include?(person.id))
+      false
+    elsif(person.is_systems_account? and !RESTRICTED_ACCOUNTS.include?(self.id))
+      false
+    elsif(self.activity_allowed?)
+      true
+    else
+      false
+    end
+  end
+
+
+
+
+  end
+
 
   # since we return a default string from timezone, this routine
   # will allow us to check for a null/empty value so we can

@@ -24,7 +24,7 @@
                   <p class="person-profile-avatar show-detail"><%= person_avatar(@person, {image_size: :large}) %></p>
                 </div>
                 <div class="modal-footer">
-                  <%- if(@person == current_person or !Person::RESTRICTED_ACCOUNTS.include?(@person.id)) -%>
+                  <%- if(current_person.can_edit_profile_for?(@person)) -%>
                     <button id="change-profile-image" class="btn btn-default btn-ms" data-toggle="modal" data-target="#myModal">change profile picture</button>
                   <%- end -%>
                   <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -115,7 +115,7 @@
            <%- if(@person == current_person) -%>
              <li><%= link_to('Privacy and sharing',public_settings_person_path(@person)) %></li>
            <%- end -%>
-            <%- if(@person == current_person or !Person::RESTRICTED_ACCOUNTS.include?(@person.id)) -%>
+            <%- if(current_person.can_edit_profile_for?(@person)) -%>
               <li><%= link_to('Edit profile',edit_person_path(@person)) %></li>
             <%- end -%>
           </ul>
@@ -179,7 +179,7 @@
   </div>
 </div>
 
-<%- if !Person::RESTRICTED_ACCOUNTS.include?(@person.id) -%>
+<%- if !@person.is_restricted_account? -%>
   <%- if(!@person.retired?) -%>
   <div class="row">
     <div class="col-md-10 col-md-offset-1">
