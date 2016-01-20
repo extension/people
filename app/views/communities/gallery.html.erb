@@ -59,7 +59,10 @@
           link_path = public_profile_path(person.idstring)
         end -%>
         <h4 class="person-profile-name"><%= link_to_person_profile(person) %></h4>
-        <p class="person-profile-title"><%= person.title %></p>
+        <h5 class="person-profile-title"><%= person.title %></h5>
+        <%- if person.public_attributes[:profile_attributes]['institution'] -%>
+          <p class="person-profile-institution"><%= institution_text(person) %></p>
+        <%- end -%>
         <div class="person-profile-social-icons">
           <%- person.facebook_connections.each do |fbc| -%>
             <%- if current_person or fbc.is_public? -%>

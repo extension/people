@@ -8,11 +8,11 @@ module PeopleHelper
 
   def institution_text(person)
     text = []
-    if(@person.institution)
-      text << @person.institution.name
+    if(person.institution)
+      text << person.institution.name
     end
-    if(@person.affiliation)
-      text << @person.affiliation
+    if(person.affiliation)
+      text << person.affiliation
     end
     text.join(', ')
   end

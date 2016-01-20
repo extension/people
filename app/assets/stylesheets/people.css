@@ -53,8 +53,7 @@ margin: auto;
   -moz-border-radius: 50%;
   -webkit-border-radius: 50%;
 }
-.person-profile-name {text-align:center;}
-.person-profile-title {text-align:center;}
+
 .person-profile-social-icons {text-align: center;}
 #public .container {max-width:960px;}
 #public .people-logo {margin-top: 20px;}
