@@ -123,7 +123,7 @@ gem 'reverse_markdown'
 
 # image upload and processing
 gem 'rmagick'
-gem 'carrierwave', "~> 0.10.0"
+gem 'carrierwave', "0.10.0ex", :source => 'https://engineering.extension.org/rubygems/'
 
 group :development do
   # require the powder gem
