@@ -1225,7 +1225,7 @@ class Person < ActiveRecord::Base
   def aae_id
     if(id_value = read_attribute(:aae_id))
       id_value
-    elsif(id_value = AaeUser.where(darmok_id: self.id).pluck(:id).first)
+    elsif(id_value = AskUser.where(darmok_id: self.id).pluck(:id).first)
       self.update_column(:aae_id,id_value)
       id_value
     else

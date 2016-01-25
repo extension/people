@@ -5,7 +5,7 @@
 #
 #  see LICENSE file
 
-class AaeUser < ActiveRecord::Base
+class AskUser < ActiveRecord::Base
   # connects to the aae database
   self.establish_connection :aae
   self.table_name='users'
@@ -28,7 +28,7 @@ class AaeUser < ActiveRecord::Base
       return self.public_name
     end
     return DEFAULT_NAME
-  end  
+  end
 
   def self.demographics_data_csv(filename)
     with_scope do
@@ -40,9 +40,9 @@ class AaeUser < ActiveRecord::Base
     with_scope do
       _demographics_data_csv(filename,true)
     end
-  end  
+  end
 
-  private 
+  private
 
   def self._demographics_data_csv(filename,show_submitter = false)
     CSV.open(filename,'wb') do |csv|
@@ -63,7 +63,7 @@ class AaeUser < ActiveRecord::Base
       # evaluation_answer_questions
       eligible_submitters = Question.where(demographic_eligible: true).pluck(:submitter_id).uniq
       response_submitters = AaeDemographic.pluck(:user_id).uniq
-      eligible_response_submitters = eligible_submitters & response_submitters      
+      eligible_response_submitters = eligible_submitters & response_submitters
       self.where("id in (#{eligible_response_submitters.join(',')})").order("RAND()").each do |person|
         demographic_count = person.demographics.count
         next if (demographic_count == 0)
@@ -83,11 +83,9 @@ class AaeUser < ActiveRecord::Base
         end
 
         csv << row
-      end 
+      end
     end
   end
 
 
 end
-
-
