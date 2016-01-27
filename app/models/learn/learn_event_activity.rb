@@ -29,5 +29,5 @@ class LearnEventActivity < ActiveRecord::Base
 
   TRANSFERRED_ACTIVITY = [ANSWER,RATING,RATING_ON_COMMENT,COMMENT,COMMENT_ON_COMMENT,CONNECT_BOOKMARK,CONNECT_ATTEND,CONNECT_WATCH]
 
-  belongs_to :learner, class_name: 'LearnLearner'
+  belongs_to :learner, class_name: 'LearnLearner',foreign_key: 'learner_id'
 end

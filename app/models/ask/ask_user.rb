@@ -13,9 +13,11 @@ class AskUser < ActiveRecord::Base
   DEFAULT_NAME = '"No name provided"'
 
 
-  has_many :demographics, class_name: 'AaeDemographic', foreign_key: 'user_id'
-  belongs_to :location, class_name: 'AaeLocation'
-  belongs_to :county, class_name: 'AaeCounty'
+  has_many :demographics, class_name: 'AskDemographic', foreign_key: 'user_id'
+  belongs_to :location, class_name: 'AskLocation'
+  belongs_to :county, class_name: 'AskCounty'
+  has_many :user_events, class_name: 'AskUserEvent', foreign_key: 'user_id'
+  has_many :question_activities, class_name: 'AskQuestionEvent', foreign_key: 'initiated_by_id'
 
   def has_exid?
     return self.kind == 'User'
@@ -53,7 +55,7 @@ class AskUser < ActiveRecord::Base
       headers << 'submitter_is_extension'
       headers << 'demographics_count'
       demographic_columns = []
-      AaeDemographicQuestion.order(:id).active.each do |adq|
+      AskDemographicQuestion.order(:id).active.each do |adq|
         demographic_columns << "demographic_#{adq.id}"
       end
       headers += demographic_columns
@@ -62,7 +64,7 @@ class AskUser < ActiveRecord::Base
       # data
       # evaluation_answer_questions
       eligible_submitters = Question.where(demographic_eligible: true).pluck(:submitter_id).uniq
-      response_submitters = AaeDemographic.pluck(:user_id).uniq
+      response_submitters = AskDemographic.pluck(:user_id).uniq
       eligible_response_submitters = eligible_submitters & response_submitters
       self.where("id in (#{eligible_response_submitters.join(',')})").order("RAND()").each do |person|
         demographic_count = person.demographics.count

@@ -118,6 +118,10 @@ class Person < ActiveRecord::Base
   has_many :interests, through: :person_interests
   has_many :site_roles, as: :permissable
 
+  # cross-database associations
+  has_one :ask_user, class_name: 'AskUser', :foreign_key => "darmok_id"
+  has_one :learn_learner, class_name: 'LearnLearner', :foreign_key => "darmok_id"
+
 
   ## scopes
   scope :retired, -> {where(retired: true)}
