@@ -959,12 +959,14 @@ class Person < ActiveRecord::Base
     community.joined_count(force: true)
 
     # sync members with whatever we sync with
-    if(Settings.sync_communities)
-      CommunityMemberSync.create_with_pending_check({community: community, person: self})
-    end
+    if(options[:nosync].nil? or !options[:nosync])
+      if(Settings.sync_communities)
+        CommunityMemberSync.create_with_pending_check({community: community, person: self})
+      end
 
-    if(Settings.sync_google and community.connect_to_google_apps? and ['leader','member'].include?(connectiontype))
-      community.update_google_groups(true)
+      if(Settings.sync_google and community.connect_to_google_apps? and ['leader','member'].include?(connectiontype))
+        community.update_google_groups(true)
+      end
     end
 
     # sync myself
@@ -1471,6 +1473,9 @@ class Person < ActiveRecord::Base
     self.email_aliases.create({mail_alias: mail_alias, destination: self.idstring, alias_type: EmailAlias::ALIAS, disabled: !self.validaccount?})
   end
 
+  def blogs_user
+    BlogsUser.where(ID: self.id).first
+  end
 
   private
 
