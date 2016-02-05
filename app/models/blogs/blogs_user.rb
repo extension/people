@@ -18,7 +18,7 @@ class BlogsUser < ActiveRecord::Base
 
 
   def add_to_blog(blogsblog, role)
-    if(role == 'administrator')
+    if(role == 'administrator' or role == 'leader')
       capability_string = PHP.serialize({"administrator"=>true})
     else
       capability_string = PHP.serialize({"editor"=>true})
@@ -39,7 +39,14 @@ class BlogsUser < ActiveRecord::Base
     end
 
     bum
-
   end
+
+  def remove_from_blog(blogsblog)
+    capability_key = "wp_#{blogsblog.blog_id}_capabilities"
+    if(bum = self.blogs_usermetas.where(meta_key: capability_key).first)
+      bum.destroy
+    end
+  end
+
 
 end
