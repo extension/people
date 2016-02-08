@@ -113,8 +113,17 @@ class AccountSync < ActiveRecord::Base
     update_database = site.sync_database
     self.connection.execute(wordpress_user_replace_query(site))
     self.connection.execute(wordpress_openid_replace_query(site))
+    check_blogs_network_admin(site)
   end
 
+  def check_blogs_network_admin(site)
+    person = self.person
+    if(SiteRole::ADMINISTRATOR == person.role_for_site(site))
+      BlogsSitemeta.add_site_administrator(person.idstring)
+    elsif(BlogsSitemeta.site_administrators.include?(person.idstring))
+      BlogsSitemeta.remove_site_administrator(person.idstring)
+    end
+  end
 
   def aae_update_query(site)
     update_database = site.sync_database
