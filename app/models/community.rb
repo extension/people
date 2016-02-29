@@ -12,6 +12,7 @@ class Community < ActiveRecord::Base
   attr_accessible :name, :description, :location, :location_id, :memberfilter, :connect_to_drupal
   attr_accessible :connect_to_google_apps, :entrytype, :shortname, :publishing_community, :is_public
   attr_accessible :community_masthead, :community_masthead_cache, :remove_community_masthead
+  attr_accessible :blog_id
 
   mount_uploader :community_masthead, CommunityMastheadUploader
 
