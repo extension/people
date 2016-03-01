@@ -56,7 +56,7 @@
 
       <%- if current_person and !@no_show_navtabs -%>
       <div class="row" id="shared-navtabs">
-        <div class="col-md-12">
+            <div class="col-md-10 col-md-offset-1">
           <%= render(partial: 'shared/navtabs') %>
         </div>
       </div>
@@ -70,15 +70,12 @@
         </div>
       </div>
 
-      <%- if !breadcrumbs.blank? -%>
-      <div class="row">
-        <div class="col-md-12">
-          <%= render_breadcrumbs :builder => ::BootstrapBreadcrumbsBuilder %>
-        </div>
-      </div>
-      <%- end -%>
 
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
       <%= yield %>
+    </div>
+  </div>
     </div>
 
 

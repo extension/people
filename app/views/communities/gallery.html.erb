@@ -1,5 +1,8 @@
 <%- @page_title = "#{@community.name}" -%>
 
+<%- if current_person -%>
+  <%= render(:partial => 'community_nav') %>
+<%- end -%>
 
 <div class="page-header">
   <div class="community-masthead">

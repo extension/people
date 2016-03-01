@@ -1,7 +1,6 @@
-<div class="dashmodule">
+<div>
 <%- case @current_person_community_connection -%>
 <%- when 'none' -%>
-  <p><strong>Make a connection:</strong></p>
   <%- case @community.memberfilter -%>
   <%- when Community::OPEN -%>
     <p>
@@ -19,13 +18,13 @@
       <%- end -%>
     </p>
   <%- when Community::INVITATIONONLY -%>
-     <p>Contact a <%= link_to('community leader', connections_community_path(@community, :connection => 'leaders')) %> to find out more about how to make a connection with this community</p>
+     <p>Contact a <%= link_to('community leader', connections_community_path(@community, :connection => 'leaders')) %> <br />to ask about joining</p>
   <%- end -%>
 <%- when 'member' -%>
   <%- if @community.is_institution? -%>
     <p><strong>You are a member of this institution.</strong></p>
   <%- else -%>
-    <p><strong>You are a member of this community</strong></p>
+    <p>You are a member</p>
   <%- end -%>
     <p><%= leave_community_link(@community) %></p>
 <%- when 'leader' -%>

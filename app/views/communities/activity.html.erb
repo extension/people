@@ -1,8 +1,9 @@
 <%- @page_title = @community.nil? ? "Community Activity" : "Community Activity for #{@community.name}" -%>
 
+<%= render(:partial => 'community_nav') %>
 <div class="page-header">
-  <h2><%= @page_title %></h2>
-</div> 
+  <h2>Activity</h2>
+</div>
 
 <%- if !@activities.blank? -%>
 <div class="row">
@@ -26,13 +27,13 @@
           <td><%= display_time(activity.created_at) %></td>
           <%- if @community -%>
             <td><%= activity_to_s(activity,{hide_community_text: true}) %></td>
-          <%- else -%>     
-            <td><%= activity_to_s(activity,{hide_community_text: false}) %></td>               
-          <%- end -%>          
+          <%- else -%>
+            <td><%= activity_to_s(activity,{hide_community_text: false}) %></td>
+          <%- end -%>
 
           <%- if(current_person.is_admin? or (!@person.blank? and @person == current_person)) -%>
             <td><%= activity.ip_address %></td>
-          <%- end -%>          
+          <%- end -%>
         </tr>
       <%- end -%>
       </tbody>
@@ -40,5 +41,3 @@
   </div>
 </div>
 <%- end -%>
-
-

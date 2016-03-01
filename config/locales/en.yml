@@ -2,6 +2,10 @@
 # See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
 
 en:
+  will_paginate:
+    page_entries_info:
+      multi_page: "Displaying %{model} %{from} - %{to} of %{count}"
+      multi_page_html: "Displaying %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> of <b>%{count}</b>"
   communities:
     entrytypes:
       approved: 'eXtension Community of Practice'

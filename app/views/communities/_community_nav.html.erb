@@ -1,0 +1,22 @@
+
+<div id="connectiontocommunity">
+  <%= render :partial => 'make_connection' %>
+</div>
+<h2 class="community-name"><%= @community.name%></h2>
+
+<div class="person-nav-wrapper">
+<ul class="nav nav-pills">
+  <li><%= current_page?(community_path(@community)) ? "<span class='nav-link'>Home</span".html_safe : link_to("Home", community_path(@community)) %></li>
+  <li><%= current_page?(connections_community_path(@community)) ? "<span class='nav-link'>Members</span".html_safe : link_to("Members",connections_community_path(@community)) %></li>
+  <li><%= current_page?(activity_community_path(@community)) ? "<span class='nav-link'>Activity</span".html_safe : link_to("Activity",activity_community_path(@community)) %></li>
+  <li><%= link_to("Gallery", gallery_community_path(@community), class: '') %></li>
+  <%- if (current_person.can_invite_others_to_community?(@community))  -%>
+    <li><%= link_to('Invite New Members', invite_community_path(@community), class: 'btn') %></li>
+  <%- end -%>
+  <%- if(current_person.can_edit_community?(@community)) -%>
+    <li><%= link_to 'Edit', edit_community_path(@community) -%></li>
+  <%- end -%>
+
+
+ </ul>
+</div>

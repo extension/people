@@ -20,7 +20,8 @@ module CommunitiesHelper
     else
       list_item_class = ((params[:connection] == connection) ? " class='active'" : '')
     end
-    "<li#{list_item_class}>#{link_to(label,connections_community_path(@community,connection: connection))}</li>".html_safe
+    description = "#{label} (#{@community.connected(connection).count})"
+    "<li#{list_item_class}>#{link_to(description,connections_community_path(@community,connection: connection))}</li>".html_safe
   end
 
   def link_to_community(community,options = {})
@@ -48,7 +49,7 @@ module CommunitiesHelper
 
   def description_for_community(community)
     if(community.description.blank?)
-      '<em>No description provided</em>'.html_safe
+      '<em class="no-description">No description provided</em>'.html_safe
     else
       community.description.html_safe
     end

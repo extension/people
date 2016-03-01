@@ -1,26 +1,74 @@
 <div class="dashmodule">
-  <p><%= link_to("View member gallery", gallery_community_path(@community), class: 'btn btn-default btn-sm') %></p>
-<ul class="list-unstyled community_numbers">
-    <li>
-        <span class='mednumber'><%= @community.leaders.count %></span>
-        <%= link_if_not_zero(@community.leaders.count, (@community.is_institution? ? 'Institutional Team' : 'Leaders') , connections_community_path(@community, :connection => 'leaders')) %>
-    </li>
-    <li>
-        <span class='mednumber'><%= (@community.members.count) %></span>
-        <%= link_if_not_zero(@community.members.count,'Members', connections_community_path(@community, :connection => 'members')) %>
-    </li>
+
+  <div class="home-member-tease">
+    <h4>Leaders <%= link_to("(#{@community.leaders.count})".html_safe,connections_community_path(@community, :connection => 'leaders')).html_safe %></h4>
+
+      <%- for person in @leaders -%>
+          <div class="person-profile">
+            <div class="person-profile-avatar"><%= link_to_person_avatar(person, {image_size: :large}) -%></div>
+            <h4 class="person-profile-name"><%= link_to_person_profile(person) %></h4>
+          </div>
+        <%- end -%>
+
+        <div class="home-member-count">
+          <%- if @community.leaders.count > 5 -%>
+            <%= link_to("<span><strong class='med-number'>+#{@community.leaders.count - 5}</strong> more</span>".html_safe,connections_community_path(@community, :connection => 'leaders'), class: 'theres-more').html_safe %>
+          <%- end -%>
+        </div>
+  </div>
+
+  <div class="home-member-tease">
+    <h4>Members <%= link_to("(#{@community.members.count})".html_safe,connections_community_path(@community, :connection => 'members')).html_safe %></h4>
+
+      <%- for person in @members -%>
+          <div class="person-profile">
+            <div class="person-profile-avatar"><%= link_to_person_avatar(person, {image_size: :large}) -%></div>
+            <h4 class="person-profile-name"><%= link_to_person_profile(person) %></h4>
+          </div>
+        <%- end -%>
+
+        <div class="home-member-count">
+          <%- if @community.members.count > 5 -%>
+            <%= link_to("<span><strong class='med-number'>+#{@community.members.count - 5}</strong> more</span>".html_safe,connections_community_path(@community, :connection => 'members'), class: 'theres-more').html_safe %>
+          <%- end -%>
+        </div>
+  </div>
+
+  <div class="home-member-tease">
   <% if @community.memberfilter == Community::MODERATED %>
-      <li>
-          <span class='mednumber'><%= @community.pending.count %></span>
-          <%= link_if_not_zero(@community.pending.count,'Pending', connections_community_path(@community, :connection => 'pending')) %>
-      </li>
+    <% if @community.pending.count > 0 %>
+      <h4>Pending membership requests <%= link_to("(#{@community.pending.count})".html_safe,connections_community_path(@community, :connection => 'pending')).html_safe %></h4>
+
+      <%- for person in @pending -%>
+          <div class="person-profile">
+            <div class="person-profile-avatar"><%= link_to_person_avatar(person, {image_size: :large}) -%></div>
+            <h4 class="person-profile-name"><%= link_to_person_profile(person) %></h4>
+          </div>
+        <%- end -%>
+
+        <div class="home-member-count">
+            <%= link_to("<span>View requests</span>".html_safe,connections_community_path(@community, :connection => 'pending'), class: 'theres-more').html_safe %>
+        </div>
+    <% end %>
   <% end %>
-  <li>
-      <span class='mednumber'><%=  @community.invited.count %></span>
-      <%= link_if_not_zero(@community.invited.count,'Invitations', connections_community_path(@community, :connection => 'invited')) %>
-  </li>
-</ul>
-  <%- if (current_person.can_invite_others_to_community?(@community))  -%>
-    <p><%= link_to('Invite others to join', invite_community_path(@community), class: 'btn') %></p>
-  <%- end -%>
+  </div>
+
+  <% if @community.invited.count > 0 %>
+  <div class="home-member-tease">
+    <h4>Invited <%= link_to("(#{@community.invited.count})".html_safe,connections_community_path(@community, :connection => 'invited')).html_safe %></h4>
+
+      <%- for person in @invited -%>
+          <div class="person-profile">
+            <div class="person-profile-avatar"><%= link_to_person_avatar(person, {image_size: :large}) -%></div>
+            <h4 class="person-profile-name"><%= link_to_person_profile(person) %></h4>
+          </div>
+        <%- end -%>
+
+        <div class="home-member-count">
+            <%= link_to("<span class='med-number'>View<br />all</span>".html_safe,connections_community_path(@community, :connection => 'invited'), class: 'theres-more').html_safe %>
+        </div>
+  </div>
+  <% end %>
+
+  <br class="clearing" />
 </div>

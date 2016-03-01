@@ -26,7 +26,7 @@ dl.community dd.description {margin-bottom: 1em;}
           border-radius: 4px;
 }
 
-.community-description {font-size:1.1em;}
+.community-description {font-size:16px;}
 .community-masthead {
   height: 340px;
   /*width: 920px;*/
@@ -51,3 +51,37 @@ margin: auto;
 .person-profile-name {text-align:center;}
 .person-profile-title {text-align:center; margin-bottom: 6px;}
 .person-profile-institution {text-align:center; font-size: 13px; color: #666; line-height: 1.1em;}
+
+.community-name {width: 65%; font-weight: normal; margin-bottom: 20px;}
+#connectiontocommunity {width: 30%; float:right;
+  /*border: 1px solid lime; */
+  text-align:right;}
+.community-attributes {background: #f5f5f5; padding: 10px 20px; color: #666; margin-bottom:20px;}
+.no-description {font-size: 21px; color: #999; display:block; padding: 30px 0 30px 0;}
+.page_entries_info {padding: 10px; color: #666;}
+#public .community-name {display:none;}
+.related-links h4 {font-weight:normal; margin-bottom:4px; font-size:17px;}
+.related-links p {line-height:1.2em; font-size:13px;}
+.dashmodule .person-profile {width: 80px;
+  /*border:1px solid lime; */
+  float:left; padding:0 10px; }
+.dashmodule .person-profile-name,
+.dashmodule .person-profile-title {font-size: 13px;}
+.home-member-count {display: block; float:left; width: 60px; text-align:center;}
+.dashmodule .person-profile-avatar {margin:0;}
+.theres-more {display: block; font-size: 13px; line-height:14px;
+  /*border: 1px solid lime; */
+  width: 60px;  height:60px; display: flex;
+  align-items: center; text-align:center;
+      border-radius: 50%;
+      -moz-border-radius: 50%;
+      -webkit-border-radius: 50%;
+      background:#f3f3f3;
+}
+.med-number {display:block; width: 60px; font-weight:normal; font-size: 14px;
+  /*border: 1px solid red;*/
+   }
+.home-member-tease {clear:both;
+  /*border-bottom:1px solid #ccc;*/
+}
+.clearing {clear:both;}

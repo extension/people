@@ -1,8 +1,7 @@
 <%- @page_title = "#{@community.name} - Community Information" -%>
 
-<div class="row">
-  <div class="col-md-10 col-md-offset-1">
-    <h2><%= community_icon(@community) %> <%= @community.name%></h2>
+    <%= render(:partial => 'community_nav') %>
+
 
     <div class="row">
       <div class="col-md-8">
@@ -10,73 +9,85 @@
           <%= description_for_community(@community) -%>
         </div>
       </div>
-      <div id="connectiontocommunity" class="col-md-3 col-md-offset-1">
-        <%= render :partial => 'make_connection' %>
-      </div>
     </div>
 
 
     <div class="row">
       <div class="col-md-7">
-        <h3>People and Activity</h3>
-
+        <h3>People and Activity <small>(most recent)</small></h3>
         <div class="row">
-          <div id="communitynumbers" class="col-md-6">
+          <div id="communitynumbers" class="col-md-12">
             <%= render(:partial => 'community_numbers') -%>
           </div>
+        </div>
 
-          <div id="notifications" class="col-md-6">
-            <%= render :partial => 'notifications' %>
+        <%- if !@activities.blank? -%>
+        <div class="row">
+          <div class="col-md-12">
+
+            <table class="table">
+              <thead>
+                <tr>
+                <th>Date/Time</th>
+                <th>Description</th>
+                <%- if(current_person.is_admin?) -%>
+                  <th><i class='fa fa-lock'></i> IP Address</th>
+                <%- end -%>
+                </tr>
+              </thead>
+
+              <tbody>
+              <%- for activity in @activities -%>
+                <tr id="activity_row_<%= activity.id %>">
+                  <td><%= display_time(activity.created_at) %></td>
+                  <%- if @community -%>
+                    <td><%= activity_to_s(activity,{hide_community_text: true}) %></td>
+                  <%- else -%>
+                    <td><%= activity_to_s(activity,{hide_community_text: false}) %></td>
+                  <%- end -%>
+
+                  <%- if(current_person.is_admin? or (!@person.blank? and @person == current_person)) -%>
+                    <td><%= activity.ip_address %></td>
+                  <%- end -%>
+                </tr>
+              <%- end -%>
+              </tbody>
+            </table>
           </div>
         </div>
+        <%- end -%>
 
-        <h3>
-          <%= @community.entrytype_display_label.capitalize -%> Attributes
-          <%- if(current_person.can_edit_community?(@community)) -%>
-            <small><%= link_to 'edit settings', edit_community_path(@community) -%></small>
-          <%- end -%>
-        </h3>
-
-        <div class="dashmodule">
-          <p class="lead"><%= @community.entrytype_to_s -%></p>
-          <dl>
-            <dt>Membership:</dt>
-            <dd><%= @community.memberfilter_to_s -%></dd>
-            <dt>Created by:</dt>
-            <dd><%= link_to_person(@community.creator) -%></dd>
-            <dt>Created:</dt>
-            <dd><%= display_time(@community.created_at) -%></dd>
-          </dl>
-        </div>
 
       </div>
 
       <div class="col-md-5">
 
         <%- if (@community.connect_to_drupal? and @community.drupal_node_id) or @community.is_launched? -%>
-          <h3>Elsewhere in eXtension</h3>
-          <div class="dashmodule">
-            <p><em>Links to information for this community in other eXtension applications</em></p>
-            <dl>
+          <h4>Community Links</h4>
+          <div class="dashmodule related-links">
+            <p><em>This community in other eXtension applications</em></p>
+
             <%- if (@community.connect_to_drupal? and @community.drupal_node_id) -%>
-              <dt>create.extension.org</dt>
-              <dd><a href="http://create.extension.org/node/<%= @community.drupal_node_id %>">Community Dashboard</a></dd>
+              <h4>create.extension.org</h4>
+              <p>Create is the content management tool which allows communities to publish to articles.extenion.org.</p>
+              <p><a href="http://create.extension.org/node/<%= @community.drupal_node_id %>">Community Dashboard</a></p>
             <%- end -%>
             <%- if  @community.is_launched? -%>
-              <dt>data.extension.org</dt>
-              <dd><a href="http://data.extension.org/groups/<%= @community.id %>">Group Information</a></dd>
+              <h4>data.extension.org</h4>
+              <p><a href="http://data.extension.org/groups/<%= @community.id %>">Group Information</a></p>
             <%- end -%>
-            </dl>
+
           </div>
         <%- end -%>
 
         <div id="communityforums">
           <%- if(@community.connect_to_google_apps? and gg = @community.joined_google_group and (current_person.is_community_member?(@community) or current_person.is_admin?)) -%>
-            <h3>Community Forums</h3>
+            <h4>Community Forums</h4>
             <div class="dashmodule">
               <dl>
                 <dt><%= link_to('Community Forum (Google Group)',gg.forum_url) %></dt>
-                <dd>Post to forum by email: <%= link_to(gg.group_email_address, "mailto:#{gg.group_email_address}") %></dd>
+                <dd>Post to forum by email:
+                  <br /><%= link_to(gg.group_email_address, "mailto:#{gg.group_email_address}") %></dd>
                 <%- if(lg = @community.leaders_google_group) -%>
                   <dt><%= link_to('Community Leader Forum (Google Group)',lg.forum_url) %></dt>
                   <dd>Post to leader forum by email: <%= link_to(lg.group_email_address, "mailto:#{lg.group_email_address}") %></dd>
@@ -88,5 +99,23 @@
 
       </div>
     </div>
-  </div>
-</div>
+
+    <div class="community-attributes">
+    <h4>
+      <%= @community.entrytype_display_label.capitalize -%> Attributes
+      <%- if(current_person.can_edit_community?(@community)) -%>
+        <small><%= link_to 'edit settings', edit_community_path(@community) -%></small>
+      <%- end -%>
+    </h4>
+    <%- if (current_person.is_community_member?(@community)) -%>
+      <%- if @thisconnection.sendnotifications? -%>
+        <p>Activity Notifications: <span class="badge badge-success">ON</span> <%= link_to('Turn Off',change_notification_communities_path({id: @thisconnection.id, is_on: 'no'}), :class => "btn btn-default btn-sm", :remote => true, :method => :post) -%></p>
+      <%- else -%>
+        <p><strong>Activity Notifications:</strong> <span class="badge badge-warning">OFF</span> <%= link_to('Turn On',change_notification_communities_path({id: @thisconnection.id, is_on: 'yes'}), :class => "btn btn-default btn-sm", :remote => true, :method => :post) -%></p>
+      <%- end -%>
+    <%- end -%>
+
+      <p><%= @community.entrytype_to_s -%> with <%= @community.memberfilter_to_s -%></p>
+      <p>Created by <%= link_to_person(@community.creator) -%> on <%= display_time(@community.created_at) -%></p>
+
+    </div>

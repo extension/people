@@ -18,8 +18,14 @@ class CommunitiesController < ApplicationController
     # will raise ActiveRecord::RecordNotFound on not found
     @community = Community.find_by_shortname_or_id(params[:id])
     member_breadcrumbs
+    @activities = @community.activities.order('created_at DESC').limit(5)
     @current_person_community_connection = current_person.connection_with_community(@community)
     @thisconnection = current_person.community_connection(@community)
+
+    @leaders = @community.connected('leaders').order('people.last_name').limit(5)
+    @members = @community.connected('members').order('people.last_name').limit(5)
+    @pending = @community.connected('pending').order('people.last_name').limit(5)
+    @invited = @community.connected('invited').order('people.last_name').limit(5)
   end
 
   def edit
@@ -125,6 +131,8 @@ class CommunitiesController < ApplicationController
     end
 
     @connections = @community.connected(connection).order('people.last_name').page(params[:page])
+    @current_person_community_connection = current_person.connection_with_community(@community)
+    @thisconnection = current_person.community_connection(@community)
   end
 
   def gallery
@@ -221,6 +229,8 @@ class CommunitiesController < ApplicationController
       collection_breadcrumbs(['Activity'])
       @activities = Activity.community.order('created_at DESC').page(params[:page])
     end
+    @current_person_community_connection = current_person.connection_with_community(@community)
+    @thisconnection = current_person.community_connection(@community)
   end
 
 
