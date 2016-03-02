@@ -32,6 +32,19 @@ class SiteRole < ActiveRecord::Base
     end
   end
 
+  def self.wordpress_user_level(role)
+    case role
+    when ADMINISTRATOR
+      10
+    when EDITOR
+      7
+    when WRITER
+      2
+    else
+      0
+    end
+  end
+
   def self.role_to_s(role)
     self.code_to_constant_string(role)
   end
