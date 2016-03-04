@@ -15,6 +15,7 @@ class SiteRole < ActiveRecord::Base
   EDITOR        = 2
   WRITER        = 3
   READER        = 4
+  PROXY         = 5
 
 
   def self.wordpress_label(role)
