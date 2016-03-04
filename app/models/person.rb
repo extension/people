@@ -1367,6 +1367,21 @@ class Person < ActiveRecord::Base
     role or site.default_role
   end
 
+  def proxy_writer_for_site?(site)
+    individual_proxy_roles = site.proxy_roles.where("permissable_type = 'Person'").map(&:permissable_id)
+    community_proxy_roles = site.proxy_roles.where("permissable_type = 'Community'").map(&:permissable_id)
+    connected_community_ids = self.connected_communities.pluck(:id)
+    if(individual_proxy_roles.include?(self.id))
+      # individual proxy record? yep, proxy writer
+      true
+    elsif(!(community_proxy_roles & connected_community_ids).blank?)
+      # intersection of proxy communities and person's communities? yep, proxy writer
+      true
+    else
+      false
+    end
+  end
+
 
   def is_admin_for_site(site)
     return (self.role_for_site(site) == SiteRole::ADMINISTRATOR)

@@ -9,6 +9,8 @@ class Site < ActiveRecord::Base
 
   has_many :site_roles
 
+
+
   def sync_database
     if(Settings.app_location == 'dev')
       self.dev_database
@@ -19,7 +21,11 @@ class Site < ActiveRecord::Base
 
   def default_role
     (self.label == 'homepage') ? SiteRole::READER : SiteRole::EDITOR
-  end 
+  end
+
+  def proxy_roles
+    site_roles.where(permission: SiteRole::PROXY)
+  end
 
 
 end
