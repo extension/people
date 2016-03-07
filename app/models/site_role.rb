@@ -15,6 +15,7 @@ class SiteRole < ActiveRecord::Base
   EDITOR        = 2
   WRITER        = 3
   READER        = 4
+  PROXY         = 5
 
 
   def self.wordpress_label(role)
@@ -29,6 +30,19 @@ class SiteRole < ActiveRecord::Base
       'follower'
     else
       'follower'
+    end
+  end
+
+  def self.wordpress_user_level(role)
+    case role
+    when ADMINISTRATOR
+      10
+    when EDITOR
+      7
+    when WRITER
+      2
+    else
+      0
     end
   end
 

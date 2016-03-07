@@ -98,6 +98,8 @@ class AccountSync < ActiveRecord::Base
     self.connection.execute(wordpress_user_replace_query(site))
     self.connection.execute(wordpress_openid_replace_query(site))
     self.connection.execute(wordpress_usermeta_role_insert_update_query(site))
+    self.connection.execute(wordpress_usermeta_userlevel_insert_update_query(site))
+    self.connection.execute(wordpress_usermeta_ghostpost_insert_update_query(site))
     self.connection.execute(wordpress_usermeta_wysiwyg_insert_query(site))
   end
 
@@ -106,6 +108,7 @@ class AccountSync < ActiveRecord::Base
     self.connection.execute(wordpress_user_replace_query(site))
     self.connection.execute(wordpress_openid_replace_query(site))
     self.connection.execute(wordpress_usermeta_role_insert_update_query(site))
+    self.connection.execute(wordpress_usermeta_userlevel_insert_update_query(site))
     self.connection.execute(wordpress_usermeta_wysiwyg_insert_query(site))
   end
 
@@ -113,8 +116,17 @@ class AccountSync < ActiveRecord::Base
     update_database = site.sync_database
     self.connection.execute(wordpress_user_replace_query(site))
     self.connection.execute(wordpress_openid_replace_query(site))
+    check_blogs_network_admin(site)
   end
 
+  def check_blogs_network_admin(site)
+    person = self.person
+    if(SiteRole::ADMINISTRATOR == person.role_for_site(site))
+      BlogsSitemeta.add_site_administrator(person.idstring)
+    elsif(BlogsSitemeta.site_administrators.include?(person.idstring))
+      BlogsSitemeta.remove_site_administrator(person.idstring)
+    end
+  end
 
   def aae_update_query(site)
     update_database = site.sync_database
@@ -455,6 +467,66 @@ class AccountSync < ActiveRecord::Base
     end
     query
   end
+
+  def wordpress_usermeta_userlevel_insert_update_query(site)
+    update_database = site.sync_database
+    person = self.person
+    if(person.retired?)
+      userlevel = 0
+    else
+      userlevel = SiteRole.wordpress_user_level(person.role_for_site(site))
+    end
+
+    # does a row exist? then update, else insert
+    result = self.connection.execute("SELECT * from #{update_database}.wp_usermeta WHERE user_id = #{person.id} and meta_key = 'wp_user_level'")
+    if(result.first.blank?)
+      query = <<-END_SQL.gsub(/\s+/, " ").strip
+      INSERT INTO #{update_database}.wp_usermeta (user_id,meta_key,meta_value)
+      SELECT #{person.id},
+             'wp_user_level',
+             #{userlevel}
+      END_SQL
+
+    else
+      query = <<-END_SQL.gsub(/\s+/, " ").strip
+      UPDATE #{update_database}.wp_usermeta
+      SET meta_value = #{userlevel}
+      WHERE user_id = #{person.id} AND meta_key = 'wp_user_level'
+      END_SQL
+    end
+    query
+  end
+
+  def wordpress_usermeta_ghostpost_insert_update_query(site)
+    update_database = site.sync_database
+    person = self.person
+    if(person.retired?)
+      ghostpost = '0'
+    else
+      ghostpost = (person.proxy_writer_for_site?(site) ? '1' : '0')
+    end
+
+    # does a row exist? then update, else insert
+    result = self.connection.execute("SELECT * from #{update_database}.wp_usermeta WHERE user_id = #{person.id} and meta_key = 'allow_ghost_post'")
+    if(result.first.blank?)
+      query = <<-END_SQL.gsub(/\s+/, " ").strip
+      INSERT INTO #{update_database}.wp_usermeta (user_id,meta_key,meta_value)
+      SELECT #{person.id},
+             'allow_ghost_post',
+             #{ActiveRecord::Base.quote_value(ghostpost)}
+      END_SQL
+
+    else
+      query = <<-END_SQL.gsub(/\s+/, " ").strip
+      UPDATE #{update_database}.wp_usermeta
+      SET meta_value = #{ActiveRecord::Base.quote_value(ghostpost)}
+      WHERE user_id = #{person.id} AND meta_key = 'allow_ghost_post'
+      END_SQL
+    end
+    query
+  end
+
+
 
   def wordpress_usermeta_wysiwyg_insert_query(site)
     update_database = site.sync_database
