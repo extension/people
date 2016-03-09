@@ -5,35 +5,85 @@
 <div class="row">
 
 <div class="col-md-6">
-
-
-  <h3>Hi <%= current_person.first_name %>, Welcome Back!</h3>
-  <p>You are joining <span class='mednumber'><%= number_with_delimiter(@active_count-1) %></span> colleagues that have been active in People within the last month.</p>
-
-  <h3>Exploring eXtension</h3>
-<ul>
-    <li>Learn more about eXtension at <%= link_to('About eXtension','http://about.extension.org') %> and <%= link_to('eXtension Create','http://create.extension.org/') %>.</li>
-    <li>Explore the content at <%= link_to('eXtension.org','http://www.extension.org') %> produced by our Communities of Practice.</li>
-    <li>See the public courses available at <%= link_to('eXtension campus','http://campus.extension.org', {:title => "eXtension Campus"}) %>.</li>
-  <li>Interact with the public and answer questions at <%= link_to('Ask an Expert', 'https://ask.extension.org', {:title => "Ask an Expert - Requires eXtensionID"}) %>.</li>
-    <li>Search all of Extension through <%= link_to('Extension Search','http://www.extension.org/search') %>.</li>
-    <li>Find professional development opportunities through <%= link_to('Learn','https://learn.extension.org') %>.</li>
-</ul>
-  </div>
-  <div class="col-md-6">
-    <div class='dashmodule'>
-    <h3>Find Colleagues</h3>
-    <%= render(:partial => 'people/find_form') %>
-    <p>You can also <%= link_to("browse the directory", browse_people_path())%> of <span class='mednumber'><%= number_with_delimiter(Person.display_accounts.count) %></span> accounts and
-    <%= link_to("filter the list by communities, locations, positions, and social networks", browse_people_path(showform: true))%></p>
-    </div>
-
-    <div class='dashmodule'>
-    <h3>Search for Communities and Institutions</h3>
-    <%= render(:partial => 'communities/find_form') %>
-
-    <p>You can also <%= link_to("browse the list", communities_path())%> of the eXtension Communities of Practice and the newest communities created by your colleagues.</p>
-    </div>
-
+  <div class="people-home">
+    <p class="person-profile-avatar"><%= person_avatar(current_person, {image_size: :large}) %></p>
+    <p><%= link_to("View your profile", person_path(current_person)) %></p>
   </div>
 </div>
+<div class="col-md-6">
+  <div class='dashmodule'>
+    <%- if current_person.connected_communities.count > 0 -%>
+      <h5>Your Communities and Institutions</h5>
+      <ul class="list-unstyled institution-list">
+        <%- current_person.connected_communities.each do |community| -%>
+          <li class="<%= community.is_institution? ? "is_institution" : "is_community" %>">
+
+            <%= link_to(community.name, community) %>
+            <small><%= current_person.connection_with_community_expanded_if_not_member(community)%></small>
+          </li>
+        <%- end -%>
+      </ul>
+    <%- else -%>
+      <p class="jumbo">You haven't yet joined or indicated an interest in any communities</p>
+      <p><%= link_to('Browse Communities',communities_path, {:class => "btn btn-default btn-lg"}) %></p>
+    <%- end -%>
+  </div>
+
+</div>
+
+<div class="row">
+
+<div class="col-md-12">
+
+  <h2 class="people-home-subhead">Learn What eXtension Can Offer You</h2>
+
+  <div class="services-module">
+    <h3>Ask an Expert</h3>
+    <p>A person can submit a question to Ask an Expert and get an answer from an extension expert nationally. <a href="https://ask.extension.org/">Visit Ask and share your expertise by answering or helping to route questions.</a></p>
+    <%= image_tag("Ask_An_Expert_logo_color.png", :class => '', :title => '') %>
+  </div>
+
+  <div class="services-module">
+    <h3>Campus</h3>
+    <p>A variety of courses can be found on eXtension’s Campus that provide professional development topics for Cooperative Extension faculty and staff as well as their public audiences. Campus is available to individuals from premium member institutions as a delivery tool of self-paced, certificate or even for-fee credit courses. <a href="https://extension.org/get-started/campus-getting-started/">Learn more about how to use Campus for your education delivery</a>.
+campus.extension.org</p>
+  </div>
+
+  <div class="services-module">
+    <h3>Learn</h3>
+    <p>eXtension’s professional development site is open to everyone! More and more of eXtension’s learning opportunities are available to the public, and to Cooperative Extension faculty and staff. You’ll find a schedule of professional development and public webinars, recordings of previous eXtension webinars, and opportunities to interact with participants. Hosting a webinar and promoting the event at Learn is easy and available to our members. Discover more about Learn with our Quick Reference Sheet. Explore!</p>
+  </div>
+  <div class="services-module">
+    <h3>Slack</h3>
+    <p><strong>eXtension staff</strong> use Slack for internal communications and chat. In addition we have extended this tool to our <strong>i-Three Issue Corps members</strong> for use. <a href="https://extension.org/slack/">Learn more about how you can use Slack in eXtension</a>.</p>
+    <%= image_tag("slack_rgb.png", :class => '', :title => '') %>
+  </div>
+
+  <div class="services-module">
+    <h3>Zoom</h3>
+    <p>We now have an eXtension Zoom Webinar room to host presentations for up to 500 participants. This can be scheduled by <strong>CoPs</strong> and <strong>LNs</strong> and used when offering webinars in Learn. <a href="https://extension.org/zoom/">Learn more about how you can use Zoom in eXtension</a>.</p>
+    <%= image_tag("zoom-logo.png", :class => '', :title => '') %>
+  </div>
+
+  <div class="services-module">
+
+    <h3>Basecamp</h3>
+    <p>A project management and collaboration tool called Basecamp is available to <strong>CoPs</strong> and <strong>LNs</strong> for use with your next big project. This may be especially helpful when addressing key issues, determine impact goals and exploring innovations to achieve them. <a href="https://extension.org/basecamp-getting-started/">Learn more about how you can use Basecamp in eXtension</a>.</p>
+    <%= image_tag("basecamp-full-standard.png", :class => '', :title => '') %>
+  </div>
+
+  <div class="services-module">
+    <h3>Catalog</h3>
+    <p>Just launched is eXtension’s new Catalog which serves as a storefront or clearinghouse of educational offerings available through Extension. This site is connected closely to Campus to facilitate the seamless sale of online courses using various pricing models including the use of discount codes, bulk seat purchases, bundled courses, and invoicing. Free courses, as well as courses located on other platforms can be listed, as can fee-based or free webinars, workshops, and eBooks. Free webinars in which the presenter would like to supplement the webinar with additional resources, forums, chat rooms, feedback surveys, certification, badges, or other educational reinforcement measures can also be accommodated.</p>
+  </div>
+
+  <div class="services-module">
+    <h3>eXtension.org</h3>
+    <p>The eXtension Foundation and its members share Cooperative Extension stories and resources at <A href="extension.org">extension.org</a>.</p>
+  </div>
+
+  </div>
+
+</div>
+
+<p><strong>Hi <%= current_person.first_name %></strong>, you are joining <span class='mednumber'><%= number_with_delimiter(@active_count-1) %></span> colleagues that have been active in People within the last month.</p>

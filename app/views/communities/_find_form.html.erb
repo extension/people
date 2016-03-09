@@ -1,9 +1,9 @@
 <%= form_tag(find_communities_path) do -%>
   <fieldset>
     <div class="input-group">
-      <%= text_field_tag("q","", class: 'form-control', :placeholder => 'name or description', )%>
+      <%= text_field_tag("q","", class: 'form-control', :placeholder => 'Community name or description', )%>
       <span class="input-group-btn">
-        <%= submit_tag('Search', class: 'btn btn-default') %>
+        <%= button_tag("<i class='fa fa-search'></i>".html_safe, class: 'btn btn-default') %>
       </span>
     </div>
   </fieldset>

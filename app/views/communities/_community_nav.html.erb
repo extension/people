@@ -1,6 +1,16 @@
 
 <div id="connectiontocommunity">
   <%= render :partial => 'make_connection' %>
+
+  <%- if (current_person.is_community_member?(@community)) -%>
+    <%- if @thisconnection.sendnotifications? -%>
+      <p><%= link_to('Stop activity notifications',change_notification_communities_path({id: @thisconnection.id, is_on: 'no'}), :class => "btn btn-default btn-sm", :remote => true, :method => :post) -%></p>
+    <%- else -%>
+      <p><%= link_to('Get activity notifications',change_notification_communities_path({id: @thisconnection.id, is_on: 'yes'}), :class => "btn btn-default btn-sm", :remote => true, :method => :post) -%></p>
+    <%- end -%>
+  <%- end -%>
+
+
 </div>
 <h2 class="community-name"><%= @community.name%></h2>
 

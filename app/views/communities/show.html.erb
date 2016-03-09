@@ -107,14 +107,6 @@
         <small><%= link_to 'edit settings', edit_community_path(@community) -%></small>
       <%- end -%>
     </h4>
-    <%- if (current_person.is_community_member?(@community)) -%>
-      <%- if @thisconnection.sendnotifications? -%>
-        <p>Activity Notifications: <span class="badge badge-success">ON</span> <%= link_to('Turn Off',change_notification_communities_path({id: @thisconnection.id, is_on: 'no'}), :class => "btn btn-default btn-sm", :remote => true, :method => :post) -%></p>
-      <%- else -%>
-        <p><strong>Activity Notifications:</strong> <span class="badge badge-warning">OFF</span> <%= link_to('Turn On',change_notification_communities_path({id: @thisconnection.id, is_on: 'yes'}), :class => "btn btn-default btn-sm", :remote => true, :method => :post) -%></p>
-      <%- end -%>
-    <%- end -%>
-
       <p><%= @community.entrytype_to_s -%> with <%= @community.memberfilter_to_s -%></p>
       <p>Created by <%= link_to_person(@community.creator) -%> on <%= display_time(@community.created_at) -%></p>
 

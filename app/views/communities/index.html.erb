@@ -15,7 +15,7 @@
       <% current_person.community_invitations.each do |community|%>
         <li>
           <%= community_icon(community) %>
-          <%= link_to(community.name,community_url(community)) %> 
+          <%= link_to(community.name,community_url(community)) %>
           <small><%= display_invited_as(community.connectiontype) %></small>
         </li>
       <% end %>
@@ -27,10 +27,10 @@
      <ul class="list-unstyled">
       <% current_person.pending_communities.each do |community|%>
         <li>
-          <%= link_to(community.name,community_url(community)) %> 
+          <%= link_to(community.name,community_url(community)) %>
         </li>
       <% end %>
-    </ul>   
+    </ul>
     <%- end -%>
 
 
@@ -39,13 +39,13 @@
 
       <ul class="list-unstyled">
         <%- current_person.connected_communities.each do |community| -%>
-          <li>
-            <%= community_icon(community) %>
-            <%= link_to(community.name, community) %> 
+          <li class="<%= community.is_institution? ? "is_institution" : "is_community" %>">
+
+            <%= link_to(community.name, community) %>
             <small><%= current_person.connection_with_community_expanded(community)%></small>
           </li>
         <%- end -%>
-      </ul>    
+      </ul>
     <%- else -%>
       <p>You haven't yet joined or indicated an interest in any communities</p>
     <%- end -%>

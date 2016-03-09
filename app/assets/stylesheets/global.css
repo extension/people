@@ -53,3 +53,21 @@ a:hover.status_icon {color:#0088cc;}
 .people-header {margin-bottom:0;}
 .page-footer {padding-top:20px;}
 .cursor {cursor:pointer;}
+.masthead-search {
+  /*outline: 1px solid #bbb;*/
+  float:right;
+width: 24em;
+padding: 0 10px;}
+.masthead-search form { clear:left;display:block; margin-bottom:10px;}
+.masthead-logo {float:left;}
+.services-module {margin-bottom:40px; float: left;
+  /*border: 1px solid #ccc; */
+  width: 45%; margin-right:5%;}
+.services-module h3 {font-size:24px;}
+.services-module p {font-size: 14px;}
+.services-module p a {font-size: 16px;}
+.services-module img {width: 100%; padding: 10px 40px;}
+.institution-list li {padding:3px 0; font-size: 15px;
+  /*outline: 1px solid red;*/
+}
+.people-home-subhead {font-size:30px; font-weight:normal; color: #f47B28;}

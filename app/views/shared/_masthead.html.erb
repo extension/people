@@ -1,9 +1,11 @@
-<div class="col-md-12">
-  <%= link_to(image_tag('people_logo_ithree_tagline.png', {class: "people-logo hidden-xs"}).html_safe,root_path) %>
+<div class="col-md-10 col-md-offset-1">
+  <%= link_to(image_tag('people_logo_ithree_tagline.png', {class: "people-logo hidden-xs"}).html_safe,root_path, {class: "masthead-logo"}) %>
 
   <p class="mobile-nav-link">
     <a href="#footer-shortcuts" class="btn btn-default"><i class="fa fa-align-justify"></i></a>
   </p>
+
+
 
 <%- if current_person -%>
 
@@ -26,4 +28,9 @@
   </div>
 
 <%- end -%>
+<div class="masthead-search">
+<%= render(:partial => 'communities/find_form') %>
+<%= render(:partial => 'people/find_form') %>
+
+</div>
 </div>

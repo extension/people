@@ -93,3 +93,7 @@ z-index: 101;}
     display: block;
     padding: 10px 15px;
   color: #888;}
+
+.people-home {width: 45%; margin-right: 5%; float:left;}
+.people-home .person-profile-avatar {width: 120px; margin:10px;}
+p.jumbo {font-size: 18px;}

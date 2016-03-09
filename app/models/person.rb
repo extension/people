@@ -535,6 +535,14 @@ class Person < ActiveRecord::Base
     I18n.translate("communities.connections.#{locale_key}")
   end
 
+  def connection_with_community_expanded_if_not_member(community)
+    connection = self.connection_with_community(community)
+    if connection == "member"
+      return
+    end
+    connection_with_community_expanded(community)
+  end
+
   def primary_institution
     self.communities.institutions.where(id: self.institution_id).first
   end
