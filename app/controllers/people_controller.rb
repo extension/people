@@ -42,14 +42,17 @@ class PeopleController < ApplicationController
   def setavatar
     @person = Person.find(params[:id])
     if(params[:delete] and TRUE_VALUES.include?(params[:delete]))
+      removed_filename = (!@person.avatar.file.nil?) ?  @person.avatar.file.filename : ''
       @person.remove_avatar!
       @person.save
-      what_changed = @person.previous_changes.reject{|attribute,value| (['updated_at'].include?(attribute) or (value[0].blank? and value[1].blank?))}
+      what_changed = {avatar: [removed_filename,'']}
     else
       update_params = params[:person]
       if(!update_params['avatar'].blank?)
+        current_filename = (!@person.avatar.file.nil?) ?  @person.avatar.file.filename : ''
         @person.update_attributes(update_params)
-        what_changed = @person.previous_changes.reject{|attribute,value| (['updated_at'].include?(attribute) or (value[0].blank? and value[1].blank?))}
+        new_filename = (!@person.avatar.file.nil?) ?  @person.avatar.file.filename : ''
+        what_changed = {avatar: [current_filename,new_filename]}
       end
     end
 
