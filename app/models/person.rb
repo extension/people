@@ -796,13 +796,6 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def self.expire_dormant_account_passwords(set_google_random = true)
-    self.not_system.inactive.where('legacy_password is NOT NULL or password_hash IS NOT NULL').each do |p|
-      p.expire_password(set_google_random)
-    end
-  end
-
-
   def self.expire_retired_account_passwords
     retire_pool = RetiredAccount.includes(:person).where('retired_accounts.created_at <= ?',Time.now.utc - 1.week).where('people.legacy_password is NOT NULL or people.password_hash IS NOT NULL').map(&:person)
     retire_pool.each do |p|

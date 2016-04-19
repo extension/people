@@ -49,10 +49,6 @@ class CronTasks < Thor
       accounts = Person.expire_retired_account_passwords
       idlist = accounts.map{|a| "##{a.id}"}
       puts "Cleared passwords for the following retired accounts: #{idlist.join(', ')}"
-
-      accounts = Person.expire_dormant_account_passwords
-      idlist = accounts.map{|a| "##{a.id}"}
-      puts "Cleared passwords for the following dormant accounts: #{idlist.join(', ')}"
     end
 
   end
@@ -73,7 +69,7 @@ class CronTasks < Thor
   def hourly
     load_rails(options[:environment])
     #no-op
-  end 
+  end
 
 end
 
