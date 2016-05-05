@@ -12,7 +12,7 @@ class Community < ActiveRecord::Base
   attr_accessible :name, :description, :location, :location_id, :memberfilter, :connect_to_drupal
   attr_accessible :connect_to_google_apps, :entrytype, :shortname, :publishing_community, :is_public
   attr_accessible :community_masthead, :community_masthead_cache, :remove_community_masthead
-  attr_accessible :blog_id
+  attr_accessible :blog_id, :primary_contact_id
 
   mount_uploader :community_masthead, CommunityMastheadUploader
 
@@ -67,6 +67,8 @@ class Community < ActiveRecord::Base
   after_save :sync_communities
 
   belongs_to :creator, :class_name => "Person", :foreign_key => "created_by"
+  belongs_to :primary_contact, :class_name => "Person", :foreign_key => "primary_contact_id"
+
   belongs_to :location
   has_many :community_connections, :dependent => :destroy
   has_many :people, through: :community_connections,

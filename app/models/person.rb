@@ -102,6 +102,8 @@ class Person < ActiveRecord::Base
 
   belongs_to :invitation
   has_many :activities
+  has_many :received_activities, class_name: 'Activity', foreign_key: 'colleague_id'
+
   has_many :auth_approvals
   has_many :profile_public_settings, dependent: :destroy
   has_many :social_network_connections, dependent: :destroy
@@ -121,13 +123,15 @@ class Person < ActiveRecord::Base
 
   ## scopes
   scope :retired, -> {where(retired: true)}
-  scope :validaccounts, where("retired = #{false} and vouched = #{true}")
-  scope :pendingreview, where("retired = #{false} and vouched = #{false} and account_status != #{STATUS_SIGNUP} && email_confirmed = #{true}")
-  scope :not_system, where("people.is_systems_account = ?",false)
+  scope :vouched, -> {where(vouched: true)}
+  scope :email_confirmed, -> {where(email_confirmed: true)}
+  scope :validaccounts, -> {where("retired = #{false} and vouched = #{true}")}
+  scope :pendingreview, -> {where("retired = #{false} and vouched = #{false} and account_status != #{STATUS_SIGNUP} && email_confirmed = #{true}")}
+  scope :not_system, -> {where("people.is_systems_account = ?",false)}
   scope :display_accounts, validaccounts.not_system
-  scope :inactive, lambda{ where('DATE(last_activity_at) < ?',Date.today - Settings.months_for_inactive_flag.months) }
-  scope :active, lambda{ where('DATE(last_activity_at) >= ?',Date.today - Settings.months_for_inactive_flag.months) }
-  scope :reminder_pool, lambda{ display_accounts.inactive.where('(last_account_reminder IS NULL or last_account_reminder <= ?)',Time.now.utc - Settings.months_for_inactive_flag.months).limit(Settings.inactive_limit) }
+  scope :inactive, -> { where('DATE(last_activity_at) < ?',Date.today - Settings.months_for_inactive_flag.months) }
+  scope :active, -> { where('DATE(last_activity_at) >= ?',Date.today - Settings.months_for_inactive_flag.months) }
+  scope :reminder_pool, -> { display_accounts.inactive.where('(last_account_reminder IS NULL or last_account_reminder <= ?)',Time.now.utc - Settings.months_for_inactive_flag.months).limit(Settings.inactive_limit) }
 
 
   # duplicated from darmok

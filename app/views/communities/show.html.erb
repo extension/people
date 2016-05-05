@@ -40,6 +40,10 @@
         <div class="dashmodule">
           <p class="lead"><%= @community.entrytype_to_s -%></p>
           <dl>
+            <%- if @community.primary_contact_id.present? -%>
+              <dt>Primary Contact</dt>
+              <dd><%= link_to_person(@community.primary_contact) -%></dd>
+            <%- end -%>
             <dt>Membership:</dt>
             <dd><%= @community.memberfilter_to_s -%></dd>
             <dt>Created by:</dt>
