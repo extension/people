@@ -104,6 +104,7 @@ People::Application.routes.draw do
       get :find
       post :find
       post :change_notification
+      get :contacts
     end
 
     member do
