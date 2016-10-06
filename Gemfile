@@ -125,6 +125,9 @@ gem 'reverse_markdown'
 gem 'rmagick'
 gem 'carrierwave', "0.10.0ex", :source => 'https://engineering.extension.org/rubygems/'
 
+# Ruby 2.2 requirement
+gem 'test-unit'
+
 group :development do
   # require the powder gem
   gem 'powder'
