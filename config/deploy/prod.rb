@@ -1,5 +1,5 @@
 set :deploy_to, "/services/people/"
 set :branch, 'master'
 set :vhost, 'people.extension.org'
-server vhost, :app, :web, :db, :primary => true
-set :port, 24
+set :deploy_server, 'people.aws.extension.org'
+server deploy_server, :app, :web, :db, :primary => true
