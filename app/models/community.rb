@@ -56,7 +56,7 @@ class Community < ActiveRecord::Base
     'leader' => 'Community Leader',
     'pending' => 'Pending Community Review',
     'invitedleader' => 'Community Invitation (Leader)',
-    'invitedleader' => 'Community Invitation (Member)'}
+    'invitedmember' => 'Community Invitation (Member)'}
 
   validates :name, :presence => true, :uniqueness => {:case_sensitive => false}
   validates :entrytype, :presence => true
