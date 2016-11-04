@@ -5,7 +5,7 @@
 #  see LICENSE file
 
 class Site < ActiveRecord::Base
-  attr_accessible :label, :database, :dev_database, :uri, :dev_uri, :apptype
+  attr_accessible :label, :database, :dev_database, :uri, :dev_uri, :apptype, :default_role
 
   has_many :site_roles
 
@@ -17,10 +17,6 @@ class Site < ActiveRecord::Base
     else
       self.database
     end
-  end
-
-  def default_role
-    (self.label == 'homepage') ? SiteRole::READER : SiteRole::EDITOR
   end
 
   def proxy_roles
