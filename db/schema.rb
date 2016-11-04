@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20160505132726) do
+ActiveRecord::Schema.define(:version => 20161104125213) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -395,8 +395,9 @@ ActiveRecord::Schema.define(:version => 20160505132726) do
     t.string   "database"
     t.string   "dev_database"
     t.string   "apptype"
-    t.datetime "created_at",   :null => false
-    t.datetime "updated_at",   :null => false
+    t.datetime "created_at",                  :null => false
+    t.datetime "updated_at",                  :null => false
+    t.integer  "default_role", :default => 2, :null => false
   end
 
   add_index "sites", ["label"], :name => "site_ndx", :unique => true
