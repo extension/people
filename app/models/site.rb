@@ -23,5 +23,9 @@ class Site < ActiveRecord::Base
     site_roles.where(permission: SiteRole::PROXY)
   end
 
+  def administrators
+    Person.validaccounts.joins(:site_roles).where("permission = ?",SiteRole::ADMINISTRATOR).where("site_id = ?",self.id)
+  end
+
 
 end
