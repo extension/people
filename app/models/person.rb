@@ -1489,6 +1489,15 @@ class Person < ActiveRecord::Base
     BlogsUser.where(ID: self.id).first
   end
 
+  def last_login_activity_for_site(site)
+    self.activities.site_logins.where("site LIKE '%#{site.uri}%'").last
+  end
+
+  def self.administrators
+    validaccounts.where(is_admin: true)
+  end
+
+
   private
 
   def check_account_status
