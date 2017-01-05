@@ -63,4 +63,16 @@ class SiteRole < ActiveRecord::Base
     return nil
   end
 
+  def self.cleanup_retired_admins
+     admin_roles = SiteRole.includes(:permissable).where(permission: SiteRole::ADMINISTRATOR)
+     admin_roles.each do |ar|
+       if(ar.permissable_type == 'Person' and ar.permissable.retired?)
+         person = ar.permissable
+         ar.destroy
+         person.synchronize_accounts
+       end
+     end
+   end
+
+
 end
