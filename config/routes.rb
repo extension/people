@@ -58,6 +58,11 @@ People::Application.routes.draw do
     simple_named_route 'set_password', via: [:post]
   end
 
+  resources :audit, only: [:index] do
+    collection do
+      get :admins
+    end
+  end
 
 
   resources :people, only: [:index, :show, :edit, :update] do
