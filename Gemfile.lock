@@ -281,6 +281,8 @@ GEM
     uglifier (2.3.0)
       execjs (>= 0.3.0)
       json (>= 1.8.0)
+    unscoped_associations (0.7.0)
+      activerecord (>= 3.2.0, <= 5.1.0)
     useragent (0.6.0)
     valid_email (0.0.4)
       activemodel
@@ -343,5 +345,9 @@ DEPENDENCIES
   thor
   turbo-sprockets-rails3
   uglifier (>= 1.0.3)
+  unscoped_associations
   useragent
   valid_email
+
+BUNDLED WITH
+   1.12.5

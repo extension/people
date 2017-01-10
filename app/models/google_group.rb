@@ -12,7 +12,7 @@ class GoogleGroup < ActiveRecord::Base
   after_save :update_email_alias
 
 
-  belongs_to :community
+  belongs_to :community, unscoped: true
   has_one  :email_alias, :as => :aliasable, :dependent => :destroy
 
   def update_email_alias

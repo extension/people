@@ -128,6 +128,9 @@ gem 'carrierwave', "0.10.0ex", :source => 'https://engineering.extension.org/rub
 # Ruby 2.2 requirement
 gem 'test-unit'
 
+# handle the issue with the community scoping
+gem 'unscoped_associations'
+
 group :development do
   # require the powder gem
   gem 'powder'
