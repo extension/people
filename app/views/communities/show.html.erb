@@ -1,5 +1,16 @@
 <%- @page_title = "#{@community.name} - Community Information" -%>
 
+<%- if (!@community.active?) -%>
+<div class="row">
+  <div class="col-md-12">
+    <div class='alert  alert-warning'>
+     <h4>Inactive Community</h4>
+     <p>This community has been marked for removal.</p>
+    </div>
+  </div>
+</div>
+<%- end -%>
+
 <div class="row">
   <div class="col-md-10 col-md-offset-1">
     <h2><%= community_icon(@community) %> <%= @community.name%></h2>
@@ -10,9 +21,11 @@
           <%= description_for_community(@community) -%>
         </div>
       </div>
+      <%- if (@community.active?) -%>
       <div id="connectiontocommunity" class="col-md-3 col-md-offset-1">
         <%= render :partial => 'make_connection' %>
       </div>
+      <%- end -%>
     </div>
 
 

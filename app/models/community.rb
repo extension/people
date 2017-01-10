@@ -15,6 +15,7 @@ class Community < ActiveRecord::Base
   attr_accessible :blog_id, :primary_contact_id
 
   mount_uploader :community_masthead, CommunityMastheadUploader
+  default_scope where(active: true)
 
   # hardcoded community ids
   INSTITUTIONAL_TEAMS_COMMUNITY_ID = 80
@@ -87,6 +88,18 @@ class Community < ActiveRecord::Base
   scope :connected_as, lambda{|connectiontype| where(CONNECTION_CONDITIONS[connectiontype])}
 
   scope :publishing, ->{where(publishing_community: true)}
+
+  def self.inactive
+    unscoped.where(active: false)
+  end
+
+  def deactivate
+    # remove all connections
+    self.people.each do |p|
+      p.remove_from_community(self,{connector_id: Person.system_id, nonotify: true})
+    end
+    self.update_attribute(:active, false)
+  end
 
 
   def sync_communities
@@ -238,9 +251,9 @@ class Community < ActiveRecord::Base
 
   def self.find_by_shortname_or_id(searchterm,raise_not_found = true)
     if(searchterm.cast_to_i > 0)
-      community = self.where(id: searchterm).first
+      community = self.unscoped.where(id: searchterm).first
     else
-      community = self.where(shortname: searchterm).first
+      community = self.unscoped.where(shortname: searchterm).first
     end
 
     if(raise_not_found and community.nil?)
