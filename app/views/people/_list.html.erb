@@ -19,9 +19,9 @@
     <tr id="person_row_<%= person.id %>" class="<%= status_class(person) %>">
       <td><%= link_to_person(person) %></td>
       <td><%= person.idstring %></td>
-      <td><%= person.email %></td>            
+      <td><%= person.display_email %></td>            
       <td><%= primary_institution_name_for_person(person,'<span class="na">not specified</span>') %></td>
-      <td><%= (person.affiliation.blank?) ? '<span class="na">&nbsp;</span>'.html_safe : person.affiliation %></td>        
+      <td><%= (person.affiliation.blank?) ? '<span class="na">&nbsp;</span>'.html_safe : person.affiliation %></td>
       <td><%= (person.location.nil?) ? '<span class="na">n/a</span>'.html_safe : person.location.abbreviation %></td>
       <%- if @browse_filter_objects and @browse_filter_objects['social_networks'] -%>
         <%- sn_id_list = @browse_filter_objects['social_networks'].map(&:id) -%>
@@ -34,7 +34,7 @@
           <%- end -%>
           </ul>
         </td>
-      <%- end -%>              
+      <%- end -%>
       <td><%= status_icon(person) %></td>
     </tr>
   <%- end -%>

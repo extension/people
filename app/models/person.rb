@@ -555,7 +555,7 @@ class Person < ActiveRecord::Base
     self.update_attributes(email: "#{self.idstring}@extension.org", google_apps_email: true)
   end
 
-  # override email_forward to return something on null
+
   def email_forward
     if(!self.primary_account_id.blank?)
       self.primary_account.idstring
@@ -563,6 +563,14 @@ class Person < ActiveRecord::Base
       "#{self.idstring}@apps.extension.org"
     elsif(self.email =~ /extension\.org$/i)
       EmailAlias::NOWHERE_LOCATION
+    else
+      self.email
+    end
+  end
+
+  def display_email
+    if(self.display_extension_email?)
+      "#{self.idstring}@extension.org"
     else
       self.email
     end
@@ -1295,7 +1303,7 @@ class Person < ActiveRecord::Base
             row << person.first_name
             row << person.last_name
             row << person.idstring
-            row << person.email
+            row << person.display_email
             row << person.phone
             row << person.title
             row << self.name_or_nil(person.position)
