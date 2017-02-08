@@ -18,7 +18,7 @@ class Person < ActiveRecord::Base
   attr_accessible :password, :interest_tags
   attr_accessible :position_id, :position, :location_id, :location, :county_id, :county, :institution_id, :institution
   attr_accessible :invitation, :invitation_id
-  attr_accessible :last_account_reminder, :password_reset, :google_apps_email, :email_forward
+  attr_accessible :last_account_reminder, :password_reset, :google_apps_email, :display_extension_email
   attr_accessible :tou_status, :tou_status_date
   attr_accessible :avatar, :avatar_cache, :remove_avatar
 
@@ -557,14 +557,12 @@ class Person < ActiveRecord::Base
 
   # override email_forward to return something on null
   def email_forward
-    if(self.email =~ /extension\.org$/i)
-      if(self.google_apps_email?)
-        "#{self.idstring}@apps.extension.org"
-      elsif(forwarding_address = read_attribute(:email_forward))
-        forwarding_address
-      else
-        EmailAlias::NOWHERE_LOCATION
-      end
+    if(!self.primary_account_id.blank?)
+      self.primary_account.idstring
+    elsif(self.google_apps_email?)
+      "#{self.idstring}@apps.extension.org"
+    elsif(self.email =~ /extension\.org$/i)
+      EmailAlias::NOWHERE_LOCATION
     else
       self.email
     end
@@ -1481,8 +1479,9 @@ class Person < ActiveRecord::Base
     self.social_networks.where(name: 'linkedin')
   end
 
-  def add_email_alias(mail_alias)
-    self.email_aliases.create({mail_alias: mail_alias, destination: self.idstring, alias_type: EmailAlias::ALIAS, disabled: !self.validaccount?})
+  def add_email_alias(mail_alias, is_personal = false)
+    alias_type = is_personal ? EmailAlias::PERSONAL_ALIAS : EmailAlias::ALIAS
+    self.email_aliases.create({mail_alias: mail_alias, destination: self.idstring, alias_type: alias_type, disabled: !self.validaccount?})
   end
 
   def blogs_user

@@ -61,6 +61,7 @@ People::Application.routes.draw do
   resources :audit, only: [:index] do
     collection do
       get :admins
+      get :aliases
     end
   end
 

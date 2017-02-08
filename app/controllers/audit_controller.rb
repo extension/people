@@ -5,9 +5,6 @@
 #  see LICENSE file
 class AuditController < ApplicationController
   before_filter :set_tab
-  before_filter :admin_required
-
-
 
   def index
   end
@@ -16,10 +13,13 @@ class AuditController < ApplicationController
   def admins
   end
 
+  def aliases
+  end
+
   private
 
   def set_tab
-    @selected_tab = 'communities'
+    @selected_tab = 'aliases'
   end
 
 end
