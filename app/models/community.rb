@@ -88,6 +88,8 @@ class Community < ActiveRecord::Base
   scope :connected_as, lambda{|connectiontype| where(CONNECTION_CONDITIONS[connectiontype])}
 
   scope :publishing, ->{where(publishing_community: true)}
+  scope :connected_to_google, ->{where(connect_to_google_apps: true)}
+
 
   def self.inactive
     unscoped.where(active: false)

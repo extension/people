@@ -58,14 +58,6 @@ People::Application.routes.draw do
     simple_named_route 'set_password', via: [:post]
   end
 
-  resources :audit, only: [:index] do
-    collection do
-      get :admins
-      get :aliases
-    end
-  end
-
-
   resources :people, only: [:index, :show, :edit, :update] do
     member do
       get :activity
@@ -125,6 +117,15 @@ People::Application.routes.draw do
       post :change_connection
       post :remove_connection
       post :setmasthead
+    end
+  end
+
+  resources :audits, only: [:index] do
+    collection do
+      get :admins
+      get :aliases
+      get :google_apps_email
+      get :google_groups
     end
   end
 

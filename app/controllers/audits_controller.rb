@@ -3,7 +3,7 @@
 #  Developed with funding for the National eXtension Initiative.
 # === LICENSE:
 #  see LICENSE file
-class AuditController < ApplicationController
+class AuditsController < ApplicationController
   before_filter :set_tab
 
   def index
@@ -14,6 +14,12 @@ class AuditController < ApplicationController
   end
 
   def aliases
+  end
+
+  def google_apps_email
+  end
+
+  def google_groups
   end
 
   private

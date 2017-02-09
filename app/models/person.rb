@@ -132,6 +132,7 @@ class Person < ActiveRecord::Base
   scope :inactive, -> { where('DATE(last_activity_at) < ?',Date.today - Settings.months_for_inactive_flag.months) }
   scope :active, -> { where('DATE(last_activity_at) >= ?',Date.today - Settings.months_for_inactive_flag.months) }
   scope :reminder_pool, -> { display_accounts.inactive.where('(last_account_reminder IS NULL or last_account_reminder <= ?)',Time.now.utc - Settings.months_for_inactive_flag.months).limit(Settings.inactive_limit) }
+  scope :google_apps_email, -> {where(google_apps_email: true)}
 
 
   # duplicated from darmok
@@ -574,6 +575,10 @@ class Person < ActiveRecord::Base
     else
       self.email
     end
+  end
+
+  def email_alias_aliases
+    email_aliases.where("alias_type IN (#{EmailAlias::ALIAS},#{EmailAlias::PERSONAL_ALIAS})")
   end
 
   def resend_confirmation
