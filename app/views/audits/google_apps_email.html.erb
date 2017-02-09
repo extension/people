@@ -1,0 +1,21 @@
+<%- @page_title = "Google Apps Email" -%>
+
+<div class="page-header">
+  <h2><%= @page_title %></h2>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <p>The following are the accounts that are utilizing eXtension Google Apps Email services.  For all other email addresses associated with a Google Account
+      our email servers forward email sent to <code>idstring@extension.org</code> to the email address listed in their profile</p>
+    <table class="table table-striped">
+    <%- Person.validaccounts.google_apps_email.order(:last_name).each do |p| -%>
+      <tr>
+        <td><%= link_to_person(p) -%></td>
+        <td><%= p.email -%></td>
+      </tr>
+    <%- end -%>
+    </table>
+
+  </div>
+</div>

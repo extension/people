@@ -3,11 +3,8 @@
 #  Developed with funding for the National eXtension Initiative.
 # === LICENSE:
 #  see LICENSE file
-class AuditController < ApplicationController
+class AuditsController < ApplicationController
   before_filter :set_tab
-  before_filter :admin_required
-
-
 
   def index
   end
@@ -16,10 +13,19 @@ class AuditController < ApplicationController
   def admins
   end
 
+  def aliases
+  end
+
+  def google_apps_email
+  end
+
+  def google_groups
+  end
+
   private
 
   def set_tab
-    @selected_tab = 'communities'
+    @selected_tab = 'aliases'
   end
 
 end

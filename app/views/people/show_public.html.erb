@@ -49,7 +49,7 @@
     <dl class='dl-horizontal dashmodule'>
       <%- if(@person.public_attributes[:profile_attributes]['email']) -%>
         <dt>Email:</dt>
-        <dd><%= @person.email%></dd>
+        <dd><%= @person.display_email%></dd>
       <%- end -%>
       <%- if(@person.public_attributes[:profile_attributes]['phone']) -%>
       <dt>Preferred Phone:</dt>

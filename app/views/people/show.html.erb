@@ -76,11 +76,19 @@
             <%= link_to('Learn more about your eXtension Google Account', 'http://create.extension.org/node/98956') %>
           </dd>
           <dt>Email:</dt>
-          <dd><%= @person.email%></dd>
+          <dd><%= @person.display_email%></dd>
           <%- if @person == current_person or current_person.is_admin? -%>
-            <%- if @person.email_forward != @person.email -%>
+            <%- if @person.display_email != @person.email -%>
             <dd>Forwards to: <%= @person.email_forward %></dd>
             <%- end -%>
+          <%- end -%>
+          <%- if @person.email_alias_aliases.count > 0 -%>
+          <dt>Email Aliases:</dt>
+          <dd>
+          <%- @person.email_alias_aliases.order("alias_type DESC,mail_alias").each do |ea| -%>
+            <%= ea.mail_alias -%>@extension.org<br/>
+          <%- end -%>
+          </dd>
           <%- end -%>
           <dt>Preferred Phone:</dt>
           <dd><%= (@person.phone.blank?) ? 'n/a' : number_to_phone(@person.phone, :area_code => true)  %></dd>

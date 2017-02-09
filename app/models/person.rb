@@ -18,7 +18,7 @@ class Person < ActiveRecord::Base
   attr_accessible :password, :interest_tags
   attr_accessible :position_id, :position, :location_id, :location, :county_id, :county, :institution_id, :institution
   attr_accessible :invitation, :invitation_id
-  attr_accessible :last_account_reminder, :password_reset, :google_apps_email, :email_forward
+  attr_accessible :last_account_reminder, :password_reset, :google_apps_email, :display_extension_email
   attr_accessible :tou_status, :tou_status_date
   attr_accessible :avatar, :avatar_cache, :remove_avatar
 
@@ -132,6 +132,7 @@ class Person < ActiveRecord::Base
   scope :inactive, -> { where('DATE(last_activity_at) < ?',Date.today - Settings.months_for_inactive_flag.months) }
   scope :active, -> { where('DATE(last_activity_at) >= ?',Date.today - Settings.months_for_inactive_flag.months) }
   scope :reminder_pool, -> { display_accounts.inactive.where('(last_account_reminder IS NULL or last_account_reminder <= ?)',Time.now.utc - Settings.months_for_inactive_flag.months).limit(Settings.inactive_limit) }
+  scope :google_apps_email, -> {where(google_apps_email: true)}
 
 
   # duplicated from darmok
@@ -555,19 +556,29 @@ class Person < ActiveRecord::Base
     self.update_attributes(email: "#{self.idstring}@extension.org", google_apps_email: true)
   end
 
-  # override email_forward to return something on null
+
   def email_forward
-    if(self.email =~ /extension\.org$/i)
-      if(self.google_apps_email?)
-        "#{self.idstring}@apps.extension.org"
-      elsif(forwarding_address = read_attribute(:email_forward))
-        forwarding_address
-      else
-        EmailAlias::NOWHERE_LOCATION
-      end
+    if(!self.primary_account_id.blank?)
+      self.primary_account.idstring
+    elsif(self.google_apps_email?)
+      "#{self.idstring}@apps.extension.org"
+    elsif(self.email =~ /extension\.org$/i)
+      EmailAlias::NOWHERE_LOCATION
     else
       self.email
     end
+  end
+
+  def display_email
+    if(self.display_extension_email?)
+      "#{self.idstring}@extension.org"
+    else
+      self.email
+    end
+  end
+
+  def email_alias_aliases
+    email_aliases.where("alias_type IN (#{EmailAlias::ALIAS},#{EmailAlias::PERSONAL_ALIAS})")
   end
 
   def resend_confirmation
@@ -1297,7 +1308,7 @@ class Person < ActiveRecord::Base
             row << person.first_name
             row << person.last_name
             row << person.idstring
-            row << person.email
+            row << person.display_email
             row << person.phone
             row << person.title
             row << self.name_or_nil(person.position)
@@ -1481,8 +1492,9 @@ class Person < ActiveRecord::Base
     self.social_networks.where(name: 'linkedin')
   end
 
-  def add_email_alias(mail_alias)
-    self.email_aliases.create({mail_alias: mail_alias, destination: self.idstring, alias_type: EmailAlias::ALIAS, disabled: !self.validaccount?})
+  def add_email_alias(mail_alias, is_personal = false)
+    alias_type = is_personal ? EmailAlias::PERSONAL_ALIAS : EmailAlias::ALIAS
+    self.email_aliases.create({mail_alias: mail_alias, destination: self.idstring, alias_type: alias_type, disabled: !self.validaccount?})
   end
 
   def blogs_user

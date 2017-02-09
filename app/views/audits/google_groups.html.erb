@@ -1,0 +1,23 @@
+<%- @page_title = "Google Groups" -%>
+
+<div class="page-header">
+  <h2><%= @page_title %></h2>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <p>The following communities are currently connected to google groups</p>
+    <table class="table table-striped">
+    <%- Community.includes(:google_groups).connected_to_google.order(:name).each do |c| -%>
+      <tr>
+        <td><%= link_to_community(c) -%></td>
+        <td>
+          <%- c.google_groups.each do |gg| -%>
+            <%= link_to("#{gg.group_id}@extension.org",gg.forum_url) -%><br/>
+          <%- end -%>
+        </td>
+      </tr>
+    <%- end -%>
+    </table>
+  </div>
+</div>
