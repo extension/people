@@ -80,7 +80,7 @@ class PeopleController < ApplicationController
   def update
     @person = Person.find(params[:id])
 
-    if(current_person != @person and !current_person.is_admin? )
+    if((@person.google_apps_email?) or (current_person != @person and !current_person.is_admin? ))
       update_params = params[:person].reject{|attribute,value| attribute == 'email'}
     else
       update_params = params[:person]
