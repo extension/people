@@ -5,6 +5,8 @@
 #  see LICENSE file
 
 require 'bcrypt'
+require 'csv'
+
 class Person < ActiveRecord::Base
   include BCrypt
   include CacheTools
@@ -1507,6 +1509,71 @@ class Person < ActiveRecord::Base
 
   def self.administrators
     validaccounts.where(is_admin: true)
+  end
+
+  def self.campus_data_match(csv_import_filename)
+    return nil if(!File.exists?(csv_import_filename))
+    match_hash = {}
+    match_stats = {total: 0, yes: 0, maybe: 0, no: 0}
+    CSV.foreach(csv_import_filename,headers: true) do |row|
+      rowhash = row.to_hash
+      campus_id = rowhash['id']
+      match_hash[campus_id] = rowhash
+      match_hash[campus_id]['match'] = 'no'
+      if(p = Person.where(email: row['email']).first)
+        match_hash[campus_id]['match'] = 'yes'
+        match_hash[campus_id]['people_id'] = p.id
+        match_hash[campus_id]['people_idstring'] = p.idstring
+        match_hash[campus_id]['people_email'] = p.email
+        match_hash[campus_id]['people_name'] = p.fullname
+      else
+        (email_address,email_domain) = row['email'].split('@')
+        email_domain_parts = email_domain.split('.')
+        if(email_domain == 'extension.org')
+          # look for an alias
+          if(ea = EmailAlias.where(aliasable_type: 'Person').where(mail_alias: email_address).first)
+            match_hash[campus_id]['match'] = 'yes'
+            p = ea.aliasable
+            match_hash[campus_id]['people_id'] = p.id
+            match_hash[campus_id]['people_idstring'] = p.idstring
+            match_hash[campus_id]['people_email'] = p.email
+            match_hash[campus_id]['people_name'] = p.fullname
+          end
+        elsif(email_domain_parts.last =~ %r{edu|mil|gov|com})
+          base_domain = "#{email_domain_parts.reverse[1]}.#{email_domain_parts.reverse[0]}"
+          if(p = Person.where(first_name: row['firstname']).where(last_name: row['lastname']).where("email LIKE '%#{base_domain}%'").first)
+            match_hash[campus_id]['match'] = 'maybe'
+            match_hash[campus_id]['people_id'] = p.id
+            match_hash[campus_id]['people_idstring'] = p.idstring
+            match_hash[campus_id]['people_email'] = p.email
+            match_hash[campus_id]['people_name'] = p.fullname
+          end
+        end
+      end
+    end # csv import file
+
+    # export it
+    CSV.open("matchresults_#{File.basename(csv_import_filename)}",'wb') do |csv|
+      headers = ['id','username','email','firstname','lastname','match','people_id','people_idstring','people_email','people_name']
+      csv << headers
+      match_hash.each do |campus_id,values|
+        match_stats[:total] += 1
+        case match_hash[campus_id]['match']
+        when 'no'
+          match_stats[:no] += 1
+        when 'yes'
+          match_stats[:yes] += 1
+        when 'maybe'
+          match_stats[:maybe] += 1
+        end
+        row = []
+        headers.each do |field|
+          row << match_hash[campus_id][field]
+        end
+        csv << row
+      end
+    end
+    match_stats
   end
 
 
