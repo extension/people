@@ -82,10 +82,10 @@
             <dd>Forwards to: <%= @person.email_forward %></dd>
             <%- end -%>
           <%- end -%>
-          <%- if @person.email_alias_aliases.count > 0 -%>
+          <%- if @person.all_email_aliases.count > 0 -%>
           <dt>Email Aliases:</dt>
           <dd>
-          <%- @person.email_alias_aliases.order("alias_type DESC,mail_alias").each do |ea| -%>
+          <%- @person.all_email_aliases.order("alias_type DESC,mail_alias").each do |ea| -%>
             <%= ea.mail_alias -%>@extension.org<br/>
           <%- end -%>
           </dd>
