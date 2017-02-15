@@ -5,6 +5,8 @@
 #  see LICENSE file
 
 require 'bcrypt'
+require 'csv'
+
 class Person < ActiveRecord::Base
   include BCrypt
   include CacheTools
@@ -577,7 +579,7 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def email_alias_aliases
+  def all_email_aliases
     email_aliases.where("alias_type IN (#{EmailAlias::ALIAS},#{EmailAlias::PERSONAL_ALIAS})")
   end
 
@@ -1492,9 +1494,24 @@ class Person < ActiveRecord::Base
     self.social_networks.where(name: 'linkedin')
   end
 
-  def add_email_alias(mail_alias, is_personal = false)
+  def add_email_alias(mail_alias, options = {})
+    is_personal = options[:is_personal] || false
+    add_mirror = options[:add_mirror] || true
     alias_type = is_personal ? EmailAlias::PERSONAL_ALIAS : EmailAlias::ALIAS
-    self.email_aliases.create({mail_alias: mail_alias, destination: self.idstring, alias_type: alias_type, disabled: !self.validaccount?})
+    ea = self.email_aliases.create({mail_alias: mail_alias, destination: self.idstring, alias_type: alias_type, disabled: !self.validaccount?})
+    if(add_mirror)
+      mirror_account = Person.find(MIRROR_ACCOUNT)
+      if(!ea = mirror_account.email_aliases.where(mail_alias: mail_alias).first)
+        mirror_account.email_aliases.create({mail_alias: mail_alias, destination: mirror_account.idstring, alias_type: EmailAlias::MIRROR, disabled: false})
+      end
+    end
+    ea
+  end
+
+  def remove_email_alias(mail_alias)
+    if(ea = self.email_aliases.where(mail_alias: mail_alias).first)
+      ea.destroy
+    end
   end
 
   def blogs_user
@@ -1508,6 +1525,8 @@ class Person < ActiveRecord::Base
   def self.administrators
     validaccounts.where(is_admin: true)
   end
+
+
 
 
   private
