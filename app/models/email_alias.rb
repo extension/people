@@ -20,19 +20,23 @@ class EmailAlias < ActiveRecord::Base
   NOWHERE_LOCATION = 'nowhere'
 
   # alias_types
-  FORWARD         = 1
-  GOOGLEAPPS      = 3
-  ALIAS           = 4
-  RENAME_ALIAS    = 5
+  FORWARD                  = 1
+  ALIAS                    = 2
+  GOOGLEAPPS               = 3
+  PERSONAL_ALIAS           = 4
+  RENAME_ALIAS             = 5
 
-  # LEGACY
+  MIRROR                     = 200
   SYSTEM_FORWARD             = 201
   SYSTEM_ALIAS               = 202
 
+  scope :active, ->{where(disabled: false)}
   scope :renames, ->{where(alias_type: RENAME_ALIAS)}
   scope :forwards, ->{where(alias_type: FORWARD)}
+  scope :system_forwards, ->{where(alias_type: SYSTEM_FORWARD)}
   scope :notforwards, ->{ where("alias_type != #{FORWARD}") }
-
+  scope :aliases, ->{ where("alias_type IN (#{ALIAS},#{MIRROR})") }
+  scope :system_aliases, ->{where(alias_type: SYSTEM_ALIAS)}
 
 
 

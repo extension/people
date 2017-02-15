@@ -1,6 +1,16 @@
 <%- @page_title = "#{@community.name} - Community Information" -%>
 
-    <%= render(:partial => 'community_nav') %>
+<%- if (!@community.active?) -%>
+<div class="row">
+  <div class="col-md-12">
+    <div class='alert  alert-warning'>
+     <h4>Inactive Community</h4>
+     <p>This community has been marked for removal.</p>
+    </div>
+  </div>
+</div>
+<%- end -%>
+<%= render(:partial => 'community_nav') %>
 
 
     <div class="row">
@@ -9,6 +19,7 @@
           <%= description_for_community(@community) -%>
         </div>
       </div>
+      <%- end -%>
     </div>
 
 

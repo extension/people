@@ -15,6 +15,7 @@ class SiteRole < ActiveRecord::Base
   EDITOR        = 2
   WRITER        = 3
   READER        = 4
+  PROXY         = 5
 
 
   def self.wordpress_label(role)
@@ -29,6 +30,19 @@ class SiteRole < ActiveRecord::Base
       'follower'
     else
       'follower'
+    end
+  end
+
+  def self.wordpress_user_level(role)
+    case role
+    when ADMINISTRATOR
+      10
+    when EDITOR
+      7
+    when WRITER
+      2
+    else
+      0
     end
   end
 
@@ -48,5 +62,17 @@ class SiteRole < ActiveRecord::Base
     # if we got here?  return nil
     return nil
   end
+
+  def self.cleanup_retired_admins
+     admin_roles = SiteRole.includes(:permissable).where(permission: SiteRole::ADMINISTRATOR)
+     admin_roles.each do |ar|
+       if(ar.permissable_type == 'Person' and ar.permissable.retired?)
+         person = ar.permissable
+         ar.destroy
+         person.synchronize_accounts
+       end
+     end
+   end
+
 
 end

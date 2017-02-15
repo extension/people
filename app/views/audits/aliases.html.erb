@@ -1,0 +1,67 @@
+<%- @page_title = "Email Aliases and Forwards" -%>
+
+<div class="page-header">
+  <h2><%= @page_title %></h2>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <ul>
+      <li><%= link_to('External Forwards','#forwards') -%>: Email forwards to an external address that are not associated with an eXtensionID</li>
+      <li><%= link_to('Aliases','#aliases') -%>: Generic aliases that go to one or more individual accounts</li>
+      <li><%= link_to('System Aliases','#system_aliases') -%>: System or application aliases that go to accounts used for systems infrastructure.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+
+    <a href="#forwards"><h3>External Forwards</h3></a>
+    <p>These are email forwards to an external address that are not associated with an eXtensionID</p>
+    <table class="table table-striped">
+    <%- EmailAlias.active.system_forwards.order(:mail_alias).each do |ea| -%>
+      <tr>
+        <td>
+          <%= "#{ea.mail_alias}@extension.org" -%>
+          <%- if ea.alias_type == EmailAlias::MIRROR -%>
+            <em>(mirror)</em>
+          <%- end -%>
+        </td>
+        <td><%= link_to(ea.destination,"mailto:#{ea.destination}") -%></td>
+      </tr>
+    <%- end -%>
+    </table>
+
+    <a href="#aliases"><h3>Aliases</h3></a>
+    <p>These are generic aliases that go to one or more individual accounts</p>
+    <table class="table table-striped">
+    <%- EmailAlias.active.aliases.where(aliasable_type: 'Person').includes(:aliasable).order(:mail_alias).each do |ea| -%>
+      <tr>
+        <td>
+          <%= "#{ea.mail_alias}@extension.org" -%>
+          <%- if ea.alias_type == EmailAlias::MIRROR -%>
+            <em>(mirror)</em>
+          <%- end -%>
+        </td>
+        <td><%= link_to_person(ea.aliasable) -%></td>
+      </tr>
+    <%- end -%>
+    </table>
+
+    <a href="#system_aliases"><h3>System Aliases</h3></a>
+    <p>These are system or application aliases that go to accounts used for systems infrastructure.</p>
+    <table class="table table-striped">
+    <%- EmailAlias.active.system_aliases.where(aliasable_type: 'Person').includes(:aliasable).order(:mail_alias).each do |ea| -%>
+      <tr>
+        <td>
+          <%= "#{ea.mail_alias}@extension.org" -%>
+        </td>
+        <td><%= link_to_person(ea.aliasable) -%></td>
+      </tr>
+    <%- end -%>
+    </table>
+
+
+  </div>
+</div>

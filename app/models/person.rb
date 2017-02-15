@@ -5,6 +5,8 @@
 #  see LICENSE file
 
 require 'bcrypt'
+require 'csv'
+
 class Person < ActiveRecord::Base
   include BCrypt
   include CacheTools
@@ -18,7 +20,7 @@ class Person < ActiveRecord::Base
   attr_accessible :password, :interest_tags
   attr_accessible :position_id, :position, :location_id, :location, :county_id, :county, :institution_id, :institution
   attr_accessible :invitation, :invitation_id
-  attr_accessible :last_account_reminder, :password_reset, :google_apps_email, :email_forward
+  attr_accessible :last_account_reminder, :password_reset, :google_apps_email, :display_extension_email
   attr_accessible :tou_status, :tou_status_date
   attr_accessible :avatar, :avatar_cache, :remove_avatar
 
@@ -102,6 +104,8 @@ class Person < ActiveRecord::Base
 
   belongs_to :invitation
   has_many :activities
+  has_many :received_activities, class_name: 'Activity', foreign_key: 'colleague_id'
+
   has_many :auth_approvals
   has_many :profile_public_settings, dependent: :destroy
   has_many :social_network_connections, dependent: :destroy
@@ -121,13 +125,16 @@ class Person < ActiveRecord::Base
 
   ## scopes
   scope :retired, -> {where(retired: true)}
-  scope :validaccounts, where("retired = #{false} and vouched = #{true}")
-  scope :pendingreview, where("retired = #{false} and vouched = #{false} and account_status != #{STATUS_SIGNUP} && email_confirmed = #{true}")
-  scope :not_system, where("people.is_systems_account = ?",false)
+  scope :vouched, -> {where(vouched: true)}
+  scope :email_confirmed, -> {where(email_confirmed: true)}
+  scope :validaccounts, -> {where("retired = #{false} and vouched = #{true}")}
+  scope :pendingreview, -> {where("retired = #{false} and vouched = #{false} and account_status != #{STATUS_SIGNUP} && email_confirmed = #{true}")}
+  scope :not_system, -> {where("people.is_systems_account = ?",false)}
   scope :display_accounts, validaccounts.not_system
-  scope :inactive, lambda{ where('DATE(last_activity_at) < ?',Date.today - Settings.months_for_inactive_flag.months) }
-  scope :active, lambda{ where('DATE(last_activity_at) >= ?',Date.today - Settings.months_for_inactive_flag.months) }
-  scope :reminder_pool, lambda{ display_accounts.inactive.where('(last_account_reminder IS NULL or last_account_reminder <= ?)',Time.now.utc - Settings.months_for_inactive_flag.months).limit(Settings.inactive_limit) }
+  scope :inactive, -> { where('DATE(last_activity_at) < ?',Date.today - Settings.months_for_inactive_flag.months) }
+  scope :active, -> { where('DATE(last_activity_at) >= ?',Date.today - Settings.months_for_inactive_flag.months) }
+  scope :reminder_pool, -> { display_accounts.inactive.where('(last_account_reminder IS NULL or last_account_reminder <= ?)',Time.now.utc - Settings.months_for_inactive_flag.months).limit(Settings.inactive_limit) }
+  scope :google_apps_email, -> {where(google_apps_email: true)}
 
 
   # duplicated from darmok
@@ -559,19 +566,29 @@ class Person < ActiveRecord::Base
     self.update_attributes(email: "#{self.idstring}@extension.org", google_apps_email: true)
   end
 
-  # override email_forward to return something on null
+
   def email_forward
-    if(self.email =~ /extension\.org$/i)
-      if(self.google_apps_email?)
-        "#{self.idstring}@apps.extension.org"
-      elsif(forwarding_address = read_attribute(:email_forward))
-        forwarding_address
-      else
-        EmailAlias::NOWHERE_LOCATION
-      end
+    if(!self.primary_account_id.blank?)
+      self.primary_account.idstring
+    elsif(self.google_apps_email?)
+      "#{self.idstring}@apps.extension.org"
+    elsif(self.email =~ /extension\.org$/i)
+      EmailAlias::NOWHERE_LOCATION
     else
       self.email
     end
+  end
+
+  def display_email
+    if(self.display_extension_email?)
+      "#{self.idstring}@extension.org"
+    else
+      self.email
+    end
+  end
+
+  def all_email_aliases
+    email_aliases.where("alias_type IN (#{EmailAlias::ALIAS},#{EmailAlias::PERSONAL_ALIAS})")
   end
 
   def resend_confirmation
@@ -803,13 +820,6 @@ class Person < ActiveRecord::Base
       person.retire(colleague: the_system, explanation: retired_reason, ip_address: '127.0.0.1')
     end
   end
-
-  def self.expire_dormant_account_passwords(set_google_random = true)
-    self.not_system.inactive.where('legacy_password is NOT NULL or password_hash IS NOT NULL').each do |p|
-      p.expire_password(set_google_random)
-    end
-  end
-
 
   def self.expire_retired_account_passwords
     retire_pool = RetiredAccount.includes(:person).where('retired_accounts.created_at <= ?',Time.now.utc - 1.week).where('people.legacy_password is NOT NULL or people.password_hash IS NOT NULL').map(&:person)
@@ -1308,7 +1318,7 @@ class Person < ActiveRecord::Base
             row << person.first_name
             row << person.last_name
             row << person.idstring
-            row << person.email
+            row << person.display_email
             row << person.phone
             row << person.title
             row << self.name_or_nil(person.position)
@@ -1373,6 +1383,21 @@ class Person < ActiveRecord::Base
                        .where(find_clause)
                        .minimum(:permission)
     role or site.default_role
+  end
+
+  def proxy_writer_for_site?(site)
+    individual_proxy_roles = site.proxy_roles.where("permissable_type = 'Person'").map(&:permissable_id)
+    community_proxy_roles = site.proxy_roles.where("permissable_type = 'Community'").map(&:permissable_id)
+    connected_community_ids = self.connected_communities.pluck(:id)
+    if(individual_proxy_roles.include?(self.id))
+      # individual proxy record? yep, proxy writer
+      true
+    elsif(!(community_proxy_roles & connected_community_ids).blank?)
+      # intersection of proxy communities and person's communities? yep, proxy writer
+      true
+    else
+      false
+    end
   end
 
 
@@ -1477,13 +1502,40 @@ class Person < ActiveRecord::Base
     self.social_networks.where(name: 'linkedin')
   end
 
-  def add_email_alias(mail_alias)
-    self.email_aliases.create({mail_alias: mail_alias, destination: self.idstring, alias_type: EmailAlias::ALIAS, disabled: !self.validaccount?})
+  def add_email_alias(mail_alias, options = {})
+    is_personal = options[:is_personal] || false
+    add_mirror = options[:add_mirror] || true
+    alias_type = is_personal ? EmailAlias::PERSONAL_ALIAS : EmailAlias::ALIAS
+    ea = self.email_aliases.create({mail_alias: mail_alias, destination: self.idstring, alias_type: alias_type, disabled: !self.validaccount?})
+    if(add_mirror)
+      mirror_account = Person.find(MIRROR_ACCOUNT)
+      if(!ea = mirror_account.email_aliases.where(mail_alias: mail_alias).first)
+        mirror_account.email_aliases.create({mail_alias: mail_alias, destination: mirror_account.idstring, alias_type: EmailAlias::MIRROR, disabled: false})
+      end
+    end
+    ea
+  end
+
+  def remove_email_alias(mail_alias)
+    if(ea = self.email_aliases.where(mail_alias: mail_alias).first)
+      ea.destroy
+    end
   end
 
   def blogs_user
     BlogsUser.where(ID: self.id).first
   end
+
+  def last_login_activity_for_site(site)
+    self.activities.site_logins.where("site LIKE '%#{site.uri}%'").last
+  end
+
+  def self.administrators
+    validaccounts.where(is_admin: true)
+  end
+
+
+
 
   private
 

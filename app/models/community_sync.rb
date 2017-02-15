@@ -15,7 +15,7 @@ class CommunitySync < ActiveRecord::Base
 
   after_create  :queue_update
 
-  belongs_to :community
+  belongs_to :community, unscoped: true
 
   scope :not_processed, lambda{ where(processed: false)}
 

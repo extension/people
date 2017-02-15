@@ -86,14 +86,22 @@
         </div>
       </div>
 
-      <%- if(current_person == @person or current_person.is_admin? ) -%>
+
       <div class="form-group">
         <label for="email" class="col-md-4 control-label">* Email</label>
+
         <div class="col-md-6">
+        <%- if(@person.google_apps_email?) -%>
+          <p><%= @person.email -%></p>
+          <p>(This account uses eXtension Google Apps for email, the address cannot be edited)</p>
+        <%- elsif(current_person != @person and !current_person.is_admin? ) -%>
+          <p><%= @person.email -%></p>
+          <p>(Only the account holder or an application admin can edit email addresses)</p>
+        <%- else -%>
           <%= f.text_field :email, :class => "form-control", :placeholder => 'Email' %>
+        <%- end -%>
         </div>
       </div>
-      <%- end -%>
 
 
 

@@ -6,7 +6,6 @@
 class PeopleController < ApplicationController
   skip_before_filter :check_hold_status, except: [:browsefile, :browse, :index, :vouch, :pendingreview, :invitations, :invite]
   before_filter :set_tab
-  before_filter :admin_required, only: [:admins]
 
   def personal_edit
     return redirect_to edit_person_url(current_person)
@@ -42,14 +41,17 @@ class PeopleController < ApplicationController
   def setavatar
     @person = Person.find(params[:id])
     if(params[:delete] and TRUE_VALUES.include?(params[:delete]))
+      removed_filename = (!@person.avatar.file.nil?) ?  @person.avatar.file.filename : ''
       @person.remove_avatar!
       @person.save
-      what_changed = @person.previous_changes.reject{|attribute,value| (['updated_at'].include?(attribute) or (value[0].blank? and value[1].blank?))}
+      what_changed = {avatar: [removed_filename,'']}
     else
       update_params = params[:person]
       if(!update_params['avatar'].blank?)
+        current_filename = (!@person.avatar.file.nil?) ?  @person.avatar.file.filename : ''
         @person.update_attributes(update_params)
-        what_changed = @person.previous_changes.reject{|attribute,value| (['updated_at'].include?(attribute) or (value[0].blank? and value[1].blank?))}
+        new_filename = (!@person.avatar.file.nil?) ?  @person.avatar.file.filename : ''
+        what_changed = {avatar: [current_filename,new_filename]}
       end
     end
 
@@ -78,7 +80,7 @@ class PeopleController < ApplicationController
   def update
     @person = Person.find(params[:id])
 
-    if(current_person != @person and !current_person.is_admin? )
+    if((@person.google_apps_email?) or (current_person != @person and !current_person.is_admin? ))
       update_params = params[:person].reject{|attribute,value| attribute == 'email'}
     else
       update_params = params[:person]
@@ -486,16 +488,7 @@ class PeopleController < ApplicationController
 
   end
 
-  def admins
-    @admins_by_application = {}
-    AdminRole.includes(:person).order(:applabel).each do |ar|
-      if(@admins_by_application[ar.applabel])
-        @admins_by_application[ar.applabel] << ar.person
-      else
-        @admins_by_application[ar.applabel] = [ar.person]
-      end
-    end
-  end
+
 
   private
 

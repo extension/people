@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20160129200644) do
+ActiveRecord::Schema.define(:version => 20170210155626) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -97,6 +97,7 @@ ActiveRecord::Schema.define(:version => 20160129200644) do
     t.datetime "updated_at",                                              :null => false
     t.string   "community_masthead"
     t.integer  "blog_id"
+    t.integer  "primary_contact_id"
   end
 
   add_index "communities", ["entrytype"], :name => "entrytype_ndx"
@@ -303,12 +304,13 @@ ActiveRecord::Schema.define(:version => 20160129200644) do
     t.datetime "created_at",                                                :null => false
     t.datetime "updated_at",                                                :null => false
     t.boolean  "google_apps_email",                      :default => false
-    t.string   "email_forward"
     t.integer  "tou_status",                             :default => 0,     :null => false
     t.datetime "tou_status_date"
     t.string   "slack_user_id"
     t.string   "avatar"
     t.boolean  "is_systems_account",                     :default => false
+    t.boolean  "display_extension_email",                :default => false, :null => false
+    t.integer  "campus_id"
   end
 
   add_index "people", ["email"], :name => "email_ndx", :unique => true
@@ -394,8 +396,9 @@ ActiveRecord::Schema.define(:version => 20160129200644) do
     t.string   "database"
     t.string   "dev_database"
     t.string   "apptype"
-    t.datetime "created_at",   :null => false
-    t.datetime "updated_at",   :null => false
+    t.datetime "created_at",                  :null => false
+    t.datetime "updated_at",                  :null => false
+    t.integer  "default_role", :default => 2, :null => false
   end
 
   add_index "sites", ["label"], :name => "site_ndx", :unique => true
