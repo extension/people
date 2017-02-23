@@ -109,9 +109,14 @@ class CampusDataMatch < Thor
     say(" Matched:          #{match_stats[:yes]}")
     say(" Possible Matches: #{match_stats[:maybe]}")
 
-    output_filedir = File.dirname(input_file)
-    output_basename = File.basename(input_file,".csv") + "_matched"
-    output_file = "#{output_filedir}/#{output_basename}.csv"
+    if(!options[:output_file])
+      output_filedir = File.dirname(input_file)
+      output_basename = File.basename(input_file,".csv") + "_matched"
+      output_file = "#{output_filedir}/#{output_basename}.csv"
+    else
+      output_file = options[:output_file]
+    end
+    
     say("Writing match results to #{output_file}")
 
     CSV.open(output_file,'wb') do |csv|
