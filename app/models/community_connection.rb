@@ -8,9 +8,9 @@
 class CommunityConnection < ActiveRecord::Base
   attr_accessible :person,:person_id,:community,:community_id,:connector,:connected_by,:connectiontype,:sendnotifications
 
-  belongs_to :community
+  belongs_to :community, unscoped: true
   belongs_to :person
- 
+
   scope :approved_community, joins(:community).where("communities.entrytype = #{Community::APPROVED}")
 
 end

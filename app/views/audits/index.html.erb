@@ -1,0 +1,19 @@
+<%- @page_title = "Audit Information" -%>
+
+<div class="page-header">
+  <h2><%= @page_title %></h2>
+</div>
+
+<div class="row">
+
+  <div class="col-md-12">
+    <ul>
+      <li><%= link_to('Application Administrators',admins_audits_path) -%></li>
+      <li><%= link_to('Email Aliases and Forwards',aliases_audits_path) -%></li>
+      <li><%= link_to('Google Apps Email Provisioning',google_apps_email_audits_path) -%></li>
+      <li><%= link_to('Google Groups',google_groups_audits_path) -%></li>
+    </ul>
+  </div>
+
+
+</div>

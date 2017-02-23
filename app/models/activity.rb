@@ -15,6 +15,8 @@ class Activity < ActiveRecord::Base
   attr_accessible :person, :person_id, :site, :activityclass, :activitycode, :reasoncode,  :additionalinfo, :additionaldata
   attr_accessible :ip_address, :community, :community_id, :colleague_id, :colleague, :is_private
 
+  scope :site_logins, -> {where(activitycode: AUTH_REMOTE_SUCCESS)}
+
  ## constants
   #### activity types
   AUTHENTICATION = 1

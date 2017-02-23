@@ -98,6 +98,11 @@ class CommunitiesController < ApplicationController
     @communities = Community.order('created_at DESC').page(params[:page])
   end
 
+  def contacts
+    collection_breadcrumbs(['eXtension Community of Practice Contacts'])
+    @communities = Community.approved.order('name')
+  end
+
   def connectionsfile
     # will raise ActiveRecord::RecordNotFound on not found
     @community = Community.find_by_shortname_or_id(params[:id])

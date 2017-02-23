@@ -12,9 +12,10 @@ class Community < ActiveRecord::Base
   attr_accessible :name, :description, :location, :location_id, :memberfilter, :connect_to_drupal
   attr_accessible :connect_to_google_apps, :entrytype, :shortname, :publishing_community, :is_public
   attr_accessible :community_masthead, :community_masthead_cache, :remove_community_masthead
-  attr_accessible :blog_id
+  attr_accessible :blog_id, :primary_contact_id
 
   mount_uploader :community_masthead, CommunityMastheadUploader
+  default_scope where(active: true)
 
   # hardcoded community ids
   INSTITUTIONAL_TEAMS_COMMUNITY_ID = 80
@@ -56,7 +57,7 @@ class Community < ActiveRecord::Base
     'leader' => 'Community Leader',
     'pending' => 'Pending Community Review',
     'invitedleader' => 'Community Invitation (Leader)',
-    'invitedleader' => 'Community Invitation (Member)'}
+    'invitedmember' => 'Community Invitation (Member)'}
 
   validates :name, :presence => true, :uniqueness => {:case_sensitive => false}
   validates :entrytype, :presence => true
@@ -67,6 +68,8 @@ class Community < ActiveRecord::Base
   after_save :sync_communities
 
   belongs_to :creator, :class_name => "Person", :foreign_key => "created_by"
+  belongs_to :primary_contact, :class_name => "Person", :foreign_key => "primary_contact_id"
+
   belongs_to :location
   has_many :community_connections, :dependent => :destroy
   has_many :people, through: :community_connections,
@@ -85,6 +88,20 @@ class Community < ActiveRecord::Base
   scope :connected_as, lambda{|connectiontype| where(CONNECTION_CONDITIONS[connectiontype])}
 
   scope :publishing, ->{where(publishing_community: true)}
+  scope :connected_to_google, ->{where(connect_to_google_apps: true)}
+
+
+  def self.inactive
+    unscoped.where(active: false)
+  end
+
+  def deactivate
+    # remove all connections
+    self.people.each do |p|
+      p.remove_from_community(self,{connector_id: Person.system_id, nonotify: true})
+    end
+    self.update_attribute(:active, false)
+  end
 
 
   def sync_communities
@@ -236,9 +253,9 @@ class Community < ActiveRecord::Base
 
   def self.find_by_shortname_or_id(searchterm,raise_not_found = true)
     if(searchterm.cast_to_i > 0)
-      community = self.where(id: searchterm).first
+      community = self.unscoped.where(id: searchterm).first
     else
-      community = self.where(shortname: searchterm).first
+      community = self.unscoped.where(shortname: searchterm).first
     end
 
     if(raise_not_found and community.nil?)

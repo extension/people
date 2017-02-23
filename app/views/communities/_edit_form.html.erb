@@ -29,6 +29,13 @@
   </div>
 
   <div class="form-group">
+    <label for="primary_contact" class="col-md-4 control-label">Primary Contact</label>
+    <div class="col-md-5">
+      <%= f.select(:primary_contact_id, options_for_select(@community.leaders.map{|p| [p.fullname, p.id]}, @community.primary_contact.present? ? @community.primary_contact_id : nil), {:include_blank => true}, {:class => "form-control"}) %>
+    </div>
+  </div>
+
+  <div class="form-group">
     <label for="location" class="col-md-4 control-label">Location</label>
     <div class="col-md-5">
       <%= f.select(:location_id, options_for_select(get_location_options, @community.location.present? ? @community.location.id : nil), {:include_blank => true}, {:class => "form-control"}) %>
