@@ -31,3 +31,6 @@ public/uploads
 
 # ignore openid dir - it's symlinked on deploy
 /openid
+
+# data exports
+/data
