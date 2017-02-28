@@ -64,7 +64,7 @@ class DataExport < Thor
           row << p.idstring
           row << p.first_name
           row << p.last_name
-          row << (p.institution.nil? ? 'n/a' : p.institution.name)
+          row << (p.institution.nil? ? '' : p.institution.name)
           sites.each do |s|
             if(activity_data[s.id] and activity_data[s.id][p.id])
               row << activity_data[s.id][p.id]
