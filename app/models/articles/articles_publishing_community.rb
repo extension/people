@@ -5,8 +5,8 @@
 #
 #  see LICENSE file
 
-class DarmokPublishingCommunity < ActiveRecord::Base
+class ArticlesPublishingCommunity < ActiveRecord::Base
   # connects to the darmok database
-  self.establish_connection :darmok
+  self.establish_connection :articles
   self.table_name= 'publishing_communities'
 end

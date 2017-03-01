@@ -11,7 +11,7 @@ class CommunitySync < ActiveRecord::Base
   attr_accessible :community, :community_id, :processed, :process_on_create
 
   UPDATE_DATABASES = {'create_database' => Settings.create_database,
-                      'www_database' => Settings.www_database}
+                      'articles_database' => Settings.articles_database}
 
   after_create  :queue_update
 
@@ -56,7 +56,7 @@ class CommunitySync < ActiveRecord::Base
     end
   end
 
-  def www_database
+  def articles_database
     if(publishing_community = DarmokPublishingCommunity.find_by_id(self.community_id))
       if(self.community.publishing_community?)
         self.connection.execute(www_update_query)
@@ -71,7 +71,7 @@ class CommunitySync < ActiveRecord::Base
 
   def www_update_query
     community = self.community
-    update_database = UPDATE_DATABASES['www_database']
+    update_database = UPDATE_DATABASES['articles_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     UPDATE #{update_database}.publishing_communities
     SET #{update_database}.publishing_communities.name            = #{quoted_value_or_null(community.name)},
@@ -84,7 +84,7 @@ class CommunitySync < ActiveRecord::Base
 
   def www_delete_query
     community = self.community
-    update_database = UPDATE_DATABASES['www_database']
+    update_database = UPDATE_DATABASES['articles_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     DELETE FROM #{update_database}.publishing_communities WHERE #{update_database}.publishing_communities.id = #{community.id}
     END_SQL
@@ -93,7 +93,7 @@ class CommunitySync < ActiveRecord::Base
 
   def www_insert_query
     community = self.community
-    update_database = UPDATE_DATABASES['www_database']
+    update_database = UPDATE_DATABASES['articles_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     INSERT INTO #{update_database}.publishing_communities (id,name,drupal_node_id,created_at,updated_at)
     SELECT  #{community.id},
