@@ -26,14 +26,18 @@ class AppActivity < ActiveRecord::Base
   # t.datetime "created_at"
 
   # tracked applications
-  APP_ARTICLES  = 1
-  APP_ASK       = 2
-  APP_BLOGS     = 3
-  APP_CREATE    = 4
-  APP_HOMEPAGE  = 5
-  APP_LEARN     = 6
-  APP_MILFAM    = 7
-  APP_PEOPLE    = 8
+  APP_ARTICLES  = 100
+  APP_ASK       = 200
+  APP_BLOGS     = 300
+  APP_CREATE    = 400
+  APP_HOMEPAGE  = 500
+  APP_LEARN     = 600
+  APP_MILFAM    = 700
+  APP_PEOPLE    = 800
+
+  # source types
+  APP_BLOGS_POSTS = 301
+  APP_BLOGS_COMMENTS = 302
 
   # tracked application labels
   APP_LABELS = {
@@ -79,6 +83,7 @@ class AppActivity < ActiveRecord::Base
         insert_list << posting.post_author # person_id
         insert_list << APP_BLOGS # app_id
         insert_list << ActiveRecord::Base.quote_value(APP_LABELS[APP_BLOGS])  # app_label
+        insert_list << APP_BLOGS_POSTS # app_source_type
         insert_list << blog_id # section_id
         insert_list << ActiveRecord::Base.quote_value(blog_name)  # section_label
         insert_list << ACTIVITY_EDIT # activity_code
@@ -89,7 +94,7 @@ class AppActivity < ActiveRecord::Base
         item_fingerprint_builder = []
         item_fingerprint_builder << APP_BLOGS
         item_fingerprint_builder << blog_id
-        item_fingerprint_builder << 'BlogsBlogpost'
+        item_fingerprint_builder << APP_BLOGS_POSTS
         item_fingerprint_builder << item_id
         item_fingerprint = Digest::SHA1.hexdigest("#{item_fingerprint_builder.join(':')}")
         insert_list << ActiveRecord::Base.quote_value(item_fingerprint) # item_fingerprint
@@ -114,9 +119,10 @@ class AppActivity < ActiveRecord::Base
       if(insert_values.size > 0)
         insert_sql = <<-END_SQL.gsub(/\s+/, " ").strip
         INSERT IGNORE INTO #{self.table_name}
-        (person_id,app_id,app_label,section_id,section_label,
-         activity_code,activity_label,item_id,item_revision_id,
-         item_fingerprint,source_id,source_model,source_table,
+        (person_id,app_id,app_label,app_source_type,
+         section_id,section_label,activity_code,activity_label,
+         item_id,item_revision_id,item_fingerprint,
+         source_id,source_model,source_table,
          fingerprint,activity_at,created_at)
         VALUES #{insert_values.join(',')};
         END_SQL
@@ -136,6 +142,7 @@ class AppActivity < ActiveRecord::Base
         insert_list << comment.user_id # person_id
         insert_list << APP_BLOGS # app_id
         insert_list << ActiveRecord::Base.quote_value(APP_LABELS[APP_BLOGS])  # app_label
+        insert_list << APP_BLOGS_COMMENTS # app_source_type
         insert_list << blog_id # section_id
         insert_list << ActiveRecord::Base.quote_value(blog_name)  # section_label
         insert_list << ACTIVITY_COMMENT # activity_code
@@ -146,7 +153,7 @@ class AppActivity < ActiveRecord::Base
         item_fingerprint_builder = []
         item_fingerprint_builder << APP_BLOGS
         item_fingerprint_builder << blog_id
-        item_fingerprint_builder << 'BlogsBlogcomment'
+        item_fingerprint_builder << APP_BLOGS_COMMENTS
         item_fingerprint_builder << item_id
         item_fingerprint = Digest::SHA1.hexdigest("#{item_fingerprint_builder.join(':')}")
         insert_list << ActiveRecord::Base.quote_value(item_fingerprint) # item_fingerprint
@@ -171,16 +178,24 @@ class AppActivity < ActiveRecord::Base
       if(insert_values.size > 0)
         insert_sql = <<-END_SQL.gsub(/\s+/, " ").strip
         INSERT IGNORE INTO #{self.table_name}
-        (person_id,app_id,app_label,section_id,section_label,
-         activity_code,activity_label,item_id,item_revision_id,
-         item_fingerprint,source_id,source_model,source_table,
+        (person_id,app_id,app_label,app_source_type,
+         section_id,section_label,activity_code,activity_label,
+         item_id,item_revision_id,item_fingerprint,
+         source_id,source_model,source_table,
          fingerprint,activity_at,created_at)
         VALUES #{insert_values.join(',')};
         END_SQL
         self.connection.execute(insert_sql)
       end
     end # blogs list
-  end
+  end  # blogs data import
+
+
+
+
+
+
+
 
   def self.periodic_activity_by_person_id(options = {})
     returndata = {}

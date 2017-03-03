@@ -56,6 +56,7 @@ ActiveRecord::Schema.define(:version => 20170301165735) do
     t.integer  "person_id",                        :default => 0
     t.integer  "app_id",                           :default => 0
     t.string   "app_label",          :limit => 25
+    t.integer  "app_source_type",                  :default => 0
     t.integer  "section_id",                       :default => 1
     t.string   "section_label",      :limit => 25
     t.integer  "activity_code",                    :default => 0
@@ -74,7 +75,7 @@ ActiveRecord::Schema.define(:version => 20170301165735) do
     t.datetime "created_at"
   end
 
-  add_index "app_activities", ["activity_at", "person_id", "app_id", "section_id", "activity_code", "ip_address"], :name => "fields_ndx"
+  add_index "app_activities", ["activity_at", "person_id", "app_id", "app_source_type", "section_id", "activity_code", "ip_address"], :name => "fields_ndx"
   add_index "app_activities", ["fingerprint"], :name => "fingerprint_ndx", :unique => true
   add_index "app_activities", ["item_fingerprint"], :name => "item_fingerprint_ndx"
 
