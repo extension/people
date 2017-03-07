@@ -131,6 +131,9 @@ gem 'test-unit'
 # handle the issue with the community scoping
 gem 'unscoped_associations'
 
+# monitoring
+gem 'ddtrace'
+
 group :development do
   # require the powder gem
   gem 'powder'
