@@ -377,7 +377,6 @@ class AppActivity < ActiveRecord::Base
     end
   end
 
-
   def self.create_workflow_events_update
     database_name = CreateWorkflowEvent.connection.current_database
     # workflow events
@@ -448,7 +447,7 @@ class AppActivity < ActiveRecord::Base
         insert_list << ActiveRecord::Base.quote_value('CreateComment') # source_model
         insert_list << ActiveRecord::Base.quote_value("#{database_name}.#{CreateComment.table_name}") # source_table
         fingerprint_builder = []
-        fingerprint_builder << comment.uid 
+        fingerprint_builder << comment.uid
         fingerprint_builder << APP_CREATE
         fingerprint_builder << ACTIVITY_COMMENT
         fingerprint_builder << source_id
