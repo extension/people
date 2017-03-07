@@ -25,6 +25,10 @@ class AppActivity < ActiveRecord::Base
   APP_LEARN_EVENT_ACTIVITY = 601
   APP_LEARN_VERSIONS = 602
 
+  APP_CREATE_REVISIONS = 401
+  APP_CREATE_WORKFLOW_EVENTS = 402
+  APP_CREATE_COMMENTS = 403
+
   # tracked application labels
   APP_LABELS = {
     APP_ARTICLES => 'articles',
@@ -46,6 +50,9 @@ class AppActivity < ActiveRecord::Base
   ACTIVITY_WATCH = 5
   ACTIVITY_RATING = 6
   ACTIVITY_ANSWER = 7
+  ACTIVITY_REVIEW = 8
+  ACTIVITY_PUBLISH = 9
+  ACTIVITY_WORKFLOW = 10
 
   ACTIVITY_LABELS = {
     ACTIVITY_GENERIC => 'activity',
@@ -55,7 +62,10 @@ class AppActivity < ActiveRecord::Base
     ACTIVITY_ATTEND => 'attend',
     ACTIVITY_WATCH => 'watch',
     ACTIVITY_RATING => 'rating',
-    ACTIVITY_ANSWER => 'answer'
+    ACTIVITY_ANSWER => 'answer',
+    ACTIVITY_REVIEW => 'review',
+    ACTIVITY_PUBLISH => 'publish',
+    ACTIVITY_WORKFLOW => 'workflow'
   }
 
   def self.blogs_update
@@ -70,11 +80,7 @@ class AppActivity < ActiveRecord::Base
       next if(postcount.nil? or postcount == 0)
       next if(BlogsBlogpost.activity_entries.count == 0)
       insert_values = []
-      post_scope = BlogsBlogpost.includes(:blogs_user => :blogs_openid).activity_entries
-      # if(!blogs_updated_at.nil?)
-      #   post_scope = post_scope.where("post_date > ?",blogs_updated_at)
-      # end
-      post_scope.each do |posting|
+      BlogsBlogpost.includes(:blogs_user => :blogs_openid).activity_entries.each do |posting|
         next if !(user = posting.blogs_user)
         next if !(openid = user.blogs_openid)
         # the core app item is the "post" at a table level, bit shifted due to multiple tables
@@ -101,6 +107,7 @@ class AppActivity < ActiveRecord::Base
         fingerprint_builder << blog_id
         fingerprint_builder << ACTIVITY_EDIT
         fingerprint_builder << (( blog_id << 24 ) | source_id )
+        fingerprint_builder << 'BlogsBlogpost'
         fingerprint_builder << posting.post_date.to_s
         fingerprint = Digest::SHA1.hexdigest("#{fingerprint_builder.join(':')}")
         insert_list << ActiveRecord::Base.quote_value(fingerprint) # fingerprint
@@ -154,6 +161,7 @@ class AppActivity < ActiveRecord::Base
         fingerprint_builder << blog_id
         fingerprint_builder << ACTIVITY_COMMENT
         fingerprint_builder << (( blog_id << 24 ) | source_id )
+        fingerprint_builder << 'BlogsBlogcomment'
         fingerprint_builder << comment.comment_date.to_s
         fingerprint = Digest::SHA1.hexdigest("#{fingerprint_builder.join(':')}")
         insert_list << ActiveRecord::Base.quote_value(fingerprint) # fingerprint
@@ -200,6 +208,11 @@ class AppActivity < ActiveRecord::Base
   end
 
   def self.learn_update
+    self.learn_event_activities_update
+    self.learn_versions_update
+  end
+
+  def self.learn_event_activities_update
     # learn event activity
     database_name = LearnEventActivity.connection.current_database
     LearnEventActivity.includes(:learner).where("activity IN (#{LearnEventActivity::TRANSFERRED_ACTIVITY.join(',')})").find_in_batches do |group|
@@ -227,6 +240,7 @@ class AppActivity < ActiveRecord::Base
         fingerprint_builder << APP_LEARN
         fingerprint_builder << activity_code
         fingerprint_builder << source_id
+        fingerprint_builder << 'LearnEventActivity'
         fingerprint_builder << activity.updated_at.to_s
         fingerprint = Digest::SHA1.hexdigest("#{fingerprint_builder.join(':')}")
         insert_list << ActiveRecord::Base.quote_value(fingerprint) # fingerprint
@@ -247,7 +261,9 @@ class AppActivity < ActiveRecord::Base
         self.connection.execute(insert_sql)
       end
     end
+  end
 
+  def self.learn_versions_update
     # learn edit activity
     database_name = LearnVersion.connection.current_database
     LearnVersion.includes(:learner).where("item_type = 'Event'").find_in_batches do |group|
@@ -274,10 +290,173 @@ class AppActivity < ActiveRecord::Base
         fingerprint_builder << APP_LEARN
         fingerprint_builder << ACTIVITY_EDIT
         fingerprint_builder << source_id
+        fingerprint_builder << 'LearnVersion'
         fingerprint_builder << revision.created_at.to_s
         fingerprint = Digest::SHA1.hexdigest("#{fingerprint_builder.join(':')}")
         insert_list << ActiveRecord::Base.quote_value(fingerprint) # fingerprint
         insert_list << ActiveRecord::Base.quote_value(revision.created_at.to_s(:db)) # activity_at
+        insert_list << ActiveRecord::Base.quote_value(Time.zone.now.to_s(:db)) # created_at
+        insert_values << "(#{insert_list.join(',')})"
+      end
+
+      if(insert_values.size > 0)
+        insert_sql = <<-END_SQL.gsub(/\s+/, " ").strip
+        INSERT IGNORE INTO #{self.table_name}
+        (person_id,app_id,app_label,app_source_type,
+         activity_code,activity_label,
+         app_item_id,source_id,source_model,source_table,
+         fingerprint,activity_at,created_at)
+        VALUES #{insert_values.join(',')};
+        END_SQL
+        self.connection.execute(insert_sql)
+      end
+    end
+  end
+
+  def self.create_update
+    self.create_revisions_update
+    self.create_workflow_events_update
+    self.create_comments_update
+  end
+
+  def self.create_workflow_activity_to_activity_code(cwe_activity)
+    if(CreateWorkflowEvent::REVIEWED_EVENTS.include?(cwe_activity))
+      ACTIVITY_REVIEW
+    elsif cwe_activity == CreateWorkflowEvent::PUBLISHED
+      ACTIVITY_PUBLISH
+    else
+      ACTIVITY_WORKFLOW
+    end
+  end
+
+  def self.create_revisions_update
+    database_name = CreateRevision.connection.current_database
+    # revisions
+    CreateRevision.find_in_batches do |group|
+      insert_values = []
+      group.each do |revision|
+        # the core app item is the node
+        app_item_id = revision.nid
+        source_id = revision.vid
+        insert_list = []
+        insert_list << revision.uid # person_id
+        insert_list << APP_CREATE # app_id
+        insert_list << ActiveRecord::Base.quote_value(APP_LABELS[APP_CREATE])  # app_label
+        insert_list << APP_CREATE_REVISIONS # app_source_type
+        insert_list << ACTIVITY_EDIT # activity_code
+        insert_list <<  ActiveRecord::Base.quote_value(ACTIVITY_LABELS[ACTIVITY_EDIT]) # activity_label
+        insert_list << app_item_id # app_item_id
+        insert_list << source_id # source_id
+        insert_list << ActiveRecord::Base.quote_value('CreateRevision') # source_model
+        insert_list << ActiveRecord::Base.quote_value("#{database_name}.#{CreateRevision.table_name}") # source_table
+        fingerprint_builder = []
+        fingerprint_builder << revision.uid
+        fingerprint_builder << APP_CREATE
+        fingerprint_builder << ACTIVITY_EDIT
+        fingerprint_builder << source_id
+        fingerprint_builder << 'CreateRevision'
+        fingerprint_builder << revision.created_at.to_s
+        fingerprint = Digest::SHA1.hexdigest("#{fingerprint_builder.join(':')}")
+        insert_list << ActiveRecord::Base.quote_value(fingerprint) # fingerprint
+        insert_list << ActiveRecord::Base.quote_value(revision.created_at.to_s(:db)) # activity_at
+        insert_list << ActiveRecord::Base.quote_value(Time.zone.now.to_s(:db)) # created_at
+        insert_values << "(#{insert_list.join(',')})"
+      end
+
+      if(insert_values.size > 0)
+        insert_sql = <<-END_SQL.gsub(/\s+/, " ").strip
+        INSERT IGNORE INTO #{self.table_name}
+        (person_id,app_id,app_label,app_source_type,
+         activity_code,activity_label,
+         app_item_id,source_id,source_model,source_table,
+         fingerprint,activity_at,created_at)
+        VALUES #{insert_values.join(',')};
+        END_SQL
+        self.connection.execute(insert_sql)
+      end
+    end
+  end
+
+
+  def self.create_workflow_events_update
+    database_name = CreateWorkflowEvent.connection.current_database
+    # workflow events
+    CreateWorkflowEvent.find_in_batches do |group|
+      insert_values = []
+      group.each do |cwe|
+        # the core app item is the node
+        app_item_id = cwe.node_id
+        source_id = cwe.weid
+        insert_list = []
+        insert_list << cwe.user_id # person_id
+        insert_list << APP_CREATE # app_id
+        insert_list << ActiveRecord::Base.quote_value(APP_LABELS[APP_CREATE])  # app_label
+        insert_list << APP_CREATE_WORKFLOW_EVENTS # app_source_type
+        activity_code = self.create_workflow_activity_to_activity_code(cwe.event_id)
+        insert_list << activity_code # activity_code
+        insert_list <<  ActiveRecord::Base.quote_value(ACTIVITY_LABELS[activity_code]) # activity_label
+        insert_list << app_item_id # app_item_id
+        insert_list << source_id # source_id
+        insert_list << ActiveRecord::Base.quote_value('CreateWorkflowEvent') # source_model
+        insert_list << ActiveRecord::Base.quote_value("#{database_name}.#{CreateWorkflowEvent.table_name}") # source_table
+        fingerprint_builder = []
+        fingerprint_builder << cwe.user_id
+        fingerprint_builder << APP_CREATE
+        fingerprint_builder << activity_code
+        fingerprint_builder << source_id
+        fingerprint_builder << 'CreateWorkflowEvent'
+        fingerprint_builder << cwe.created_at.to_s
+        fingerprint = Digest::SHA1.hexdigest("#{fingerprint_builder.join(':')}")
+        insert_list << ActiveRecord::Base.quote_value(fingerprint) # fingerprint
+        insert_list << ActiveRecord::Base.quote_value(cwe.created_at.to_s(:db)) # activity_at
+        insert_list << ActiveRecord::Base.quote_value(Time.zone.now.to_s(:db)) # created_at
+        insert_values << "(#{insert_list.join(',')})"
+      end
+
+      if(insert_values.size > 0)
+        insert_sql = <<-END_SQL.gsub(/\s+/, " ").strip
+        INSERT IGNORE INTO #{self.table_name}
+        (person_id,app_id,app_label,app_source_type,
+         activity_code,activity_label,
+         app_item_id,source_id,source_model,source_table,
+         fingerprint,activity_at,created_at)
+        VALUES #{insert_values.join(',')};
+        END_SQL
+        self.connection.execute(insert_sql)
+      end
+    end
+  end
+
+  def self.create_comments_update
+    # comments
+    database_name = CreateComment.connection.current_database
+    CreateComment.find_in_batches do |group|
+      insert_values = []
+      group.each do |comment|
+        # the core app item is the node
+        app_item_id = comment.nid
+        source_id = comment.cid
+        insert_list = []
+        insert_list << comment.uid # person_id
+        insert_list << APP_CREATE # app_id
+        insert_list << ActiveRecord::Base.quote_value(APP_LABELS[APP_CREATE])  # app_label
+        insert_list << APP_CREATE_COMMENTS # app_source_type
+        insert_list << ACTIVITY_COMMENT # activity_code
+        insert_list <<  ActiveRecord::Base.quote_value(ACTIVITY_LABELS[ACTIVITY_COMMENT]) # activity_label
+        insert_list << app_item_id # app_item_id
+        insert_list << source_id # source_id
+        insert_list << ActiveRecord::Base.quote_value('CreateComment') # source_model
+        insert_list << ActiveRecord::Base.quote_value("#{database_name}.#{CreateComment.table_name}") # source_table
+        fingerprint_builder = []
+        fingerprint_builder << comment.uid 
+        fingerprint_builder << APP_CREATE
+        fingerprint_builder << ACTIVITY_COMMENT
+        fingerprint_builder << source_id
+        fingerprint_builder << 'CreateComment'
+        fingerprint_builder << comment.created_at.to_s
+        fingerprint = Digest::SHA1.hexdigest("#{fingerprint_builder.join(':')}")
+        insert_list << ActiveRecord::Base.quote_value(fingerprint) # fingerprint
+        insert_list << ActiveRecord::Base.quote_value(comment.created_at.to_s(:db)) # activity_at
         insert_list << ActiveRecord::Base.quote_value(Time.zone.now.to_s(:db)) # created_at
         insert_values << "(#{insert_list.join(',')})"
       end
@@ -317,7 +496,5 @@ class AppActivity < ActiveRecord::Base
     end
     returndata
   end
-
-
 
 end
