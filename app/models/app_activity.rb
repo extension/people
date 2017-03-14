@@ -29,6 +29,8 @@ class AppActivity < ActiveRecord::Base
   APP_CREATE_WORKFLOW_EVENTS = 402
   APP_CREATE_COMMENTS = 403
 
+  APP_ASK_QUESTIONEVENTS = 201
+
   # tracked application labels
   APP_LABELS = {
     APP_ARTICLES => 'articles',

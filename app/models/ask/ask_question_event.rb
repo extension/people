@@ -14,9 +14,16 @@ class AskQuestionEvent < ActiveRecord::Base
 
 ## attributes
   serialize :updated_question_values
+  serialize :group_logs
 
 
 ## constants
+  # date of first QuestionEvent for default dates to avoid hitting db
+  FIRST_CONTACT = Date.parse('2006-10-10').to_datetime
+
+
+  # #'s 3 and 4 were the old marked spam and marked non spam question events from darmok, these were
+  # just pulled instead of renumbering all these so to not disturb the other status numbers being pulled over from the other sytem
   ASSIGNED_TO = 1
   RESOLVED = 2
   REACTIVATE = 5
@@ -32,6 +39,15 @@ class AskQuestionEvent < ActiveRecord::Base
   ASSIGNED_TO_GROUP = 15
   CHANGED_GROUP = 16
   CHANGED_LOCATION = 17
+  EXPERT_EDIT_QUESTION = 18
+  EXPERT_EDIT_RESPONSE = 19
+  CHANGED_TO_PUBLIC = 20
+  CHANGED_TO_PRIVATE = 21
+  CHANGED_FEATURED = 22
+  ADDED_TAG = 23
+  DELETED_TAG = 24
+  PASSED_TO_WRANGLER = 25
+  AUTO_ASSIGNED_TO = 26
 
   EVENT_TO_TEXT_MAPPING = { ASSIGNED_TO => 'assigned to',
                             RESOLVED => 'resolved by',
@@ -47,9 +63,21 @@ class AskQuestionEvent < ActiveRecord::Base
                             INTERNAL_COMMENT => 'commented',
                             ASSIGNED_TO_GROUP => 'assigned to group',
                             CHANGED_GROUP => 'group changed',
-                            CHANGED_LOCATION => 'location changed' }
+                            CHANGED_LOCATION => 'location changed',
+                            EXPERT_EDIT_QUESTION => 'expert edit of question',
+                            EXPERT_EDIT_RESPONSE => 'expert edit of response',
+                            CHANGED_TO_PUBLIC => 'changed to public by',
+                            CHANGED_TO_PRIVATE => 'changed to private by',
+                            CHANGED_FEATURED => 'changed featured by',
+                            ADDED_TAG => 'tag added by',
+                            DELETED_TAG => 'tag deleted by',
+                            PASSED_TO_WRANGLER => 'handed off to',
+                            AUTO_ASSIGNED_TO => 'automatically assigned to'
+                          }
 
-  HANDLING_EVENTS = [ASSIGNED_TO, ASSIGNED_TO_GROUP, RESOLVED, NO_ANSWER, CLOSED]
+  HANDLING_EVENTS = [ASSIGNED_TO, PASSED_TO_WRANGLER, ASSIGNED_TO_GROUP, RESOLVED, REJECTED, NO_ANSWER, CLOSED]
+  SIGNIFICANT_EVENTS = [REJECTED,PASSED_TO_WRANGLER,NO_ANSWER,EXPERT_EDIT_QUESTION,EXPERT_EDIT_RESPONSE,CHANGED_TO_PUBLIC,CHANGED_TO_PRIVATE]
+  UPDATE_LAST_ASSIGNED_AT_EVENTS = [ASSIGNED_TO, ASSIGNED_TO_GROUP, PASSED_TO_WRANGLER]
 
 ## validations
 
