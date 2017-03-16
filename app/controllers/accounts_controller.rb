@@ -167,6 +167,10 @@ class AccountsController < ApplicationController
     end
   end
 
+  def display_eligibility_notice
+    return render(template: 'accounts/eligibility_notice')
+  end
+
   def create
     @person = Person.new(params[:person])
     if(@person.email =~ /extension\.org$/i)
