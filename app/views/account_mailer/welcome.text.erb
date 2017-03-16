@@ -1,7 +1,7 @@
 <%= render(:partial => 'shared_mailer/demo_notice') if is_demo? -%>
 Hi <%= @recipient.first_name %>,
 
-Thank you for signing up for your eXtensionID! 
+Thank you for signing up for your eXtensionID!
 
 You have registered with the following information:
 
@@ -13,12 +13,8 @@ Tell us more about your interests and expertise and review your profile informat
 
 <%= person_url(@recipient) %>
 
-Learn a great deal more about eXtension at our "About eXtension" site at:
-
-http://about.extension.org
+Learn a great deal more about eXtension at: https://extension.org
 
 Welcome to eXtension!
 
 <%= render(:partial => 'shared_mailer/help_footer') %>
-
-
