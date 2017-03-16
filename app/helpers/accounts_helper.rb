@@ -48,9 +48,6 @@ module AccountsHelper
     when Person::STATUS_CONTRIBUTOR
       # just for debugging - should never see in normal operation
       explanation = "<p>Your current account status is: <span class='label label-info'>Person</span></p>"
-    when Person::STATUS_REVIEWAGREEMENT
-      # just for debugging - should never see in normal operation
-      explanation = "<p>Your current account status is: <span class='label label-info'>Pending Agreement Review</span></p>"
      when Person::STATUS_PARTICIPANT
       # just for debugging - should never see in normal operation
       explanation = "<p>Your current account status is: <span class='label label-info'>Participant</span></p>"
