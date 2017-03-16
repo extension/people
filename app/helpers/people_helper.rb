@@ -45,7 +45,7 @@ module PeopleHelper
     is_private = (!current_person && !person.profile_setting_is_public?('avatar'))
 
     if(person.is_systems_account?)
-      image_tag("engbot.png", :class => 'avatar size' + image_size_in_px, :size => image_size_in_px, :title => 'private profile').html_safe      
+      image_tag("engbot.png", :class => 'avatar size' + image_size_in_px, :size => image_size_in_px, :title => 'private profile').html_safe
     elsif(is_private)
       image_tag("avatar_private_w_lock.png", :class => 'avatar size' + image_size_in_px, :size => image_size_in_px, :title => 'private profile').html_safe
     elsif(!person.avatar.present?)
@@ -240,23 +240,8 @@ module PeopleHelper
     end
   end
 
-  def agreement_status(person)
-    if(person.contributor_agreement.nil?)
-      status_text = 'Not Yet Reviewed'
-      date_text = ''
-    elsif(person.contributor_agreement)
-      status_text = "Accepted"
-      date_text = "(#{display_time(person.contributor_agreement_at)})"
-    else
-      status_text = "Declined"
-      date_text = "(#{display_time(person.contributor_agreement_at)})"
-    end
-
-    if(current_person and (current_person == person))
-      "#{link_to(status_text,accounts_contributor_agreement_path).html_safe} #{date_text}".html_safe
-    else
-      "#{status_text} #{date_text}".html_safe
-    end
+  def tou_status(person)
+    # TODO: TOU STATUS
   end
 
 

@@ -1081,8 +1081,6 @@ class Person < ActiveRecord::Base
     system_account_attributes[:google_apps_email] = true
     system_account_attributes[:email] = "#{idstring}@extension.org"
     system_account_attributes[:involvement] = "Systems Account"
-    system_account_attributes[:contributor_agreement] = true
-    system_account_attributes[:contributor_agreement_at] = Time.zone.now
     system_account_attributes[:last_activity_at] = Time.zone.now
     system_account = Person.new(system_account_attributes, :without_protection => true)
     if(system_account.save)
@@ -1256,16 +1254,6 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def contributor_agreement_to_s
-    if(self.contributor_agreement.nil?)
-      'Not reviewed'
-    elsif(!self.contributor_agreement)
-      'Not accepted'
-    else
-      'Accepted'
-    end
-  end
-
   def self.name_or_nil(item)
     item.nil? ? nil : item.name
   end
@@ -1318,7 +1306,7 @@ class Person < ActiveRecord::Base
             row << person.affiliation
             row << self.name_or_nil(person.location)
             row << self.name_or_nil(person.county)
-            row << person.contributor_agreement_to_s
+            # row << person.tou_status_to_s
             row << (person.created_at ? person.created_at.utc.strftime("%Y-%m-%d %H:%M:%S") : nil)
             row << (person.last_activity_at ? person.last_activity_at.utc.strftime("%Y-%m-%d %H:%M:%S") : nil)
             if(options[:browse_filter])
@@ -1537,10 +1525,6 @@ class Person < ActiveRecord::Base
         self.account_status = STATUS_CONFIRM_EMAIL if (account_status != STATUS_INVALIDEMAIL and account_status != STATUS_INVALIDEMAIL_FROM_SIGNUP)
       elsif (!self.vouched?)
         self.account_status = STATUS_REVIEW
-      elsif self.contributor_agreement.nil?
-        self.account_status = STATUS_REVIEWAGREEMENT
-      elsif not self.contributor_agreement
-        self.account_status = STATUS_PARTICIPANT
       else
         self.account_status = STATUS_CONTRIBUTOR
       end
