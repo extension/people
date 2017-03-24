@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20170210155626) do
+ActiveRecord::Schema.define(:version => 20170320141413) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -170,6 +170,14 @@ ActiveRecord::Schema.define(:version => 20170210155626) do
   add_index "email_aliases", ["aliasable_type", "aliasable_id", "alias_type", "mail_alias", "destination"], :name => "alias_ndx", :unique => true
   add_index "email_aliases", ["mail_alias", "destination", "disabled"], :name => "postfix_select_ndx"
 
+  create_table "extension_regions", :force => true do |t|
+    t.string   "shortname"
+    t.string   "label"
+    t.string   "association_url"
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
+  end
+
   create_table "google_accounts", :force => true do |t|
     t.integer  "person_id",             :default => 0,     :null => false
     t.string   "username",                                 :null => false
@@ -211,6 +219,14 @@ ActiveRecord::Schema.define(:version => 20170210155626) do
   end
 
   add_index "google_groups", ["community_id"], :name => "community_ndx"
+
+  create_table "institutional_regions", :force => true do |t|
+    t.integer  "extension_region_id"
+    t.integer  "institution_id"
+    t.datetime "created_at"
+  end
+
+  add_index "institutional_regions", ["extension_region_id", "institution_id"], :name => "region_ndx", :unique => true
 
   create_table "interests", :force => true do |t|
     t.string   "name"

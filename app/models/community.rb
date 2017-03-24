@@ -80,6 +80,8 @@ class Community < ActiveRecord::Base
   has_many :google_groups, :dependent => :destroy
   has_many :activities, :dependent => :destroy
   has_many :community_syncs, :dependent => :destroy
+  has_many :institutional_regions, :foreign_key => "institution_id", :dependent => :destroy
+  has_many :extension_regions, :through => :institutional_regions
 
   scope :approved, where(entrytype: APPROVED)
   scope :institutions, where(entrytype: INSTITUTION)
