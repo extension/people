@@ -1,0 +1,29 @@
+<%- @page_title = "eXtension Institutions" -%>
+
+<div class="page-header">
+  <h2><%= @page_title %></h2>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+        <th>Institution</th>
+        <th>Members</th>
+        <th>Regions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+      <%- for institution in @institutions -%>
+        <tr>
+          <td><%= link_to(institution.name,community_url(institution)) %></td>
+          <td><%= institution.joined.count -%></td>
+          <td><%= institution.extension_regions.map(&:label).join(', ') -%></td>
+        </tr>
+      <%- end -%>
+      </tbody>
+    </table>
+  </div>
+</div>

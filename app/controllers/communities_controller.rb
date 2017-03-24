@@ -14,6 +14,10 @@ class CommunitiesController < ApplicationController
     @approved_joined_counts = Community.approved.connected_counts('joined')
   end
 
+  def institutions
+    @institutions = Community.institutions.order(:name)
+  end
+
   def show
     # will raise ActiveRecord::RecordNotFound on not found
     @community = Community.find_by_shortname_or_id(params[:id])
