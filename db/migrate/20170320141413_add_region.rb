@@ -18,11 +18,11 @@ class AddRegion < ActiveRecord::Migration
 
     # seed regions
     ExtensionRegion.reset_column_information
-    ExtensionRegion.create(shortname: '1890', label: '1890 Region', association_url: 'http://1890aea.org/')
-    ExtensionRegion.create(shortname: 'northcentral', label: 'North Central Region', association_url: 'http://www.nccea.org/')
-    ExtensionRegion.create(shortname: 'northeast', label: 'Northeast Region', association_url: 'http://northeastextension.org/')
-    ExtensionRegion.create(shortname: 'southern', label: 'Southern Region', association_url: 'http://asred.msstate.edu/')
-    ExtensionRegion.create(shortname: 'western', label: 'Western Region', association_url: 'http://extension.oregonstate.edu/weda/')
+    ExtensionRegion.create(shortname: '1890', label: '1890', association_url: 'http://1890aea.org/')
+    ExtensionRegion.create(shortname: 'northcentral', label: 'North Central', association_url: 'http://www.nccea.org/')
+    ExtensionRegion.create(shortname: 'northeast', label: 'Northeast', association_url: 'http://northeastextension.org/')
+    ExtensionRegion.create(shortname: 'southern', label: 'Southern', association_url: 'http://asred.msstate.edu/')
+    ExtensionRegion.create(shortname: 'western', label: 'Western', association_url: 'http://extension.oregonstate.edu/weda/')
 
     # associate institutions
     execute "INSERT INTO institutional_regions (extension_region_id,institution_id,created_at) SELECT 1,241,NOW()" # Alabama A & M University
@@ -104,8 +104,6 @@ class AddRegion < ActiveRecord::Migration
 
     # lincoln double-region
     execute "INSERT INTO institutional_regions (extension_region_id,institution_id,created_at) SELECT 2,275,NOW()" # Lincoln University of Missouri
-
-
 
   end
 
