@@ -187,9 +187,6 @@ class AccountsController < ApplicationController
     @person.account_status = Person::STATUS_SIGNUP
     @person.last_activity_at = Time.zone.now
 
-    @person.tou_status = Person::TOU_ACCEPTED
-    @person.tou_status_date = Time.zone.now
-
     if(@person.save)
       # automatically log them in
       set_current_person(@person)
