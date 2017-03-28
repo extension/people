@@ -66,8 +66,8 @@ class OpieController < ApplicationController
         if(opierequest.trust_root =~ %r{extension\.org} or opierequest.trust_root =~ %r{\.dev$})
           if(current_person.present_tou_interstitial?)
             session[:last_opierequest] = opierequest
-            current_person.set_tou_status
-            Activity.log_tou_activity(:person => current_person,:ip_address => request.remote_ip)
+            activitycode = (current_person.account_status == Person::STATUS_TOU_HALT) ? Activity::TOU_HALTED : Activity::TOU_PRESENTED
+            Activity.log_activity(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip, activitycode: activitycode)
             @tou_url = url_for(:controller => 'opie', :action => 'tou_notice', :protocol => ((Settings.app_location == 'localdev') ? 'http://': 'https://'))
             return render(:template => 'opie/tou_notice', :layout => 'application')
           end
@@ -218,18 +218,21 @@ class OpieController < ApplicationController
       session[:last_opierequest] = nil
       return render(layout: 'application')
     elsif(params[:commit] == 'Remind me next login')
-      if([Person::TOU_NOT_PRESENTED, Person::TOU_PRESENTED, Person::TOU_NEXT_LOGIN].include?(current_person.tou_status))
-        current_person.set_tou_status
-        Activity.log_tou_activity(:person => current_person,:ip_address => request.remote_ip)
+      if(Date.today < EpochDate::TOU_ENFORCEMENT_DATE and current_person.account_status != Person::STATUS_TOU_HALT)
+        Activity.log_activity(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip, activitycode: Activity::TOU_NEXT_LOGIN)
         # keep going
+      elsif(current_person.account_status == Person::STATUS_TOU_PENDING)
+        # one more login grace period
+        Activity.log_activity(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip, activitycode: Activity::TOU_NEXT_LOGIN)
+        current_person.update_attribute(:account_status,Person::STATUS_TOU_HALT)
       else
-        Activity.log_tou_activity(:person => current_person,:ip_address => request.remote_ip)
+        Activity.log_activity(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip, activitycode: Activity::TOU_HALT)
         session[:last_opierequest] = nil
         return render(layout: 'application')
       end
     elsif(params[:commit] == 'I accept the Terms of Use')
-      current_person.set_tou_status(Person::TOU_ACCEPTED)
-      Activity.log_tou_activity(:person => current_person,:ip_address => request.remote_ip)
+      current_person.accept_tou
+      Activity.log_activity(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip, activitycode: Activity::TOU_ACCEPTED)
     end
 
     server_url = url_for(:action => 'index', :protocol => 'https://')
