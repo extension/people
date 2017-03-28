@@ -41,16 +41,14 @@ module AccountsHelper
       explanation = "<h4>You need to confirm your email address.</h4> <p>#{link_to('Learn how',accounts_pending_confirmation_path, class: 'btn btn-default btn-primary')}</p>"
     when Person::STATUS_CONFIRM_EMAIL
       explanation = "<p>You need to confirm your email address. #{link_to('Learn more about email confirmation',accounts_pending_confirmation_path)}</p>"
-    when Person::STATUS_RETIRED
-      explanation = "<p>Your account has been retired. #{link_to('Contact us for more information.',help_path)}</p>"
-    when Person::STATUS_INVALIDEMAIL
-      explanation = "<p>Your email is invalid. #{link_to('Learn more about email confirmation',accounts_pending_confirmation_path)}</p>"
+    when Person::STATUS_TOU_HALT
+      explanation = "<p>You have not yet accepted the eXtension Terms of Use.  #TODO - Link</p>"
     when Person::STATUS_CONTRIBUTOR
       # just for debugging - should never see in normal operation
       explanation = "<p>Your current account status is: <span class='label label-info'>Person</span></p>"
-     when Person::STATUS_PARTICIPANT
+     when Person::STATUS_TOU_PENDING
       # just for debugging - should never see in normal operation
-      explanation = "<p>Your current account status is: <span class='label label-info'>Participant</span></p>"
+      explanation = "<p>Your current account status is: <span class='label label-info'>Terms of Use Acceptance Pending</span></p>"
     else
       explanation = "<p>Unknown account status.</p>"
     end
