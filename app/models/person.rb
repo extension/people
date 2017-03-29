@@ -21,7 +21,6 @@ class Person < ActiveRecord::Base
   attr_accessible :position_id, :position, :location_id, :location, :county_id, :county, :institution_id, :institution
   attr_accessible :invitation, :invitation_id
   attr_accessible :last_account_reminder, :password_reset, :google_apps_email, :display_extension_email
-  attr_accessible :tou_status, :tou_status_date
   attr_accessible :avatar, :avatar_cache, :remove_avatar
 
 
@@ -1299,7 +1298,6 @@ class Person < ActiveRecord::Base
             row << person.affiliation
             row << self.name_or_nil(person.location)
             row << self.name_or_nil(person.county)
-            # row << person.tou_status_to_s
             row << (person.created_at ? person.created_at.utc.strftime("%Y-%m-%d %H:%M:%S") : nil)
             row << (person.last_activity_at ? person.last_activity_at.utc.strftime("%Y-%m-%d %H:%M:%S") : nil)
             if(options[:browse_filter])

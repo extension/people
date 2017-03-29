@@ -240,11 +240,5 @@ module PeopleHelper
     end
   end
 
-  def tou_status(person)
-    # TODO: TOU STATUS
-  end
-
-
-
 
 end
