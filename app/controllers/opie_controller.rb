@@ -222,9 +222,11 @@ class OpieController < ApplicationController
         Activity.log_activity(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip, activitycode: Activity::TOU_NEXT_LOGIN)
         # keep going
       elsif(current_person.account_status == Person::STATUS_TOU_PENDING)
-        # one more login grace period
         Activity.log_activity(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip, activitycode: Activity::TOU_NEXT_LOGIN)
-        current_person.update_attribute(:account_status,Person::STATUS_TOU_HALT)
+        if(Date.today >= EpochDate::TOU_ENFORCEMENT_DATE)
+          # one more login grace period
+          current_person.update_attribute(:account_status,Person::STATUS_TOU_HALT)
+        end
       else
         Activity.log_activity(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip, activitycode: Activity::TOU_HALT)
         session[:last_opierequest] = nil
