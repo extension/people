@@ -320,7 +320,6 @@ ActiveRecord::Schema.define(:version => 20170328153245) do
     t.datetime "created_at",                                                :null => false
     t.datetime "updated_at",                                                :null => false
     t.boolean  "google_apps_email",                      :default => false
-    t.integer  "tou_status",                             :default => 0,     :null => false
     t.datetime "tou_accepted_at"
     t.string   "slack_user_id"
     t.string   "avatar"
