@@ -42,7 +42,7 @@ module AccountsHelper
     when Person::STATUS_CONFIRM_EMAIL
       explanation = "<p>You need to confirm your email address. #{link_to('Learn more about email confirmation',accounts_pending_confirmation_path)}</p>"
     when Person::STATUS_TOU_HALT
-      explanation = "<p>You have not yet accepted the eXtension Terms of Use.  #TODO - Link</p>"
+      explanation = "<p>You have not yet accepted the eXtension Terms of Use. #{link_to('Learn more about the eXtension Terms of Use',accounts_tou_notice_path)} </p>"
     when Person::STATUS_CONTRIBUTOR
       # just for debugging - should never see in normal operation
       explanation = "<p>Your current account status is: <span class='label label-info'>Person</span></p>"

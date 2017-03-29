@@ -25,7 +25,11 @@ class AccountsController < ApplicationController
           set_current_person(person)
           flash[:success] = "Login successful"
           Activity.log_local_auth_success(person_id: person.id, authname: params[:email], ip_address: request.remote_ip)
-          return redirect_back_or_default(root_url)
+          if(person.present_tou_interstitial?)
+            return redirect_to(accounts_tou_notice_url)
+          else
+            return redirect_back_or_default(root_url)
+          end
         rescue AuthenticationError => ae
           flash.now[:failure] = explain_auth_result(ae.error_code.to_i)
           Activity.log_local_auth_failure(person_id: ae.person_id, authname: params[:email], ip_address: request.remote_ip, fail_code: ae.error_code)
@@ -201,6 +205,30 @@ class AccountsController < ApplicationController
   def review
   end
 
+  def tou_notice
+    if(request.post?)
+      if(params[:commit] == 'Remind me next login')
+        if(Date.today < EpochDate::TOU_ENFORCEMENT_DATE and current_person.account_status != Person::STATUS_TOU_HALT)
+          Activity.log_activity(person_id: current_person.id, site: 'local', ip_address: request.remote_ip, activitycode: Activity::TOU_NEXT_LOGIN)
+          return redirect_to(root_url)
+        elsif(current_person.account_status == Person::STATUS_TOU_PENDING)
+          Activity.log_activity(person_id: current_person.id, site: 'local', ip_address: request.remote_ip, activitycode: Activity::TOU_NEXT_LOGIN)
+          if(Date.today >= EpochDate::TOU_ENFORCEMENT_DATE)
+            # one more login grace period
+            current_person.update_attribute(:account_status,Person::STATUS_TOU_HALT)
+          end
+        else
+          # this really can only happen if someone is manipulating params
+          Activity.log_activity(person_id: current_person.id, site: 'local', ip_address: request.remote_ip, activitycode: Activity::TOU_HALT)
+        end
+      elsif(params[:commit] == 'I accept the Terms of Use')
+        current_person.accept_tou
+        Activity.log_activity(person_id: current_person.id, site: 'local', ip_address: request.remote_ip, activitycode: Activity::TOU_ACCEPTED)
+      end
+      return redirect_back_or_default(root_url)
+    end
+  end
+
   private
 
   def confirm_signup
@@ -229,7 +257,6 @@ class AccountsController < ApplicationController
     current_person.confirm_email({ip_address: request.remote_ip})
     return redirect_to(root_url)
   end
-
 
   def explain_auth_result(resultcode)
     case resultcode

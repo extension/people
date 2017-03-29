@@ -1,0 +1,21 @@
+<p>
+  Using and contributing to eXtension websites requires that you read and accept the
+  <a href="https://extension.org/terms-of-use/" target="_blank">eXtension Terms of Use</a>
+</p>
+
+<%- if current_person.tou_accepted? -%>
+  <p>
+    You have already indicated your acceptance of the eXtension Terms of Use.
+    You accepted the Terms of Use at <%= display_time(current_person.tou_accepted_at) -%>
+  </p>
+  <p>
+    <%= submit_tag "OK", :class => "btn btn-default" %>
+  </p>
+<%- else -%>
+  <p>
+    <%= submit_tag "I accept the Terms of Use", :class => "btn btn-default" %>
+    <%- if(allow_next_login_tou_reminder?) -%>
+      <%= submit_tag "Remind me next login", :class => "btn btn-link" %>
+    <%- end -%>
+  </p>
+<%- end -%>

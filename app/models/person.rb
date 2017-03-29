@@ -42,12 +42,12 @@ class Person < ActiveRecord::Base
 
   # account status
   # states 4,5,6,7,8 no longer used
-  STATUS_SIGNUP = 0
-  STATUS_REVIEW = 1
+  STATUS_SIGNUP        = 0
+  STATUS_REVIEW        = 1
   STATUS_CONFIRM_EMAIL = 2
-  STATUS_TOU_PENDING = 3
-  STATUS_TOU_HALTED = 24
-  STATUS_CONTRIBUTOR = 42
+  STATUS_TOU_PENDING   = 3
+  STATUS_TOU_HALT      = 24
+  STATUS_CONTRIBUTOR   = 42
 
 
 
@@ -1449,12 +1449,25 @@ class Person < ActiveRecord::Base
 
   def accept_tou
     if([STATUS_TOU_PENDING,STATUS_TOU_HALT].include?(self.account_status))
-      self.update_attributes(account_status: STATUS_CONTRIBUTOR, tou_accepted_at: Time.zone.now)
+      self.account_status = STATUS_CONTRIBUTOR
+      self.tou_accepted_at = Time.zone.now
+      self.save
     else
-      self.update_attribute(:tou_accepted_at, Time.zone.now)
+      self.tou_accepted_at = Time.zone.now
+      self.save
     end
   end
 
+  def clear_tou
+    if(self.account_status == STATUS_CONTRIBUTOR)
+      self.account_status = STATUS_TOU_PENDING
+      self.tou_accepted_at = nil
+      self.save
+    else
+      self.tou_accepted_at = nil
+      self.save
+    end
+  end
 
   def facebook_connections
     self.social_networks.where(name: 'facebook')
@@ -1499,9 +1512,6 @@ class Person < ActiveRecord::Base
   def self.administrators
     validaccounts.where(is_admin: true)
   end
-
-
-
 
   private
 
