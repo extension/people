@@ -45,6 +45,7 @@ class Person < ActiveRecord::Base
   STATUS_REVIEW        = 1
   STATUS_CONFIRM_EMAIL = 2
   STATUS_TOU_PENDING   = 3
+  STATUS_TOU_GRACE     = 4
   STATUS_TOU_HALT      = 24
   STATUS_CONTRIBUTOR   = 42
 
@@ -291,6 +292,8 @@ class Person < ActiveRecord::Base
       when STATUS_CONTRIBUTOR
         return true
       when STATUS_TOU_PENDING
+        return true
+      when STATUS_TOU_GRACE
         return true
       when STATUS_TOU_HALT
         return false
@@ -1457,7 +1460,7 @@ class Person < ActiveRecord::Base
   end
 
   def accept_tou
-    if([STATUS_TOU_PENDING,STATUS_TOU_HALT].include?(self.account_status))
+    if([STATUS_TOU_PENDING,STATUS_TOU_HALT,STATUS_TOU_GRACE].include?(self.account_status))
       self.account_status = STATUS_CONTRIBUTOR
       self.tou_accepted_at = Time.zone.now
       self.save
@@ -1530,7 +1533,7 @@ class Person < ActiveRecord::Base
         self.account_status = STATUS_CONFIRM_EMAIL
       elsif(!self.vouched?)
         self.account_status = STATUS_REVIEW
-      elsif(!self.tou_accepted?)
+      elsif(!self.tou_accepted? and self.account_status != STATUS_TOU_GRACE)
         self.account_status = STATUS_TOU_PENDING
       end
     end
