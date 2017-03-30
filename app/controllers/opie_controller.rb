@@ -117,7 +117,6 @@ class OpieController < ApplicationController
         else
           session[:last_opierequest] = opierequest
           cookies[:return_to] = url_for(:controller=>"opie", :action =>"index", :returnfrom => 'login')
-          logger.debug("WTF??!?!?LOL?!?!?BBQ")
           return(redirect_to signin_url)
         end
         return
@@ -224,11 +223,15 @@ class OpieController < ApplicationController
       if(Date.today < EpochDate::TOU_ENFORCEMENT_DATE and current_person.account_status != Person::STATUS_TOU_HALT)
         Activity.log_activity(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip, activitycode: Activity::TOU_NEXT_LOGIN)
         # keep going
-      elsif(current_person.account_status == Person::STATUS_TOU_PENDING)
+      elsif(current_person.account_status == Person::STATUS_TOU_PENDING or current_person.account_status == Person::STATUS_TOU_GRACE)
         Activity.log_activity(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip, activitycode: Activity::TOU_NEXT_LOGIN)
         if(Date.today >= EpochDate::TOU_ENFORCEMENT_DATE)
-          # one more login grace period
-          current_person.update_attribute(:account_status,Person::STATUS_TOU_HALT)
+          if(current_person.account_status == Person::STATUS_TOU_PENDING)
+            # one more login grace period
+            current_person.update_attribute(:account_status,Person::STATUS_TOU_GRACE)
+          else
+            current_person.update_attribute(:account_status,Person::STATUS_TOU_HALT)
+          end
         end
       else
         Activity.log_activity(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip, activitycode: Activity::TOU_HALT)
@@ -374,7 +377,6 @@ class OpieController < ApplicationController
       if(current_person.activity_allowed?)
         return true
       elsif(current_person.account_status == Person::STATUS_TOU_HALT)
-        logger.debug("WTF?!?!?!?!?")
         return true
       else
         clear_location
