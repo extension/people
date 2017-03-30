@@ -26,7 +26,7 @@ class AccountsController < ApplicationController
           flash[:success] = "Login successful"
           Activity.log_local_auth_success(person_id: person.id, authname: params[:email], ip_address: request.remote_ip)
           if(session[:last_opierequest].blank? and person.present_tou_interstitial?)
-            if(person.account_status == Person::STATUS_TOU_GRACE)
+            if(Date.today >= EpochDate::TOU_ENFORCEMENT_DATE and person.account_status == Person::STATUS_TOU_GRACE)
               person.update_attribute(:account_status,Person::STATUS_TOU_HALT)
             end
             return redirect_to(accounts_tou_notice_url)
