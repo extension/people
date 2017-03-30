@@ -240,5 +240,21 @@ module PeopleHelper
     end
   end
 
+  def tou_status(person)
+    if(person.tou_accepted_at.nil?)
+      status_text = "Not Yet Accepted"
+      date_text = ''
+    else
+      status_text = "Accepted"
+      date_text = "(#{display_time(person.tou_accepted_at)})"
+    end
+
+    if(current_person and (current_person == person))
+     "#{link_to(status_text,accounts_tou_notice_path).html_safe} #{date_text}".html_safe
+    else
+     "#{status_text} #{date_text}".html_safe
+    end
+  end
+
 
 end

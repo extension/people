@@ -1441,6 +1441,17 @@ class Person < ActiveRecord::Base
     end
   end
 
+  # #TODO - no longer needed after TOU_START_DATE
+  def show_tou_status?
+    if(Date.today >= EpochDate::TOU_START_DATE)
+      true
+    elsif(!Settings.limit_tou_groups.blank? and !(self.connected_communities.map(&:id) & Settings.limit_tou_groups).blank?)
+      true
+    else
+      false
+    end
+  end
+
   def tou_accepted?
     !self.tou_accepted_at.blank?
   end
