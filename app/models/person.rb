@@ -40,8 +40,8 @@ class Person < ActiveRecord::Base
 
 
   # account status
-  # states 4,5,6,7,8 no longer used
-  STATUS_SIGNUP        = 0
+  # states 4,5,6,8 no longer used
+  STATUS_SIGNUP        = 7
   STATUS_REVIEW        = 1
   STATUS_CONFIRM_EMAIL = 2
   STATUS_TOU_PENDING   = 3

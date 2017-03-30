@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20170328153245) do
+ActiveRecord::Schema.define(:version => 20170330183757) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
