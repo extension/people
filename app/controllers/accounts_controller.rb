@@ -25,7 +25,7 @@ class AccountsController < ApplicationController
           set_current_person(person)
           flash[:success] = "Login successful"
           Activity.log_local_auth_success(person_id: person.id, authname: params[:email], ip_address: request.remote_ip)
-          if(person.present_tou_interstitial?)
+          if(session[:last_opierequest].blank? and person.present_tou_interstitial?)
             return redirect_to(accounts_tou_notice_url)
           else
             return redirect_back_or_default(root_url)
