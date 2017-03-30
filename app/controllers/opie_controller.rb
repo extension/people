@@ -21,9 +21,11 @@ end
 class OpieController < ApplicationController
   layout nil
   include OpenID::Server
-  skip_before_filter :verify_authenticity_token
-  skip_before_filter :signin_required, :check_hold_status, except: [:decision]
   before_filter :signin_optional
+  before_filter :check_opie_hold_status
+  skip_before_filter :verify_authenticity_token
+  skip_before_filter :signin_required, except: [:decision]
+  skip_before_filter :check_hold_status
 
   def delegate
     @person = Person.find_by_idstring(params[:extensionid])
@@ -66,7 +68,7 @@ class OpieController < ApplicationController
         if(opierequest.trust_root =~ %r{extension\.org} or opierequest.trust_root =~ %r{\.dev$})
           if(current_person.present_tou_interstitial?)
             session[:last_opierequest] = opierequest
-            activitycode = (current_person.account_status == Person::STATUS_TOU_HALT) ? Activity::TOU_HALTED : Activity::TOU_PRESENTED
+            activitycode = (current_person.account_status == Person::STATUS_TOU_HALT) ? Activity::TOU_HALT : Activity::TOU_PRESENTED
             Activity.log_activity(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip, activitycode: activitycode)
             @tou_url = url_for(:controller => 'opie', :action => 'tou_notice', :protocol => ((Settings.app_location == 'localdev') ? 'http://': 'https://'))
             return render(:template => 'opie/tou_notice', :layout => 'application')
@@ -115,6 +117,7 @@ class OpieController < ApplicationController
         else
           session[:last_opierequest] = opierequest
           cookies[:return_to] = url_for(:controller=>"opie", :action =>"index", :returnfrom => 'login')
+          logger.debug("WTF??!?!?LOL?!?!?BBQ")
           return(redirect_to signin_url)
         end
         return
@@ -262,10 +265,18 @@ class OpieController < ApplicationController
   def checklogin(is_idselect,identity,trust_root)
     if current_person
       if(is_idselect)
-        return current_person.activity_allowed?
+        if(current_person.account_status == Person::STATUS_TOU_HALT)
+          return true
+        else
+          return current_person.activity_allowed?
+        end
       else
         if(current_person.openid_url == identity or current_person.openid_url == identity +'/')
-          return current_person.activity_allowed?
+          if(current_person.account_status == Person::STATUS_TOU_HALT)
+            return true
+          else
+            return current_person.activity_allowed?
+          end
         else
           flash[:failure] = "The OpenID you used doesn't match the OpenID for your account.  Please use your back button and enter your OpenID: #{current_person.openid_url}"
           return false
@@ -355,5 +366,23 @@ class OpieController < ApplicationController
       render :text => web_response.body, :status => 400
     end
   end
+
+  private
+
+  def check_opie_hold_status
+    if(current_person)
+      if(current_person.activity_allowed?)
+        return true
+      elsif(current_person.account_status == Person::STATUS_TOU_HALT)
+        logger.debug("WTF?!?!?!?!?")
+        return true
+      else
+        clear_location
+        return access_notice
+      end
+    end
+  end
+
+
 
 end
