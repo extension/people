@@ -21,7 +21,6 @@ class Person < ActiveRecord::Base
   attr_accessible :position_id, :position, :location_id, :location, :county_id, :county, :institution_id, :institution
   attr_accessible :invitation, :invitation_id
   attr_accessible :last_account_reminder, :password_reset, :google_apps_email, :display_extension_email
-  attr_accessible :tou_status, :tou_status_date
   attr_accessible :avatar, :avatar_cache, :remove_avatar
 
 
@@ -41,24 +40,17 @@ class Person < ActiveRecord::Base
 
 
   # account status
-  STATUS_CONTRIBUTOR = 42
-  STATUS_REVIEW = 1
+  # states 4,5,6,7,8 no longer used
+  STATUS_SIGNUP        = 0
+  STATUS_REVIEW        = 1
   STATUS_CONFIRM_EMAIL = 2
-  STATUS_REVIEWAGREEMENT = 3
-  STATUS_PARTICIPANT = 4
-  STATUS_RETIRED = 5
-  STATUS_INVALIDEMAIL = 6
-  STATUS_SIGNUP = 7
-  STATUS_INVALIDEMAIL_FROM_SIGNUP = 8
+  STATUS_TOU_PENDING   = 3
+  STATUS_TOU_HALT      = 24
+  STATUS_CONTRIBUTOR   = 42
 
-  STATUS_OK = 100
 
-  # Terms of Use status
-  TOU_NOT_PRESENTED = 0
-  TOU_PRESENTED = 1
-  TOU_NEXT_LOGIN = 2
-  TOU_HALT = 7
-  TOU_ACCEPTED = 42
+
+
 
   ## validations
   validates :first_name, :presence => true
@@ -298,10 +290,10 @@ class Person < ActiveRecord::Base
       case self.account_status
       when STATUS_CONTRIBUTOR
         return true
-      when STATUS_PARTICIPANT
+      when STATUS_TOU_PENDING
         return true
-      when STATUS_REVIEWAGREEMENT
-        return true
+      when STATUS_TOU_HALT
+        return false
       else
         return false
       end
@@ -1306,7 +1298,6 @@ class Person < ActiveRecord::Base
             row << person.affiliation
             row << self.name_or_nil(person.location)
             row << self.name_or_nil(person.county)
-            # row << person.tou_status_to_s
             row << (person.created_at ? person.created_at.utc.strftime("%Y-%m-%d %H:%M:%S") : nil)
             row << (person.last_activity_at ? person.last_activity_at.utc.strftime("%Y-%m-%d %H:%M:%S") : nil)
             if(options[:browse_filter])
@@ -1441,33 +1432,50 @@ class Person < ActiveRecord::Base
   end
 
   def present_tou_interstitial?
-    if(!Settings.limit_tou.blank?)
-      if(!(self.connected_communities.map(&:id) & Settings.limit_tou).blank?)
-        self.tou_status != TOU_ACCEPTED
-      end
+    if(Date.today >= EpochDate::TOU_START_DATE)
+      !self.tou_accepted?
+    elsif(!Settings.limit_tou_groups.blank? and !(self.connected_communities.map(&:id) & Settings.limit_tou_groups).blank?)
+      !self.tou_accepted?
     else
-      self.tou_status != TOU_ACCEPTED
+      false
     end
   end
 
-  def set_tou_status(status = nil)
-    if(status.blank?)
-      case self.tou_status
-      when TOU_NOT_PRESENTED
-        status = TOU_PRESENTED
-      when TOU_PRESENTED
-        status = TOU_NEXT_LOGIN
-      when TOU_NEXT_LOGIN
-        status = TOU_HALT
-      when TOU_HALT
-        return false
-      when TOU_ACCEPTED
-        return false
-      else
-        return false
-      end
+  # #TODO - no longer needed after TOU_START_DATE
+  def show_tou_status?
+    if(Date.today >= EpochDate::TOU_START_DATE)
+      true
+    elsif(!Settings.limit_tou_groups.blank? and !(self.connected_communities.map(&:id) & Settings.limit_tou_groups).blank?)
+      true
+    else
+      false
     end
-    self.update_attributes(tou_status: status, tou_status_date: Time.now)
+  end
+
+  def tou_accepted?
+    !self.tou_accepted_at.blank?
+  end
+
+  def accept_tou
+    if([STATUS_TOU_PENDING,STATUS_TOU_HALT].include?(self.account_status))
+      self.account_status = STATUS_CONTRIBUTOR
+      self.tou_accepted_at = Time.zone.now
+      self.save
+    else
+      self.tou_accepted_at = Time.zone.now
+      self.save
+    end
+  end
+
+  def clear_tou
+    if(self.account_status == STATUS_CONTRIBUTOR)
+      self.account_status = STATUS_TOU_PENDING
+      self.tou_accepted_at = nil
+      self.save
+    else
+      self.tou_accepted_at = nil
+      self.save
+    end
   end
 
   def facebook_connections
@@ -1514,19 +1522,16 @@ class Person < ActiveRecord::Base
     validaccounts.where(is_admin: true)
   end
 
-
-
-
   private
 
   def check_account_status
-    if (!self.retired? and self.account_status != STATUS_SIGNUP)
-      if (!self.email_confirmed?)
-        self.account_status = STATUS_CONFIRM_EMAIL if (account_status != STATUS_INVALIDEMAIL and account_status != STATUS_INVALIDEMAIL_FROM_SIGNUP)
-      elsif (!self.vouched?)
+    if (!self.retired? and self.account_status != STATUS_SIGNUP and self.account_status != STATUS_TOU_HALT)
+      if(!self.email_confirmed?)
+        self.account_status = STATUS_CONFIRM_EMAIL
+      elsif(!self.vouched?)
         self.account_status = STATUS_REVIEW
-      else
-        self.account_status = STATUS_CONTRIBUTOR
+      elsif(!self.tou_accepted?)
+        self.account_status = STATUS_TOU_PENDING
       end
     end
   end

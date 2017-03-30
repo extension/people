@@ -23,7 +23,7 @@ milfam_database: 'use_local_settings'
 months_for_inactive_flag: 6
 inactive_limit: 100
 openid_endpoint: 'http://people.dev/opie'
-openid_host: 'https://people.extension.org'
+openid_host: 'http://people.dev'
 redis_enabled: true
 session_token: '123456789012345678901234567890'
 sync_accounts: false

@@ -56,6 +56,7 @@ People::Application.routes.draw do
     simple_named_route 'resend_confirmation'
     simple_named_route 'set_password', via: [:post]
     simple_named_route 'display_eligibility_notice'
+    simple_named_route 'tou_notice', via: [:get,:post] 
   end
 
   resources :people, only: [:index, :show, :edit, :update] do
