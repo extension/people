@@ -41,6 +41,7 @@ class Person < ActiveRecord::Base
 
   # account status
   # states 4,5,6,8 no longer used
+  STATUS_PLACEHOLDER   = 999
   STATUS_SIGNUP        = 7
   STATUS_REVIEW        = 1
   STATUS_CONFIRM_EMAIL = 2
@@ -623,7 +624,7 @@ class Person < ActiveRecord::Base
   def confirm_email(options = {})
     self.email_confirmed = true
     self.email_confirmed_at = Time.zone.now
-    self.account_status = STATUS_OK
+    self.account_status = STATUS_PLACEHOLDER
 
     if(!self.vouched? and self.has_whitelisted_email?)
       self.vouched = true
@@ -844,7 +845,7 @@ class Person < ActiveRecord::Base
     # email settings
     self.email_confirmed = true
     self.email_confirmed_at = now
-    self.account_status = STATUS_OK # will get reset before_save via :check_account_status if not valid
+    self.account_status = STATUS_PLACEHOLDER # will get reset before_save via :check_account_status if not valid
 
     if(self.save)
 
