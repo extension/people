@@ -174,30 +174,6 @@ class Activity < ActiveRecord::Base
     end
   end
 
-  def self.log_tou_activity(options = {})
-    person = options[:person]
-    logger.debug(person.tou_status)
-    case person.tou_status
-    when Person::TOU_PRESENTED
-      activitycode = TOU_PRESENTED
-    when Person::TOU_NEXT_LOGIN
-      activitycode = TOU_NEXT_LOGIN
-    when Person::TOU_HALT
-      activitycode = TOU_HALT
-    when Person::TOU_ACCEPTED
-      activitycode = TOU_ACCEPTED
-    else
-      return nil
-    end
-
-    create_parameters = {}
-    create_parameters[:site] = 'local'
-    create_parameters[:person_id] = person.id
-    create_parameters[:activitycode] = activitycode
-    create_parameters[:ip_address] = options[:ip_address] || 'unknown'
-    self.create(create_parameters)
-  end
-
   def self.log_activity(options = {})
     required = [:person_id,:activitycode]
     required.each do |required_option|

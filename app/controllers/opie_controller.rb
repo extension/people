@@ -21,9 +21,11 @@ end
 class OpieController < ApplicationController
   layout nil
   include OpenID::Server
-  skip_before_filter :verify_authenticity_token
-  skip_before_filter :signin_required, :check_hold_status, except: [:decision]
   before_filter :signin_optional
+  before_filter :check_opie_hold_status
+  skip_before_filter :verify_authenticity_token
+  skip_before_filter :signin_required, except: [:decision]
+  skip_before_filter :check_hold_status
 
   def delegate
     @person = Person.find_by_idstring(params[:extensionid])
@@ -66,8 +68,8 @@ class OpieController < ApplicationController
         if(opierequest.trust_root =~ %r{extension\.org} or opierequest.trust_root =~ %r{\.dev$})
           if(current_person.present_tou_interstitial?)
             session[:last_opierequest] = opierequest
-            current_person.set_tou_status
-            Activity.log_tou_activity(:person => current_person,:ip_address => request.remote_ip)
+            activitycode = (current_person.account_status == Person::STATUS_TOU_HALT) ? Activity::TOU_HALT : Activity::TOU_PRESENTED
+            Activity.log_activity(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip, activitycode: activitycode)
             @tou_url = url_for(:controller => 'opie', :action => 'tou_notice', :protocol => ((Settings.app_location == 'localdev') ? 'http://': 'https://'))
             return render(:template => 'opie/tou_notice', :layout => 'application')
           end
@@ -218,18 +220,27 @@ class OpieController < ApplicationController
       session[:last_opierequest] = nil
       return render(layout: 'application')
     elsif(params[:commit] == 'Remind me next login')
-      if([Person::TOU_NOT_PRESENTED, Person::TOU_PRESENTED, Person::TOU_NEXT_LOGIN].include?(current_person.tou_status))
-        current_person.set_tou_status
-        Activity.log_tou_activity(:person => current_person,:ip_address => request.remote_ip)
+      if(Date.today < EpochDate::TOU_ENFORCEMENT_DATE and current_person.account_status != Person::STATUS_TOU_HALT)
+        Activity.log_activity(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip, activitycode: Activity::TOU_NEXT_LOGIN)
         # keep going
+      elsif(current_person.account_status == Person::STATUS_TOU_PENDING or current_person.account_status == Person::STATUS_TOU_GRACE)
+        Activity.log_activity(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip, activitycode: Activity::TOU_NEXT_LOGIN)
+        if(Date.today >= EpochDate::TOU_ENFORCEMENT_DATE)
+          if(current_person.account_status == Person::STATUS_TOU_PENDING)
+            # one more login grace period
+            current_person.update_attribute(:account_status,Person::STATUS_TOU_GRACE)
+          else
+            current_person.update_attribute(:account_status,Person::STATUS_TOU_HALT)
+          end
+        end
       else
-        Activity.log_tou_activity(:person => current_person,:ip_address => request.remote_ip)
+        Activity.log_activity(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip, activitycode: Activity::TOU_HALT)
         session[:last_opierequest] = nil
         return render(layout: 'application')
       end
     elsif(params[:commit] == 'I accept the Terms of Use')
-      current_person.set_tou_status(Person::TOU_ACCEPTED)
-      Activity.log_tou_activity(:person => current_person,:ip_address => request.remote_ip)
+      current_person.accept_tou
+      Activity.log_activity(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip, activitycode: Activity::TOU_ACCEPTED)
     end
 
     server_url = url_for(:action => 'index', :protocol => 'https://')
@@ -257,10 +268,18 @@ class OpieController < ApplicationController
   def checklogin(is_idselect,identity,trust_root)
     if current_person
       if(is_idselect)
-        return current_person.activity_allowed?
+        if(current_person.account_status == Person::STATUS_TOU_HALT)
+          return true
+        else
+          return current_person.activity_allowed?
+        end
       else
         if(current_person.openid_url == identity or current_person.openid_url == identity +'/')
-          return current_person.activity_allowed?
+          if(current_person.account_status == Person::STATUS_TOU_HALT)
+            return true
+          else
+            return current_person.activity_allowed?
+          end
         else
           flash[:failure] = "The OpenID you used doesn't match the OpenID for your account.  Please use your back button and enter your OpenID: #{current_person.openid_url}"
           return false
@@ -350,5 +369,22 @@ class OpieController < ApplicationController
       render :text => web_response.body, :status => 400
     end
   end
+
+  private
+
+  def check_opie_hold_status
+    if(current_person)
+      if(current_person.activity_allowed?)
+        return true
+      elsif(current_person.account_status == Person::STATUS_TOU_HALT)
+        return true
+      else
+        clear_location
+        return access_notice
+      end
+    end
+  end
+
+
 
 end

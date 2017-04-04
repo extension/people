@@ -51,11 +51,12 @@ People::Application.routes.draw do
     simple_named_route 'reset_password', via: [:get,:post]
     simple_named_route 'missing_token'
     simple_named_route 'review'
-    simple_named_route 'contributor_agreement', via: [:get,:post]
     simple_named_route 'post_signup'
     simple_named_route 'pending_confirmation'
     simple_named_route 'resend_confirmation'
     simple_named_route 'set_password', via: [:post]
+    simple_named_route 'display_eligibility_notice'
+    simple_named_route 'tou_notice', via: [:get,:post] 
   end
 
   resources :people, only: [:index, :show, :edit, :update] do
@@ -103,6 +104,7 @@ People::Application.routes.draw do
       post :find
       post :change_notification
       get :contacts
+      get :institutions
     end
 
     member do

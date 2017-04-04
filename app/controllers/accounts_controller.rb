@@ -6,7 +6,7 @@
 
 class AccountsController < ApplicationController
   skip_before_filter :check_hold_status
-  skip_before_filter :signin_required, except: [:post_signup, :confirm, :resend_confirmation, :pending_confirmation, :contributor_agreement, :review]
+  skip_before_filter :signin_required, except: [:post_signup, :confirm, :resend_confirmation, :pending_confirmation, :review]
   before_filter :signin_optional
 
   def signout
@@ -25,7 +25,14 @@ class AccountsController < ApplicationController
           set_current_person(person)
           flash[:success] = "Login successful"
           Activity.log_local_auth_success(person_id: person.id, authname: params[:email], ip_address: request.remote_ip)
-          return redirect_back_or_default(root_url)
+          if(session[:last_opierequest].blank? and person.present_tou_interstitial?)
+            if(Date.today >= EpochDate::TOU_ENFORCEMENT_DATE and person.account_status == Person::STATUS_TOU_GRACE)
+              person.update_attribute(:account_status,Person::STATUS_TOU_HALT)
+            end
+            return redirect_to(accounts_tou_notice_url)
+          else
+            return redirect_back_or_default(root_url)
+          end
         rescue AuthenticationError => ae
           flash.now[:failure] = explain_auth_result(ae.error_code.to_i)
           Activity.log_local_auth_failure(person_id: ae.person_id, authname: params[:email], ip_address: request.remote_ip, fail_code: ae.error_code)
@@ -167,6 +174,10 @@ class AccountsController < ApplicationController
     end
   end
 
+  def display_eligibility_notice
+    return render(template: 'accounts/eligibility_notice')
+  end
+
   def create
     @person = Person.new(params[:person])
     if(@person.email =~ /extension\.org$/i)
@@ -183,9 +194,6 @@ class AccountsController < ApplicationController
     @person.account_status = Person::STATUS_SIGNUP
     @person.last_activity_at = Time.zone.now
 
-    @person.tou_status = Person::TOU_ACCEPTED
-    @person.tou_status_date = Time.zone.now
-
     if(@person.save)
       # automatically log them in
       set_current_person(@person)
@@ -200,27 +208,33 @@ class AccountsController < ApplicationController
   def review
   end
 
-  def contributor_agreement
+  def tou_notice
     if(request.post?)
-      if(current_person.contributor_agreement.nil?)
-        if(params[:agreement_agree])
-          current_person.contributor_agreement = true
-          current_person.contributor_agreement_at = Time.zone.now
-          if(current_person.save)
-            flash[:success] = 'Thank you for your response'
+      if(params[:commit] == 'Remind me next login')
+        if(Date.today < EpochDate::TOU_ENFORCEMENT_DATE and current_person.account_status != Person::STATUS_TOU_HALT)
+          Activity.log_activity(person_id: current_person.id, site: 'local', ip_address: request.remote_ip, activitycode: Activity::TOU_NEXT_LOGIN)
+          return redirect_to(root_url)
+        elsif(current_person.account_status == Person::STATUS_TOU_PENDING or current_person.account_status == Person::STATUS_TOU_GRACE)
+          Activity.log_activity(person_id: current_person.id, site: 'local', ip_address: request.remote_ip, activitycode: Activity::TOU_NEXT_LOGIN)
+          if(Date.today >= EpochDate::TOU_ENFORCEMENT_DATE)
+            if(current_person.account_status == Person::STATUS_TOU_PENDING)
+              # one more login grace period
+              current_person.update_attribute(:account_status,Person::STATUS_TOU_GRACE)
+            else
+              current_person.update_attribute(:account_status,Person::STATUS_TOU_HALT)
+            end
           end
-        elsif(params[:agreement_noagree])
-          current_person.contributor_agreement = false
-          current_person.contributor_agreement_at = Time.zone.now
-          if(current_person.save)
-            flash[:success] = 'Thank you for your response'
-          end
+        else
+          # this really can only happen if someone is manipulating params
+          Activity.log_activity(person_id: current_person.id, site: 'local', ip_address: request.remote_ip, activitycode: Activity::TOU_HALT)
         end
+      elsif(params[:commit] == 'I accept the Terms of Use')
+        current_person.accept_tou
+        Activity.log_activity(person_id: current_person.id, site: 'local', ip_address: request.remote_ip, activitycode: Activity::TOU_ACCEPTED)
       end
-      return redirect_to(accounts_contributor_agreement_url)
+      return redirect_back_or_default(root_url)
     end
   end
-
 
   private
 
@@ -250,7 +264,6 @@ class AccountsController < ApplicationController
     current_person.confirm_email({ip_address: request.remote_ip})
     return redirect_to(root_url)
   end
-
 
   def explain_auth_result(resultcode)
     case resultcode

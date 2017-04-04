@@ -19,6 +19,7 @@ class ApplicationController < ActionController::Base
   before_filter :update_last_activity
   before_filter :check_hold_status
   helper_method :current_person
+  helper_method :allow_next_login_tou_reminder?
 
   def append_info_to_payload(payload)
     super
@@ -39,7 +40,15 @@ class ApplicationController < ActionController::Base
     true
   end
 
-
+  def allow_next_login_tou_reminder?
+    if(Date.today < EpochDate::TOU_ENFORCEMENT_DATE and current_person.account_status != Person::STATUS_TOU_HALT)
+      return true
+    elsif(current_person.account_status == Person::STATUS_TOU_PENDING)
+      return true
+    else
+      return false
+    end
+  end
 
 
 end
