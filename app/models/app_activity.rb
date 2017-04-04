@@ -337,7 +337,12 @@ class AppActivity < ActiveRecord::Base
   def self.create_revisions_update
     database_name = CreateRevision.connection.current_database
     # revisions
-    CreateRevision.find_in_batches do |group|
+    if(get_since = self.where(source_model: 'CreateRevision').maximum(:activity_at))
+      get_since_timestamp = get_since.to_i
+    else
+      get_since_timestamp = CreateRevision.minimum(:timestamp)
+    end
+    CreateRevision.where("timestamp >= ?",get_since_timestamp).find_in_batches do |group|
       insert_values = []
       group.each do |revision|
         # the core app item is the node
@@ -385,7 +390,12 @@ class AppActivity < ActiveRecord::Base
   def self.create_workflow_events_update
     database_name = CreateWorkflowEvent.connection.current_database
     # workflow events
-    CreateWorkflowEvent.find_in_batches do |group|
+    if(get_since = self.where(source_model: 'CreateWorkflowEvent').maximum(:activity_at))
+      get_since_timestamp = get_since.to_i
+    else
+      get_since_timestamp = CreateWorkflowEvent.minimum(:created)
+    end
+    CreateWorkflowEvent.where("created >= ?",get_since_timestamp).find_in_batches do |group|
       insert_values = []
       group.each do |cwe|
         # the core app item is the node
@@ -434,7 +444,12 @@ class AppActivity < ActiveRecord::Base
   def self.create_comments_update
     # comments
     database_name = CreateComment.connection.current_database
-    CreateComment.find_in_batches do |group|
+    if(get_since = self.where(source_model: 'CreateComment').maximum(:activity_at))
+      get_since_timestamp = get_since.to_i
+    else
+      get_since_timestamp = CreateComment.minimum(:created)
+    end
+    CreateComment.where("created >= ?",get_since_timestamp).find_in_batches do |group|
       insert_values = []
       group.each do |comment|
         # the core app item is the node
@@ -478,6 +493,8 @@ class AppActivity < ActiveRecord::Base
       end
     end
   end
+
+
 
   def self.periodic_activity_by_person_id(options = {})
     returndata = {}
