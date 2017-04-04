@@ -1399,46 +1399,6 @@ class Person < ActiveRecord::Base
     self.synchronize_accounts
   end
 
-  def update_blogs_user
-
-    # note, because blogs.extension.org does not currently
-    # match up to user_id = this method intentionally keys
-    # off idstring, and provides yet another reason idstrings
-    # can't be changed
-
-    if(!blogsuser = BlogsUser.where(user_login: self.idstring).first)
-      blogsuser = BlogsUser.create(user_login: self.idstring,
-                                   user_pass: Settings.create_password_string,
-                                   user_nicename: self.idstring,
-                                   user_email: self.email,
-                                   user_registered: self.created_at,
-                                   display_name: self.fullname)
-    else
-      blogsuser.update_attributes(user_pass: Settings.create_password_string,
-                                  user_nicename: self.idstring,
-                                  user_email: self.email,
-                                  user_registered: self.created_at,
-                                  display_name: self.fullname)
-    end
-
-    if(!blogsuser.blogs_openid)
-      blogsuser.create_blogs_openid(url: self.openid_url)
-    end
-
-    blogsuser
-  end
-
-  def add_to_blog(blog_name, role)
-    # find the blog first
-    if(!blog = BlogsBlog.where(path: "/#{blog_name}/").first)
-      return nil
-    end
-
-    # insert / update user
-    blogsuser = self.update_blogs_user
-    blogsuser.add_to_blog(blog, role)
-  end
-
   def present_tou_interstitial?
     if(Date.today >= EpochDate::TOU_START_DATE)
       !self.tou_accepted?
