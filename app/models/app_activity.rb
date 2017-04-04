@@ -98,7 +98,7 @@ class AppActivity < ActiveRecord::Base
         insert_list << ActiveRecord::Base.quote_value(APP_LABELS[APP_PUBLISH])  # app_label
         insert_list << APP_PUBLISH_POSTS # app_source_type
         insert_list << publish_site_id # section_id
-        insert_list << ActiveRecord::Base.quote_value(blog_name)  # section_label
+        insert_list << ActiveRecord::Base.quote_value(publish_site_name)  # section_label
         insert_list << ACTIVITY_EDIT # activity_code
         insert_list <<  ActiveRecord::Base.quote_value(ACTIVITY_LABELS[ACTIVITY_EDIT]) # activity_label
         insert_list << app_item_id # app_item_id
@@ -152,7 +152,7 @@ class AppActivity < ActiveRecord::Base
         insert_list << ActiveRecord::Base.quote_value(APP_LABELS[APP_PUBLISH])  # app_label
         insert_list << APP_PUBLISH_COMMENTS # app_source_type
         insert_list << publish_site_id # section_id
-        insert_list << ActiveRecord::Base.quote_value(blog_name)  # section_label
+        insert_list << ActiveRecord::Base.quote_value(publish_site_name)  # section_label
         insert_list << ACTIVITY_COMMENT # activity_code
         insert_list <<  ActiveRecord::Base.quote_value(ACTIVITY_LABELS[ACTIVITY_COMMENT]) # activity_label
         insert_list << app_item_id # app_item_id
