@@ -11,7 +11,7 @@ class AppActivity < ActiveRecord::Base
   # tracked applications
   APP_ARTICLES  = 100
   APP_ASK       = 200
-  APP_BLOGS     = 300
+  APP_PUBLISH   = 300
   APP_CREATE    = 400
   APP_HOMEPAGE  = 500
   APP_LEARN     = 600
@@ -19,8 +19,11 @@ class AppActivity < ActiveRecord::Base
   APP_PEOPLE    = 800
 
   # source types
-  APP_BLOGS_POSTS = 301
-  APP_BLOGS_COMMENTS = 302
+  APP_PUBLISH_POSTS = 301
+  APP_PUBLISH_COMMENTS = 302
+
+  APP_HOMEPAGE_POSTS = 301
+  APP_HOMEPAGE_COMMENTS = 302
 
   APP_LEARN_EVENT_ACTIVITY = 601
   APP_LEARN_VERSIONS = 602
@@ -35,12 +38,12 @@ class AppActivity < ActiveRecord::Base
   APP_LABELS = {
     APP_ARTICLES => 'articles',
     APP_ASK => 'ask',
-    APP_BLOGS => 'blogs',
     APP_CREATE => 'create',
     APP_HOMEPAGE => 'homepage',
     APP_LEARN => 'learn',
     APP_MILFAM => 'milfam',
-    APP_PEOPLE => 'people'
+    APP_PEOPLE => 'people',
+    APP_PUBLISH => 'publish'
   }
 
   # activities
@@ -70,46 +73,46 @@ class AppActivity < ActiveRecord::Base
     ACTIVITY_WORKFLOW => 'workflow'
   }
 
-  def self.blogs_update
-    BlogsBlog.order(:blog_id).each do |blog|
-      blog_id = blog.blog_id
-      blog_name = blog.path.gsub('/','')
-      blog_name = 'root' if(blog_name.blank?)
+  def self.publish_update
+    PublishSite.order(:blog_id).each do |publish_site|
+      publish_site_id = publish_site.blog_id
+      publish_site_name = publish_site.path.gsub('/','')
+      publish_site_name = 'root' if(publish_site_name.blank?)
 
       # edits
-      postcount = BlogsBlogpost.repoint(blog_id)
-      database_name = BlogsBlogpost.connection.current_database
+      postcount = PublishSitePost.repoint(publish_site_id)
+      database_name = PublishSitePost.connection.current_database
       next if(postcount.nil? or postcount == 0)
-      next if(BlogsBlogpost.activity_entries.count == 0)
+      next if(PublishSitePost.activity_entries.count == 0)
       insert_values = []
-      BlogsBlogpost.includes(:blogs_user => :blogs_openid).activity_entries.each do |posting|
-        next if !(user = posting.blogs_user)
-        next if !(openid = user.blogs_openid)
+      PublishSitePost.includes(:publish_user => :publish_openid).activity_entries.each do |posting|
+        next if !(user = posting.publish_user)
+        next if !(openid = user.publish_openid)
         # the core app item is the "post" at a table level, bit shifted due to multiple tables
         item_id = (posting.post_parent != 0 ? posting.post_parent : posting.ID)
-        app_item_id = (( blog_id << 24 ) | item_id)
+        app_item_id = (( publish_site_id << 24 ) | item_id)
         source_id = posting.ID
         insert_list = []
         insert_list << posting.post_author # person_id
-        insert_list << APP_BLOGS # app_id
-        insert_list << ActiveRecord::Base.quote_value(APP_LABELS[APP_BLOGS])  # app_label
-        insert_list << APP_BLOGS_POSTS # app_source_type
-        insert_list << blog_id # section_id
+        insert_list << APP_PUBLISH # app_id
+        insert_list << ActiveRecord::Base.quote_value(APP_LABELS[APP_PUBLISH])  # app_label
+        insert_list << APP_PUBLISH_POSTS # app_source_type
+        insert_list << publish_site_id # section_id
         insert_list << ActiveRecord::Base.quote_value(blog_name)  # section_label
         insert_list << ACTIVITY_EDIT # activity_code
         insert_list <<  ActiveRecord::Base.quote_value(ACTIVITY_LABELS[ACTIVITY_EDIT]) # activity_label
         insert_list << app_item_id # app_item_id
         insert_list << posting.ID # source_id
-        insert_list << ActiveRecord::Base.quote_value('BlogsBlogpost') # source_model
-        insert_list << ActiveRecord::Base.quote_value("#{database_name}.#{BlogsBlogpost.table_name}") # source_table
+        insert_list << ActiveRecord::Base.quote_value('PublishSitePost') # source_model
+        insert_list << ActiveRecord::Base.quote_value("#{database_name}.#{PublishSitePost.table_name}") # source_table
         # fingerprint = person_id:app_id:section_id:activity_code:item_fingerprint:activity_at
         fingerprint_builder = []
         fingerprint_builder << posting.post_author
-        fingerprint_builder << APP_BLOGS
-        fingerprint_builder << blog_id
+        fingerprint_builder << APP_PUBLISH
+        fingerprint_builder << publish_site_id
         fingerprint_builder << ACTIVITY_EDIT
-        fingerprint_builder << (( blog_id << 24 ) | source_id )
-        fingerprint_builder << 'BlogsBlogpost'
+        fingerprint_builder << (( publish_site_id << 24 ) | source_id )
+        fingerprint_builder << 'PublishSitePost'
         fingerprint_builder << posting.post_date.to_s
         fingerprint = Digest::SHA1.hexdigest("#{fingerprint_builder.join(':')}")
         insert_list << ActiveRecord::Base.quote_value(fingerprint) # fingerprint
@@ -131,39 +134,39 @@ class AppActivity < ActiveRecord::Base
       end
 
 
-      commentcount = BlogsBlogcomment.repoint(blog_id)
-      database_name = BlogsBlogcomment.connection.current_database
+      commentcount = PublishSiteComment.repoint(publish_site_id)
+      database_name = PublishSiteComment.connection.current_database
       next if(commentcount.nil? or commentcount == 0)
-      next if (BlogsBlogcomment.user_activities.count == 0)
+      next if (PublishSiteComment.user_activities.count == 0)
       insert_values = []
-      BlogsBlogcomment.includes(:blogs_user => :blogs_openid).user_activities.each do |comment|
-        next if !(user = comment.blogs_user)
-        next if !(openid = user.blogs_openid)
+      PublishSiteComment.includes(:publish_user => :publish_openid).user_activities.each do |comment|
+        next if !(user = comment.publish_user)
+        next if !(openid = user.publish_openid)
         # the core app item is the "post" at a table level, bit shifted due to multiple tables
         item_id = comment.comment_post_ID
-        app_item_id = (( blog_id << 24 ) | item_id)
+        app_item_id = (( publish_site_id << 24 ) | item_id)
         source_id = comment.comment_ID
         insert_list = []
         insert_list << comment.user_id # person_id
-        insert_list << APP_BLOGS # app_id
-        insert_list << ActiveRecord::Base.quote_value(APP_LABELS[APP_BLOGS])  # app_label
-        insert_list << APP_BLOGS_COMMENTS # app_source_type
-        insert_list << blog_id # section_id
+        insert_list << APP_PUBLISH # app_id
+        insert_list << ActiveRecord::Base.quote_value(APP_LABELS[APP_PUBLISH])  # app_label
+        insert_list << APP_PUBLISH_COMMENTS # app_source_type
+        insert_list << publish_site_id # section_id
         insert_list << ActiveRecord::Base.quote_value(blog_name)  # section_label
         insert_list << ACTIVITY_COMMENT # activity_code
         insert_list <<  ActiveRecord::Base.quote_value(ACTIVITY_LABELS[ACTIVITY_COMMENT]) # activity_label
         insert_list << app_item_id # app_item_id
         insert_list << source_id # source_id
-        insert_list << ActiveRecord::Base.quote_value('BlogsBlogcomment') # source_model
-        insert_list << ActiveRecord::Base.quote_value("#{database_name}.#{BlogsBlogcomment.table_name}") # source_table
+        insert_list << ActiveRecord::Base.quote_value('PublishSiteComment') # source_model
+        insert_list << ActiveRecord::Base.quote_value("#{database_name}.#{PublishSiteComment.table_name}") # source_table
         # fingerprint = person_id:app_id:section_id:activity_code:item_fingerprint:activity_at
         fingerprint_builder = []
         fingerprint_builder << comment.user_id
-        fingerprint_builder << APP_BLOGS
-        fingerprint_builder << blog_id
+        fingerprint_builder << APP_PUBLISH
+        fingerprint_builder << publish_site_id
         fingerprint_builder << ACTIVITY_COMMENT
-        fingerprint_builder << (( blog_id << 24 ) | source_id )
-        fingerprint_builder << 'BlogsBlogcomment'
+        fingerprint_builder << (( publish_site_id << 24 ) | source_id )
+        fingerprint_builder << 'PublishSiteComment'
         fingerprint_builder << comment.comment_date.to_s
         fingerprint = Digest::SHA1.hexdigest("#{fingerprint_builder.join(':')}")
         insert_list << ActiveRecord::Base.quote_value(fingerprint) # fingerprint
@@ -183,8 +186,8 @@ class AppActivity < ActiveRecord::Base
         END_SQL
         self.connection.execute(insert_sql)
       end
-    end # blogs list
-  end  # blogs data import
+    end # publish site list
+  end  # publish data import
 
   def self.learn_activity_to_activity_code(learn_activity)
     case learn_activity

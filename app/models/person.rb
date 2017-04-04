@@ -1478,8 +1478,8 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def blogs_user
-    BlogsUser.where(ID: self.id).first
+  def publish_user
+    PublishUser.where(ID: self.id).first
   end
 
   def last_login_activity_for_site(site)
