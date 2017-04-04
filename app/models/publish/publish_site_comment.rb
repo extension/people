@@ -5,13 +5,13 @@
 #
 #  see LICENSE file
 
-class BlogsBlogcomment < ActiveRecord::Base
+class PublishSiteComment < ActiveRecord::Base
   # connects to the blogs database
-  self.establish_connection :blogs
+  self.establish_connection :publish
   self.table_name='wp_1_comments'
   self.primary_key = 'comment_ID'
 
-  belongs_to :blogs_user, foreign_key: 'user_id'
+  belongs_to :publish_user, foreign_key: 'user_id'
 
   scope :user_activities, lambda{where("user_id > 0").where('comment_approved = 1')}
 

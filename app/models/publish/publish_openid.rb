@@ -5,13 +5,13 @@
 #
 #  see LICENSE file
 
-class BlogsOpenid < ActiveRecord::Base
+class PublishOpenid < ActiveRecord::Base
   # connects to the blogs database
-  self.establish_connection :blogs
+  self.establish_connection :publish
   self.table_name='wp_openid_identities'
   self.primary_key = 'uurl_id'
 
-  belongs_to :blogs_user, foreign_key: 'user_id'
+  belongs_to :publish_user, foreign_key: 'user_id'
 
   attr_accessible :user_id, :url
 end
