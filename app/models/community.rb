@@ -82,6 +82,8 @@ class Community < ActiveRecord::Base
   has_many :community_syncs, :dependent => :destroy
   has_many :institutional_regions, :foreign_key => "institution_id", :dependent => :destroy
   has_many :extension_regions, :through => :institutional_regions
+  has_many :site_roles, as: :permissable
+
 
   scope :approved, where(entrytype: APPROVED)
   scope :institutions, where(entrytype: INSTITUTION)
@@ -319,7 +321,28 @@ class Community < ActiveRecord::Base
     self.google_groups.where(connectiontype: 'leaders').first
   end
 
+  def add_role_for_site(site,permission)
+    if(sr = SiteRole.where(permissable_id: self.id).where(permissable_type: self.class.name).where(site_id: site.id).first)
+      sr.update_attribute(:permission,permission)
+    else
+      self.site_roles.create(site: site, permission: permission)
+    end
+    # synchronize members
+    self.joined.each do |p|
+      p.synchronize_accounts
+    end
+  end
 
+
+  def remove_role_for_site(site)
+    if(sr = SiteRole.where(permissable: self).where(site_id: site.id).first)
+      sr.destroy
+    end
+    # synchronize members
+    self.joined.each do |p|
+      p.synchronize_accounts
+    end
+  end
 
 
 end
