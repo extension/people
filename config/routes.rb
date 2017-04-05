@@ -56,7 +56,7 @@ People::Application.routes.draw do
     simple_named_route 'resend_confirmation'
     simple_named_route 'set_password', via: [:post]
     simple_named_route 'display_eligibility_notice'
-    simple_named_route 'tou_notice', via: [:get,:post] 
+    simple_named_route 'tou_notice', via: [:get,:post]
   end
 
   resources :people, only: [:index, :show, :edit, :update] do
@@ -93,6 +93,7 @@ People::Application.routes.draw do
       post :edit_social_network
       post :delete_social_network
       get :personal_edit
+      get :tou_activity
     end
   end
 
@@ -128,6 +129,8 @@ People::Application.routes.draw do
       get :aliases
       get :google_apps_email
       get :google_groups
+      get :account_status
+      get :account_status_list
     end
   end
 
