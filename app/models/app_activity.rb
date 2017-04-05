@@ -189,6 +189,101 @@ class AppActivity < ActiveRecord::Base
     end # publish site list
   end  # publish data import
 
+  def self.homepage_update
+    # edits
+    database_name = HomepagePost.connection.current_database
+    insert_values = []
+    HomepagePost.includes(:homepage_user).activity_entries.each do |posting|
+      next if !(user = posting.homepage_user)
+      # the core app item is the "post" at a table level
+      item_id = (posting.post_parent != 0 ? posting.post_parent : posting.ID)
+      app_item_id = item_id
+      source_id = posting.ID
+      insert_list = []
+      insert_list << posting.post_author # person_id
+      insert_list << APP_HOMEPAGE # app_id
+      insert_list << ActiveRecord::Base.quote_value(APP_LABELS[APP_HOMEPAGE])  # app_label
+      insert_list << APP_HOMEPAGE_POSTS # app_source_type
+      insert_list << ACTIVITY_EDIT # activity_code
+      insert_list <<  ActiveRecord::Base.quote_value(ACTIVITY_LABELS[ACTIVITY_EDIT]) # activity_label
+      insert_list << app_item_id # app_item_id
+      insert_list << posting.ID # source_id
+      insert_list << ActiveRecord::Base.quote_value('HomepagePost') # source_model
+      insert_list << ActiveRecord::Base.quote_value("#{database_name}.#{HomepagePost.table_name}") # source_table
+      # fingerprint = person_id:app_id:section_id:activity_code:item_fingerprint:activity_at
+      fingerprint_builder = []
+      fingerprint_builder << posting.post_author
+      fingerprint_builder << APP_HOMEPAGE
+      fingerprint_builder << ACTIVITY_EDIT
+      fingerprint_builder << source_id
+      fingerprint_builder << 'HomepagePost'
+      fingerprint_builder << posting.post_date.to_s
+      fingerprint = Digest::SHA1.hexdigest("#{fingerprint_builder.join(':')}")
+      insert_list << ActiveRecord::Base.quote_value(fingerprint) # fingerprint
+      insert_list << ActiveRecord::Base.quote_value(posting.post_date.to_s(:db)) # activity_at
+      insert_list << ActiveRecord::Base.quote_value(Time.zone.now.to_s(:db)) # created_at
+      insert_values << "(#{insert_list.join(',')})"
+    end
+
+    if(insert_values.size > 0)
+      insert_sql = <<-END_SQL.gsub(/\s+/, " ").strip
+      INSERT IGNORE INTO #{self.table_name}
+      (person_id,app_id,app_label,app_source_type,
+       activity_code,activity_label,
+       app_item_id,source_id,source_model,source_table,
+       fingerprint,activity_at,created_at)
+      VALUES #{insert_values.join(',')};
+      END_SQL
+      self.connection.execute(insert_sql)
+    end
+
+    database_name = HomepageComment.connection.current_database
+    insert_values = []
+    HomepageComment.includes(:homepage_user).user_activities.each do |comment|
+      next if !(user = comment.homepage_user)
+      # the core app item is the "post" at a table level, bit shifted due to multiple tables
+      item_id = comment.comment_post_ID
+      app_item_id = item_id
+      source_id = comment.comment_ID
+      insert_list = []
+      insert_list << comment.user_id # person_id
+      insert_list << APP_HOMEPAGE # app_id
+      insert_list << ActiveRecord::Base.quote_value(APP_LABELS[APP_HOMEPAGE])  # app_label
+      insert_list << APP_HOMEPAGE_COMMENTS # app_source_type
+      insert_list << ACTIVITY_COMMENT # activity_code
+      insert_list <<  ActiveRecord::Base.quote_value(ACTIVITY_LABELS[ACTIVITY_COMMENT]) # activity_label
+      insert_list << app_item_id # app_item_id
+      insert_list << source_id # source_id
+      insert_list << ActiveRecord::Base.quote_value('HomepageComment') # source_model
+      insert_list << ActiveRecord::Base.quote_value("#{database_name}.#{HomepageComment.table_name}") # source_table
+      # fingerprint = person_id:app_id:section_id:activity_code:item_fingerprint:activity_at
+      fingerprint_builder = []
+      fingerprint_builder << comment.user_id
+      fingerprint_builder << APP_HOMEPAGE
+      fingerprint_builder << ACTIVITY_COMMENT
+      fingerprint_builder << source_id
+      fingerprint_builder << 'HomepageComment'
+      fingerprint_builder << comment.comment_date.to_s
+      fingerprint = Digest::SHA1.hexdigest("#{fingerprint_builder.join(':')}")
+      insert_list << ActiveRecord::Base.quote_value(fingerprint) # fingerprint
+      insert_list << ActiveRecord::Base.quote_value(comment.comment_date.to_s(:db)) # activity_at
+      insert_list << ActiveRecord::Base.quote_value(Time.zone.now.to_s(:db)) # created_at
+      insert_values << "(#{insert_list.join(',')})"
+    end
+
+    if(insert_values.size > 0)
+      insert_sql = <<-END_SQL.gsub(/\s+/, " ").strip
+      INSERT IGNORE INTO #{self.table_name}
+      (person_id,app_id,app_label,app_source_type,
+       activity_code,activity_label,
+       app_item_id,source_id,source_model,source_table,
+       fingerprint,activity_at,created_at)
+      VALUES #{insert_values.join(',')};
+      END_SQL
+      self.connection.execute(insert_sql)
+    end
+  end  # homepage data import
+
   def self.learn_activity_to_activity_code(learn_activity)
     case learn_activity
     when LearnEventActivity::ANSWER
