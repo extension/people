@@ -50,6 +50,18 @@ class Person < ActiveRecord::Base
   STATUS_TOU_HALT      = 24
   STATUS_CONTRIBUTOR   = 42
 
+  STATUS_STRINGS = {
+    STATUS_PLACEHOLDER => 'Placeholder',
+    STATUS_SIGNUP => 'Waiting Signup Confirmation',
+    STATUS_REVIEW => 'Account Review',
+    STATUS_CONFIRM_EMAIL => 'Waiting Email Confirmation',
+    STATUS_TOU_PENDING => 'Terms of Use Pending',
+    STATUS_TOU_GRACE => 'Terms of Use Grace Login',
+    STATUS_TOU_HALT => 'Terms of Use Halted',
+    STATUS_CONTRIBUTOR => 'Contributor'
+  }
+
+
 
 
 
@@ -119,9 +131,10 @@ class Person < ActiveRecord::Base
 
   ## scopes
   scope :retired, -> {where(retired: true)}
+  scope :not_retired, -> {where(retired: false)}
   scope :vouched, -> {where(vouched: true)}
   scope :email_confirmed, -> {where(email_confirmed: true)}
-  scope :validaccounts, -> {where("retired = #{false} and vouched = #{true}")}
+  scope :validaccounts, -> {not_retired.vouched}
   scope :pendingreview, -> {where("retired = #{false} and vouched = #{false} and account_status != #{STATUS_SIGNUP} && email_confirmed = #{true}")}
   scope :not_system, -> {where("people.is_systems_account = ?",false)}
   scope :display_accounts, validaccounts.not_system
@@ -129,7 +142,7 @@ class Person < ActiveRecord::Base
   scope :active, -> { where('DATE(last_activity_at) >= ?',Date.today - Settings.months_for_inactive_flag.months) }
   scope :reminder_pool, -> { display_accounts.inactive.where('(last_account_reminder IS NULL or last_account_reminder <= ?)',Time.now.utc - Settings.months_for_inactive_flag.months).limit(Settings.inactive_limit) }
   scope :google_apps_email, -> {where(google_apps_email: true)}
-
+  scope :tou_accepted, ->{where("tou_accepted_at IS NOT NULL")}
 
   # duplicated from darmok
   # TODO - sanity check this

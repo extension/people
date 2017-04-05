@@ -476,6 +476,11 @@ class PeopleController < ApplicationController
     end
   end
 
+  def tou_activity
+    @activities = Activity.tou.order('created_at DESC').page(params[:page])
+  end
+
+
   def authsummary
     @person = Person.find_by_email_or_idstring_or_id(params[:id])
     member_breadcrumbs(['Authentication Summary'])

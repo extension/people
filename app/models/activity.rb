@@ -15,7 +15,6 @@ class Activity < ActiveRecord::Base
   attr_accessible :person, :person_id, :site, :activityclass, :activitycode, :reasoncode,  :additionalinfo, :additionaldata
   attr_accessible :ip_address, :community, :community_id, :colleague_id, :colleague, :is_private
 
-  scope :site_logins, -> {where(activitycode: AUTH_REMOTE_SUCCESS)}
 
  ## constants
   #### activity types
@@ -64,6 +63,7 @@ class Activity < ActiveRecord::Base
   TOU_NEXT_LOGIN                      = 132
   TOU_HALT                            = 133
   TOU_ACCEPTED                        = 134
+
 
   # COMMUNITY
   COMMUNITY_CREATE                    = 200
@@ -132,6 +132,7 @@ class Activity < ActiveRecord::Base
 
 
   PRIVATE_ACTIVITIES = [AUTH_LOCAL_FAILURE,PASSWORD_RESET_REQUEST,PASSWORD_RESET,PASSWORD_CHANGE]
+  TOU_ACTIVITY = [TOU_HALT,TOU_ACCEPTED,TOU_NEXT_LOGIN,TOU_PRESENTED]
 
   ## validations
 
@@ -146,9 +147,11 @@ class Activity < ActiveRecord::Base
   belongs_to :community
 
   ## scopes
-  scope :related_to_person, lambda{|person| where("person_id = ? or colleague_id = ?",person.id,person.id)}
-  scope :public_activity, lambda{where(is_private: false)}
-  scope :community, where("activitycode >= ? and activitycode <= ?",COMMUNITY_RANGE.first, COMMUNITY_RANGE.last)
+  scope :related_to_person, -> (person){where("person_id = ? or colleague_id = ?",person.id,person.id)}
+  scope :public_activity, -> {where(is_private: false)}
+  scope :community, -> {where("activitycode >= ? and activitycode <= ?",COMMUNITY_RANGE.first, COMMUNITY_RANGE.last)}
+  scope :site_logins, -> {where(activitycode: AUTH_REMOTE_SUCCESS)}
+  scope :tou, -> {where("activitycode IN (#{TOU_ACTIVITY.join(',')})")}
 
   def check_privacy_flag
     if(PRIVATE_ACTIVITIES.include?(self.activitycode))

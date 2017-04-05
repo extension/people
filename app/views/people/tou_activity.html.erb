@@ -1,0 +1,75 @@
+<%- @page_title = "Colleague Terms of Use Activity" -%>
+
+<div class="page-header">
+  <h2><%= @page_title %></h2>
+</div>
+
+<%- if !@activities.blank? -%>
+<div class="row">
+  <div class="col-md-12">
+    <%= page_entries_info @activities %>
+    <%= paginate(@activities) %>
+    <table class="table">
+      <thead>
+        <tr>
+        <th>&nbsp;</th>
+        <th>Date/Time</th>
+        <th>Description</th>
+        <%- if(current_person.is_admin? or (!@person.blank? and @person == current_person)) -%>
+          <th><i class='fa fa-lock'></i> IP Address</th>
+        <%- end -%>
+        </tr>
+      </thead>
+
+      <tbody>
+      <%- for activity in @activities -%>
+        <tr id="activity_row_<%= activity.id %>">
+          <%- if(activity.is_private?) -%>
+            <td><i class='fa fa-lock'></i></td>
+          <%- else -%>
+            <td>&nbsp;</td>
+          <%- end -%>
+          <td><%= display_time(activity.created_at) %></td>
+
+          <td>
+          <%- if(@person and activity.person_id == @person.id) -%>
+            <%= activity_to_s(activity, {hide_person_text: true}) %>
+          <%- else -%>
+            <%= activity_to_s(activity) %>
+          <%- end -%>
+
+          <%-
+            begin
+              what_changed = activity.additionaldata[:what_changed]
+            rescue
+              what_changed = nil
+            end
+          -%>
+          <%- if [Activity::UPDATE_PROFILE,Activity::UPDATE_COLLEAGUE_PROFILE].include?(activity.activitycode) and activity.additionaldata and what_changed -%>
+               <%= link_to("(details)".html_safe,
+                '#',
+                id: "detailstoggler_#{activity.id}",
+                data: {toggle: 'collapse', target: "#showdetails_#{activity.id}"}) %>
+
+          <div id="showdetails_<%= activity.id %>" class="collapse">
+            <ul class='list-unstyled'>
+              <%- profile_changes(what_changed).each do |change| -%>
+                <li><%= change %></li>
+              <%- end -%>
+            </ul>
+          </div>
+          <%- end -%>
+          </td>
+
+          <%- if(current_person.is_admin?) -%>
+            <td><%= link_to(activity.ip_address,activity_people_path(ip: activity.ip_address)) %></td>
+          <%- elsif(!@person.blank? and @person == current_person) -%>
+            <td><%= activity.ip_address %></td>
+          <%- end -%>
+        </tr>
+      <%- end -%>
+      </tbody>
+    </table>
+  </div>
+</div>
+<%- end -%>
