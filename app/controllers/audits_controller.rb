@@ -22,10 +22,19 @@ class AuditsController < ApplicationController
   def google_groups
   end
 
+  def account_status
+    @status_counts = Person.not_system.not_retired.group(:account_status).count
+  end
+
+  def account_status_list
+    @status_label = Person::STATUS_STRINGS[params[:account_status].to_i]
+    @account_list = Person.not_system.not_retired.where(account_status: params[:account_status]).page(params[:page]).order('last_name ASC')
+  end
+
   private
 
   def set_tab
-    @selected_tab = 'aliases'
+    @selected_tab = 'audits'
   end
 
 end

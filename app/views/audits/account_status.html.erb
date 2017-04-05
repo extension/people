@@ -1,0 +1,18 @@
+<%- @page_title = "Account Status Counts" -%>
+
+<div class="page-header">
+  <h2><%= @page_title %></h2>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <table class="table table-striped">
+    <%- Person::STATUS_STRINGS.each do |status,label| -%>
+      <tr>
+        <td><%= link_to(label,account_status_list_audits_path(account_status: status)) -%></td>
+        <td><%= @status_counts[status].blank? ? 0 : @status_counts[status] -%></td>
+      </tr>
+    <%- end -%>
+    </table>
+  </div>
+</div>

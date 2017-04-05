@@ -1,0 +1,51 @@
+<%- @page_title = "Colleagues By Account Status" -%>
+
+<div class="page-header">
+  <h2><%= @page_title %></h2>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class='alert alert-info'>
+      <p>Account Status: <%= @status_label -%></p>
+    </div>
+  </div>
+</div>
+
+
+<%- if !@account_list.blank? -%>
+<div class="row">
+  <div class="col-md-12">
+    <%= page_entries_info @account_list %>
+    <%= paginate(@account_list) %>
+
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+        <th>Name</th>
+        <th>ID string</th>
+        <th>Email</th>
+        <th>Institution</th>
+        <th>Other Affiliation</th>
+        <th>Location</th>
+        <th>&nbsp;</th>
+        </tr>
+      </thead>
+
+      <tbody>
+      <%- for person in @account_list -%>
+        <tr id="person_row_<%= person.id %>" class="<%= status_class(person) %>">
+          <td><%= link_to_person(person) %></td>
+          <td><%= person.idstring %></td>
+          <td><%= person.display_email %></td>
+          <td><%= primary_institution_name_for_person(person,'<span class="na">not specified</span>') %></td>
+          <td><%= (person.affiliation.blank?) ? '<span class="na">&nbsp;</span>'.html_safe : person.affiliation %></td>
+          <td><%= (person.location.nil?) ? '<span class="na">n/a</span>'.html_safe : person.location.abbreviation %></td>
+          <td><%= status_icon(person) %></td>
+        </tr>
+      <%- end -%>
+      </tbody>
+    </table>
+  </div>
+</div>
+<%- end -%>
