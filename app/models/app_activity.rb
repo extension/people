@@ -288,11 +288,11 @@ class AppActivity < ActiveRecord::Base
   def self.learn_activity_to_activity_code(learn_activity)
     case learn_activity
     when LearnEventActivity::ANSWER
-      ACTIVITY_ANSWER
+      ACTIVITY_OTHER
     when LearnEventActivity::RATING
-      ACTIVITY_RATING
+      ACTIVITY_OTHER
     when LearnEventActivity::RATING_ON_COMMENT
-      ACTIVITY_RATING
+      ACTIVITY_OTHER
     when LearnEventActivity::COMMENT
       ACTIVITY_COMMENT
     when LearnEventActivity::COMMENT_ON_COMMENT
@@ -304,7 +304,7 @@ class AppActivity < ActiveRecord::Base
     when LearnEventActivity::CONNECT_WATCH
       ACTIVITY_WATCH
     else
-      ACTIVITY_GENERIC
+      ACTIVITY_OTHER
     end
   end
 
@@ -572,6 +572,78 @@ class AppActivity < ActiveRecord::Base
         fingerprint = Digest::SHA1.hexdigest("#{fingerprint_builder.join(':')}")
         insert_list << ActiveRecord::Base.quote_value(fingerprint) # fingerprint
         insert_list << ActiveRecord::Base.quote_value(comment.created_at.to_s(:db)) # activity_at
+        insert_list << ActiveRecord::Base.quote_value(Time.zone.now.to_s(:db)) # created_at
+        insert_values << "(#{insert_list.join(',')})"
+      end
+
+      if(insert_values.size > 0)
+        insert_sql = <<-END_SQL.gsub(/\s+/, " ").strip
+        INSERT IGNORE INTO #{self.table_name}
+        (person_id,app_id,app_label,app_source_type,
+         activity_code,activity_label,
+         app_item_id,source_id,source_model,source_table,
+         fingerprint,activity_at,created_at)
+        VALUES #{insert_values.join(',')};
+        END_SQL
+        self.connection.execute(insert_sql)
+      end
+    end
+  end
+
+  def self.ask_activity_to_activity_code(ask_activity)
+    if(ask_activity == AskQuestionEvent::RESOLVED)
+      ACTIVITY_ANSWER
+    elsif(AskQuestionEvent::GENERAL_HANDLING_EVENTS.include?(ask_activity))
+      ACTIVITY_HANDLED
+    elsif(ask_activity == AskQuestionEvent::INTERNAL_COMMENT)
+      ACTIVITY_COMMENT
+    elsif([AskQuestionEvent::EDIT_QUESTION,AskQuestionEvent::EXPERT_EDIT_QUESTION,AskQuestionEvent::EXPERT_EDIT_RESPONSE].include?(ask_activity))
+      ACTIVITY_EDIT
+    else
+      ACTIVITY_OTHER
+    end
+  end
+
+  def self.ask_update
+    self.ask_questionevent_update
+  end
+
+  def self.ask_questionevent_update
+    database_name = AskQuestionEvent.connection.current_database
+    # revisions
+    if(!get_since = self.where(source_model: 'AskQuestionEvent').maximum(:activity_at))
+      get_since = AskQuestionEvent.minimum(:created_at)
+    end
+    AskQuestionEvent.includes(:initiator).where("created_at >= ?",get_since).find_in_batches do |group|
+      insert_values = []
+      group.each do |question_event|
+        next if !(ask_user = question_event.initiator)
+        next if ask_user.darmok_id.blank?
+        # the core app item is the question
+        app_item_id = question_event.question_id
+        source_id = question_event.id
+        insert_list = []
+        insert_list << ask_user.darmok_id # person_id
+        insert_list << APP_ASK # app_id
+        insert_list << ActiveRecord::Base.quote_value(APP_LABELS[APP_ASK])  # app_label
+        insert_list << APP_ASK_QUESTIONEVENTS # app_source_type
+        activity_code = self.ask_activity_to_activity_code(question_event.event_state)
+        insert_list << activity_code # activity_code
+        insert_list <<  ActiveRecord::Base.quote_value(ACTIVITY_LABELS[activity_code]) # activity_label
+        insert_list << app_item_id # app_item_id
+        insert_list << source_id # source_id
+        insert_list << ActiveRecord::Base.quote_value('AskQuestionEvent') # source_model
+        insert_list << ActiveRecord::Base.quote_value("#{database_name}.#{AskQuestionEvent.table_name}") # source_table
+        fingerprint_builder = []
+        fingerprint_builder << ask_user.darmok_id
+        fingerprint_builder << APP_CREATE
+        fingerprint_builder << activity_code
+        fingerprint_builder << source_id
+        fingerprint_builder << 'AskQuestionEvent'
+        fingerprint_builder << question_event.created_at.to_s
+        fingerprint = Digest::SHA1.hexdigest("#{fingerprint_builder.join(':')}")
+        insert_list << ActiveRecord::Base.quote_value(fingerprint) # fingerprint
+        insert_list << ActiveRecord::Base.quote_value(question_event.created_at.to_s(:db)) # activity_at
         insert_list << ActiveRecord::Base.quote_value(Time.zone.now.to_s(:db)) # created_at
         insert_values << "(#{insert_list.join(',')})"
       end
