@@ -47,30 +47,31 @@ class AppActivity < ActiveRecord::Base
   }
 
   # activities
-  ACTIVITY_GENERIC = 0
-  ACTIVITY_EDIT = 1
-  ACTIVITY_COMMENT = 2
-  ACTIVITY_BOOKMARK = 3
-  ACTIVITY_ATTEND = 4
-  ACTIVITY_WATCH = 5
-  ACTIVITY_RATING = 6
-  ACTIVITY_ANSWER = 7
-  ACTIVITY_REVIEW = 8
-  ACTIVITY_PUBLISH = 9
-  ACTIVITY_WORKFLOW = 10
+  ACTIVITY_OTHER = 1
+  ACTIVITY_EDIT = 2
+  ACTIVITY_COMMENT = 3
+  ACTIVITY_BOOKMARK = 4
+  ACTIVITY_ATTEND = 5
+  ACTIVITY_WATCH = 6
+  ACTIVITY_REVIEW = 7
+  ACTIVITY_PUBLISH = 8
+  ACTIVITY_WORKFLOW = 9
+  ACTIVITY_ANSWER = 10
+  ACTIVITY_HANDLED = 11
+
 
   ACTIVITY_LABELS = {
-    ACTIVITY_GENERIC => 'activity',
+    ACTIVITY_OTHER => 'other activity',
     ACTIVITY_EDIT => 'edit',
     ACTIVITY_COMMENT => 'comment',
     ACTIVITY_BOOKMARK => 'bookmark',
     ACTIVITY_ATTEND => 'attend',
     ACTIVITY_WATCH => 'watch',
-    ACTIVITY_RATING => 'rating',
-    ACTIVITY_ANSWER => 'answer',
     ACTIVITY_REVIEW => 'review',
     ACTIVITY_PUBLISH => 'publish',
-    ACTIVITY_WORKFLOW => 'workflow'
+    ACTIVITY_WORKFLOW => 'workflow',
+    ACTIVITY_ANSWER => 'answer',
+    ACTIVITY_HANDLED => 'handled'
   }
 
   def self.publish_update
