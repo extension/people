@@ -636,7 +636,7 @@ class AppActivity < ActiveRecord::Base
         insert_list << ActiveRecord::Base.quote_value("#{database_name}.#{AskQuestionEvent.table_name}") # source_table
         fingerprint_builder = []
         fingerprint_builder << ask_user.darmok_id
-        fingerprint_builder << APP_CREATE
+        fingerprint_builder << APP_ASK
         fingerprint_builder << activity_code
         fingerprint_builder << source_id
         fingerprint_builder << 'AskQuestionEvent'
