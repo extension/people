@@ -34,6 +34,9 @@ class AppActivity < ActiveRecord::Base
 
   APP_ASK_QUESTIONEVENTS = 201
 
+  # APP_PEOPLE_ACTIVITY    = 801
+
+
   # tracked application labels
   APP_LABELS = {
     APP_ARTICLES => 'articles',
@@ -58,6 +61,10 @@ class AppActivity < ActiveRecord::Base
   ACTIVITY_WORKFLOW = 9
   ACTIVITY_ANSWER = 10
   ACTIVITY_HANDLED = 11
+  # ACTIVITY_LOGIN = 12
+  # ACTIVITY_PROFILE = 13
+  # ACTIVITY_COLLEAGUE_PROFILE = 14
+  # ACTIVITY_GROUP = 15
 
 
   ACTIVITY_LABELS = {
@@ -72,6 +79,10 @@ class AppActivity < ActiveRecord::Base
     ACTIVITY_WORKFLOW => 'workflow',
     ACTIVITY_ANSWER => 'answer',
     ACTIVITY_HANDLED => 'handled'
+    # ACTIVITY_LOGIN => 'login',
+    # ACTIVITY_PROFILE => 'profile',
+    # ACTIVITY_COLLEAGUE_PROFILE => 'colleague profile',
+    # ACTIVITY_GROUP => 'group'
   }
 
   def self.publish_update
@@ -662,7 +673,7 @@ class AppActivity < ActiveRecord::Base
     end
   end
 
-
+  # todo? merge in People Activity?
 
   def self.periodic_activity_by_person_id(options = {})
     returndata = {}
