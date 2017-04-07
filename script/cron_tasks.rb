@@ -51,6 +51,13 @@ class CronTasks < Thor
       puts "Cleared passwords for the following retired accounts: #{idlist.join(', ')}"
     end
 
+    def import_activity
+      puts "Importing activity..."
+      results = ActivityImport.go_and_import('all')
+      results.each do |item,result|
+        puts "  #{item} #{result ? 'success' : 'failed'}"
+      end
+    end
   end
 
   desc "daily", "All daily cron tasks"
@@ -62,6 +69,7 @@ class CronTasks < Thor
     cleanup_invitations
     expire_passwords
     create_account_reminders
+    import_activity
   end
 
   desc "hourly", "All hourly cron tasks"
