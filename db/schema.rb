@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20170330183757) do
+ActiveRecord::Schema.define(:version => 20170407122920) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -43,6 +43,18 @@ ActiveRecord::Schema.define(:version => 20170330183757) do
 
   add_index "activities", ["created_at", "person_id", "activityclass", "activitycode", "reasoncode", "community_id"], :name => "recordsignature"
   add_index "activities", ["ip_address"], :name => "ip_ndx"
+
+  create_table "activity_imports", :force => true do |t|
+    t.string   "item"
+    t.string   "operation"
+    t.datetime "started"
+    t.datetime "finished"
+    t.float    "run_time"
+    t.boolean  "success"
+    t.text     "additionaldata"
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
+  end
 
   create_table "admin_roles", :force => true do |t|
     t.integer  "person_id"

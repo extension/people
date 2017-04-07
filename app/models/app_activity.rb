@@ -85,7 +85,7 @@ class AppActivity < ActiveRecord::Base
     # ACTIVITY_GROUP => 'group'
   }
 
-  def self.publish_update
+  def self.publish_post_activity_import
     PublishSite.order(:blog_id).each do |publish_site|
       publish_site_id = publish_site.blog_id
       publish_site_name = publish_site.path.gsub('/','')
@@ -145,6 +145,15 @@ class AppActivity < ActiveRecord::Base
         self.connection.execute(insert_sql)
       end
 
+    end # publish site list
+  end  # publish data import
+
+  def self.publish_comment_activity_import
+
+    PublishSite.order(:blog_id).each do |publish_site|
+      publish_site_id = publish_site.blog_id
+      publish_site_name = publish_site.path.gsub('/','')
+      publish_site_name = 'root' if(publish_site_name.blank?)
 
       commentcount = PublishSiteComment.repoint(publish_site_id)
       database_name = PublishSiteComment.connection.current_database
@@ -201,7 +210,7 @@ class AppActivity < ActiveRecord::Base
     end # publish site list
   end  # publish data import
 
-  def self.homepage_update
+  def self.homepage_post_activity_import
     # edits
     database_name = HomepagePost.connection.current_database
     insert_values = []
@@ -248,7 +257,9 @@ class AppActivity < ActiveRecord::Base
       END_SQL
       self.connection.execute(insert_sql)
     end
+  end
 
+  def self.homepage_comment_activity_import
     database_name = HomepageComment.connection.current_database
     insert_values = []
     HomepageComment.includes(:homepage_user).user_activities.each do |comment|
@@ -319,12 +330,7 @@ class AppActivity < ActiveRecord::Base
     end
   end
 
-  def self.learn_update
-    self.learn_event_activities_update
-    self.learn_versions_update
-  end
-
-  def self.learn_event_activities_update
+  def self.learn_event_activity_import
     # learn event activity
     database_name = LearnEventActivity.connection.current_database
     LearnEventActivity.includes(:learner).where("activity IN (#{LearnEventActivity::TRANSFERRED_ACTIVITY.join(',')})").find_in_batches do |group|
@@ -375,7 +381,7 @@ class AppActivity < ActiveRecord::Base
     end
   end
 
-  def self.learn_versions_update
+  def self.learn_versions_activity_import
     # learn edit activity
     database_name = LearnVersion.connection.current_database
     LearnVersion.includes(:learner).where("item_type = 'Event'").find_in_batches do |group|
@@ -425,12 +431,6 @@ class AppActivity < ActiveRecord::Base
     end
   end
 
-  def self.create_update
-    self.create_revisions_update
-    self.create_workflow_events_update
-    self.create_comments_update
-  end
-
   def self.create_workflow_activity_to_activity_code(cwe_activity)
     if(CreateWorkflowEvent::REVIEWED_EVENTS.include?(cwe_activity))
       ACTIVITY_REVIEW
@@ -441,7 +441,7 @@ class AppActivity < ActiveRecord::Base
     end
   end
 
-  def self.create_revisions_update
+  def self.create_revisions_activity_import
     database_name = CreateRevision.connection.current_database
     # revisions
     if(get_since = self.where(source_model: 'CreateRevision').maximum(:activity_at))
@@ -494,7 +494,7 @@ class AppActivity < ActiveRecord::Base
     end
   end
 
-  def self.create_workflow_events_update
+  def self.create_workflow_events_activity_import
     database_name = CreateWorkflowEvent.connection.current_database
     # workflow events
     if(get_since = self.where(source_model: 'CreateWorkflowEvent').maximum(:activity_at))
@@ -548,7 +548,7 @@ class AppActivity < ActiveRecord::Base
     end
   end
 
-  def self.create_comments_update
+  def self.create_comments_activity_import
     # comments
     database_name = CreateComment.connection.current_database
     if(get_since = self.where(source_model: 'CreateComment').maximum(:activity_at))
@@ -615,11 +615,7 @@ class AppActivity < ActiveRecord::Base
     end
   end
 
-  def self.ask_update
-    self.ask_questionevent_update
-  end
-
-  def self.ask_questionevent_update
+  def self.ask_questionevent_activity_import
     database_name = AskQuestionEvent.connection.current_database
     # revisions
     if(!get_since = self.where(source_model: 'AskQuestionEvent').maximum(:activity_at))
