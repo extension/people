@@ -29,7 +29,7 @@
         </tr>
 
       <%- case eq.responsetype -%>
-      <%- when AaeEvaluationQuestion::SCALE -%>
+      <%- when AskEvaluationQuestion::SCALE -%>
         <%- (eq.range_start..eq.range_end).each do |value| -%>
         <tr>
           <td>
@@ -47,7 +47,7 @@
           </td>
         </tr>
         <%- end -%>
-      <%- when AaeEvaluationQuestion::MULTIPLE_CHOICE -%>
+      <%- when AskEvaluationQuestion::MULTIPLE_CHOICE -%>
         <%- (eq.responses).each_with_index do |response,index| -%>
         <tr>
           <td>
@@ -59,7 +59,7 @@
           </td>
         </tr>
         <%- end -%>
-      <%- when AaeEvaluationQuestion::OPEN_DOLLAR_VALUE -%>
+      <%- when AskEvaluationQuestion::OPEN_DOLLAR_VALUE -%>
         <%- (response_data[:labels]).each_with_index do |bin,index| -%>
         <tr>
           <td>

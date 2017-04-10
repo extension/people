@@ -5,9 +5,9 @@
 #
 #  see LICENSE file
 
-class BlogsBlog < ActiveRecord::Base
+class PublishSite < ActiveRecord::Base
   # connects to the blogs database
-  self.establish_connection :blogs
+  self.establish_connection :publish
   self.table_name='wp_blogs'
   self.primary_key = 'blog_id'
 
@@ -15,7 +15,7 @@ class BlogsBlog < ActiveRecord::Base
   def access_list
     returnhash = {}
     meta_key = "wp_#{self.blog_id}_capabilities"
-    if(usermeta_group = BlogsUsermeta.where(meta_key: meta_key))
+    if(usermeta_group = PublishUsermeta.where(meta_key: meta_key))
       usermeta_group.each do |bum|
         if(person = Person.where(id: bum.user_id).first)
           permission = PHP.unserialize(bum.meta_value)

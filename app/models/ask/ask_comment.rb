@@ -5,8 +5,11 @@
 #
 #  see LICENSE file
 
-class DarmokPublishingCommunity < ActiveRecord::Base
+class AskComment < ActiveRecord::Base
   # connects to the darmok database
-  self.establish_connection :darmok
-  self.table_name= 'publishing_communities'
+  self.establish_connection :aae
+  self.table_name='comments'
+
+  belongs_to :question, class_name: 'AskQuestion'
+
 end

@@ -45,9 +45,9 @@ class AccountSync < ActiveRecord::Base
 
   def sync_ask(site)
     update_database = site.sync_database
-    if(aae_user = AaeUser.find_by_darmok_id(self.person_id))
+    if(aae_user = AskUser.find_by_darmok_id(self.person_id))
       self.connection.execute(aae_update_query(site))
-    elsif(aae_user = AaeUser.find_by_email(self.person.email))
+    elsif(aae_user = AskUser.find_by_email(self.person.email))
       self.connection.execute(aae_conversion_query(site))
     else
       self.connection.execute(aae_insert_query(site))

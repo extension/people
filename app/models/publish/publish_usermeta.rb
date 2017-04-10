@@ -5,13 +5,13 @@
 #
 #  see LICENSE file
 
-class BlogsUsermeta < ActiveRecord::Base
+class PublishUsermeta < ActiveRecord::Base
   # connects to the blogs database
-  self.establish_connection :blogs
+  self.establish_connection :publish
   self.table_name='wp_usermeta'
   self.primary_key = 'umeta_id'
 
-  belongs_to :blogs_user, foreign_key: 'user_id'
+  belongs_to :publish_user, foreign_key: 'user_id'
 
   attr_accessible :user_id, :meta_key, :meta_value
 

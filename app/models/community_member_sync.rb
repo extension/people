@@ -44,7 +44,7 @@ class CommunityMemberSync < ActiveRecord::Base
     if(!self.processed?)
       begin
         self.create_database
-        self.blogs_database
+        self.publish_database
         self.update_attributes({processed: true, success: true})
       rescue StandardError => e
         self.update_attributes({processed: true, success: false, errors: e.message})
@@ -52,16 +52,16 @@ class CommunityMemberSync < ActiveRecord::Base
     end
   end
 
-  def blogs_database
+  def publish_database
     person = self.person
     community = self.community
     return if(community.blog_id.nil?)
-    if(bb = BlogsBlog.find(community.blog_id) and bu = person.blogs_user)
+    if(ps = PublishSite.find(community.blog_id) and pu = person.publish_user)
       connection = person.connection_with_community(community)
       if(['leader','member'].include?(connection))
-        bu.add_to_blog(bb,connection)
+        pu.add_to_publish_site(ps,connection)
       else
-        bu.remove_from_blog(bb)
+        pu.remove_from_publish_site(ps)
       end
     end
   end

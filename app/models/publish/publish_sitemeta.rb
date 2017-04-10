@@ -5,24 +5,24 @@
 #
 #  see LICENSE file
 
-class BlogsSitemeta < ActiveRecord::Base
+class PublishSitemeta < ActiveRecord::Base
   # connects to the blogs database
-  self.establish_connection :blogs
+  self.establish_connection :publish
   self.table_name='wp_sitemeta'
   self.primary_key = 'meta_id'
 
   attr_accessible :site_id, :meta_key, :meta_value
-  BLOGS_CORE_SITE = 1
+  PUBLISH_CORE_SITE = 1
 
 
-  def self.site_administrators(site_id = BLOGS_CORE_SITE)
+  def self.site_administrators(site_id = PUBLISH_CORE_SITE)
     if(bsm = self.where(site_id: site_id).where(meta_key: 'site_admins').first)
       list = PHP.unserialize(bsm.meta_value)
     end
     return list
   end
 
-  def self.add_site_administrator(idstring,site_id = BLOGS_CORE_SITE)
+  def self.add_site_administrator(idstring,site_id = PUBLISH_CORE_SITE)
     if(list = self.site_administrators)
       list << idstring
       list.uniq!
@@ -34,7 +34,7 @@ class BlogsSitemeta < ActiveRecord::Base
     return false
   end
 
-  def self.remove_site_administrator(idstring,site_id = BLOGS_CORE_SITE)
+  def self.remove_site_administrator(idstring,site_id = PUBLISH_CORE_SITE)
     if(list = self.site_administrators)
       list.delete_if{|entry| entry == idstring}
       list.uniq!

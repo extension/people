@@ -128,6 +128,10 @@ class Person < ActiveRecord::Base
   has_many :interests, through: :person_interests
   has_many :site_roles, as: :permissable
 
+  # cross-database associations
+  has_one :ask_user, class_name: 'AskUser', :foreign_key => "darmok_id"
+  has_one :learn_learner, class_name: 'LearnLearner', :foreign_key => "darmok_id"
+
 
   ## scopes
   scope :retired, -> {where(retired: true)}
@@ -1244,7 +1248,7 @@ class Person < ActiveRecord::Base
   def aae_id
     if(id_value = read_attribute(:aae_id))
       id_value
-    elsif(id_value = AaeUser.where(darmok_id: self.id).pluck(:id).first)
+    elsif(id_value = AskUser.where(darmok_id: self.id).pluck(:id).first)
       self.update_column(:aae_id,id_value)
       id_value
     else
@@ -1408,46 +1412,6 @@ class Person < ActiveRecord::Base
     self.synchronize_accounts
   end
 
-  def update_blogs_user
-
-    # note, because blogs.extension.org does not currently
-    # match up to user_id = this method intentionally keys
-    # off idstring, and provides yet another reason idstrings
-    # can't be changed
-
-    if(!blogsuser = BlogsUser.where(user_login: self.idstring).first)
-      blogsuser = BlogsUser.create(user_login: self.idstring,
-                                   user_pass: Settings.create_password_string,
-                                   user_nicename: self.idstring,
-                                   user_email: self.email,
-                                   user_registered: self.created_at,
-                                   display_name: self.fullname)
-    else
-      blogsuser.update_attributes(user_pass: Settings.create_password_string,
-                                  user_nicename: self.idstring,
-                                  user_email: self.email,
-                                  user_registered: self.created_at,
-                                  display_name: self.fullname)
-    end
-
-    if(!blogsuser.blogs_openid)
-      blogsuser.create_blogs_openid(url: self.openid_url)
-    end
-
-    blogsuser
-  end
-
-  def add_to_blog(blog_name, role)
-    # find the blog first
-    if(!blog = BlogsBlog.where(path: "/#{blog_name}/").first)
-      return nil
-    end
-
-    # insert / update user
-    blogsuser = self.update_blogs_user
-    blogsuser.add_to_blog(blog, role)
-  end
-
   def present_tou_interstitial?
     if(Date.today >= EpochDate::TOU_START_DATE)
       !self.tou_accepted?
@@ -1527,8 +1491,8 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def blogs_user
-    BlogsUser.where(ID: self.id).first
+  def publish_user
+    PublishUser.where(ID: self.id).first
   end
 
   def last_login_activity_for_site(site)
