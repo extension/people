@@ -7,7 +7,7 @@
 
 class AskEvaluationQuestion < ActiveRecord::Base
   include CacheTools
-  extend YearWeek
+  #extend YearWeek
 
   # connects to the aae database
   self.establish_connection :aae
