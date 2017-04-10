@@ -8,7 +8,7 @@ require 'csv'
 
 class AskQuestion < ActiveRecord::Base
   include CacheTools
-  extend YearWeek
+  #extend YearWeek
 
   # connects to the aae database
   self.establish_connection :aae
@@ -20,13 +20,13 @@ class AskQuestion < ActiveRecord::Base
 
 ## constants
 
-  # status numbers (for status_state)     
+  # status numbers (for status_state)
   STATUS_SUBMITTED = 1
   STATUS_RESOLVED = 2
   STATUS_NO_ANSWER = 3
   STATUS_REJECTED = 4
   STATUS_CLOSED = 5
-  
+
   # status text (to be used when a text version of the status is needed)
   STATUS_TEXT = {
     STATUS_SUBMITTED => 'submitted',
@@ -63,8 +63,8 @@ class AskQuestion < ActiveRecord::Base
   belongs_to :initial_response,  class_name: 'AskResponse', :foreign_key => "initial_response_id"
 
   has_many :responses, class_name: 'AskResponse', foreign_key: 'question_id'
-  has_many :evaluation_answers, class_name: 'AskEvaluationAnswer', foreign_key: 'question_id' 
-  has_many :comments, class_name: 'AskComment', foreign_key: 'question_id' 
+  has_many :evaluation_answers, class_name: 'AskEvaluationAnswer', foreign_key: 'question_id'
+  has_many :comments, class_name: 'AskComment', foreign_key: 'question_id'
 
 ## scopes
   scope :answered, where(:status_state => STATUS_RESOLVED)
@@ -206,7 +206,7 @@ class AskQuestion < ActiveRecord::Base
         end
 
         csv << row
-      end 
+      end
     end
   end
 
