@@ -68,8 +68,8 @@ class EpochDate
 
   ## Terms of Use Dates
   # start of tou agreement display for all groups
-  TOU_START_DATE                = Date.parse('2017-04-18')
+  TOU_START_DATE                = Date.parse('2017-05-09')
   # begin tou halts/enforcement
-  TOU_ENFORCEMENT_DATE          = Date.parse('2017-06-01')
+  TOU_ENFORCEMENT_DATE          = Date.parse('2017-06-20')
 
 end

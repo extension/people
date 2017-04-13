@@ -69,7 +69,7 @@ class CronTasks < Thor
     cleanup_invitations
     expire_passwords
     create_account_reminders
-    import_activity
+    #import_activity
   end
 
   desc "hourly", "All hourly cron tasks"
