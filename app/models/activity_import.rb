@@ -9,20 +9,15 @@ class ActivityImport < ActiveRecord::Base
   serialize :additionaldata
   attr_accessible :item, :operation, :started, :finished, :run_time, :additionaldata, :success
 
-  PUBLISH_IMPORT = [{'AppActivity' => 'publish_post_activity_import'},
-                    {'AppActivity' => 'publish_comment_activity_import'}]
+  PUBLISH_IMPORT = []
 
-  HOMEPAGE_IMPORT = [{'AppActivity' => 'homepage_post_activity_import'},
-                    {'AppActivity' => 'homepage_comment_activity_import'}]
+  HOMEPAGE_IMPORT = []
 
-  LEARN_IMPORT    = [{'AppActivity' => 'learn_event_activity_import'},
-                    {'AppActivity' => 'learn_versions_activity_import'}]
+  LEARN_IMPORT    = []
 
-  CREATE_IMPORT   = [{'AppActivity' => 'create_revisions_activity_import'},
-                    {'AppActivity' => 'create_workflow_events_activity_import'},
-                    {'AppActivity' => 'create_comments_activity_import'}]
+  CREATE_IMPORT   = []
 
-  ASK_IMPORT      = [{'AppActivity' => 'ask_questionevent_activity_import'}]
+  ASK_IMPORT      = []
 
 
   def run_and_log(model,action)
