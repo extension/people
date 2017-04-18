@@ -4,18 +4,26 @@
 # === LICENSE:
 # see LICENSE file
 
-class LearnPresenterConnection < ActiveRecord::Base
+class LearnEventConnection < ActiveRecord::Base
   # connects to the learn database
   self.establish_connection :learn
-  self.table_name='presenter_connections'
+  self.table_name='event_connections'
+
+  # connection types
+  BOOKMARK = 3
+  ATTEND = 4
+  WATCH = 5
 
   belongs_to :event, class_name: 'LearnEvent',foreign_key: 'event_id'
   belongs_to :learner, class_name: 'LearnLearner',foreign_key: 'learner_id'
 
   scope :event_date_filtered, ->(start_date,end_date) {includes(:event).where('DATE(events.session_start) >= ? AND DATE(events.session_start) <= ?', start_date, end_date) }
 
+  scope :bookmarked, ->{where(connectiontype: BOOKMARK)}
+  scope :attended, ->{where(connectiontype: ATTEND)}
+  scope :watched, ->{where(connectiontype: WATCH)}
 
-  def self.get_events_by_extensionid(options = {})
+  def self.get_events_by_extensionid(connectiontype,options = {})
     today = Date.today
     if(options[:year])
       year = options[:year]
@@ -27,6 +35,7 @@ class LearnPresenterConnection < ActiveRecord::Base
                      .where("#{LearnEvent.table_name}.is_deleted = ?",false)
                      .where("#{LearnEvent.table_name}.is_canceled = ?",false)
                      .where("DATE(#{LearnEvent.table_name}.session_start) <= ?",today)
+                     .where(connectiontype: connectiontype)
     date_scope = base_scope.where("YEAR(events.session_start) = ?",year)
     if(options[:month] and (1..12).to_a.include?(options[:month]))
       date_scope = date_scope.where("MONTH(events.session_start) = ?",options[:month])
@@ -50,6 +59,5 @@ class LearnPresenterConnection < ActiveRecord::Base
     end
     events_by_extensionid
   end
-
 
 end
