@@ -9,6 +9,16 @@ class AppActivity < ActiveRecord::Base
   serialize :additionaldata
   extend DateTools
 
+  attr_accessible :trackable, :trackable_id, :trackable_type
+  attr_accessible :app_id, :activity_code
+  attr_accessible :section_id, :section_label # relevant to publish site
+  attr_accessible :source_model
+  attr_accessible :year, :month, :quarter
+  attr_accessible :item_count, :activity_count, :person_count, :pool_count
+  attr_accessible :additionaldata
+
+
+
   # tracked applications
   APP_ARTICLES  = 100
   APP_ASK       = 200
@@ -18,25 +28,6 @@ class AppActivity < ActiveRecord::Base
   APP_LEARN     = 600
   APP_MILFAM    = 700
   APP_PEOPLE    = 800
-
-  # source types
-  APP_PUBLISH_POSTS = 301
-  APP_PUBLISH_COMMENTS = 302
-
-  APP_HOMEPAGE_POSTS = 301
-  APP_HOMEPAGE_COMMENTS = 302
-
-  APP_LEARN_EVENT_ACTIVITY = 601
-  APP_LEARN_VERSIONS = 602
-
-  APP_CREATE_REVISIONS = 401
-  APP_CREATE_WORKFLOW_EVENTS = 402
-  APP_CREATE_COMMENTS = 403
-
-  APP_ASK_QUESTIONEVENTS = 201
-
-  # APP_PEOPLE_ACTIVITY    = 801
-
 
   # tracked application labels
   APP_LABELS = {
@@ -50,43 +41,75 @@ class AppActivity < ActiveRecord::Base
     APP_PUBLISH => 'publish'
   }
 
-  # activities
-  ACTIVITY_OTHER = 1
-  ACTIVITY_EDIT = 2
-  ACTIVITY_COMMENT = 3
-  ACTIVITY_BOOKMARK = 4
-  ACTIVITY_ATTEND = 5
-  ACTIVITY_WATCH = 6
-  ACTIVITY_REVIEW = 7
-  ACTIVITY_PUBLISH = 8
-  ACTIVITY_WORKFLOW = 9
-  ACTIVITY_ANSWER = 10
-  ACTIVITY_HANDLED = 11
-  # ACTIVITY_LOGIN = 12
-  # ACTIVITY_PROFILE = 13
-  # ACTIVITY_COLLEAGUE_PROFILE = 14
-  # ACTIVITY_GROUP = 15
+  # activity codes
+  APP_LEARN_PRESENTED_EVENTS = 601
+
 
 
   ACTIVITY_LABELS = {
-    ACTIVITY_OTHER => 'other activity',
-    ACTIVITY_EDIT => 'edit',
-    ACTIVITY_COMMENT => 'comment',
-    ACTIVITY_BOOKMARK => 'bookmark',
-    ACTIVITY_ATTEND => 'attend',
-    ACTIVITY_WATCH => 'watch',
-    ACTIVITY_REVIEW => 'review',
-    ACTIVITY_PUBLISH => 'publish',
-    ACTIVITY_WORKFLOW => 'workflow',
-    ACTIVITY_ANSWER => 'answer',
-    ACTIVITY_HANDLED => 'handled'
-    # ACTIVITY_LOGIN => 'login',
-    # ACTIVITY_PROFILE => 'profile',
-    # ACTIVITY_COLLEAGUE_PROFILE => 'colleague profile',
-    # ACTIVITY_GROUP => 'group'
+    APP_LEARN_PRESENTED_EVENTS => 'presented learn events'
   }
 
+  def self.find_by_unique_key(attributes)
+    self.where(trackable_id: attributes[:trackable_id]) \
+        .where(trackable_type: attributes[:trackable_type]) \
+        .where(year: attributes[:year]) \
+        .where(quarter: attributes[:quarter]) \
+        .where(month: attributes[:month]) \
+        .where(activity_code: attributes[:activity_code]).first
+  end
 
+
+  def self.loop_presented_events_by_extensionid(start_date,end_date)
+
+    years = self.years_between_dates(start_date,end_date)
+    year_quarters = self.year_quarters_between_dates(start_date,end_date)
+    year_months = self.year_months_between_dates(start_date,end_date)
+
+    # years
+    years.each do |year|
+      get_presented_events_by_extensionid(year: year, month: 0, quarter: 0)
+    end
+
+    # year+quarters
+    year_quarters.each do |year,quarter|
+      get_presented_events_by_extensionid(year: year, month: 0, quarter: quarter)
+    end
+
+    # year+months
+    year_months.each do |year,month|
+      get_presented_events_by_extensionid(year: year, month: month, quarter: 0)
+    end
+
+  end
+
+  def self.get_presented_events_by_extensionid(options = {})
+    base_record_params = {
+      :app_id => APP_LEARN,
+      :activity_code => APP_LEARN_PRESENTED_EVENTS,
+      :source_model => 'LearnPresenterConnection',
+      :trackable_type => 'Person',
+      :person_count => 1,
+      :pool_count => 1
+    }
+    record_params = base_record_params.merge(options)
+    presenters_and_events = LearnPresenterConnection.get_events_by_extensionid(options)
+    presenters_and_events.each do |presenter_id,event_list|
+      count_params = {
+        :trackable_id => presenter_id,
+        :item_count => event_list.uniq.size,
+        :activity_count => event_list.uniq.size,
+        :additionaldata => event_list
+      }
+      record_params.merge!(count_params)
+      begin
+        self.create(record_params)
+      rescue ActiveRecord::RecordNotUnique => e
+        record = self.find_by_unique_key(record_params)
+        record.update_attributes(count_params)
+      end
+    end
+  end
 
 
 
