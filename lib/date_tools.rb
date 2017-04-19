@@ -44,7 +44,17 @@ module DateTools
     years
   end
 
-  
+  def year_quarters_between_dates(start_date,end_date)
+    year_quarters = []
+    the_end = end_date.beginning_of_quarter
+    loop_date = start_date.beginning_of_quarter
+    while loop_date <= the_end
+      quarter = (loop_date.month / 3.0).ceil
+      year_quarters << [loop_date.year,quarter]
+      loop_date = loop_date.months_since(3)
+    end
+    year_quarters
+  end
 
 
 end
