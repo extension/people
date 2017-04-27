@@ -12,6 +12,8 @@ class Invitation < ActiveRecord::Base
   serialize :invitedcommunities
   attr_accessible :email, :invitedcommunities, :message
 
+  auto_strip_attributes :email
+
   ## validations
   validates :email, :presence => true, :email => true, :uniqueness => {:message => "has already been invited", :case_sensitive => false }
 
@@ -50,7 +52,7 @@ class Invitation < ActiveRecord::Base
     else
       []
     end
-  end 
+  end
 
   def accept(acceptingcolleague,accepted_at=Time.now.utc,options = {})
     self.accepted_by = acceptingcolleague.id
@@ -59,10 +61,10 @@ class Invitation < ActiveRecord::Base
     if(self.save)
       Notification.create(:notification_type => Notification::INVITATION_ACCEPTED, :notifiable => self)
       Activity.log_activity(person_id: acceptingcolleague.id,
-                            colleague_id: self.person_id, 
-                            activitycode: Activity::INVITATION_ACCEPTED, 
-                            additionalinfo: self.email, 
-                            additionaldata: {'invitation_id' => self.id}, 
+                            colleague_id: self.person_id,
+                            activitycode: Activity::INVITATION_ACCEPTED,
+                            additionalinfo: self.email,
+                            additionaldata: {'invitation_id' => self.id},
                             ip_address: options[:ip_address])
 
       # check for community invitations
@@ -71,19 +73,19 @@ class Invitation < ActiveRecord::Base
       end
     end
   end
-  
+
   def create_invitation_notification
     Notification.create(:notification_type => Notification::INVITATION_TO_EXTENSIONID, :notifiable => self)
   end
-    
+
   protected
-  
+
   def generate_token
     randval = rand
     self.token = Digest::SHA1.hexdigest(Settings.session_token+self.email+randval.to_s)
   end
-  
 
 
-    
+
+
 end
