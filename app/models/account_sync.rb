@@ -13,7 +13,8 @@ class AccountSync < ActiveRecord::Base
 
   belongs_to :person
 
-  scope :not_processed, lambda{ where(processed: false)}
+  scope :not_processed, -> { where(processed: false)}
+  scope :has_error, -> { where(success: false)}
 
   def queue_update
     if(self.process_on_create or !Settings.redis_enabled)
@@ -38,7 +39,7 @@ class AccountSync < ActiveRecord::Base
         end
         self.update_attributes({processed: true, success: true})
       rescue StandardError => e
-        # self.update_attributes({processed: true, success: false, errors: e.message})
+        self.update_attributes({processed: true, success: false, errors: e.message})
       end
     end
   end
@@ -122,9 +123,9 @@ class AccountSync < ActiveRecord::Base
   def check_blogs_network_admin(site)
     person = self.person
     if(SiteRole::ADMINISTRATOR == person.role_for_site(site))
-      BlogsSitemeta.add_site_administrator(person.idstring)
-    elsif(BlogsSitemeta.site_administrators.include?(person.idstring))
-      BlogsSitemeta.remove_site_administrator(person.idstring)
+      PublishSitemeta.add_site_administrator(person.idstring)
+    elsif(PublishSitemeta.site_administrators.include?(person.idstring))
+      PublishSitemeta.remove_site_administrator(person.idstring)
     end
   end
 
