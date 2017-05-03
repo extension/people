@@ -65,7 +65,8 @@ class AccountSync < ActiveRecord::Base
     if(learn_learner = LearnLearner.find_by_darmok_id(self.person_id))
       self.connection.execute(learn_update_query(site))
     elsif(learn_learner = LearnLearner.find_by_email(self.person.email))
-      self.connection.execute(learn_conversion_query(site))
+      learn_learner.update_column(:darmok_id, self.person.id)
+      self.connection.execute(learn_update_query(site))
     else
       self.connection.execute(learn_insert_query(site))
     end
@@ -240,23 +241,6 @@ class AccountSync < ActiveRecord::Base
         #{update_database}.learners.time_zone    = #{quoted_value_or_null(person.time_zone(false))},
         #{update_database}.learners.needs_search_update  = 1
     WHERE #{update_database}.learners.darmok_id = #{person.id}
-    END_SQL
-    query
-  end
-
-  def learn_conversion_query(site)
-    update_database = site.sync_database
-    person = self.person
-    query = <<-END_SQL.gsub(/\s+/, " ").strip
-    UPDATE #{update_database}.learners
-    SET #{update_database}.learners.name         = #{quoted_value_or_null(person.fullname)},
-        #{update_database}.learners.retired      = #{person.retired},
-        #{update_database}.learners.is_admin     = #{person.is_admin_for_site(site)},
-        #{update_database}.learners.email        = #{quoted_value_or_null(person.email)},
-        #{update_database}.learners.time_zone    = #{quoted_value_or_null(person.time_zone(false))},
-        #{update_database}.learners.needs_search_update  = 1
-    WHERE #{update_database}.learners.email = #{ActiveRecord::Base.quote_value(person.email)}
-    AND #{update_database}.learners.darmok_id IS NULL
     END_SQL
     query
   end
