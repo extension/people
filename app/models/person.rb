@@ -691,10 +691,8 @@ class Person < ActiveRecord::Base
   def synchronize_accounts
     if(Settings.sync_accounts)
       if((self.validaccount? or self.retired?) and !self.is_systems_account?)
-        if(as = self.account_syncs.where(processed: false).order('account_syncs.created_at DESC').first)
-          as.queue_update
-        elsif(as = self.account_syncs.create({is_rename: self.changes.keys.include?('idstring')}))
-          as.queue_update
+        if(!as = self.account_syncs.where(processed: false).order('account_syncs.created_at DESC').first)
+          as = self.account_syncs.create({is_rename: self.changes.keys.include?('idstring')})
         end
       end
     end
