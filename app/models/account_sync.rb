@@ -12,6 +12,7 @@ class AccountSync < ActiveRecord::Base
   CREATE_ADMIN_ROLE = 3
 
   belongs_to :person
+  after_create  :queue_update
 
   scope :not_processed, -> { where(processed: false)}
   scope :has_error, -> { where(success: false)}
