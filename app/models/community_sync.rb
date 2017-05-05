@@ -17,7 +17,8 @@ class CommunitySync < ActiveRecord::Base
 
   belongs_to :community, unscoped: true
 
-  scope :not_processed, lambda{ where(processed: false)}
+  scope :not_processed, -> {where(processed: false)}
+  scope :failed, -> {where(success: false)}
 
   def queue_update
     if(self.process_on_create? or !Settings.redis_enabled)
@@ -57,19 +58,19 @@ class CommunitySync < ActiveRecord::Base
   end
 
   def articles_database
-    if(publishing_community = DarmokPublishingCommunity.find_by_id(self.community_id))
+    if(publishing_community = ArticlesPublishingCommunity.find_by_id(self.community_id))
       if(self.community.publishing_community?)
-        self.connection.execute(www_update_query)
+        self.connection.execute(articles_update_query)
       else
-        self.connection.execute(www_delete_query)
+        self.connection.execute(articles_delete_query)
       end
     elsif(self.community.publishing_community?)
-      self.connection.execute(www_insert_query)
+      self.connection.execute(articles_insert_query)
     end
   end
 
 
-  def www_update_query
+  def articles_update_query
     community = self.community
     update_database = UPDATE_DATABASES['articles_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
@@ -82,7 +83,7 @@ class CommunitySync < ActiveRecord::Base
     query
   end
 
-  def www_delete_query
+  def articles_delete_query
     community = self.community
     update_database = UPDATE_DATABASES['articles_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
@@ -91,7 +92,7 @@ class CommunitySync < ActiveRecord::Base
     query
   end
 
-  def www_insert_query
+  def articles_insert_query
     community = self.community
     update_database = UPDATE_DATABASES['articles_database']
     query = <<-END_SQL.gsub(/\s+/, " ").strip
@@ -362,5 +363,6 @@ class CommunitySync < ActiveRecord::Base
   def quoted_value_or_null(value)
     value.blank? ? 'NULL' : ActiveRecord::Base.quote_value(value)
   end
+
 
 end
