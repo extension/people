@@ -70,10 +70,6 @@ class AccountSync < ActiveRecord::Base
     else
       self.connection.execute(learn_insert_query(site))
     end
-    self.connection.execute(learn_authmap_insert_query(site))
-    if(self.is_rename?)
-      self.connection.execute(learn_authmap_delete_query(site))
-    end
   end
 
   def sync_create(site)
@@ -234,11 +230,13 @@ class AccountSync < ActiveRecord::Base
     person = self.person
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     UPDATE #{update_database}.learners
-    SET #{update_database}.learners.name         = #{quoted_value_or_null(person.fullname)},
-        #{update_database}.learners.retired      = #{person.retired},
-        #{update_database}.learners.is_admin     = #{person.is_admin_for_site(site)},
-        #{update_database}.learners.email        = #{quoted_value_or_null(person.email)},
-        #{update_database}.learners.time_zone    = #{quoted_value_or_null(person.time_zone(false))},
+    SET #{update_database}.learners.name           = #{quoted_value_or_null(person.fullname)},
+        #{update_database}.learners.openid         = CONCAT('https://people.extension.org/',#{ActiveRecord::Base.quote_value(person.idstring)}),
+        #{update_database}.learners.institution_id = #{person.institution_id},
+        #{update_database}.learners.retired        = #{person.retired},
+        #{update_database}.learners.is_admin       = #{person.is_admin_for_site(site)},
+        #{update_database}.learners.email          = #{quoted_value_or_null(person.email)},
+        #{update_database}.learners.time_zone      = #{quoted_value_or_null(person.time_zone(false))},
         #{update_database}.learners.needs_search_update  = 1
     WHERE #{update_database}.learners.darmok_id = #{person.id}
     END_SQL
@@ -249,8 +247,10 @@ class AccountSync < ActiveRecord::Base
     update_database = site.sync_database
     person = self.person
     query = <<-END_SQL.gsub(/\s+/, " ").strip
-    INSERT INTO #{update_database}.learners (name, email, has_profile, time_zone, darmok_id, is_admin, needs_search_update, created_at, updated_at)
+    INSERT INTO #{update_database}.learners (name, openid, institution_id, email, has_profile, time_zone, darmok_id, is_admin, needs_search_update, created_at, updated_at)
     SELECT  #{quoted_value_or_null(person.fullname)},
+            CONCAT('https://people.extension.org/',#{ActiveRecord::Base.quote_value(person.idstring)}),
+            #{person.institution_id},
             #{quoted_value_or_null(person.email)},
             1,
             #{quoted_value_or_null(person.time_zone(false))},
@@ -262,36 +262,6 @@ class AccountSync < ActiveRecord::Base
     END_SQL
     query
   end
-
-  def learn_authmap_insert_query(site)
-    update_database = site.sync_database
-    person = self.person
-    query = <<-END_SQL.gsub(/\s+/, " ").strip
-    INSERT IGNORE INTO #{update_database}.authmaps (learner_id, authname, source, created_at, updated_at)
-    SELECT #{update_database}.learners.id,
-           CONCAT('https://people.extension.org/',#{ActiveRecord::Base.quote_value(person.idstring)}),
-           'people',
-           #{update_database}.learners.created_at,
-           NOW()
-    FROM #{update_database}.learners
-    WHERE #{update_database}.learners.darmok_id = #{person.id}
-    END_SQL
-    query
-  end
-
-  def learn_authmap_delete_query(site)
-    update_database = site.sync_database
-    person = self.person
-    query = <<-END_SQL.gsub(/\s+/, " ").strip
-    DELETE #{update_database}.authmaps.* FROM #{update_database}.authmaps,#{update_database}.learners
-    WHERE #{update_database}.authmaps.learner_id = #{update_database}.learners.id
-          AND #{update_database}.authmaps.authname != CONCAT('https://people.extension.org/',#{ActiveRecord::Base.quote_value(person.idstring)})
-          AND #{update_database}.authmaps.source = 'people'
-          AND #{update_database}.learners.darmok_id = #{person.id}
-    END_SQL
-    query
-  end
-
 
   def create_insert_update_query(site)
     update_database = site.sync_database
