@@ -1413,7 +1413,7 @@ class Person < ActiveRecord::Base
   end
 
   def present_tou_interstitial?
-    if(Date.today >= EpochDate::TOU_START_DATE)
+    if(Settings.present_tou_interstitial)
       !self.tou_accepted?
     elsif(!Settings.limit_tou_groups.blank? and !(self.connected_communities.map(&:id) & Settings.limit_tou_groups).blank?)
       !self.tou_accepted?
@@ -1424,7 +1424,7 @@ class Person < ActiveRecord::Base
 
   # #TODO - no longer needed after TOU_START_DATE
   def show_tou_status?
-    if(Date.today >= EpochDate::TOU_START_DATE)
+    if(Settings.present_tou_interstitial)
       true
     elsif(!Settings.limit_tou_groups.blank? and !(self.connected_communities.map(&:id) & Settings.limit_tou_groups).blank?)
       true

@@ -220,12 +220,12 @@ class OpieController < ApplicationController
       session[:last_opierequest] = nil
       return render(layout: 'application')
     elsif(params[:commit] == 'Remind me next login')
-      if(Date.today < EpochDate::TOU_ENFORCEMENT_DATE and current_person.account_status != Person::STATUS_TOU_HALT)
+      if(!Settings.enforce_tou and current_person.account_status != Person::STATUS_TOU_HALT)
         Activity.log_activity(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip, activitycode: Activity::TOU_NEXT_LOGIN)
         # keep going
       elsif(current_person.account_status == Person::STATUS_TOU_PENDING or current_person.account_status == Person::STATUS_TOU_GRACE)
         Activity.log_activity(person_id: current_person.id, site: opierequest.trust_root, ip_address: request.remote_ip, activitycode: Activity::TOU_NEXT_LOGIN)
-        if(Date.today >= EpochDate::TOU_ENFORCEMENT_DATE)
+        if(Settings.enforce_tou)
           if(current_person.account_status == Person::STATUS_TOU_PENDING)
             # one more login grace period
             current_person.update_attribute(:account_status,Person::STATUS_TOU_GRACE)

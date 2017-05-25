@@ -26,7 +26,7 @@ class AccountsController < ApplicationController
           flash[:success] = "Login successful"
           Activity.log_local_auth_success(person_id: person.id, authname: params[:email], ip_address: request.remote_ip)
           if(session[:last_opierequest].blank? and person.present_tou_interstitial?)
-            if(Date.today >= EpochDate::TOU_ENFORCEMENT_DATE and person.account_status == Person::STATUS_TOU_GRACE)
+            if(Settings.enforce_tou and person.account_status == Person::STATUS_TOU_GRACE)
               person.update_attribute(:account_status,Person::STATUS_TOU_HALT)
             end
             return redirect_to(accounts_tou_notice_url)
@@ -211,12 +211,12 @@ class AccountsController < ApplicationController
   def tou_notice
     if(request.post?)
       if(params[:commit] == 'Remind me next login')
-        if(Date.today < EpochDate::TOU_ENFORCEMENT_DATE and current_person.account_status != Person::STATUS_TOU_HALT)
+        if(!Settings.enforce_tou and current_person.account_status != Person::STATUS_TOU_HALT)
           Activity.log_activity(person_id: current_person.id, site: 'local', ip_address: request.remote_ip, activitycode: Activity::TOU_NEXT_LOGIN)
           return redirect_to(root_url)
         elsif(current_person.account_status == Person::STATUS_TOU_PENDING or current_person.account_status == Person::STATUS_TOU_GRACE)
           Activity.log_activity(person_id: current_person.id, site: 'local', ip_address: request.remote_ip, activitycode: Activity::TOU_NEXT_LOGIN)
-          if(Date.today >= EpochDate::TOU_ENFORCEMENT_DATE)
+          if(Settings.enforce_tou)
             if(current_person.account_status == Person::STATUS_TOU_PENDING)
               # one more login grace period
               current_person.update_attribute(:account_status,Person::STATUS_TOU_GRACE)

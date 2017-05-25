@@ -66,10 +66,5 @@ class EpochDate
   # range slider to radio button conversion on evaluation form
   CONVERT_EVALUATION_SLIDERS    = Date.parse('2014-07-21')
 
-  ## Terms of Use Dates
-  # start of tou agreement display for all groups
-  TOU_START_DATE                = Date.parse('2017-05-30')
-  # begin tou halts/enforcement
-  TOU_ENFORCEMENT_DATE          = Date.parse('2017-06-20')
 
 end
