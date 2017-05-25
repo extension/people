@@ -49,7 +49,7 @@ class AccountSync < ActiveRecord::Base
     update_database = site.sync_database
     if(aae_user = AskUser.find_by_darmok_id(self.person_id))
       self.connection.execute(aae_update_query(site))
-    elsif(aae_user = AskUser.find_by_email(self.person.email))
+    elsif(aae_user = AskUser.find_by_email(self.person.display_email))
       self.connection.execute(aae_conversion_query(site))
     else
       self.connection.execute(aae_insert_query(site))
@@ -64,7 +64,7 @@ class AccountSync < ActiveRecord::Base
     update_database = site.sync_database
     if(learn_learner = LearnLearner.find_by_darmok_id(self.person_id))
       self.connection.execute(learn_update_query(site))
-    elsif(learn_learner = LearnLearner.find_by_email(self.person.email))
+    elsif(learn_learner = LearnLearner.find_by_email(self.person.display_email))
       learn_learner.update_column(:darmok_id, self.person.id)
       self.connection.execute(learn_update_query(site))
     else
@@ -137,7 +137,7 @@ class AccountSync < ActiveRecord::Base
         #{update_database}.users.last_name            = #{quoted_value_or_null(person.last_name)},
         #{update_database}.users.retired              = #{person.retired},
         #{update_database}.users.is_admin             = #{person.is_admin_for_site(site)},
-        #{update_database}.users.email                = #{quoted_value_or_null(person.email)},
+        #{update_database}.users.email                = #{quoted_value_or_null(person.display_email)},
         #{update_database}.users.time_zone            = #{quoted_value_or_null(person.time_zone(false))},
         #{update_database}.users.location_id          = #{value_or_null(person.location_id)},
         #{update_database}.users.county_id            = #{value_or_null(person.county_id)},
@@ -166,7 +166,7 @@ class AccountSync < ActiveRecord::Base
         #{update_database}.users.county_id            = #{value_or_null(person.county_id)},
         #{update_database}.users.title                = #{quoted_value_or_null(person.title)},
         #{update_database}.users.needs_search_update  = 1
-    WHERE #{update_database}.users.email = #{ActiveRecord::Base.quote_value(person.email)}
+    WHERE #{update_database}.users.email = #{ActiveRecord::Base.quote_value(person.display_email)}
     AND #{update_database}.users.kind = 'PublicUser'
     END_SQL
     query
@@ -181,7 +181,7 @@ class AccountSync < ActiveRecord::Base
             #{quoted_value_or_null(person.first_name)},
             #{quoted_value_or_null(person.last_name)},
             'User',
-            #{quoted_value_or_null(person.email)},
+            #{quoted_value_or_null(person.display_email)},
             #{quoted_value_or_null(person.time_zone(false))},
             #{person.id},
             #{person.is_admin_for_site(site)},
@@ -235,7 +235,7 @@ class AccountSync < ActiveRecord::Base
         #{update_database}.learners.institution_id = #{person.institution_id},
         #{update_database}.learners.retired        = #{person.retired},
         #{update_database}.learners.is_admin       = #{person.is_admin_for_site(site)},
-        #{update_database}.learners.email          = #{quoted_value_or_null(person.email)},
+        #{update_database}.learners.email          = #{quoted_value_or_null(person.display_email)},
         #{update_database}.learners.time_zone      = #{quoted_value_or_null(person.time_zone(false))},
         #{update_database}.learners.needs_search_update  = 1
     WHERE #{update_database}.learners.darmok_id = #{person.id}
@@ -251,7 +251,7 @@ class AccountSync < ActiveRecord::Base
     SELECT  #{quoted_value_or_null(person.fullname)},
             CONCAT('https://people.extension.org/',#{ActiveRecord::Base.quote_value(person.idstring)}),
             #{person.institution_id},
-            #{quoted_value_or_null(person.email)},
+            #{quoted_value_or_null(person.display_email)},
             1,
             #{quoted_value_or_null(person.time_zone(false))},
             #{person.id},
@@ -271,13 +271,13 @@ class AccountSync < ActiveRecord::Base
     SELECT  #{person.id},
             #{quoted_value_or_null(person.idstring)},
             #{ActiveRecord::Base.quote_value(Settings.create_password_string)},
-            #{quoted_value_or_null(person.email)},
+            #{quoted_value_or_null(person.display_email)},
             UNIX_TIMESTAMP('#{person.created_at.to_s(:db)}'),
             #{(person.validaccount? ? 1 : 0)}
     ON DUPLICATE KEY
     UPDATE name=#{quoted_value_or_null(person.idstring)},
            pass=#{ActiveRecord::Base.quote_value(Settings.create_password_string)},
-           mail=#{quoted_value_or_null(person.email)},
+           mail=#{quoted_value_or_null(person.display_email)},
            status=#{(person.validaccount? ? 1 : 0)},
            created=UNIX_TIMESTAMP('#{person.created_at.to_s(:db)}')
     END_SQL
@@ -375,7 +375,7 @@ class AccountSync < ActiveRecord::Base
     SELECT #{person.id},
            #{ActiveRecord::Base.quote_value(person.idstring)},
            #{ActiveRecord::Base.quote_value(Settings.create_password_string)},
-           #{quoted_value_or_null(person.email)},
+           #{quoted_value_or_null(person.display_email)},
            #{ActiveRecord::Base.quote_value(person.idstring)},
            #{ActiveRecord::Base.quote_value(person.fullname)}
     END_SQL
