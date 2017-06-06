@@ -47,16 +47,12 @@ class AccountSync < ActiveRecord::Base
 
   def sync_ask(site)
     update_database = site.sync_database
-    if(aae_user = AskUser.find_by_darmok_id(self.person_id))
-      self.connection.execute(aae_update_query(site))
-    elsif(aae_user = AskUser.find_by_email(self.person.display_email))
-      self.connection.execute(aae_conversion_query(site))
+    if(ask_user = AskUser.find_by_darmok_id(self.person_id))
+      self.connection.execute(ask_update_query(site))
+    elsif(ask_user = AskUser.find_by_email(self.person.display_email))
+      self.connection.execute(ask_conversion_query(site))
     else
-      self.connection.execute(aae_insert_query(site))
-    end
-    self.connection.execute(aae_authmap_insert_query(site))
-    if(self.is_rename?)
-      self.connection.execute(aae_authmap_delete_query(site))
+      self.connection.execute(ask_insert_query(site))
     end
   end
 
@@ -127,20 +123,23 @@ class AccountSync < ActiveRecord::Base
     end
   end
 
-  def aae_update_query(site)
+  def ask_update_query(site)
     update_database = site.sync_database
     person = self.person
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     UPDATE #{update_database}.users
     SET #{update_database}.users.login                = #{quoted_value_or_null(person.idstring)},
+        #{update_database}.users.openid               = CONCAT('https://people.extension.org/',#{quoted_value_or_null(person.idstring)}),
         #{update_database}.users.first_name           = #{quoted_value_or_null(person.first_name)},
         #{update_database}.users.last_name            = #{quoted_value_or_null(person.last_name)},
-        #{update_database}.users.retired              = #{person.retired},
+        #{update_database}.users.unavailable          = #{(person.unavailable? ? 1 : 0)},
+        #{update_database}.users.unavailable_reason   = #{value_or_null(person.unavailable_reason)},
         #{update_database}.users.is_admin             = #{person.is_admin_for_site(site)},
         #{update_database}.users.email                = #{quoted_value_or_null(person.display_email)},
         #{update_database}.users.time_zone            = #{quoted_value_or_null(person.time_zone(false))},
         #{update_database}.users.location_id          = #{value_or_null(person.location_id)},
         #{update_database}.users.county_id            = #{value_or_null(person.county_id)},
+        #{update_database}.users.institution_id       = #{value_or_null(person.institution_id)},
         #{update_database}.users.title                = #{quoted_value_or_null(person.title)},
         #{update_database}.users.needs_search_update  = 1
     WHERE #{update_database}.users.darmok_id = #{person.id}
@@ -149,7 +148,7 @@ class AccountSync < ActiveRecord::Base
     query
   end
 
-  def aae_conversion_query(site)
+  def ask_conversion_query(site)
     update_database = site.sync_database
     person = self.person
     query = <<-END_SQL.gsub(/\s+/, " ").strip
@@ -157,13 +156,16 @@ class AccountSync < ActiveRecord::Base
     SET #{update_database}.users.kind                 = 'User',
         #{update_database}.users.darmok_id            = #{person.id},
         #{update_database}.users.login                = #{quoted_value_or_null(person.idstring)},
+        #{update_database}.users.openid               = CONCAT('https://people.extension.org/',#{quoted_value_or_null(person.idstring)}),
         #{update_database}.users.first_name           = #{quoted_value_or_null(person.first_name)},
         #{update_database}.users.last_name            = #{quoted_value_or_null(person.last_name)},
-        #{update_database}.users.retired              = #{person.retired},
+        #{update_database}.users.unavailable          = #{(person.unavailable? ? 1 : 0)},
+        #{update_database}.users.unavailable_reason   = #{value_or_null(person.unavailable_reason)},
         #{update_database}.users.is_admin             = #{person.is_admin_for_site(site)},
         #{update_database}.users.time_zone            = #{quoted_value_or_null(person.time_zone(false))},
         #{update_database}.users.location_id          = #{value_or_null(person.location_id)},
         #{update_database}.users.county_id            = #{value_or_null(person.county_id)},
+        #{update_database}.users.institution_id       = #{value_or_null(person.institution_id)},
         #{update_database}.users.title                = #{quoted_value_or_null(person.title)},
         #{update_database}.users.needs_search_update  = 1
     WHERE #{update_database}.users.email = #{ActiveRecord::Base.quote_value(person.display_email)}
@@ -172,12 +174,15 @@ class AccountSync < ActiveRecord::Base
     query
   end
 
-  def aae_insert_query(site)
+  def ask_insert_query(site)
     update_database = site.sync_database
     person = self.person
     query = <<-END_SQL.gsub(/\s+/, " ").strip
-    INSERT INTO #{update_database}.users (login, first_name, last_name, kind, email, time_zone, darmok_id, is_admin, location_id, county_id, title, needs_search_update, created_at, updated_at)
+    INSERT INTO #{update_database}.users (login, openid, first_name, last_name, kind, email, time_zone,
+                                          darmok_id, is_admin, location_id, county_id, institution_id,
+                                          title, unavailable, unavailable_reason, needs_search_update, created_at, updated_at)
     SELECT  #{quoted_value_or_null(person.idstring)},
+            CONCAT('https://people.extension.org/',#{quoted_value_or_null(person.idstring)}),
             #{quoted_value_or_null(person.first_name)},
             #{quoted_value_or_null(person.last_name)},
             'User',
@@ -187,7 +192,10 @@ class AccountSync < ActiveRecord::Base
             #{person.is_admin_for_site(site)},
             #{value_or_null(person.location_id)},
             #{value_or_null(person.county_id)},
+            #{value_or_null(person.institution_id)},
             #{quoted_value_or_null(person.title)},
+            #{(person.unavailable? ? 1 : 0)},
+            #{value_or_null(person.unavailable_reason)},
             1,
             #{quoted_value_or_null(person.created_at.to_s(:db))},
             NOW()
@@ -195,43 +203,13 @@ class AccountSync < ActiveRecord::Base
     query
   end
 
-  def aae_authmap_insert_query(site)
-    update_database = site.sync_database
-    person = self.person
-    query = <<-END_SQL.gsub(/\s+/, " ").strip
-    INSERT IGNORE INTO #{update_database}.authmaps (user_id, authname, source, created_at, updated_at)
-    SELECT #{update_database}.users.id,
-           CONCAT('https://people.extension.org/',#{update_database}.users.login),
-           'people',
-           #{update_database}.users.created_at,
-           NOW()
-    FROM #{update_database}.users
-    WHERE #{update_database}.users.darmok_id = #{person.id}
-    END_SQL
-    query
-  end
-
-  def aae_authmap_delete_query(site)
-    update_database = site.sync_database
-    person = self.person
-    query = <<-END_SQL.gsub(/\s+/, " ").strip
-    DELETE #{update_database}.authmaps.* FROM #{update_database}.authmaps,#{update_database}.users
-    WHERE #{update_database}.authmaps.user_id = #{update_database}.users.id
-          AND #{update_database}.authmaps.authname != CONCAT('https://people.extension.org/',#{update_database}.users.login)
-          AND #{update_database}.authmaps.source = 'people'
-          AND #{update_database}.users.darmok_id = #{person.id}
-    END_SQL
-    query
-  end
-
-
   def learn_update_query(site)
     update_database = site.sync_database
     person = self.person
     query = <<-END_SQL.gsub(/\s+/, " ").strip
     UPDATE #{update_database}.learners
     SET #{update_database}.learners.name           = #{quoted_value_or_null(person.fullname)},
-        #{update_database}.learners.openid         = CONCAT('https://people.extension.org/',#{ActiveRecord::Base.quote_value(person.idstring)}),
+        #{update_database}.learners.openid         = CONCAT('https://people.extension.org/',#{quoted_value_or_null(person.idstring)}),
         #{update_database}.learners.institution_id = #{person.institution_id},
         #{update_database}.learners.retired        = #{person.retired},
         #{update_database}.learners.is_admin       = #{person.is_admin_for_site(site)},
