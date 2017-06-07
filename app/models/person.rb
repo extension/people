@@ -1526,6 +1526,12 @@ class Person < ActiveRecord::Base
     end
   end
 
+  def self.synchronize_all_accounts
+    Person.order("last_activity_at DESC").find_each do |p|
+      p.synchronize_accounts
+    end
+  end
+
   private
 
   def check_account_status
