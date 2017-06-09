@@ -62,6 +62,11 @@ class Person < ActiveRecord::Base
   }
 
 
+  # unavailable reasons (for ask sync)
+  UNAVAILABLE_RETIRED = 1
+  UNAVAILABLE_CONFIRM_EMAIL = 2
+  UNAVAILABLE_TOU_HALT = 3
+
 
 
 
@@ -1501,6 +1506,30 @@ class Person < ActiveRecord::Base
 
   def self.administrators
     validaccounts.where(is_admin: true)
+  end
+
+  def unavailable?
+    (self.retired? or (account_status == STATUS_TOU_HALT) or (account_status == STATUS_CONFIRM_EMAIL))
+  end
+
+  def unavailable_reason
+    if(!self.unavailable?)
+      nil
+    elsif(self.retired?)
+      Person::UNAVAILABLE_RETIRED
+    elsif(self.account_status == STATUS_TOU_HALT)
+      Person::UNAVAILABLE_TOU_HALT
+    elsif(self.account_status == STATUS_CONFIRM_EMAIL)
+      Person::UNAVAILABLE_CONFIRM_EMAIL
+    else
+      nil
+    end
+  end
+
+  def self.synchronize_all_accounts
+    Person.order("last_activity_at DESC").find_each do |p|
+      p.synchronize_accounts
+    end
   end
 
   private
