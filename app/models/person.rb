@@ -378,11 +378,15 @@ class Person < ActiveRecord::Base
     aes.key = key
     aes.iv = information[:iv]
     decrypted_data_string = aes.update(information[:encrypted_data]) + aes.final
-    decrypted_data = YAML.load(decrypted_data_string)
-    if(!decrypted_data.is_a?(Hash) or !decrypted_data[:password])
-      return nil
-    else
-      return decrypted_data[:password]
+    begin
+      decrypted_data = YAML.load(decrypted_data_string)
+      if(!decrypted_data.is_a?(Hash) or !decrypted_data[:password])
+        return nil
+      else
+        return decrypted_data[:password]
+      end
+    rescue StandardError => e
+      raise PasswordDecryptionError, "Unable to decrypt password reset data, #{e.message}"
     end
   end
 
