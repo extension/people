@@ -1546,6 +1546,8 @@ class Person < ActiveRecord::Base
         self.account_status = STATUS_REVIEW
       elsif(!self.tou_accepted? and self.account_status != STATUS_TOU_GRACE)
         self.account_status = STATUS_TOU_PENDING
+      else
+        self.account_status = STATUS_CONTRIBUTOR
       end
     end
   end
