@@ -210,7 +210,7 @@ class AccountSync < ActiveRecord::Base
     UPDATE #{update_database}.learners
     SET #{update_database}.learners.name           = #{quoted_value_or_null(person.fullname)},
         #{update_database}.learners.openid         = CONCAT('https://people.extension.org/',#{quoted_value_or_null(person.idstring)}),
-        #{update_database}.learners.institution_id = #{person.institution_id},
+        #{update_database}.learners.institution_id = #{value_or_null(person.institution_id)},
         #{update_database}.learners.retired        = #{person.retired},
         #{update_database}.learners.is_admin       = #{person.is_admin_for_site(site)},
         #{update_database}.learners.email          = #{quoted_value_or_null(person.display_email)},
@@ -228,7 +228,7 @@ class AccountSync < ActiveRecord::Base
     INSERT INTO #{update_database}.learners (name, openid, institution_id, email, has_profile, time_zone, darmok_id, is_admin, needs_search_update, created_at, updated_at)
     SELECT  #{quoted_value_or_null(person.fullname)},
             CONCAT('https://people.extension.org/',#{ActiveRecord::Base.quote_value(person.idstring)}),
-            #{person.institution_id},
+            #{value_or_null(person.institution_id)},
             #{quoted_value_or_null(person.display_email)},
             1,
             #{quoted_value_or_null(person.time_zone(false))},
