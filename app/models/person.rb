@@ -1522,7 +1522,7 @@ class Person < ActiveRecord::Base
   private
 
   def check_account_status
-    if (!self.retired? and self.account_status != STATUS_SIGNUP and self.account_status != STATUS_TOU_HALT and self.account_status != STATUS_TOU_GRACE)
+    if (!self.retired? and !([STATUS_SIGNUP,STATUS_TOU_HALT,STATUS_TOU_GRACE,STATUS_TOU_PENDING].include?(self.account_status)))
       if(!self.email_confirmed?)
         self.account_status = STATUS_CONFIRM_EMAIL
       elsif(!self.vouched?)
