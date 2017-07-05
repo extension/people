@@ -1539,13 +1539,13 @@ class Person < ActiveRecord::Base
   private
 
   def check_account_status
-    if (!self.retired? and self.account_status != STATUS_SIGNUP and self.account_status != STATUS_TOU_HALT)
+    if (!self.retired? and self.account_status != STATUS_SIGNUP and self.account_status != STATUS_TOU_HALT and self.account_status != STATUS_TOU_GRACE)
       if(!self.email_confirmed?)
         self.account_status = STATUS_CONFIRM_EMAIL
       elsif(!self.vouched?)
         self.account_status = STATUS_REVIEW
       elsif(!self.tou_accepted? and self.account_status != STATUS_TOU_GRACE)
-        self.account_status = STATUS_TOU_PENDING
+        self.account_status = STATUS_TOU_GRACE
       else
         self.account_status = STATUS_CONTRIBUTOR
       end
