@@ -6,6 +6,7 @@
 
 class AccountsController < ApplicationController
   skip_before_filter :check_hold_status
+  skip_before_filter :update_last_activity, only: [:signin]
   skip_before_filter :signin_required, except: [:post_signup, :confirm, :resend_confirmation, :pending_confirmation, :review]
   before_filter :signin_optional
 
@@ -23,10 +24,11 @@ class AccountsController < ApplicationController
         begin
           person = Person.authenticate(params[:email],params[:password])
           set_current_person(person)
+          person.update_attribute(:last_activity_at,Time.now.utc)
           flash[:success] = "Login successful"
           Activity.log_local_auth_success(person_id: person.id, authname: params[:email], ip_address: request.remote_ip)
           if(session[:last_opierequest].blank? and person.present_tou_interstitial?)
-            if(Settings.enforce_tou and person.account_status == Person::STATUS_TOU_GRACE)
+            if(person.account_status == Person::STATUS_TOU_GRACE)
               person.update_attribute(:account_status,Person::STATUS_TOU_HALT)
             end
             return redirect_to(accounts_tou_notice_url)
@@ -211,18 +213,13 @@ class AccountsController < ApplicationController
   def tou_notice
     if(request.post?)
       if(params[:commit] == 'Remind me next login')
-        if(!Settings.enforce_tou and current_person.account_status != Person::STATUS_TOU_HALT)
+        if(current_person.account_status == Person::STATUS_TOU_PENDING or current_person.account_status == Person::STATUS_TOU_GRACE)
           Activity.log_activity(person_id: current_person.id, site: 'local', ip_address: request.remote_ip, activitycode: Activity::TOU_NEXT_LOGIN)
-          return redirect_to(root_url)
-        elsif(current_person.account_status == Person::STATUS_TOU_PENDING or current_person.account_status == Person::STATUS_TOU_GRACE)
-          Activity.log_activity(person_id: current_person.id, site: 'local', ip_address: request.remote_ip, activitycode: Activity::TOU_NEXT_LOGIN)
-          if(Settings.enforce_tou)
-            if(current_person.account_status == Person::STATUS_TOU_PENDING)
-              # one more login grace period
-              current_person.update_attribute(:account_status,Person::STATUS_TOU_GRACE)
-            else
-              current_person.update_attribute(:account_status,Person::STATUS_TOU_HALT)
-            end
+          if(current_person.account_status == Person::STATUS_TOU_PENDING)
+            # one more login grace period
+            current_person.update_attribute(:account_status,Person::STATUS_TOU_GRACE)
+          else
+            current_person.update_attribute(:account_status,Person::STATUS_TOU_HALT)
           end
         else
           # this really can only happen if someone is manipulating params

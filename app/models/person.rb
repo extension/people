@@ -1422,24 +1422,7 @@ class Person < ActiveRecord::Base
   end
 
   def present_tou_interstitial?
-    if(Settings.present_tou_interstitial)
-      !self.tou_accepted?
-    elsif(!Settings.limit_tou_groups.blank? and !(self.connected_communities.map(&:id) & Settings.limit_tou_groups).blank?)
-      !self.tou_accepted?
-    else
-      false
-    end
-  end
-
-  # #TODO - no longer needed after TOU_START_DATE
-  def show_tou_status?
-    if(Settings.present_tou_interstitial)
-      true
-    elsif(!Settings.limit_tou_groups.blank? and !(self.connected_communities.map(&:id) & Settings.limit_tou_groups).blank?)
-      true
-    else
-      false
-    end
+    !self.tou_accepted?
   end
 
   def tou_accepted?
@@ -1539,13 +1522,13 @@ class Person < ActiveRecord::Base
   private
 
   def check_account_status
-    if (!self.retired? and self.account_status != STATUS_SIGNUP and self.account_status != STATUS_TOU_HALT)
+    if (!self.retired? and self.account_status != STATUS_SIGNUP and self.account_status != STATUS_TOU_HALT and self.account_status != STATUS_TOU_GRACE)
       if(!self.email_confirmed?)
         self.account_status = STATUS_CONFIRM_EMAIL
       elsif(!self.vouched?)
         self.account_status = STATUS_REVIEW
       elsif(!self.tou_accepted? and self.account_status != STATUS_TOU_GRACE)
-        self.account_status = STATUS_TOU_PENDING
+        self.account_status = STATUS_TOU_GRACE
       else
         self.account_status = STATUS_CONTRIBUTOR
       end

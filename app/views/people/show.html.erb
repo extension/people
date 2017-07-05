@@ -71,10 +71,8 @@
         <dl class='dl-horizontal dashmodule'>
           <dt>eXtensionID:</dt>
           <dd><%= @person.idstring%></dd>
-          <%- if(@person.show_tou_status?) -%>
-            <dt>Terms of Use Status:</dt>
-            <dd><%= tou_status(@person) -%></dd>
-          <%- end -%>
+          <dt>Terms of Use Status:</dt>
+          <dd><%= tou_status(@person) -%></dd>
           <dt>Google Account:</dt>
           <dd><%= @person.idstring%>@extension.org<br/>
             <%= link_to('Learn more about your eXtension Google Account', 'http://create.extension.org/node/98956') %>
