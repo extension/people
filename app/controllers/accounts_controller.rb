@@ -6,6 +6,7 @@
 
 class AccountsController < ApplicationController
   skip_before_filter :check_hold_status
+  skip_before_filter :update_last_activity, only: [:signin]
   skip_before_filter :signin_required, except: [:post_signup, :confirm, :resend_confirmation, :pending_confirmation, :review]
   before_filter :signin_optional
 
@@ -23,6 +24,7 @@ class AccountsController < ApplicationController
         begin
           person = Person.authenticate(params[:email],params[:password])
           set_current_person(person)
+          person.update_attribute(:last_activity_at,Time.now.utc)
           flash[:success] = "Login successful"
           Activity.log_local_auth_success(person_id: person.id, authname: params[:email], ip_address: request.remote_ip)
           if(session[:last_opierequest].blank? and person.present_tou_interstitial?)
