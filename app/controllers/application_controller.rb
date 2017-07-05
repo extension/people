@@ -41,9 +41,7 @@ class ApplicationController < ActionController::Base
   end
 
   def allow_next_login_tou_reminder?
-    if(!Settings.enforce_tou and current_person.account_status != Person::STATUS_TOU_HALT)
-      return true
-    elsif(current_person.account_status == Person::STATUS_TOU_PENDING)
+    if(current_person.account_status == Person::STATUS_TOU_PENDING)
       return true
     else
       return false
