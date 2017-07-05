@@ -40,6 +40,7 @@ class AccountSync < ActiveRecord::Base
         end
         self.update_attributes({processed: true, success: true})
       rescue StandardError => e
+        Honeybadger.notify(e)
         self.update_attributes({processed: true, success: false, errors: e.message})
       end
     end
