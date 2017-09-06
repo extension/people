@@ -5,18 +5,6 @@
 class DataController < ApplicationController
   skip_before_filter :signin_required, :check_hold_status
 
-  def groups
-    if params[:term]
-      like= "%".concat(params[:term].concat("%"))
-      groups = Group.launched.where("name like ?", like)
-    else
-      groups = Group.all
-    end
-    list = groups.map {|g| Hash[ id: g.id, label: g.name, name: g.name]}
-    render json: list
-  end
-
-
   def publicprofile
     person_id = params[:person_id] || params[:person]
     if(person_id.blank?)

@@ -1296,7 +1296,7 @@ class Person < ActiveRecord::Base
         headers << 'Other affiliation'
         headers << 'Location'
         headers << 'County'
-        headers << 'Agreement status'
+        headers << 'Tou agreement status'
         headers << 'Account created'
         headers << 'Last active at'
         if(options[:browse_filter])
@@ -1328,6 +1328,11 @@ class Person < ActiveRecord::Base
             row << person.affiliation
             row << self.name_or_nil(person.location)
             row << self.name_or_nil(person.county)
+            if(person.tou_accepted_at.nil?)
+              row << "Not Yet Accepted"
+            else
+              row << "Accepted"
+            end
             row << (person.created_at ? person.created_at.utc.strftime("%Y-%m-%d %H:%M:%S") : nil)
             row << (person.last_activity_at ? person.last_activity_at.utc.strftime("%Y-%m-%d %H:%M:%S") : nil)
             if(options[:browse_filter])

@@ -10,6 +10,8 @@
       <thead>
         <tr>
         <th>Institution</th>
+        <th>Location</th>
+        <th>Primary contact</th>
         <th>Members</th>
         <th>Regions</th>
         </tr>
@@ -19,6 +21,8 @@
       <%- for institution in @institutions -%>
         <tr>
           <td><%= link_to(institution.name,community_url(institution)) %></td>
+          <td><%= institution.location.blank? ? '&nbsp;' : institution.location.name  %></td>
+          <td><%= link_to_person(institution.primary_contact, :show_blank => true) -%></td>
           <td><%= institution.joined.count -%></td>
           <td><%= institution.extension_regions.map(&:label).join(', ') -%></td>
         </tr>

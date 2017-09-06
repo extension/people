@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20170413123521) do
+ActiveRecord::Schema.define(:version => 20170906194651) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -86,27 +86,20 @@ ActiveRecord::Schema.define(:version => 20170413123521) do
   add_index "browse_filters", ["fingerprint"], :name => "fingerprint_ndx", :unique => true
 
   create_table "communities", :force => true do |t|
-    t.integer  "entrytype",                            :default => 0,     :null => false
-    t.string   "name",                                                    :null => false
+    t.integer  "entrytype",              :default => 0,     :null => false
+    t.string   "name",                                      :null => false
     t.text     "description"
-    t.integer  "created_by",                           :default => 0
-    t.integer  "memberfilter",                         :default => 1
+    t.integer  "created_by",             :default => 0
+    t.integer  "memberfilter",           :default => 1
     t.string   "shortname"
-    t.string   "public_name"
-    t.text     "public_description"
-    t.boolean  "is_launched",                          :default => false
-    t.integer  "public_topic_id"
-    t.boolean  "publishing_community",                 :default => false
-    t.integer  "location_id",                          :default => 0
-    t.string   "public_uri"
-    t.string   "referer_domain"
-    t.string   "institution_code",       :limit => 10
-    t.boolean  "connect_to_drupal",                    :default => false
+    t.boolean  "publishing_community",   :default => false
+    t.integer  "location_id",            :default => 0
+    t.boolean  "connect_to_drupal",      :default => false
     t.integer  "drupal_node_id"
-    t.boolean  "connect_to_google_apps",               :default => false
-    t.boolean  "active",                               :default => true
-    t.datetime "created_at",                                              :null => false
-    t.datetime "updated_at",                                              :null => false
+    t.boolean  "connect_to_google_apps", :default => false
+    t.boolean  "active",                 :default => true
+    t.datetime "created_at",                                :null => false
+    t.datetime "updated_at",                                :null => false
     t.string   "community_masthead"
     t.integer  "blog_id"
     t.integer  "primary_contact_id"
@@ -114,7 +107,6 @@ ActiveRecord::Schema.define(:version => 20170413123521) do
 
   add_index "communities", ["entrytype"], :name => "entrytype_ndx"
   add_index "communities", ["name"], :name => "communities_name_index", :unique => true
-  add_index "communities", ["referer_domain"], :name => "index_communities_on_referer_domain"
   add_index "communities", ["shortname"], :name => "index_communities_on_shortname", :unique => true
 
   create_table "community_connections", :force => true do |t|
@@ -338,6 +330,7 @@ ActiveRecord::Schema.define(:version => 20170413123521) do
     t.boolean  "is_systems_account",                     :default => false
     t.boolean  "display_extension_email",                :default => false, :null => false
     t.integer  "campus_id"
+    t.datetime "retired_at"
   end
 
   add_index "people", ["email"], :name => "email_ndx", :unique => true

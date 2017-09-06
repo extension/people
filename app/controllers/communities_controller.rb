@@ -15,7 +15,7 @@ class CommunitiesController < ApplicationController
   end
 
   def institutions
-    @institutions = Community.institutions.order(:name)
+    @institutions = Community.institutions.includes(:location,:primary_contact).order(:name)
   end
 
   def show
