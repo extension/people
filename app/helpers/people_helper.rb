@@ -19,12 +19,17 @@ module PeopleHelper
 
 
   def link_to_person(person,options = {})
+    show_blank = options[:show_blank] || false
     show_unknown = options[:show_unknown] || false
     show_systemuser = options[:show_systemuser] || false
     nolink = options[:nolink] || false
 
     if person.nil?
-      show_unknown ? 'Unknown' : 'System'
+      if(show_blank)
+        '&nbsp'.html_safe
+      else
+        show_unknown ? 'Unknown' : 'System'
+      end
     elsif(person.id == 1 and !show_systemuser)
       'System'
     elsif(nolink)
