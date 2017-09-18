@@ -1,36 +1,54 @@
 <%- @page_title = "Find and Invite Colleagues: #{@community.name}" -%>
 
-<div class="page-header">
-  <h2><%= @page_title %></h2>
-</div>
-
 <div class="row">
-  <div class="col-md-6">
-    <h3>Find Colleagues</h3>
-    <%= form_tag(:action=> "invite") do -%>
-      <fieldset>
-        <div class="input-group">
-          <%= text_field_tag("q","", class: 'form-control input-lg', :placeholder => 'Search by eXtensionID, email, first or last name', )%>
-          <span class="input-group-btn">
-            <%= submit_tag('Search', class: 'btn btn-default btn-primary input-lg') %>
-          </span>
+  <div class="col-md-10 col-md-offset-1">
+
+    <div class="page-header">
+      <h2><%= @page_title %></h2>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <h3>Find Colleagues</h3>
+        <%= form_tag(:action=> "invite") do -%>
+          <fieldset>
+            <div class="input-group">
+              <%= text_field_tag("q","", class: 'form-control input-lg', :placeholder => 'Search by eXtensionID, email, first or last name', )%>
+              <span class="input-group-btn">
+                <%= submit_tag('Search', class: 'btn btn-default btn-primary input-lg') %>
+              </span>
+            </div>
+          </fieldset>
+        <%- end -%>
+        <p><span class="help-block">This search form will find colleagues that already have an eXtension account.</span></p>
+      </div>
+
+      <div class="col-md-4 col-md-offset-2">
+        <h4>Does your colleague need an eXtension Account?</h4>
+        <div class="colleague-invite-rich">
+          <p class="invite-avatar show-profile">
+            <img class="avatar size300x300" height="50"  width="50" src="/assets/person.png" >
+          </p>
+          <h3>Invite a colleague to get an eXtension account</h3>
+          <p><%= link_to('Send Invitation'.html_safe, invite_people_path, :class => "btn btn-default btn-info btn-xs" )%></p>
         </div>
-      </fieldset>
-    <%- end -%>
-    <span class="help-block">This search form will find colleagues that already have an eXtension account. You can <%= link_to("invite your colleague to get an eXtensionID", invite_people_path)%> if they do not already have an account.</span>
-  </div>
-</div>
+      </div>
 
-<%- if !@connections.blank? -%>
-<div class="row">
-  <div class="col-md-12">
-    <%= page_entries_info @connections %>
-    <%= paginate(@connections) %>
-    <%- if @community.is_institution? %>
-      <%= render(:partial => 'institution_connections_table') %>
-    <%- else -%>
-      <%= render(:partial => 'community_connections_table') %>
+    </div>
+
+    <%- if !@connections.blank? -%>
+    <div class="row">
+      <div class="col-md-12">
+        <%= page_entries_info @connections %>
+        <%= paginate(@connections) %>
+        <%- if @community.is_institution? %>
+          <%= render(:partial => 'institution_connections_table') %>
+        <%- else -%>
+          <%= render(:partial => 'community_connections_table') %>
+        <%- end -%>
+      </div>
+    </div>
     <%- end -%>
+    
   </div>
 </div>
-<%- end -%>

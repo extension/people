@@ -9,6 +9,15 @@
     <h3>Find people</h3>
     <%= render(:partial => 'people/find_form') %>
   </div>
+  <div class="col-md-4 col-md-offset-2">
+    <div class="colleague-invite-rich">
+      <p class="invite-avatar show-profile">
+        <img class="avatar size300x300" height="50"  width="50" src="/assets/person.png" >
+      </p>
+      <h3>Invite a colleague to get an eXtension account</h3>
+      <p><%= link_to('Send Invitation'.html_safe, invite_people_path, :class => "btn btn-default btn-info btn-xs" )%></p>
+    </div>
+  </div>
 </div>
 
 
@@ -31,5 +40,8 @@
     <h3>Colleague not found?</h3>
 
     <p><%= link_to("Invite your colleague to get an eXtensionID", invite_people_path)%>. You just need to know your colleague's email address.  You can also <%= link_to("browse existing invitations", invitations_people_path)%>.</p>
+  </div>
+  <div class="col-md-4">
+
   </div>
 </div>
