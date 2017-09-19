@@ -30,7 +30,7 @@
             <img class="avatar size300x300" height="50"  width="50" src="/assets/person.png" >
           </p>
           <h3>Invite a colleague to get an eXtension account</h3>
-          <p><%= link_to('Send Invitation'.html_safe, invite_people_path, :class => "btn btn-default btn-info btn-xs" )%></p>
+          <p><%= link_to('Send Invitation'.html_safe, invite_people_path(:community => @community.id), :class => "btn btn-default btn-info btn-xs" )%></p>
         </div>
       </div>
 
