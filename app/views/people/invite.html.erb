@@ -52,7 +52,7 @@
               <% @invite_communities.each do |community| %>
                 <div class="checkbox">
                   <label>
-                    <%= check_box_tag("invitation[invitedcommunities][]",community.id, ((params[:community].to_f == community.id) ? true : nil ), {:id => "invitation_invitedcommunities_#{community.id}"}) %> <%= community.name %>
+                    <%= check_box_tag("invitation[invitedcommunities][]",community.id, (@check_community and @check_community.id == community.id), {:id => "invitation_invitedcommunities_#{community.id}"}) %> <%= community.name %>
                   </label>
                 </div>
               <% end %>

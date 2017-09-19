@@ -245,6 +245,9 @@ class PeopleController < ApplicationController
       end
     else
       @invitation = Invitation.new()
+      if(params[:community])
+        @check_community = Community.where(id: params[:community]).first
+      end
     end
   end
 
