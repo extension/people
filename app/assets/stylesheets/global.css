@@ -5,6 +5,38 @@
   padding-right: 20px;
 }
 
+.colleague-invite {
+  float:right;
+  margin-top:-4em;
+}
+.btn-extension {background: #fa6218; border:none;}
+.colleague-invite-rich {
+  padding:14px 14px 10px;
+  background: #eee;
+  border-radius: 10px;
+  /*float:right;*/
+  /*margin-top:-7em;*/
+/*border:2px solid #ddd;*/
+/*background: #9fb2d7;*/
+}
+.colleague-invite-rich h3 {font-size:13px;
+  /*float:left;*/
+  margin:0 0 10px;;}
+.colleague-invite-rich p {margin-bottom:0;}
+.colleague-invite-rich .btn {letter-spacing:1px;}
+.invite-avatar {float:left; margin-right:20px; margin-bottom:0;}
+.invite-avatar img {
+  /*opacity: 0.5;*/
+  border:1px  solid #999;
+    width: 100%;
+    height: 100%;
+    max-width: 50px;
+    max-height: 50px;
+    border-radius: 50%;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+}
+
 /* Footer
 -------------------------------------------------- */
 

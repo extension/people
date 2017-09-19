@@ -5,8 +5,8 @@
 <div class="row">
 
 <div class="col-md-6">
-    
-    
+
+
   <h3>Hi <%= current_person.first_name %>, Welcome Back!</h3>
   <p>You are joining <span class='mednumber'><%= number_with_delimiter(@active_count-1) %></span> colleagues that have been active in People within the last month.</p>
 
@@ -24,10 +24,18 @@
     <div class='dashmodule'>
     <h3>Find Colleagues</h3>
     <%= render(:partial => 'people/find_form') %>
-    <p>You can also <%= link_to("browse the directory", browse_people_path())%> of <span class='mednumber'><%= number_with_delimiter(Person.display_accounts.count) %></span> accounts and 
+    <p>You can also <%= link_to("browse the directory", browse_people_path())%> of <span class='mednumber'><%= number_with_delimiter(Person.display_accounts.count) %></span> accounts and
     <%= link_to("filter the list by communities, locations, positions, and social networks", browse_people_path(showform: true))%></p>
+
+    <div class="colleague-invite-rich">
+      <p class="invite-avatar show-profile">
+        <img class="avatar size300x300" height="50"  width="50" src="/assets/person.png" >
+      </p>
+      <h3>Invite a colleague to get an eXtension account</h3>
+      <p><%= link_to('Send Invitation'.html_safe, invite_people_path, :class => "btn btn-default btn-info btn-xs" )%></p>
     </div>
-    
+    </div>
+
     <div class='dashmodule'>
     <h3>Search for Communities and Institutions</h3>
     <%= render(:partial => 'communities/find_form') %>
