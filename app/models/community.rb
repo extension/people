@@ -44,14 +44,14 @@ class Community < ActiveRecord::Base
   }
 
   # eXtension insitutitional membership status
-  NOT_MEMBER = 1
-  BASIC_MEMBER = 2
-  PREMIUM_MEMBER = 3
+  NOT_MEMBER = 0
+  BASIC_MEMBER = 1
+  PREMIUM_MEMBER = 2
 
   MEMBERSTATUS_LABELS = {
-    NOT_MEMBER => 'not a member',
-    BASIC_MEMBER => 'basic',
-    PREMIUM_MEMBER => 'premium'
+    NOT_MEMBER => 'Not a member',
+    BASIC_MEMBER => 'Basic member',
+    PREMIUM_MEMBER => 'Premium member'
   }
 
   CONNECTION_CONDITIONS = {
@@ -352,6 +352,10 @@ class Community < ActiveRecord::Base
     self.joined.each do |p|
       p.synchronize_accounts
     end
+  end
+
+  def membership_status_label
+    MEMBERSTATUS_LABELS[self.membership_status]
   end
 
 
