@@ -1293,6 +1293,7 @@ class Person < ActiveRecord::Base
         headers << 'Title'
         headers << 'Position'
         headers << 'Institution'
+        headers << 'Institution Membership Level'
         headers << 'Other affiliation'
         headers << 'Location'
         headers << 'County'
@@ -1325,6 +1326,11 @@ class Person < ActiveRecord::Base
             row << person.title
             row << self.name_or_nil(person.position)
             row << self.name_or_nil(person.institution)
+            if(!person.institution.nil?)
+              row << person.institution.membership_level_label
+            else
+              row << 'n/a'
+            end
             row << person.affiliation
             row << self.name_or_nil(person.location)
             row << self.name_or_nil(person.county)
