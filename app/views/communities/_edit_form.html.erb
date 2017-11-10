@@ -73,6 +73,13 @@
       </div>
     </div>
 
+    <div class="form-group">
+      <label for="entrytype" class="col-md-4 control-label">eXtension Membership Level</label>
+      <div class="col-md-5">
+        <%= f.select(:membership_level, options_for_select(get_membershiplevels_for_select, @community.membership_level), {}, {:class => "form-control"}) %>
+      </div>
+    </div>
+
     <%- if !@community.is_institution? -%>
     <div class="form-group">
       <label for="connect_to_drupal" class="col-md-4 control-label">Public content</label>

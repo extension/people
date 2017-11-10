@@ -136,6 +136,15 @@ module CommunitiesHelper
     returnarray
   end
 
+  def get_membershiplevels_for_select
+    returnarray = []
+    Community::MEMBERSHIPLEVEL_LABELS.keys.sort.each do |key|
+      returnarray << ["#{Community::MEMBERSHIPLEVEL_LABELS[key].capitalize}",key]
+    end
+    returnarray
+  end
+
+
   def community_icon(community)
     if(community.is_institution?)
       "<i class='fa fa-building-o'></i>".html_safe

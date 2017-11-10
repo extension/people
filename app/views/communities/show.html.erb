@@ -53,6 +53,10 @@
         <div class="dashmodule">
           <p class="lead"><%= @community.entrytype_to_s -%></p>
           <dl>
+            <%- if @community.is_institution? -%>
+              <dt>eXtension Membership Level</dt>
+              <dd><%= @community.membership_level_label -%></dd>
+            <%- end -%>
             <%- if @community.primary_contact_id.present? -%>
               <dt>Primary Contact</dt>
               <dd><%= link_to_person(@community.primary_contact) -%></dd>
