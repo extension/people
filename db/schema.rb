@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20170906194651) do
+ActiveRecord::Schema.define(:version => 20171109224219) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -103,6 +103,7 @@ ActiveRecord::Schema.define(:version => 20170906194651) do
     t.string   "community_masthead"
     t.integer  "blog_id"
     t.integer  "primary_contact_id"
+    t.integer  "membership_status",      :default => 1,     :null => false
   end
 
   add_index "communities", ["entrytype"], :name => "entrytype_ndx"

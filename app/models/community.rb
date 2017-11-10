@@ -43,6 +43,16 @@ class Community < ActiveRecord::Base
     INVITATIONONLY => 'invitation'
   }
 
+  # eXtension insitutitional membership status
+  NOT_MEMBER = 1
+  BASIC_MEMBER = 2
+  PREMIUM_MEMBER = 3
+
+  MEMBERSTATUS_LABELS = {
+    NOT_MEMBER => 'not a member',
+    BASIC_MEMBER => 'basic',
+    PREMIUM_MEMBER => 'premium'
+  }
 
   CONNECTION_CONDITIONS = {
     'joined'  => "connectiontype IN ('member','leader')",
