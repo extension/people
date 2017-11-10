@@ -103,7 +103,7 @@ ActiveRecord::Schema.define(:version => 20171109224219) do
     t.string   "community_masthead"
     t.integer  "blog_id"
     t.integer  "primary_contact_id"
-    t.integer  "membership_status",      :default => 0,     :null => false
+    t.integer  "membership_level",       :default => 0,     :null => false
   end
 
   add_index "communities", ["entrytype"], :name => "entrytype_ndx"
