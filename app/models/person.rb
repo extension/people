@@ -258,8 +258,11 @@ class Person < ActiveRecord::Base
       person = self.find_by_id(id)
     elsif(id =~ %r{@})
       person = self.find_by_email(id)
-    # does the id contain a least one alpha? let's search by idstring
+      if(person.nil? and checkid = check_idstring_for_extensionorg(id))
+        person = self.find_by_idstring(checkid)
+      end
     elsif(id =~ %r{[[:alpha:]]?})
+      # does the id contain a least one alpha? let's search by idstring
       person = self.find_by_idstring(id)
     end
 
