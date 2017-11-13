@@ -80,7 +80,7 @@
           <dt>Email:</dt>
           <dd><%= @person.display_email%></dd>
           <%- if @person == current_person or current_person.is_admin? -%>
-            <%- if @person.display_email != @person.email -%>
+            <%- if (@person.display_email != @person.email) or @person.display_email_is_extension? -%>
             <dd>Forwards to: <%= @person.email_forward %></dd>
             <%- end -%>
           <%- end -%>

@@ -258,8 +258,11 @@ class Person < ActiveRecord::Base
       person = self.find_by_id(id)
     elsif(id =~ %r{@})
       person = self.find_by_email(id)
-    # does the id contain a least one alpha? let's search by idstring
+      if(person.nil? and checkid = check_idstring_for_extensionorg(id))
+        person = self.find_by_idstring(checkid)
+      end
     elsif(id =~ %r{[[:alpha:]]?})
+      # does the id contain a least one alpha? let's search by idstring
       person = self.find_by_idstring(id)
     end
 
@@ -583,7 +586,7 @@ class Person < ActiveRecord::Base
 
   def email_forward
     if(!self.primary_account_id.blank?)
-      self.primary_account.idstring
+      "#{self.primary_account.idstring}@extension.org"
     elsif(self.google_apps_email?)
       "#{self.idstring}@apps.extension.org"
     elsif(self.email =~ /extension\.org$/i)
@@ -599,6 +602,10 @@ class Person < ActiveRecord::Base
     else
       self.email
     end
+  end
+
+  def display_email_is_extension?
+    ((self.display_email =~ /extension\.org$/i) > 0)
   end
 
   def all_email_aliases
@@ -1293,6 +1300,7 @@ class Person < ActiveRecord::Base
         headers << 'Title'
         headers << 'Position'
         headers << 'Institution'
+        headers << 'Institution Membership Level'
         headers << 'Other affiliation'
         headers << 'Location'
         headers << 'County'
@@ -1325,6 +1333,11 @@ class Person < ActiveRecord::Base
             row << person.title
             row << self.name_or_nil(person.position)
             row << self.name_or_nil(person.institution)
+            if(!person.institution.nil?)
+              row << person.institution.membership_level_label
+            else
+              row << 'n/a'
+            end
             row << person.affiliation
             row << self.name_or_nil(person.location)
             row << self.name_or_nil(person.county)

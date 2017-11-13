@@ -53,6 +53,10 @@
         <div class="dashmodule">
           <p class="lead"><%= @community.entrytype_to_s -%></p>
           <dl>
+            <%- if @community.is_institution? -%>
+              <dt>eXtension Membership Level</dt>
+              <dd><%= @community.membership_level_label -%></dd>
+            <%- end -%>
             <%- if @community.primary_contact_id.present? -%>
               <dt>Primary Contact</dt>
               <dd><%= link_to_person(@community.primary_contact) -%></dd>
@@ -84,19 +88,21 @@
         <%- end -%>
 
         <div id="communityforums">
-          <%- if(@community.connect_to_google_apps? and gg = @community.joined_google_group and (current_person.is_community_member?(@community) or current_person.is_admin?)) -%>
-            <h3>Community Forums</h3>
+          <h3>Google Group Forum</h3>
             <div class="dashmodule">
+              <%- if(@community.connect_to_google_apps? and gg = @community.joined_google_group) -%>
               <dl>
-                <dt><%= link_to('Community Forum (Google Group)',gg.forum_url) %></dt>
+                <dt><%= link_to('Google Group Forum',gg.forum_url) %></dt>
                 <dd>Post to forum by email: <%= link_to(gg.group_email_address, "mailto:#{gg.group_email_address}") %></dd>
-                <%- if(lg = @community.leaders_google_group) -%>
-                  <dt><%= link_to('Community Leader Forum (Google Group)',lg.forum_url) %></dt>
+                  <%- if(lg = @community.leaders_google_group) -%>
+                  <dt><%= link_to('Google Group Forum - Leaders',lg.forum_url) %></dt>
                   <dd>Post to leader forum by email: <%= link_to(lg.group_email_address, "mailto:#{lg.group_email_address}") %></dd>
-                <%- end -%>
+                  <%- end -%>
               </dl>
-            </div>
-          <%- end -%>
+              <%- else -%>
+              <p>This community is not connected to an eXtension GSuite Google Group</p>
+              <%- end -%>
+          </div>
         </div>
 
       </div>

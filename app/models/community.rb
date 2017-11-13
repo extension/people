@@ -12,7 +12,7 @@ class Community < ActiveRecord::Base
   attr_accessible :name, :description, :location, :location_id, :memberfilter, :connect_to_drupal
   attr_accessible :connect_to_google_apps, :entrytype, :shortname, :publishing_community, :is_public
   attr_accessible :community_masthead, :community_masthead_cache, :remove_community_masthead
-  attr_accessible :blog_id, :primary_contact_id
+  attr_accessible :blog_id, :primary_contact_id, :membership_level
 
   mount_uploader :community_masthead, CommunityMastheadUploader
   default_scope where(active: true)
@@ -43,6 +43,16 @@ class Community < ActiveRecord::Base
     INVITATIONONLY => 'invitation'
   }
 
+  # eXtension insitutitional membership level
+  NOT_MEMBER = 0
+  BASIC_MEMBER = 1
+  PREMIUM_MEMBER = 2
+
+  MEMBERSHIPLEVEL_LABELS = {
+    NOT_MEMBER => 'none',
+    BASIC_MEMBER => 'basic',
+    PREMIUM_MEMBER => 'premium'
+  }
 
   CONNECTION_CONDITIONS = {
     'joined'  => "connectiontype IN ('member','leader')",
@@ -342,6 +352,10 @@ class Community < ActiveRecord::Base
     self.joined.each do |p|
       p.synchronize_accounts
     end
+  end
+
+  def membership_level_label
+    MEMBERSHIPLEVEL_LABELS[self.membership_level].capitalize
   end
 
 

@@ -57,10 +57,7 @@ class AccountsController < ApplicationController
       if(!params[:email])
         flash.now[:error] = 'You must provide your email address'
       else
-        @person = Person.find_by_email(params[:email])
-        if(@person.nil?)
-          @person = Person.find_by_idstring(params[:email])
-        end
+        @person = Person.find_by_email_or_idstring_or_id(params[:email],false)
 
         if(@person.nil?)
           flash.now[:warning] = "We are not able to find an account registered with that email address"
