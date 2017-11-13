@@ -583,7 +583,7 @@ class Person < ActiveRecord::Base
 
   def email_forward
     if(!self.primary_account_id.blank?)
-      self.primary_account.idstring
+      "#{self.primary_account.idstring}@extension.org"
     elsif(self.google_apps_email?)
       "#{self.idstring}@apps.extension.org"
     elsif(self.email =~ /extension\.org$/i)
@@ -599,6 +599,10 @@ class Person < ActiveRecord::Base
     else
       self.email
     end
+  end
+
+  def display_email_is_extension?
+    ((self.display_email =~ /extension\.org$/i) > 0)
   end
 
   def all_email_aliases
