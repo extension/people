@@ -605,7 +605,7 @@ class Person < ActiveRecord::Base
   end
 
   def display_email_is_extension?
-    ((self.display_email =~ /extension\.org$/i) > 0)
+    (!(self.display_email =~ /extension\.org$/i).nil?)
   end
 
   def all_email_aliases
