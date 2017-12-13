@@ -7,9 +7,41 @@
 
 class GoogleAccount < ActiveRecord::Base
   serialize :last_error
+  serialize :google_account_data
   attr_accessible :person, :person_id, :given_name, :family_name, :is_admin, :suspended, :apps_updated_at, :has_error, :last_error
+  attr_accessible :last_ga_login_request_at, :last_ga_login_at
   belongs_to :person
   before_save  :set_values_from_person
+
+
+
+  def get_google_account_data
+    gda = GoogleDirectoryApi.new
+    if(!self.renamed_from_username.blank?)
+      found_account = gda.retrieve_account(self.renamed_from_username)
+    else
+      found_account = gda.retrieve_account(self.username)
+    end
+
+    if(found_account)
+      gda.last_result
+    else
+      nil
+    end
+  end
+
+  def update_last_ga_login_at
+    if(account_data = self.get_google_account_data)
+      self.last_ga_login_request_at = Time.now
+      begin
+        self.last_ga_login_at = Time.parse(account_data['lastLoginTime'])
+      rescue
+        self.last_ga_login_at = nil
+      end
+      self.save
+    end
+  end
+
 
   def set_values_from_person
     if(!self.new_record?)
@@ -38,9 +70,23 @@ class GoogleAccount < ActiveRecord::Base
     end
   end
 
+  def queue_update_last_ga_login_at
+    if(Settings.redis_enabled)
+      self.class.delay_for(5.seconds).delayed_update_last_ga_login_at(self.id)
+    else
+      self.update_last_ga_login_at
+    end
+  end
+
   def self.delayed_update_apps_account(record_id)
     if(record = find_by_id(record_id))
       record.update_apps_account
+    end
+  end
+
+  def self.delayed_update_last_ga_login_at(record_id)
+    if(record = find_by_id(record_id))
+      record.update_last_ga_login_at
     end
   end
 

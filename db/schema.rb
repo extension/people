@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20171109224219) do
+ActiveRecord::Schema.define(:version => 20171213195842) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -184,18 +184,20 @@ ActiveRecord::Schema.define(:version => 20171109224219) do
   end
 
   create_table "google_accounts", :force => true do |t|
-    t.integer  "person_id",             :default => 0,     :null => false
-    t.string   "username",                                 :null => false
-    t.string   "given_name",                               :null => false
-    t.string   "family_name",                              :null => false
-    t.boolean  "is_admin",              :default => false
-    t.boolean  "suspended",             :default => false
+    t.integer  "person_id",                :default => 0,     :null => false
+    t.string   "username",                                    :null => false
+    t.string   "given_name",                                  :null => false
+    t.string   "family_name",                                 :null => false
+    t.boolean  "is_admin",                 :default => false
+    t.boolean  "suspended",                :default => false
     t.datetime "apps_updated_at"
-    t.boolean  "has_error",             :default => false
+    t.boolean  "has_error",                :default => false
     t.text     "last_error"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "renamed_from_username"
+    t.datetime "last_ga_login_request_at"
+    t.datetime "last_ga_login_at"
   end
 
   add_index "google_accounts", ["person_id"], :name => "person_ndx", :unique => true
