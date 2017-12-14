@@ -126,17 +126,17 @@ class GoogleAccount < ActiveRecord::Base
       found_account = gda.retrieve_account(self.username)
     end
 
-    # is the password reset field blank now? then set a random one
-    # so that we can get the account updated or created
-    begin
-      if(!google_password = self.person.password_reset)
-        self.person.password_reset = SecureRandom.hex(16)
-      end
-    rescue PasswordDecryptionError => e
-      Honeybadger.notify("Google Account Sync Error")
-      self.update_attributes({:has_error => true, :last_error => e.message})
-      return nil
-    end
+    # # is the password reset field blank now? then set a random one
+    # # so that we can get the account updated or created
+    # begin
+    #   if(!google_password = self.person.password_reset)
+    #     self.person.password_reset = SecureRandom.hex(16)
+    #   end
+    # rescue PasswordDecryptionError => e
+    #   Honeybadger.notify("Google Account Sync Error")
+    #   self.update_attributes({:has_error => true, :last_error => e.message})
+    #   return nil
+    # end
 
     # create the account if it didn't exist
     if(!found_account)
