@@ -30,16 +30,37 @@ class GoogleAccount < ActiveRecord::Base
     end
   end
 
-  def update_last_ga_login_at
-    if(account_data = self.get_google_account_data)
+  # if I restructure update_account, this method exists to use the account data
+  # we have from the account update, it now just gets it again when it already
+  # had it in the directory api calls, but in lieu of modifying the directory api calls
+  # for now, it's just abstraction silliness or maybe syntactic sugar, yeah, syntactic semantic sugar
+  def set_last_ga_login_values_from_google_account_data(google_account_data,save_values = true)
+    if(!google_account_data.blank?)
       self.last_ga_login_request_at = Time.now
       begin
-        self.last_ga_login_at = Time.parse(account_data['lastLoginTime'])
+        ga_last_login_time = Time.parse(google_account_data['lastLoginTime'])
+        if(ga_last_login_time.to_i > 0)
+          self.last_ga_login_at = ga_last_login_time
+          self.has_ga_login = true
+        else
+          self.last_ga_login_at = nil
+          self.has_ga_login = false
+        end
       rescue
+        # time parse failure
         self.last_ga_login_at = nil
+        self.has_ga_login = nil
       end
-      self.save
+
+      if(save_values)
+        self.save
+      end
     end
+    self
+  end
+
+  def update_last_ga_login_at
+    self.set_last_ga_login_values_from_google_account_data(self.get_google_account_data)
   end
 
 
@@ -144,6 +165,8 @@ class GoogleAccount < ActiveRecord::Base
     # if we made it here, it must have worked
     self.update_column(:renamed_from_username,nil)
     self.person.clear_password_reset
+    # retrieve the account again for good measure and set last google login
+    self.update_last_ga_login_at
     return self
   end
 
