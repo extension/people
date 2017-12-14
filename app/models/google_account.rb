@@ -13,6 +13,10 @@ class GoogleAccount < ActiveRecord::Base
   belongs_to :person
   before_save  :set_values_from_person
 
+  scope :not_suspended, ->{where(suspended: false)}
+  scope :suspended, ->{where(suspended: true)}
+  scope :has_ga_login, ->{where(has_ga_login: true)}
+  scope :active, -> { where('DATE(last_ga_login_at) >= ?',Date.today - Settings.months_for_inactive_flag.months) }
 
 
   def get_google_account_data
@@ -112,12 +116,26 @@ class GoogleAccount < ActiveRecord::Base
   end
 
   def update_apps_account
+    # clear errors out
+    self.update_attributes(has_error: false, last_error: nil)
     # load GoogleDirectoryApi
     gda = GoogleDirectoryApi.new
     if(!self.renamed_from_username.blank?)
       found_account = gda.retrieve_account(self.renamed_from_username)
     else
       found_account = gda.retrieve_account(self.username)
+    end
+
+    # is the password reset field blank now? then set a random one
+    # so that we can get the account updated or created
+    begin
+      if(!google_password = self.person.password_reset)
+        self.person.password_reset = SecureRandom.hex(16)
+      end
+    rescue PasswordDecryptionError => e
+      Honeybadger.notify("Google Account Sync Error")
+      self.update_attributes({:has_error => true, :last_error => e.message})
+      return nil
     end
 
     # create the account if it didn't exist
@@ -129,13 +147,13 @@ class GoogleAccount < ActiveRecord::Base
                                               password: self.person.password_reset,
                                               suspended: self.suspended?})
       rescue StandardError => e
-        Honeybadger.notify("Google Account Sync Error")
+        Honeybadger.notify("Google Account Sync Error", error_class: 'GoogleAccount', context: {google_account_id: self.id})
         self.update_attributes({:has_error => true, :last_error => e.message})
         return nil
       end
 
       if(!created_account)
-        Honeybadger.notify("Google Account Sync Error")
+        Honeybadger.notify("Google Account Sync Error", error_class: 'GoogleAccount', context: {google_account_id: self.id})
         self.update_attributes({:has_error => true, :last_error => gda.last_result})
         return nil
       end
@@ -149,13 +167,13 @@ class GoogleAccount < ActiveRecord::Base
                                               password: self.person.password_reset,
                                               suspended: self.suspended?})
       rescue StandardError => e
-        Honeybadger.notify("Google Account Sync Error")
+        Honeybadger.notify("Google Account Sync Error", error_class: 'GoogleAccount', context: {google_account_id: self.id})
         self.update_attributes({:has_error => true, :last_error => e.message})
         return nil
       end
 
       if(!updated_account)
-        Honeybadger.notify("Google Account Sync Error")
+        Honeybadger.notify("Google Account Sync Error", error_class: 'GoogleAccount', context: {google_account_id: self.id})
         self.update_attributes({:has_error => true, :last_error => gda.last_result})
         return nil
       end
