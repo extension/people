@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20171213195842) do
+ActiveRecord::Schema.define(:version => 20171214140411) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -198,6 +198,7 @@ ActiveRecord::Schema.define(:version => 20171213195842) do
     t.string   "renamed_from_username"
     t.datetime "last_ga_login_request_at"
     t.datetime "last_ga_login_at"
+    t.boolean  "has_ga_login"
   end
 
   add_index "google_accounts", ["person_id"], :name => "person_ndx", :unique => true

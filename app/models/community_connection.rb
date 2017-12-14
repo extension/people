@@ -11,6 +11,8 @@ class CommunityConnection < ActiveRecord::Base
   belongs_to :community, unscoped: true
   belongs_to :person
 
-  scope :approved_community, joins(:community).where("communities.entrytype = #{Community::APPROVED}")
+  scope :approved_community, ->{joins(:community).where("communities.entrytype = #{Community::APPROVED}")}
+  scope :connected_to_google, ->{joins(:community).where("communities.connect_to_google_apps = 1")}
+  scope :joined_connections, ->{where(Community::CONNECTION_CONDITIONS['joined'])}
 
 end
