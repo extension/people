@@ -1537,6 +1537,27 @@ class Person < ActiveRecord::Base
     end
   end
 
+
+  def self.google_group_members
+    # get a community_id
+    google_group_joined_people = CommunityConnection.connected_to_google.joined_connections.pluck("DISTINCT community_connections.person_id")
+    with_scope do
+      self.where(id: google_group_joined_people)
+    end
+  end
+
+  def self.ga_login_stats
+    with_scope do
+      has_ga_login_count = self.joins(:google_account).where("google_accounts.has_ga_login = 1").count
+      active_ga_login_count = self.joins(:google_account) \
+                                  .where("google_accounts.has_ga_login = 1") \
+                                  .where('DATE(google_accounts.last_ga_login_at) >= ?',Date.today - Settings.months_for_inactive_flag.months).count
+      no_ga_login_count = self.joins(:google_account).where("google_accounts.has_ga_login = 0").count
+      unknown_ga_login_count = self.joins(:google_account).where("google_accounts.has_ga_login IS NULL").count
+      {yes: has_ga_login_count, no: no_ga_login_count, unknown: unknown_ga_login_count, active: active_ga_login_count }
+    end
+  end
+
   private
 
   def check_account_status
