@@ -180,7 +180,7 @@ class GoogleDirectoryApi
     # so like Pokémon, we gotta catch them all
     did_we_catch_them_all = false
     pagination_token = nil
-    returnmembers = []
+    member_email_addresses = []
     while(!did_we_catch_them_all)
       if(!pagination_token.nil?)
         request_parameters['pageToken'] = pagination_token
@@ -208,8 +208,8 @@ class GoogleDirectoryApi
         members = last_result_data['members']
         if(!members.nil?)
           members.each do |member_resource|
-            if(%r{([\w-]+)\@extension\.org$} =~ member_resource['email'])
-              returnmembers << $1
+            if(!member_resource['email'].blank?)
+              member_email_addresses << member_resource['email']
             end
           end
         end
@@ -221,18 +221,18 @@ class GoogleDirectoryApi
       end
     end
 
-    returnmembers
+    member_email_addresses
   end
 
-  def add_member_to_group(account_idstring,group_idstring)
+  def add_member_to_group(email_address,group_idstring)
     add_parameters = {
-      'email' => "#{account_idstring}@extension.org"
+      'email' => email_address
     }
 
     # hardcoded role of member or owner depending
     # on whether this is the moderator account
 
-    if(account_idstring == 'systemsmoderator')
+    if(email_address == 'systemsmoderator@extension.org')
       add_parameters['role'] = 'OWNER'
     else
       add_parameters['role'] = 'MEMBER'
@@ -244,19 +244,19 @@ class GoogleDirectoryApi
       {:api_method => @directory_api.members.insert,
       :parameters => {'groupKey' => "#{group_idstring}@extension.org"},
       :body_object => member_data},
-      {group_id: group_idstring, account_id: account_idstring}
+      {group_id: group_idstring, account_id: email_address}
     )
     return (@last_result.status == 200)
 
   end
 
 
-  def remove_member_from_group(account_idstring,group_idstring)
+  def remove_member_from_group(email_address,group_idstring)
     @last_result = self.api_request(
       {:api_method => @directory_api.members.delete,
-      :parameters => {'memberKey' => "#{account_idstring}@extension.org",
+      :parameters => {'memberKey' => email_address,
                       'groupKey' => "#{group_idstring}@extension.org"}},
-                      {group_id: group_idstring, account_id: account_idstring}
+                      {group_id: group_idstring, account_id: email_address}
     )
     return (@last_result.status == 204)
   end

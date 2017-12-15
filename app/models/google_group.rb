@@ -114,47 +114,63 @@ class GoogleGroup < ActiveRecord::Base
     return self
   end
 
+  def get_apps_group_members(gda)
+    gda.retrieve_group_members(self.group_id)
+  end
+
+  def map_community_members_to_emails
+    if(self.use_profile_email_addresses)
+      # map the community members to an array of profile emails
+      # - actual email *not* the display email
+      if(self.connectiontype == 'leaders')
+        community_members = self.community.leaders.map{|person| "#{person.email}"}
+      else
+        community_members = self.community.joined.map{|person| "#{person.email}"}
+      end
+    else
+      # map the community members to an array of idstring@extension.org emails
+      if(self.connectiontype == 'leaders')
+        community_members = self.community.leaders.map{|person| "#{person.idstring}@extension.org"}
+      else
+        community_members = self.community.joined.map{|person| "#{person.idstring}@extension.org"}
+      end
+    end
+    community_members
+  end
+
+
   def update_apps_group_members
     # load GoogleDirectoryApi
     gda = GoogleDirectoryApi.new
 
-    apps_group_members = gda.retrieve_group_members(self.group_id)
+    apps_group_members = self.get_apps_group_members(gda)
     if(apps_group_members.nil?)
       self.update_attributes({:has_error => true, :last_error => gda.last_result})
       return nil
     end
 
-    # map the community members to an array of idstrings
-    if(self.connectiontype == 'leaders')
-      community_members = self.community.leaders.map{|person| "#{person.idstring}"}
-    else
-      community_members = self.community.joined.map{|person| "#{person.idstring}"}
-    end
-
     # inject the moderator account
     moderator_account = Person.find(Person::MODERATOR_ACCOUNT)
-    if(community_members)
-      community_members << moderator_account.idstring
+    if(community_members = self.map_community_members_to_emails)
+      community_members << moderator_account.email
     else
-      community_members = [moderator_account.idstring]
+      community_members = [moderator_account.email]
     end
 
     adds = community_members - apps_group_members
     removes = apps_group_members - community_members
 
-    adds.each do |member_id|
+    adds.each do |member_email|
       # split the id string back out
-      gda.add_member_to_group(member_id, self.group_id)
+      gda.add_member_to_group(member_email, self.group_id)
     end
 
-    removes.each do |member_id|
-      gda.remove_member_from_group(member_id, self.group_id)
+    removes.each do |member_email|
+      gda.remove_member_from_group(member_email, self.group_id)
     end
 
     return self
   end
-
-
 
 
   def self.clear_errors
