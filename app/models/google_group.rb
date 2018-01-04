@@ -28,7 +28,15 @@ class GoogleGroup < ActiveRecord::Base
   end
 
   def group_email_address
-    "#{self.group_id}@extension.org"
+    if(self.use_groups_domain)
+      "#{self.group_id}@#{Settings.googleapps_groups_domain}"
+    else
+      "#{self.group_id}@extension.org"
+    end
+  end
+
+  def group_key_for_api
+    self.group_email_address
   end
 
 
@@ -91,18 +99,18 @@ class GoogleGroup < ActiveRecord::Base
 
     # load GoogleDirectoryApi
     gda = GoogleDirectoryApi.new
-    found_group = gda.retrieve_group(self.group_id)
+    found_group = gda.retrieve_group(self.group_key_for_api)
 
     # create the group if it doesnt't exist
     if(!found_group)
-      created_group = gda.create_group(self.group_id, {description: self.group_name, name: self.group_name})
+      created_group = gda.create_group(self.group_key_for_api, {description: self.group_name, name: self.group_name})
 
       if(!created_group)
         self.update_attributes({:has_error => true, :last_error => gda.last_result})
         return nil
       end
     else
-      updated_group = gda.update_group(self.group_id, {description: self.group_name, name: self.group_name})
+      updated_group = gda.update_group(self.group_key_for_api, {description: self.group_name, name: self.group_name})
 
       if(!updated_group)
         self.update_attributes({:has_error => true, :last_error => gda.last_result})
@@ -115,11 +123,11 @@ class GoogleGroup < ActiveRecord::Base
   end
 
   def get_apps_group_members(gda)
-    gda.retrieve_group_members(self.group_id)
+    gda.retrieve_group_members(self.group_key_for_api)
   end
 
   def map_community_members_to_emails
-    if(self.use_profile_email_addresses)
+    if(self.use_groups_domain)
       # map the community members to an array of profile emails
       # - actual email *not* the display email
       if(self.connectiontype == 'leaders')
@@ -162,11 +170,11 @@ class GoogleGroup < ActiveRecord::Base
 
     adds.each do |member_email|
       # split the id string back out
-      gda.add_member_to_group(member_email, self.group_id)
+      gda.add_member_to_group(member_email, self.group_key_for_api)
     end
 
     removes.each do |member_email|
-      gda.remove_member_from_group(member_email, self.group_id)
+      gda.remove_member_from_group(member_email, self.group_key_for_api)
     end
 
     return self

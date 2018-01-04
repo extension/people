@@ -125,18 +125,18 @@ class GoogleDirectoryApi
   end
 
 
-  def retrieve_group(group_idstring)
+  def retrieve_group(group_key)
     @last_result = self.api_request({
       :api_method => @directory_api.groups.get,
-      :parameters => {'groupKey' => "#{group_idstring}@extension.org"}
-    },{group_id: group_idstring}
+      :parameters => {'groupKey' => "#{group_key}"}
+    },{group_id: group_key}
     )
     return (@last_result.status == 200)
   end
 
-  def create_group(group_idstring, create_options = {})
+  def create_group(group_key, create_options = {})
     create_parameters = {
-      'email' => "#{group_idstring}@extension.org",
+      'email' => "#{group_key}",
       "description" => create_options[:description],
       "name" => create_options[:name]
     }
@@ -146,14 +146,14 @@ class GoogleDirectoryApi
     @last_result = self.api_request(
       {:api_method => @directory_api.groups.insert,
         :body_object => group_data},
-      {group_id: group_idstring}
+      {group_id: group_key}
     )
     return (@last_result.status == 200)
   end
 
-  def update_group(group_idstring, update_options = {})
+  def update_group(group_key, update_options = {})
     update_parameters = {
-      'email' => "#{group_idstring}@extension.org",
+      'email' => "#{group_key}",
       "description" => update_options[:description],
       "name" => update_options[:name]
     }
@@ -162,19 +162,19 @@ class GoogleDirectoryApi
 
     @last_result = self.api_request(
       {:api_method => @directory_api.groups.update,
-       :parameters => {'groupKey' => "#{group_idstring}@extension.org"},
+       :parameters => {'groupKey' => "#{group_key}"},
        :body_object => group_data},
-      {group_id: group_idstring}
+      {group_id: group_key}
     )
     return (@last_result.status == 200)
   end
 
-  def retrieve_group_members(group_idstring)
-    if(!self.retrieve_group(group_idstring))
+  def retrieve_group_members(group_key)
+    if(!self.retrieve_group(group_key))
       return nil
     end
 
-    request_parameters = {'groupKey' => "#{group_idstring}@extension.org"}
+    request_parameters = {'groupKey' => "#{group_key}"}
 
     # group membership requests are limited to 200 members
     # so like Pokémon, we gotta catch them all
@@ -191,7 +191,7 @@ class GoogleDirectoryApi
       @last_result =  self.api_request(
         {:api_method => @directory_api.members.list,
         :parameters => request_parameters},
-        {group_id: group_idstring}
+        {group_id: group_key}
       )
       last_result_data = @last_result.data.to_hash
 
@@ -224,7 +224,7 @@ class GoogleDirectoryApi
     member_email_addresses
   end
 
-  def add_member_to_group(email_address,group_idstring)
+  def add_member_to_group(email_address,group_key)
     add_parameters = {
       'email' => email_address
     }
@@ -242,21 +242,21 @@ class GoogleDirectoryApi
 
     @last_result = self.api_request(
       {:api_method => @directory_api.members.insert,
-      :parameters => {'groupKey' => "#{group_idstring}@extension.org"},
+      :parameters => {'groupKey' => "#{group_key}"},
       :body_object => member_data},
-      {group_id: group_idstring, account_id: email_address}
+      {group_id: group_key, account_id: email_address}
     )
     return (@last_result.status == 200)
 
   end
 
 
-  def remove_member_from_group(email_address,group_idstring)
+  def remove_member_from_group(email_address,group_key)
     @last_result = self.api_request(
       {:api_method => @directory_api.members.delete,
       :parameters => {'memberKey' => email_address,
-                      'groupKey' => "#{group_idstring}@extension.org"}},
-                      {group_id: group_idstring, account_id: email_address}
+                      'groupKey' => "#{group_key}"}},
+                      {group_id: group_key, account_id: email_address}
     )
     return (@last_result.status == 204)
   end

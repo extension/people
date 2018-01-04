@@ -16,6 +16,7 @@ googleapps_account: "use_local_settings"
 googleapps_secret:  "use_local_settings"
 googleapps_service_account: 'use_local_settings'
 googleapps_key_secret: 'use_local_settings'
+googleapps_groups_domain: 'groups.extension.org'
 honeybadger_api_key:  "use_local_settings"
 learn_database: 'use_local_settings'
 max_live_dump_count: 200
