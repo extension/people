@@ -110,6 +110,7 @@ gem 'rack-robustness'
 gem 'lograge'
 
 # google api
+gem 'googleauth'
 gem 'google-api-client'
 
 # backport of handling json parser errors
@@ -134,6 +135,8 @@ gem 'unscoped_associations'
 group :development do
   # require the powder gem
   gem 'powder'
+   # including httpclient explicitly so that we can use httplog in development for google api requests
+  gem 'httpclient'
   gem 'httplog'
   gem 'pry'
 
