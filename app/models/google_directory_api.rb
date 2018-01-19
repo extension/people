@@ -8,6 +8,8 @@ require 'google/apis/admin_directory_v1'
 
 class GoogleDirectoryApi
 
+
+
   def initialize
     # establish the connection and get an access token
     # I don't know how long the access tokens live for
@@ -25,80 +27,96 @@ class GoogleDirectoryApi
     @service
   end
 
-  # def last_result
-  #   if(!@last_result.nil?)
-  #     @last_result.data.to_hash
-  #   else
-  #     nil
-  #   end
-  # end
-  #
-  # def last_raw_result
-  #   @last_result
-  # end
-  #
-  # def retrieve_account(account_idstring)
-  #
-  #   @last_result = self.api_request(
-  #     {:api_method => @directory_api.users.get,
-  #     :parameters => {'userKey' => "#{account_idstring}@extension.org"}},
-  #     {account_id: account_idstring}
-  #   )
-  #   return (@last_result.status == 200)
-  # end
-  #
-  # def create_account(account_idstring,account_options)
-  #   if(!(password = account_options[:password]))
-  #     password = SecureRandom.hex(16)
-  #   end
-  #
-  #   create_parameters = {
-  #     'primaryEmail' => "#{account_idstring}@extension.org",
-  #     "name" => {
-  #       "givenName" => account_options[:given_name],
-  #       "familyName" => account_options[:family_name]
-  #     },
-  #     "suspended" => (account_options[:suspended] ? "true" : "false"),
-  #     "password" =>  password,
-  #     "hashFunction" => "SHA-1"
-  #   }
-  #
-  #   account_data = @directory_api.users.insert.request_schema.new(create_parameters)
-  #
-  #   @last_result =  self.api_request(
-  #     {:api_method => @directory_api.users.insert,
-  #     :body_object => account_data},
-  #     {account_id: account_idstring}
-  #   )
-  #   return (@last_result.status == 200)
-  # end
-  #
-  # def update_account(user_key,account_idstring, account_options)
-  #
-  #   update_parameters = {
-  #     'primaryEmail' => "#{account_idstring}@extension.org",
-  #     "name" => {
-  #       "givenName" => account_options[:given_name],
-  #       "familyName" => account_options[:family_name]
-  #     },
-  #     "suspended" => (account_options[:suspended] ? "true" : "false"),
-  #   }
-  #
-  #   if(password = account_options[:password])
-  #     update_parameters["password"] = password
-  #     update_parameters["hashFunction"] = "SHA-1"
-  #   end
-  #
-  #   account_data = @directory_api.users.update.request_schema.new(update_parameters)
-  #
-  #   @last_result = self.api_request(
-  #     {:api_method => @directory_api.users.update,
-  #     :parameters => {'userKey' => user_key},
-  #     :body_object => account_data},
-  #     {account_id: account_idstring}
-  #   )
-  #   return (@last_result.status == 200)
-  # end
+  def api_log
+    @api_log
+  end
+
+  def retrieve_account(account_idstring)
+    user_key = "#{account_idstring}@extension.org"
+
+    api_method = 'get_user'
+    begin
+      google_account = @service.get_user(user_key)
+      @api_log = GoogleApiLog.log_success_request(api_method: api_method,
+                                                  user_key: user_key)
+      return google_account
+    rescue StandardError => e
+      @api_log = GoogleApiLog.log_error_request(api_method: api_method,
+                                                user_key: user_key,
+                                                error_class: e.class.to_s,
+                                                error_message: e.message)
+      return nil
+    end
+  end
+
+  def create_account(account_idstring,account_options)
+    user_key = "#{account_idstring}@extension.org"
+    if(!(password = account_options[:password]))
+      password = SecureRandom.hex(16)
+    end
+
+    user_object = Google::Apis::AdminDirectoryV1::User.new
+    user_object.primary_email = user_key
+    user_object.name = Google::Apis::AdminDirectoryV1::UserName.new
+    user_object.name.given_name = account_options[:given_name]
+    user_object.name.family_name = account_options[:family_name]
+    user_object.password = password
+    user_object.suspended = account_options[:suspended] ? "true" : "false"
+    user_object.hash_function = "SHA-1"
+
+
+    api_method = 'insert_user'
+
+    begin
+      google_account = @service.insert_user(user_object)
+      @api_log = GoogleApiLog.log_success_request(api_method: api_method,
+                                                  user_key: user_key)
+      return google_account
+    rescue StandardError => e
+      @api_log = GoogleApiLog.log_error_request(api_method: api_method,
+                                                user_key: user_key,
+                                                error_class: e.class.to_s,
+                                                error_message: e.message)
+      return nil
+    end
+  end
+
+  def update_account(account_idstring,account_options)
+    user_key = "#{account_idstring}@extension.org"
+
+
+    user_object = Google::Apis::AdminDirectoryV1::User.new
+    user_object.primary_email = user_key
+    user_object.name = Google::Apis::AdminDirectoryV1::UserName.new
+    user_object.name.given_name = account_options[:given_name]
+    user_object.name.family_name = account_options[:family_name]
+    user_object.suspended = account_options[:suspended] ? "true" : "false"
+
+    if(password = account_options[:password])
+      if(password == 'random')
+        password = SecureRandom.hex(16)
+      end
+      user_object.password = password
+      user_object.hash_function = "SHA-1"
+    end
+
+    api_method = 'update_user'
+
+    begin
+      google_account = @service.update_user(user_key,user_object)
+      @api_log = GoogleApiLog.log_success_request(api_method: api_method,
+                                                  user_key: user_key)
+      return google_account
+    rescue StandardError => e
+      @api_log = GoogleApiLog.log_error_request(api_method: api_method,
+                                                user_key: user_key,
+                                                error_class: e.class.to_s,
+                                                error_message: e.message)
+      return nil
+    end
+  end
+
+
   #
   #
   # def retrieve_group(group_key)
@@ -239,23 +257,7 @@ class GoogleDirectoryApi
   #
   #
   #
-  # def api_request(api_data, log_options)
-  #   result = @apps_connection.execute(api_data)
-  #   request_options = {}
-  #   api_method_string = api_data[:api_method].id
-  #   request_options[:api_method] = api_method_string
-  #   request_options[:resultcode] = result.status
-  #   if(api_method_string == 'directory.members.delete')
-  #     success_status = 204
-  #   else
-  #     success_status = 200
-  #   end
-  #   if(result.status != success_status)
-  #     request_options[:errordata] = result.data.to_hash if result.data
-  #   end
-  #   request_options.merge!(log_options)
-  #   GoogleApiLog.log_request(request_options)
-  #   result
-  # end
+
+
 
 end
