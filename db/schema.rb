@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20171214211622) do
+ActiveRecord::Schema.define(:version => 20180118235200) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -206,10 +206,11 @@ ActiveRecord::Schema.define(:version => 20171214211622) do
   create_table "google_api_logs", :force => true do |t|
     t.datetime "created_at"
     t.string   "api_method"
-    t.string   "group_id"
-    t.string   "account_id"
-    t.integer  "resultcode"
-    t.text     "errordata"
+    t.string   "group_key"
+    t.string   "user_key"
+    t.boolean  "has_error",     :default => false, :null => false
+    t.string   "error_class"
+    t.string   "error_message"
   end
 
   create_table "google_groups", :force => true do |t|

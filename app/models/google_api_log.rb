@@ -6,12 +6,14 @@
 #  see LICENSE file
 
 class GoogleApiLog < ActiveRecord::Base
-  serialize :errordata
-  attr_accessible :api_method, :group_id, :account_id, :resultcode, :errordata
+  attr_accessible :api_method, :group_key, :user_key, :has_error, :error_class, :error_message
 
+  def self.log_success_request(log_data)
+    self.create(log_data.merge({has_error: false}))
+  end
 
-  def self.log_request(log_options)
-    self.create(log_options)
+  def self.log_error_request(log_data)
+    self.create(log_data.merge({has_error: true}))
   end
 
 end
