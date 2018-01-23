@@ -5,8 +5,8 @@
 #
 #  see LICENSE file
 class GoogleGroup < ActiveRecord::Base
-  serialize :last_error
-  attr_accessible :community, :community_id, :group_id, :group_name, :email_permission, :apps_updated_at, :has_error, :last_error, :connectiontype, :lists_alias
+  attr_accessible :community, :community_id, :group_id, :group_name, :email_permission, :apps_updated_at,
+  attr_accessible :has_error, :last_api_request, :connectiontype, :lists_alias
 
   before_save  :set_values_from_community
   after_save :update_email_alias
@@ -24,7 +24,11 @@ class GoogleGroup < ActiveRecord::Base
   end
 
   def forum_url
-    "https://groups.google.com/a/extension.org/d/forum/#{self.group_id}?hl=en"
+    if(self.use_groups_domain)
+      "https://groups.google.com/a/#{Settings.googleapps_groups_domain}/d/forum/#{self.group_id}?hl=en"
+    else
+      "https://groups.google.com/a/extension.org/d/forum/#{self.group_id}?hl=en"
+    end
   end
 
   def group_email_address
@@ -70,9 +74,9 @@ class GoogleGroup < ActiveRecord::Base
   def queue_members_update
     if(Settings.sync_google)
       if(Settings.redis_enabled)
-        self.class.delay_for(90.seconds).delayed_update_apps_group_members_and_owners(self.id)
+        self.class.delay_for(90.seconds).delayed_update_apps_group_members(self.id)
       else
-        self.update_apps_group_members_and_owners
+        self.update_apps_group_members
       end
     end
   end
@@ -83,20 +87,14 @@ class GoogleGroup < ActiveRecord::Base
     end
   end
 
-
-  def update_apps_group_members_and_owners
-    group = update_apps_group_members
-  end
-
-  def self.delayed_update_apps_group_members_and_owners(record_id)
+  def self.delayed_update_apps_group_members(record_id)
     if(record = find_by_id(record_id))
-      record.update_apps_group_members_and_owners
+      record.update_apps_group_members
     end
   end
 
 
   def update_apps_group
-
     # load GoogleDirectoryApi
     gda = GoogleDirectoryApi.new
     found_group = gda.retrieve_group(self.group_key_for_api)
@@ -106,19 +104,19 @@ class GoogleGroup < ActiveRecord::Base
       created_group = gda.create_group(self.group_key_for_api, {description: self.group_name, name: self.group_name})
 
       if(!created_group)
-        self.update_attributes({:has_error => true, :last_error => gda.last_result})
+        self.update_attributes({:has_error => true, :last_api_request => gda.api_log.id})
         return nil
       end
     else
       updated_group = gda.update_group(self.group_key_for_api, {description: self.group_name, name: self.group_name})
 
       if(!updated_group)
-        self.update_attributes({:has_error => true, :last_error => gda.last_result})
+        self.update_attributes({:has_error => true, :last_api_request => gda.api_log.id})
         return nil
       end
     end
 
-    self.update_attributes({has_error: false, last_error: nil, apps_updated_at: Time.now.utc})
+    self.update_attributes({has_error: false, apps_updated_at: Time.now.utc, :last_api_request => gda.api_log.id})
     return self
   end
 
@@ -150,11 +148,10 @@ class GoogleGroup < ActiveRecord::Base
   def update_apps_group_members
     # load GoogleDirectoryApi
     gda = GoogleDirectoryApi.new
-
     apps_group_members = self.get_apps_group_members(gda)
     if(apps_group_members.nil?)
-      self.update_attributes({:has_error => true, :last_error => gda.last_result})
-      return nil
+      self.update_attributes({:has_error => true, :last_api_request => gda.api_log.id})
+      return false
     end
 
     # inject the moderator account
@@ -169,19 +166,20 @@ class GoogleGroup < ActiveRecord::Base
     removes = apps_group_members - community_members
 
     adds.each do |member_email|
-      # split the id string back out
-      gda.add_member_to_group(member_email, self.group_key_for_api)
+      is_owner = (member_email == moderator_account.email)
+      gda.add_member_to_group(member_email, self.group_key_for_api,is_owner)
     end
 
     removes.each do |member_email|
       gda.remove_member_from_group(member_email, self.group_key_for_api)
     end
 
-    return self
+    self.update_attributes({has_error: false, apps_updated_at: Time.now.utc, :last_api_request => gda.api_log.id})
+    return true
   end
-
 
   def self.clear_errors
-    self.update_all("has_error = 0, last_error = ''","has_error = 1")
+    self.update_all("has_error = 0","has_error = 1")
   end
+
 end
