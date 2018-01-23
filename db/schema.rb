@@ -222,9 +222,9 @@ ActiveRecord::Schema.define(:version => 20180119153128) do
     t.string   "email_permission",                        :null => false
     t.datetime "apps_updated_at"
     t.boolean  "has_error",         :default => false
-    t.text     "last_error"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "last_api_request"
     t.boolean  "use_groups_domain", :default => false,    :null => false
   end
 
