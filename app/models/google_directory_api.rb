@@ -117,146 +117,159 @@ class GoogleDirectoryApi
   end
 
 
-  #
-  #
-  # def retrieve_group(group_key)
-  #   @last_result = self.api_request({
-  #     :api_method => @directory_api.groups.get,
-  #     :parameters => {'groupKey' => "#{group_key}"}
-  #   },{group_id: group_key}
-  #   )
-  #   return (@last_result.status == 200)
-  # end
-  #
-  # def create_group(group_key, create_options = {})
-  #   create_parameters = {
-  #     'email' => "#{group_key}",
-  #     "description" => create_options[:description],
-  #     "name" => create_options[:name]
-  #   }
-  #
-  #   group_data = @directory_api.groups.insert.request_schema.new(create_parameters)
-  #
-  #   @last_result = self.api_request(
-  #     {:api_method => @directory_api.groups.insert,
-  #       :body_object => group_data},
-  #     {group_id: group_key}
-  #   )
-  #   return (@last_result.status == 200)
-  # end
-  #
-  # def update_group(group_key, update_options = {})
-  #   update_parameters = {
-  #     'email' => "#{group_key}",
-  #     "description" => update_options[:description],
-  #     "name" => update_options[:name]
-  #   }
-  #
-  #   group_data = @directory_api.groups.update.request_schema.new(update_parameters)
-  #
-  #   @last_result = self.api_request(
-  #     {:api_method => @directory_api.groups.update,
-  #      :parameters => {'groupKey' => "#{group_key}"},
-  #      :body_object => group_data},
-  #     {group_id: group_key}
-  #   )
-  #   return (@last_result.status == 200)
-  # end
-  #
-  # def retrieve_group_members(group_key)
-  #   if(!self.retrieve_group(group_key))
-  #     return nil
-  #   end
-  #
-  #   request_parameters = {'groupKey' => "#{group_key}"}
-  #
-  #   # group membership requests are limited to 200 members
-  #   # so like Pokémon, we gotta catch them all
-  #   did_we_catch_them_all = false
-  #   pagination_token = nil
-  #   member_email_addresses = []
-  #   while(!did_we_catch_them_all)
-  #     if(!pagination_token.nil?)
-  #       request_parameters['pageToken'] = pagination_token
-  #     else
-  #       request_parameters['pageToken'] = nil
-  #     end
-  #
-  #     @last_result =  self.api_request(
-  #       {:api_method => @directory_api.members.list,
-  #       :parameters => request_parameters},
-  #       {group_id: group_key}
-  #     )
-  #     last_result_data = @last_result.data.to_hash
-  #
-  #     if(last_result_data['nextPageToken'])
-  #       pagination_token = last_result_data['nextPageToken']
-  #       did_we_catch_them_all = false
-  #     else
-  #       did_we_catch_them_all = true
-  #       pagination_token = nil
-  #     end
-  #
-  #
-  #     if(@last_result.status == 200)
-  #       members = last_result_data['members']
-  #       if(!members.nil?)
-  #         members.each do |member_resource|
-  #           if(!member_resource['email'].blank?)
-  #             member_email_addresses << member_resource['email']
-  #           end
-  #         end
-  #       end
-  #     else
-  #       # yes potentially breaking out of the loop
-  #       # but if the request fails, I want to get
-  #       # that error
-  #       return nil
-  #     end
-  #   end
-  #
-  #   member_email_addresses
-  # end
-  #
-  # def add_member_to_group(email_address,group_key)
-  #   add_parameters = {
-  #     'email' => email_address
-  #   }
-  #
-  #   # hardcoded role of member or owner depending
-  #   # on whether this is the moderator account
-  #
-  #   if(email_address == 'systemsmoderator@extension.org')
-  #     add_parameters['role'] = 'OWNER'
-  #   else
-  #     add_parameters['role'] = 'MEMBER'
-  #   end
-  #
-  #   member_data = @directory_api.members.insert.request_schema.new(add_parameters)
-  #
-  #   @last_result = self.api_request(
-  #     {:api_method => @directory_api.members.insert,
-  #     :parameters => {'groupKey' => "#{group_key}"},
-  #     :body_object => member_data},
-  #     {group_id: group_key, account_id: email_address}
-  #   )
-  #   return (@last_result.status == 200)
-  #
-  # end
-  #
-  #
-  # def remove_member_from_group(email_address,group_key)
-  #   @last_result = self.api_request(
-  #     {:api_method => @directory_api.members.delete,
-  #     :parameters => {'memberKey' => email_address,
-  #                     'groupKey' => "#{group_key}"}},
-  #                     {group_id: group_key, account_id: email_address}
-  #   )
-  #   return (@last_result.status == 204)
-  # end
-  #
-  #
-  #
+
+  def retrieve_group(group_key)
+    api_method = 'get_group'
+    begin
+      google_group = @service.get_group(group_key)
+      @api_log = GoogleApiLog.log_success_request(api_method: api_method,
+                                                  group_key: group_key)
+      return google_group
+    rescue StandardError => e
+      @api_log = GoogleApiLog.log_error_request(api_method: api_method,
+                                                group_key: group_key,
+                                                error_class: e.class.to_s,
+                                                error_message: e.message)
+      return nil
+    end
+  end
+
+
+
+
+  def create_group(group_key,create_options)
+    group_object = Google::Apis::AdminDirectoryV1::Group.new
+    group_object.email = group_key
+    group_object.name = create_options[:name]
+    group_object.description = create_options[:description]
+
+    api_method = 'insert_group'
+
+    begin
+      google_group = @service.insert_group(group_object)
+      @api_log = GoogleApiLog.log_success_request(api_method: api_method,
+                                                  group_key: group_key)
+      return google_group
+    rescue StandardError => e
+      @api_log = GoogleApiLog.log_error_request(api_method: api_method,
+                                                group_key: group_key,
+                                                error_class: e.class.to_s,
+                                                error_message: e.message)
+      return nil
+    end
+  end
+
+
+  def update_group(group_key,update_options)
+    group_object = Google::Apis::AdminDirectoryV1::Group.new
+    group_object.email = group_key
+    group_object.name = update_options[:name]
+    group_object.description = update_options[:description]
+
+    api_method = 'update_group'
+
+    begin
+      google_group = @service.update_group(group_key,group_object)
+      @api_log = GoogleApiLog.log_success_request(api_method: api_method,
+                                                  group_key: group_key)
+      return google_group
+    rescue StandardError => e
+      @api_log = GoogleApiLog.log_error_request(api_method: api_method,
+                                                group_key: group_key,
+                                                error_class: e.class.to_s,
+                                                error_message: e.message)
+      return nil
+    end
+  end
+
+
+  def retrieve_group_members(group_key)
+    if(!(google_group = self.retrieve_group(group_key)))
+      return nil
+    end
+
+    # group membership requests are limited to 200 members
+    # so like Pokémon, we gotta catch them all
+    did_we_catch_them_all = false
+    pagination_token = nil
+    member_email_addresses = []
+    while(!did_we_catch_them_all)
+      api_method = 'list_members'
+
+      begin
+        group_members = @service.list_members(group_key,{page_token: pagination_token})
+        @api_log = GoogleApiLog.log_success_request(api_method: api_method,
+                                                    group_key: group_key)
+      rescue StandardError => e
+        @api_log = GoogleApiLog.log_error_request(api_method: api_method,
+                                                  group_key: group_key,
+                                                  error_class: e.class.to_s,
+                                                  error_message: e.message)
+        return nil
+      end
+
+
+      if(group_members.next_page_token.nil?)
+        did_we_catch_them_all = true
+      else
+        did_we_catch_them_all = false
+        pagination_token = group_members.next_page_token
+      end
+
+      group_members.members.each do |member_object|
+        member_email_addresses << member_object.email
+      end
+    end # caught them all!
+
+    member_email_addresses
+  end
+
+
+  def add_member_to_group(email_address,group_key,is_owner)
+    api_method = 'insert_member'
+
+    member_object = Google::Apis::AdminDirectoryV1::Member.new
+    member_object.email = email_address
+
+    if(is_owner)
+      member_object.role = 'OWNER'
+    else
+      member_object.role = 'MEMBER'
+    end
+
+    begin
+      added_member = @service.insert_member(group_key,member_object)
+      @api_log = GoogleApiLog.log_success_request(api_method: api_method,
+                                                  group_key: group_key,
+                                                  user_key: email_address)
+      return tradded_memberue
+    rescue StandardError => e
+      @api_log = GoogleApiLog.log_error_request(api_method: api_method,
+                                                group_key: group_key,
+                                                user_key: email_address,
+                                                error_class: e.class.to_s,
+                                                error_message: e.message)
+      return nil
+    end
+  end
+
+  def remove_member_from_group(email_address,group_key)
+    api_method = 'delete_member'
+    begin
+      @service.delete_member(group_key,email_address)
+      @api_log = GoogleApiLog.log_success_request(api_method: api_method,
+                                                  group_key: group_key,
+                                                  user_key: email_address)
+      return true
+    rescue StandardError => e
+      @api_log = GoogleApiLog.log_error_request(api_method: api_method,
+                                                group_key: group_key,
+                                                user_key: email_address,
+                                                error_class: e.class.to_s,
+                                                error_message: e.message)
+      return false
+    end
+  end
 
 
 
