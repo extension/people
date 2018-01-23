@@ -34,7 +34,7 @@ class GoogleDirectoryApi
   def retrieve_account(account_idstring)
     user_key = "#{account_idstring}@extension.org"
 
-    api_method = 'get_user'
+    api_method = 'directory.get_user'
     begin
       google_account = @service.get_user(user_key)
       @api_log = GoogleApiLog.log_success_request(api_method: api_method,
@@ -65,7 +65,7 @@ class GoogleDirectoryApi
     user_object.hash_function = "SHA-1"
 
 
-    api_method = 'insert_user'
+    api_method = 'directory.insert_user'
 
     begin
       google_account = @service.insert_user(user_object)
@@ -100,7 +100,7 @@ class GoogleDirectoryApi
       user_object.hash_function = "SHA-1"
     end
 
-    api_method = 'update_user'
+    api_method = 'directory.update_user'
 
     begin
       google_account = @service.update_user(user_key,user_object)
@@ -119,7 +119,7 @@ class GoogleDirectoryApi
 
 
   def retrieve_group(group_key)
-    api_method = 'get_group'
+    api_method = 'directory.get_group'
     begin
       google_group = @service.get_group(group_key)
       @api_log = GoogleApiLog.log_success_request(api_method: api_method,
@@ -143,7 +143,7 @@ class GoogleDirectoryApi
     group_object.name = create_options[:name]
     group_object.description = create_options[:description]
 
-    api_method = 'insert_group'
+    api_method = 'directory.insert_group'
 
     begin
       google_group = @service.insert_group(group_object)
@@ -166,7 +166,7 @@ class GoogleDirectoryApi
     group_object.name = update_options[:name]
     group_object.description = update_options[:description]
 
-    api_method = 'update_group'
+    api_method = 'directory.update_group'
 
     begin
       google_group = @service.update_group(group_key,group_object)
@@ -194,7 +194,7 @@ class GoogleDirectoryApi
     pagination_token = nil
     member_email_addresses = []
     while(!did_we_catch_them_all)
-      api_method = 'list_members'
+      api_method = 'directory.list_members'
 
       begin
         group_members = @service.list_members(group_key,{page_token: pagination_token})
@@ -226,7 +226,7 @@ class GoogleDirectoryApi
 
 
   def add_member_to_group(email_address,group_key,is_owner)
-    api_method = 'insert_member'
+    api_method = 'directory.insert_member'
 
     member_object = Google::Apis::AdminDirectoryV1::Member.new
     member_object.email = email_address
@@ -254,7 +254,7 @@ class GoogleDirectoryApi
   end
 
   def remove_member_from_group(email_address,group_key)
-    api_method = 'delete_member'
+    api_method = 'directory.delete_member'
     begin
       @service.delete_member(group_key,email_address)
       @api_log = GoogleApiLog.log_success_request(api_method: api_method,
