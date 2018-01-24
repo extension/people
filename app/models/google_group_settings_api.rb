@@ -46,4 +46,27 @@ class GoogleGroupSettingsApi
     end
   end
 
+  def set_initial_group_settings(group_key)
+    group_object = Google::Apis::GroupssettingsV1::Groups.new
+    group_object.allow_external_members = "true"
+    group_object.is_archived = "true"
+    group_object.who_can_join = "INVITED_CAN_JOIN"
+    group_object.members_can_post_as_the_group = "true"
+
+    api_method = 'groupsettings.patch_group'
+
+    begin
+      google_group = @service.patch_group(group_key,group_object)
+      @api_log = GoogleApiLog.log_success_request(api_method: api_method,
+                                                  group_key: group_key)
+      return google_group
+    rescue StandardError => e
+      @api_log = GoogleApiLog.log_error_request(api_method: api_method,
+                                                group_key: group_key,
+                                                error_class: e.class.to_s,
+                                                error_message: e.message)
+      return nil
+    end
+  end
+
 end
