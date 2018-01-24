@@ -135,7 +135,21 @@ class GoogleDirectoryApi
   end
 
 
-
+  def delete_group(group_key)
+    api_method = 'directory.delete_group'
+    begin
+      @service.delete_group(group_key)
+      @api_log = GoogleApiLog.log_success_request(api_method: api_method,
+                                                  group_key: group_key)
+      return true
+    rescue StandardError => e
+      @api_log = GoogleApiLog.log_error_request(api_method: api_method,
+                                                group_key: group_key,
+                                                error_class: e.class.to_s,
+                                                error_message: e.message)
+      return false
+    end
+  end
 
   def create_group(group_key,create_options)
     group_object = Google::Apis::AdminDirectoryV1::Group.new
