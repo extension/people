@@ -17,8 +17,12 @@ class GoogleGroup < ActiveRecord::Base
 
   def update_email_alias
     if(!self.email_alias.blank?)
-      self.email_alias.update_attribute(:alias_type, EmailAlias::GOOGLEAPPS)
-    else
+      if(self.migrated_to_groups_domain)
+        self.email_alias.update_attribute(:alias_type, EmailAlias::GOOGLEGROUP)
+      else
+        self.email_alias.update_attribute(:alias_type, EmailAlias::GOOGLEAPPS)
+      end
+    elsif(!self.use_groups_domain)
       self.create_email_alias(:alias_type => EmailAlias::GOOGLEAPPS)
     end
   end
