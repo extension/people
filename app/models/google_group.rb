@@ -110,6 +110,13 @@ class GoogleGroup < ActiveRecord::Base
       if(!created_group)
         self.update_attributes({:has_error => true, :last_api_request => gda.api_log.id})
         return nil
+      else
+        # set the initial group settings
+        groupsettings = GoogleGroupSettingsApi.new
+        if(set_group = groupsettings.set_initial_group_settings(self.group_key_for_api))
+          self.update_attributes({:has_error => true, :last_api_request => gda.api_log.id})
+          return nil
+        end
       end
     else
       updated_group = gda.update_group(self.group_key_for_api, {description: self.group_name, name: self.group_name})
