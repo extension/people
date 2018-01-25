@@ -214,18 +214,19 @@ ActiveRecord::Schema.define(:version => 20180119153128) do
   end
 
   create_table "google_groups", :force => true do |t|
-    t.integer  "community_id",      :default => 0,        :null => false
-    t.string   "connectiontype",    :default => "joined"
+    t.integer  "community_id",              :default => 0,        :null => false
+    t.string   "connectiontype",            :default => "joined"
     t.string   "lists_alias"
-    t.string   "group_id",                                :null => false
-    t.string   "group_name",                              :null => false
-    t.string   "email_permission",                        :null => false
+    t.string   "group_id",                                        :null => false
+    t.string   "group_name",                                      :null => false
+    t.string   "email_permission",                                :null => false
     t.datetime "apps_updated_at"
-    t.boolean  "has_error",         :default => false
+    t.boolean  "has_error",                 :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "last_api_request"
-    t.boolean  "use_groups_domain", :default => false,    :null => false
+    t.boolean  "use_groups_domain",         :default => false,    :null => false
+    t.boolean  "migrated_to_groups_domain", :default => false,    :null => false
   end
 
   add_index "google_groups", ["community_id"], :name => "community_ndx"
