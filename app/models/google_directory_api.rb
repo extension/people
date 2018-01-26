@@ -230,8 +230,10 @@ class GoogleDirectoryApi
         pagination_token = group_members.next_page_token
       end
 
-      group_members.members.each do |member_object|
-        member_email_addresses << member_object.email
+      if(!group_members.members.blank?)
+        group_members.members.each do |member_object|
+          member_email_addresses << member_object.email
+        end
       end
     end # caught them all!
 
@@ -256,7 +258,7 @@ class GoogleDirectoryApi
       @api_log = GoogleApiLog.log_success_request(api_method: api_method,
                                                   group_key: group_key,
                                                   user_key: email_address)
-      return tradded_memberue
+      return added_member
     rescue StandardError => e
       @api_log = GoogleApiLog.log_error_request(api_method: api_method,
                                                 group_key: group_key,
