@@ -5,8 +5,9 @@
 #
 #  see LICENSE file
 class GoogleGroup < ActiveRecord::Base
-  attr_accessible :community, :community_id, :group_id, :group_name, :email_permission, :apps_updated_at,
+  attr_accessible :community, :community_id, :group_id, :group_name, :email_permission, :apps_updated_at
   attr_accessible :has_error, :last_api_request, :connectiontype, :lists_alias
+  attr_accessible :use_groups_domain, :migrated_to_groups_domain
 
   before_save  :set_values_from_community
   after_save :update_email_alias
@@ -187,6 +188,25 @@ class GoogleGroup < ActiveRecord::Base
 
     self.update_attributes({has_error: false, apps_updated_at: Time.now.utc, :last_api_request => gda.api_log.id})
     return true
+  end
+
+  # does not background requests, meant to be run from console
+  def migrate_to_groups_domain(delete_old_group = false)
+    # set flags
+    self.update_attributes(use_groups_domain: true, migrated_to_groups_domain: true)
+
+    # create new group @ google
+    self.update_apps_group
+
+    # update group members
+    self.update_apps_group_members
+
+    # delete old group @ google
+    if(delete_old_group)
+      old_group_email = "#{self.group_id}@extension.org"
+      gda = GoogleDirectoryApi.new
+      gda.delete_group(old_group_email)
+    end
   end
 
   def self.clear_errors
