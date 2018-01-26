@@ -16,6 +16,9 @@ class GoogleGroup < ActiveRecord::Base
   belongs_to :community, unscoped: true
   has_one  :email_alias, :as => :aliasable, :dependent => :destroy
 
+  # Google Group Names are limited to 60 characters
+  validates :group_name, length: { maximum: 60 }
+
   def update_email_alias
     if(!self.email_alias.blank?)
       if(self.migrated_to_groups_domain)
