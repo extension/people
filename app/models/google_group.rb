@@ -132,7 +132,10 @@ class GoogleGroup < ActiveRecord::Base
     return self
   end
 
-  def get_apps_group_members(gda)
+  def get_apps_group_members(gda = nil)
+    if(gda.nil?)
+      gda = GoogleDirectoryApi.new
+    end
     gda.retrieve_group_members(self.group_key_for_api)
   end
 
