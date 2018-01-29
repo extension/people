@@ -12,6 +12,7 @@ class GoogleGroup < ActiveRecord::Base
   before_save  :set_values_from_community
   after_save :update_email_alias
 
+  before_destroy :delete_apps_group
 
   belongs_to :community, unscoped: true
   has_one  :email_alias, :as => :aliasable, :dependent => :destroy
@@ -213,6 +214,11 @@ class GoogleGroup < ActiveRecord::Base
       gda = GoogleDirectoryApi.new
       gda.delete_group(old_group_email)
     end
+  end
+
+  def delete_apps_group
+    gda = GoogleDirectoryApi.new
+    gda.delete_group(self.group_key_for_api)
   end
 
   def self.clear_errors
