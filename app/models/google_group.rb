@@ -5,30 +5,51 @@
 #
 #  see LICENSE file
 class GoogleGroup < ActiveRecord::Base
-  serialize :last_error
-  attr_accessible :community, :community_id, :group_id, :group_name, :email_permission, :apps_updated_at, :has_error, :last_error, :connectiontype, :lists_alias
+  attr_accessible :community, :community_id, :group_id, :group_name, :email_permission, :apps_updated_at
+  attr_accessible :has_error, :last_api_request, :connectiontype, :lists_alias
+  attr_accessible :use_groups_domain, :migrated_to_groups_domain
 
   before_save  :set_values_from_community
   after_save :update_email_alias
 
+  before_destroy :delete_apps_group
 
   belongs_to :community, unscoped: true
   has_one  :email_alias, :as => :aliasable, :dependent => :destroy
 
+  # Google Group Names are limited to 60 characters
+  validates :group_name, length: { maximum: 60 }
+
   def update_email_alias
     if(!self.email_alias.blank?)
-      self.email_alias.update_attribute(:alias_type, EmailAlias::GOOGLEAPPS)
-    else
+      if(self.migrated_to_groups_domain)
+        self.email_alias.update_attribute(:alias_type, EmailAlias::GOOGLEGROUP)
+      else
+        self.email_alias.update_attribute(:alias_type, EmailAlias::GOOGLEAPPS)
+      end
+    elsif(!self.use_groups_domain)
       self.create_email_alias(:alias_type => EmailAlias::GOOGLEAPPS)
     end
   end
 
   def forum_url
-    "https://groups.google.com/a/extension.org/d/forum/#{self.group_id}?hl=en"
+    if(self.use_groups_domain)
+      "https://groups.google.com/a/#{Settings.googleapps_groups_domain}/d/forum/#{self.group_id}?hl=en"
+    else
+      "https://groups.google.com/a/extension.org/d/forum/#{self.group_id}?hl=en"
+    end
   end
 
   def group_email_address
-    "#{self.group_id}@extension.org"
+    if(self.use_groups_domain)
+      "#{self.group_id}@#{Settings.googleapps_groups_domain}"
+    else
+      "#{self.group_id}@extension.org"
+    end
+  end
+
+  def group_key_for_api
+    self.group_email_address
   end
 
 
@@ -62,9 +83,9 @@ class GoogleGroup < ActiveRecord::Base
   def queue_members_update
     if(Settings.sync_google)
       if(Settings.redis_enabled)
-        self.class.delay_for(90.seconds).delayed_update_apps_group_members_and_owners(self.id)
+        self.class.delay_for(90.seconds).delayed_update_apps_group_members(self.id)
       else
-        self.update_apps_group_members_and_owners
+        self.update_apps_group_members
       end
     end
   end
@@ -75,89 +96,133 @@ class GoogleGroup < ActiveRecord::Base
     end
   end
 
-
-  def update_apps_group_members_and_owners
-    group = update_apps_group_members
-  end
-
-  def self.delayed_update_apps_group_members_and_owners(record_id)
+  def self.delayed_update_apps_group_members(record_id)
     if(record = find_by_id(record_id))
-      record.update_apps_group_members_and_owners
+      record.update_apps_group_members
     end
   end
 
 
   def update_apps_group
-
     # load GoogleDirectoryApi
     gda = GoogleDirectoryApi.new
-    found_group = gda.retrieve_group(self.group_id)
+    found_group = gda.retrieve_group(self.group_key_for_api)
 
     # create the group if it doesnt't exist
     if(!found_group)
-      created_group = gda.create_group(self.group_id, {description: self.group_name, name: self.group_name})
+      created_group = gda.create_group(self.group_key_for_api, {description: self.group_name, name: self.group_name})
 
       if(!created_group)
-        self.update_attributes({:has_error => true, :last_error => gda.last_result})
+        self.update_attributes({:has_error => true, :last_api_request => gda.api_log.id})
         return nil
+      else
+        # set the initial group settings
+        groupsettings = GoogleGroupSettingsApi.new
+        if(set_group = groupsettings.set_initial_group_settings(self.group_key_for_api))
+          self.update_attributes({:has_error => true, :last_api_request => gda.api_log.id})
+          return nil
+        end
       end
     else
-      updated_group = gda.update_group(self.group_id, {description: self.group_name, name: self.group_name})
+      updated_group = gda.update_group(self.group_key_for_api, {description: self.group_name, name: self.group_name})
 
       if(!updated_group)
-        self.update_attributes({:has_error => true, :last_error => gda.last_result})
+        self.update_attributes({:has_error => true, :last_api_request => gda.api_log.id})
         return nil
       end
     end
 
-    self.update_attributes({has_error: false, last_error: nil, apps_updated_at: Time.now.utc})
+    self.update_attributes({has_error: false, apps_updated_at: Time.now.utc, :last_api_request => gda.api_log.id})
     return self
   end
+
+  def get_apps_group_members(gda = nil)
+    if(gda.nil?)
+      gda = GoogleDirectoryApi.new
+    end
+    gda.retrieve_group_members(self.group_key_for_api)
+  end
+
+  def map_community_members_to_emails
+    if(self.use_groups_domain)
+      # map the community members to an array of profile emails
+      # - actual email *not* the display email
+      if(self.connectiontype == 'leaders')
+        community_members = self.community.leaders.map{|person| "#{person.email}"}
+      else
+        community_members = self.community.joined.map{|person| "#{person.email}"}
+      end
+    else
+      # map the community members to an array of idstring@extension.org emails
+      if(self.connectiontype == 'leaders')
+        community_members = self.community.leaders.map{|person| "#{person.idstring}@extension.org"}
+      else
+        community_members = self.community.joined.map{|person| "#{person.idstring}@extension.org"}
+      end
+    end
+    community_members
+  end
+
 
   def update_apps_group_members
     # load GoogleDirectoryApi
     gda = GoogleDirectoryApi.new
-
-    apps_group_members = gda.retrieve_group_members(self.group_id)
+    apps_group_members = self.get_apps_group_members(gda)
     if(apps_group_members.nil?)
-      self.update_attributes({:has_error => true, :last_error => gda.last_result})
-      return nil
-    end
-
-    # map the community members to an array of idstrings
-    if(self.connectiontype == 'leaders')
-      community_members = self.community.leaders.map{|person| "#{person.idstring}"}
-    else
-      community_members = self.community.joined.map{|person| "#{person.idstring}"}
+      self.update_attributes({:has_error => true, :last_api_request => gda.api_log.id})
+      return false
     end
 
     # inject the moderator account
     moderator_account = Person.find(Person::MODERATOR_ACCOUNT)
-    if(community_members)
-      community_members << moderator_account.idstring
+    if(community_members = self.map_community_members_to_emails)
+      community_members << moderator_account.email
     else
-      community_members = [moderator_account.idstring]
+      community_members = [moderator_account.email]
     end
 
     adds = community_members - apps_group_members
     removes = apps_group_members - community_members
 
-    adds.each do |member_id|
-      # split the id string back out
-      gda.add_member_to_group(member_id, self.group_id)
+    adds.each do |member_email|
+      is_owner = (member_email == moderator_account.email)
+      gda.add_member_to_group(member_email, self.group_key_for_api,is_owner)
     end
 
-    removes.each do |member_id|
-      gda.remove_member_from_group(member_id, self.group_id)
+    removes.each do |member_email|
+      gda.remove_member_from_group(member_email, self.group_key_for_api)
     end
 
-    return self
+    self.update_attributes({has_error: false, apps_updated_at: Time.now.utc, :last_api_request => gda.api_log.id})
+    return true
   end
 
+  # does not background requests, meant to be run from console
+  def migrate_to_groups_domain(delete_old_group = false)
+    # set flags
+    self.update_attributes(use_groups_domain: true, migrated_to_groups_domain: true)
 
+    # create new group @ google
+    self.update_apps_group
 
+    # update group members
+    self.update_apps_group_members
+
+    # delete old group @ google
+    if(delete_old_group)
+      old_group_email = "#{self.group_id}@extension.org"
+      gda = GoogleDirectoryApi.new
+      gda.delete_group(old_group_email)
+    end
+  end
+
+  def delete_apps_group
+    gda = GoogleDirectoryApi.new
+    gda.delete_group(self.group_key_for_api)
+  end
 
   def self.clear_errors
-    self.update_all("has_error = 0, last_error = ''","has_error = 1")
+    self.update_all("has_error = 0","has_error = 1")
   end
+
 end

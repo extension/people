@@ -20,15 +20,16 @@ class EmailAlias < ActiveRecord::Base
   NOWHERE_LOCATION = 'nowhere'
 
   # alias_types
-  FORWARD                  = 1
-  ALIAS                    = 2
-  GOOGLEAPPS               = 3
-  PERSONAL_ALIAS           = 4
-  RENAME_ALIAS             = 5
+  FORWARD                   = 1
+  ALIAS                     = 2
+  GOOGLEAPPS                = 3
+  PERSONAL_ALIAS            = 4
+  RENAME_ALIAS              = 5
+  GOOGLEGROUP               = 6
 
-  MIRROR                     = 200
-  SYSTEM_FORWARD             = 201
-  SYSTEM_ALIAS               = 202
+  MIRROR                    = 200
+  SYSTEM_FORWARD            = 201
+  SYSTEM_ALIAS              = 202
 
   scope :active, ->{where(disabled: false)}
   scope :renames, ->{where(alias_type: RENAME_ALIAS)}
@@ -67,6 +68,10 @@ class EmailAlias < ActiveRecord::Base
         self.disabled = false
         self.mail_alias = self.aliasable.group_id
         self.destination = "#{self.mail_alias}@#{Settings.googleapps_domain}"
+      elsif(self.alias_type == GOOGLEGROUP)
+        self.disabled = false
+        self.mail_alias = self.aliasable.group_id
+        self.destination = "#{self.mail_alias}@#{Settings.googleapps_groups_domain}"
       end
     end
   end

@@ -183,8 +183,9 @@ class Community < ActiveRecord::Base
           end
         end
       else
-        # create 'joined' group
-        if(gg = self.google_groups.create)
+        # create 'joined' group  - all new groups go to the groups domain
+        if(gg = self.google_groups.create(use_groups_domain: true))
+          gg.queue_group_update
           gg.queue_members_update
         end
       end
