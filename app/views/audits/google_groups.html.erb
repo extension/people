@@ -8,8 +8,15 @@
   <div class="col-md-12">
     <p>The following communities are currently connected to google groups</p>
     <table class="table table-striped">
-    <%- Community.includes(:google_groups).connected_to_google.order(:name).each do |c| -%>
+    <%- Community.unscoped.includes(:google_groups).connected_to_google.order(:active,:name).each do |c| -%>
       <tr>
+        <td>
+          <%- if c.active? -%>
+            <%= image_tag('green_dot.png') -%>
+          <%- else -%>
+            &nbsp;
+          <%- end -%>
+        </td>
         <td><%= link_to_community(c) -%></td>
         <td>
           <%- c.google_groups.each do |gg| -%>
