@@ -6,21 +6,22 @@
 
 <div class="row">
   <div class="col-md-12">
-    <p>The following communities are currently connected to google groups</p>
+    <p>The following google groups and their communities are implemented at google</p>
     <table class="table table-striped">
-    <%- Community.unscoped.includes(:google_groups).connected_to_google.order(:active,:name).each do |c| -%>
+    <%- GoogleGroup.unscoped.includes(:community).order(:group_name).each do |gg| -%>
       <tr>
         <td>
-          <%- if c.active? -%>
+          <%= gg.group_name -%>
+        </td>
+        <td>
+          <%= link_to(gg.group_key_for_api,gg.forum_url) -%>
+        </td>
+        <td><%= link_to_community(gg.community) -%></td>
+        <td>
+          <%- if gg.community.active? -%>
             <%= image_tag('green_dot.png') -%>
           <%- else -%>
             &nbsp;
-          <%- end -%>
-        </td>
-        <td><%= link_to_community(c) -%></td>
-        <td>
-          <%- c.google_groups.each do |gg| -%>
-            <%= link_to("#{gg.group_id}@extension.org",gg.forum_url) -%><br/>
           <%- end -%>
         </td>
       </tr>
