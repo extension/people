@@ -145,6 +145,30 @@ class AccountMailer < BaseMailer
 
     return_email
   end
+
+
+  def google_group_change(options = {})
+    @community = options[:community]
+    @recipient = options[:recipient]
+    @google_group = options[:google_group]
+    @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
+    connectiontype = options[:connectiontype]
+    if(connectiontype == 'leader')
+      @recipient_connection = @community.is_institution? ? 'member of the insititutional team' : 'leader'
+    else
+      @recipient_connection = 'member'
+    end
+
+    @subject = "eXtension: Your Google Group has a new email address: #{@google_group.group_email_address}"
+
+    if(!@recipient.email.blank?)
+      return_email = create_mail(to: @recipient.email,
+                                 subject: @subject, 
+                                 return_path: 'contact-us@extension.org')
+      save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
+    end
+
+    return_email
   end
 
 end
