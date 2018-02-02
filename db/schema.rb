@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20180119153128) do
+ActiveRecord::Schema.define(:version => 20180201150519) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -199,6 +199,7 @@ ActiveRecord::Schema.define(:version => 20180119153128) do
     t.datetime "last_ga_login_at"
     t.boolean  "has_ga_login"
     t.integer  "last_api_request"
+    t.text     "last_google_data"
   end
 
   add_index "google_accounts", ["person_id"], :name => "person_ndx", :unique => true
@@ -227,6 +228,8 @@ ActiveRecord::Schema.define(:version => 20180119153128) do
     t.integer  "last_api_request"
     t.boolean  "use_groups_domain",         :default => false,    :null => false
     t.boolean  "migrated_to_groups_domain", :default => false,    :null => false
+    t.boolean  "marked_for_removal",        :default => false,    :null => false
+    t.text     "last_google_data"
   end
 
   add_index "google_groups", ["community_id"], :name => "community_ndx"

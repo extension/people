@@ -114,7 +114,17 @@ class Community < ActiveRecord::Base
     self.people.each do |p|
       p.remove_from_community(self,{connector_id: Person.system_id, nonotify: true})
     end
-    self.update_attribute(:active, false)
+
+    self.google_groups.each do |gg|
+      gg.update_attribute(:marked_for_removal, true)
+    end
+
+    if(self.connect_to_google_apps?)
+      self.update_attribute(:active, false)
+      self.update_attribute(:connect_to_google_apps, false)
+    else
+      self.update_attribute(:active, false)
+    end
   end
 
 
