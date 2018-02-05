@@ -163,7 +163,7 @@ class AccountMailer < BaseMailer
 
     if(!@recipient.email.blank?)
       return_email = create_mail(to: @recipient.email,
-                                 subject: @subject, 
+                                 subject: @subject,
                                  return_path: 'contact-us@extension.org')
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
