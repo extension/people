@@ -91,6 +91,7 @@ class Person < ActiveRecord::Base
   after_update :synchronize_accounts
   after_update :update_google_account
   after_update :create_rename_alias
+  after_update :update_google_groups_on_email_change
   after_save   :update_nonforwarding_email_aliases
 
   ## associations
@@ -1530,6 +1531,23 @@ class Person < ActiveRecord::Base
       nil
     end
   end
+
+  def google_groups
+    GoogleGroup.where(community_id: self.connected_communities.map(&:id)).uniq
+  end
+
+  def update_google_groups_on_email_change
+    if(self.changes.keys.include?('email') and !self.email_confirmed?)
+      # do nothing
+    else
+      self.google_groups.where(use_groups_domain: true).each do |gg|
+        gg.queue_group_update
+        gg.queue_members_update
+      end
+    end
+    true
+  end
+
 
   def self.synchronize_all_accounts
     Person.order("last_activity_at DESC").find_each do |p|
