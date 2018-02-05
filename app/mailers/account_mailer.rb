@@ -147,7 +147,7 @@ class AccountMailer < BaseMailer
   end
 
 
-  def google_group_change(options = {})
+  def google_group_migration(options = {})
     @community = options[:community]
     @recipient = options[:recipient]
     @google_group = options[:google_group]
