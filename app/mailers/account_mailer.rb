@@ -148,12 +148,12 @@ class AccountMailer < BaseMailer
 
 
   def google_group_migration(options = {})
-    @community = options[:community]
     @recipient = options[:recipient]
     @google_group = options[:google_group]
+    @community = @google_group.community
     @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
-    connectiontype = options[:connectiontype]
-    if(connectiontype == 'leader')
+    connectiontype = @google_group.connectiontype
+    if(connectiontype == 'leaders')
       @recipient_connection = @community.is_institution? ? 'member of the insititutional team' : 'leader'
     else
       @recipient_connection = 'member'
