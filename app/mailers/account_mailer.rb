@@ -164,7 +164,7 @@ class AccountMailer < BaseMailer
     if(!@recipient.email.blank?)
       return_email = create_mail(to: @recipient.email,
                                  subject: @subject,
-                                 return_path: 'contact-us@extension.org')
+                                 return_path: Settings.google_support_contact)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
 
