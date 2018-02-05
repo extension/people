@@ -5,17 +5,17 @@ You are receiving this email because you are connected as a <%= @recipient_conne
 to the <%= @community.name %> community at https://people.extension.org
 
 Your community has a Google Group associated with the community.  eXtension uses
-Google Groups to provide mailing list-like services to our communities, and we
-are in the process of taking steps to improve how these Google Groups are provisioned
-and managed.
+Google Groups to provide mailing list services to our communities, and we are
+taking steps to improve how these Google Groups are provisioned and managed.
 
-As part of that process, your Google Group has a new email address.  The new
-email address to send email to this Google Group is:
+As part of that process, your Google Group has a new email address.
+The new email address to send email to this Google Group is:
 
 <%= @google_group.group_email_address -%>
 
-The old address for the group <%= @google_group.old_group_email_address -%> will still
-work! But we would strongly encourage you to start using the new email address.
+The old address for the group, <%= @google_group.old_group_email_address -%>,
+will still work until April 2, 2018, but we strongly encourage you to start
+using the new email address immediately.
 
 <%- if !@google_group.lists_alias.blank? -%>
 If you are still using the legacy email address for this Google Group:
@@ -25,8 +25,7 @@ email address.  Beginning April 2, 2018, <%= @google_group.lists_alias -%>@lists
 will no longer be forwarded to your google group.
 
 <%- end -%>
-If you have any questions or concerns - do not hesistate to contact me by emailing
-our Google/People support address at:
+If you have any questions or concerns, do not hesitate to contact me by email at:
 
 contact-us@extension.org
 
