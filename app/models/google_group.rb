@@ -40,11 +40,23 @@ class GoogleGroup < ActiveRecord::Base
     end
   end
 
+  def extension_domain_email
+    "#{self.group_id}@extension.org"
+  end
+
   def group_email_address
     if(self.use_groups_domain)
       "#{self.group_id}@#{Settings.googleapps_groups_domain}"
     else
-      "#{self.group_id}@extension.org"
+      self.extension_domain_email
+    end
+  end
+
+  def old_group_email_address
+    if(self.migrated_to_groups_domain)
+      self.extension_domain_email
+    else
+      self.group_email_address
     end
   end
 
@@ -200,16 +212,11 @@ class GoogleGroup < ActiveRecord::Base
   def delete_apps_group(force_extension_domain = false)
     gda = GoogleDirectoryApi.new
     if(force_extension_domain)
-      extension_domain_email = "#{self.group_id}@extension.org"
       gda.delete_group(self.extension_domain_email)
     else
       gda.delete_group(self.group_key_for_api)
     end
-
   end
-
-
-
 
   # does not background requests, meant to be run from console
   def migrate_to_groups_domain(delete_old_group = true)
@@ -222,9 +229,20 @@ class GoogleGroup < ActiveRecord::Base
     # update group members
     self.update_apps_group_members
 
+    # schedule notifications
+    Notification.create(:notification_type => Notification::GOOGLE_GROUP_MIGRATION, :notifiable => self)
+
     # delete old group @ google
     if(delete_old_group)
       self.delete_apps_group(true)
+    end
+  end
+
+  def notification_pool
+    if(self.connectiontype == 'leaders')
+      self.community.people.validaccounts.where('community_connections.connectiontype = ?',"leader")
+    else
+      self.community.people.validaccounts
     end
   end
 

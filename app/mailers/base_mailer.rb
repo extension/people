@@ -10,14 +10,14 @@ class BaseMailer < ActionMailer::Base
   default from: Settings.email_from_address
   default bcc: Settings.email_bcc_address
   helper_method :ssl_root_url, :ssl_webmail_logo, :is_demo?
-  
+
 
   def save_sent_email_for_recipient(email,recipient,options = {})
     if(recipient.is_a?(Person))
       create_options = {person: recipient, markup: email.body.to_s}
     elsif(recipient.is_a?(String))
       create_options = {email: recipient, markup: email.body.to_s}
-    end      
+    end
     create_options.merge!({notification: options[:notification]}) if(!options[:notification].blank?)
     SentEmail.create(create_options)
   end
@@ -47,7 +47,7 @@ class BaseMailer < ActionMailer::Base
     mailoptions = options.dup
     send_in_demo = mailoptions.delete(:send_in_demo)
     if(is_demo? and !send_in_demo)
-      mailoptions[:subject] = "[#{options[:to]}] #{options[:subject]}"  
+      mailoptions[:subject] = "[#{options[:to]}] #{options[:subject]}"
       mailoptions[:to] = Settings.email_test_address
       mailoptions[:cc] = nil
       mailoptions[:bcc] = nil
