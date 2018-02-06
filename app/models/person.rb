@@ -1004,7 +1004,7 @@ class Person < ActiveRecord::Base
         CommunityMemberSync.create_with_pending_check({community: community, person: self})
       end
 
-      if(Settings.sync_google and community.connect_to_google_apps? and ['leader','member'].include?(connectiontype))
+      if(Settings.sync_google and ['leader','member'].include?(connectiontype))
         community.update_google_groups(true)
       end
     end
@@ -1043,7 +1043,7 @@ class Person < ActiveRecord::Base
       CommunityMemberSync.create_with_pending_check({community: community, person: self})
     end
 
-    if(Settings.sync_google and community.connect_to_google_apps?)
+    if(Settings.sync_google)
       community.update_google_groups(true)
     end
 
@@ -1552,15 +1552,6 @@ class Person < ActiveRecord::Base
   def self.synchronize_all_accounts
     Person.order("last_activity_at DESC").find_each do |p|
       p.synchronize_accounts
-    end
-  end
-
-
-  def self.google_group_members
-    # get a community_id
-    google_group_joined_people = CommunityConnection.connected_to_google.joined_connections.pluck("DISTINCT community_connections.person_id")
-    with_scope do
-      self.where(id: google_group_joined_people)
     end
   end
 

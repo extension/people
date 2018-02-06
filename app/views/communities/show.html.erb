@@ -90,7 +90,7 @@
         <div id="communityforums">
           <h3>Google Group Forum</h3>
             <div class="dashmodule">
-              <%- if(@community.connect_to_google_apps? and gg = @community.joined_google_group) -%>
+              <%- if(gg = @community.joined_google_group) -%>
               <dl>
                 <dt><%= link_to('Google Group Forum',gg.forum_url) %></dt>
                 <dd>Post to forum by email: <%= link_to(gg.group_email_address, "mailto:#{gg.group_email_address}") %></dd>

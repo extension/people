@@ -102,7 +102,6 @@ class Community < ActiveRecord::Base
   scope :connected_as, lambda{|connectiontype| where(CONNECTION_CONDITIONS[connectiontype])}
 
   scope :publishing, ->{where(publishing_community: true)}
-  scope :connected_to_google, ->{where(connect_to_google_apps: true)}
 
 
   def self.inactive
@@ -119,12 +118,8 @@ class Community < ActiveRecord::Base
       gg.update_attribute(:marked_for_removal, true)
     end
 
-    if(self.connect_to_google_apps?)
-      self.update_attribute(:active, false)
-      self.update_attribute(:connect_to_google_apps, false)
-    else
-      self.update_attribute(:active, false)
-    end
+    self.update_attribute(:active, false)
+
   end
 
 
@@ -181,28 +176,47 @@ class Community < ActiveRecord::Base
   end
 
   def update_google_groups(update_members = false)
-    if(self.connect_to_google_apps?)
-      if(!self.google_groups.blank?)
-        if(update_members)
-          self.google_groups.each do |gg|
-            gg.queue_members_update
-          end
-        else
-          self.google_groups.each do |gg|
-            gg.queue_group_update
-          end
-        end
-      else
-        # create 'joined' group  - all new groups go to the groups domain
-        if(gg = self.google_groups.create(use_groups_domain: true))
-          gg.queue_group_update
+    if(!self.google_groups.blank?)
+      if(update_members)
+        self.google_groups.each do |gg|
           gg.queue_members_update
         end
+      else
+        self.google_groups.each do |gg|
+          gg.queue_group_update
+        end
       end
-    else
-      # do nothing
     end
     return true
+  end
+
+  def create_joined_google_group(use_groups_domain = true)
+    if(!(gg = self.joined_google_group))
+      # create 'joined' group  - all new groups go to the groups domain
+      if(gg = self.google_groups.create(use_groups_domain: use_groups_domain))
+        gg.queue_group_update
+        gg.queue_members_update
+      end
+    end
+    return gg
+  end
+
+  def joined_google_group
+    self.google_groups.where(connectiontype: 'joined').first
+  end
+
+  def create_leaders_google_group(use_groups_domain = true)
+    if(!(gg = self.leaders_google_group))
+      if(gg = self.google_groups.create(connectiontype: 'leaders', use_groups_domain: use_groups_domain))
+        gg.queue_group_update
+        gg.queue_members_update
+      end
+    end
+    return gg
+  end
+
+  def leaders_google_group
+    self.google_groups.where(connectiontype: 'leaders').first
   end
 
   def is_institution?
@@ -321,25 +335,6 @@ class Community < ActiveRecord::Base
     Rails.cache.fetch(cache_key,cache_options) do
       joined.count
     end
-  end
-
-  def joined_google_group
-    self.google_groups.where(connectiontype: 'joined').first
-  end
-
-  def create_leaders_google_group
-    if(self.connect_to_google_apps?)
-      if(!(gg = self.leaders_google_group))
-        if(gg = self.google_groups.create(connectiontype: 'leaders'))
-          gg.queue_members_update
-        end
-      end
-      return gg
-    end
-  end
-
-  def leaders_google_group
-    self.google_groups.where(connectiontype: 'leaders').first
   end
 
   def add_role_for_site(site,permission)
