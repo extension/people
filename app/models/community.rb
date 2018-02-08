@@ -114,11 +114,12 @@ class Community < ActiveRecord::Base
       p.remove_from_community(self,{connector_id: Person.system_id, nonotify: true})
     end
 
-    self.google_groups.each do |gg|
-      gg.update_attribute(:marked_for_removal, true)
-    end
-
     self.update_attribute(:active, false)
+
+    # go ahead and remove google groups
+    self.google_groups.each do |gg|
+      gg.destroy
+    end
 
   end
 
