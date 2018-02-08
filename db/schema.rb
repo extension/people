@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20180201150519) do
+ActiveRecord::Schema.define(:version => 20180208140925) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -86,24 +86,23 @@ ActiveRecord::Schema.define(:version => 20180201150519) do
   add_index "browse_filters", ["fingerprint"], :name => "fingerprint_ndx", :unique => true
 
   create_table "communities", :force => true do |t|
-    t.integer  "entrytype",              :default => 0,     :null => false
-    t.string   "name",                                      :null => false
+    t.integer  "entrytype",            :default => 0,     :null => false
+    t.string   "name",                                    :null => false
     t.text     "description"
-    t.integer  "created_by",             :default => 0
-    t.integer  "memberfilter",           :default => 1
+    t.integer  "created_by",           :default => 0
+    t.integer  "memberfilter",         :default => 1
     t.string   "shortname"
-    t.boolean  "publishing_community",   :default => false
-    t.integer  "location_id",            :default => 0
-    t.boolean  "connect_to_drupal",      :default => false
+    t.boolean  "publishing_community", :default => false
+    t.integer  "location_id",          :default => 0
+    t.boolean  "connect_to_drupal",    :default => false
     t.integer  "drupal_node_id"
-    t.boolean  "connect_to_google_apps", :default => false
-    t.boolean  "active",                 :default => true
-    t.datetime "created_at",                                :null => false
-    t.datetime "updated_at",                                :null => false
+    t.boolean  "active",               :default => true
+    t.datetime "created_at",                              :null => false
+    t.datetime "updated_at",                              :null => false
     t.string   "community_masthead"
     t.integer  "blog_id"
     t.integer  "primary_contact_id"
-    t.integer  "membership_level",       :default => 0,     :null => false
+    t.integer  "membership_level",     :default => 0,     :null => false
   end
 
   add_index "communities", ["entrytype"], :name => "entrytype_ndx"
@@ -228,7 +227,6 @@ ActiveRecord::Schema.define(:version => 20180201150519) do
     t.integer  "last_api_request"
     t.boolean  "use_groups_domain",         :default => false,    :null => false
     t.boolean  "migrated_to_groups_domain", :default => false,    :null => false
-    t.boolean  "marked_for_removal",        :default => false,    :null => false
     t.text     "last_google_data"
   end
 
