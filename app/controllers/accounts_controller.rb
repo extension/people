@@ -9,6 +9,7 @@ class AccountsController < ApplicationController
   skip_before_filter :update_last_activity, only: [:signin]
   skip_before_filter :signin_required, except: [:post_signup, :confirm, :resend_confirmation, :pending_confirmation, :review]
   before_filter :signin_optional
+  before_filter :set_referer_track
 
   def signout
     set_current_person(nil)
@@ -229,6 +230,31 @@ class AccountsController < ApplicationController
       return redirect_back_or_default(root_url)
     end
   end
+
+
+  def set_referer_track
+    # ignore bots
+    return true if request.bot?
+
+    # ignore StatusCake
+    return true if(request.env['HTTP_USER_AGENT'] =~ %r{StatusCake}i)
+
+    if(cookies.signed[:rt] and referer_track = RefererTrack.where(id: session[:rt]).first)
+      referer_track.increment!(:load_count)
+    else
+      expires = 1.day.from_now
+      referer_track = RefererTrack.create(ipaddr: request.remote_ip,
+                                          referer: request.env["HTTP_REFERER"],
+                                          user_agent: request.env['HTTP_USER_AGENT'],
+                                          expires_at: expires)
+
+      cookies.signed[:rt] = {
+        value: referer_track.id,
+        expires: expires
+      }
+    end
+  end
+
 
   private
 
