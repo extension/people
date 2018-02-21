@@ -9,7 +9,98 @@ class AccountsController < ApplicationController
   skip_before_filter :update_last_activity, only: [:signin]
   skip_before_filter :signin_required, except: [:post_signup, :confirm, :resend_confirmation, :pending_confirmation, :review]
   before_filter :signin_optional
-  before_filter :set_referer_track
+  before_filter :set_referer_track, only: [:signup, :signup_email]
+
+  def signup
+    reset_session
+    if(!request.post?)
+      # check for invitation
+      if(!params[:invite].nil?)
+        if(invitation = Invitation.find_by_token(params[:invite]))
+          # check invitation to see if already accepted
+
+        else
+          # invitation code no longer available or valid, just start over
+          # ToDo: log in case it comes up as a support issue?
+          return render(template: 'accounts/eligibility_notice')
+        end
+      else
+        return render(template: 'accounts/eligibility_notice')
+      end
+    end
+
+    if params[:signup_email]
+      @signup_email = SignupEmail.new(params[:signup_email])
+    else
+      @signup_email = SignupEmail.new
+    end
+  end
+
+  def signup_email
+    @signup_email = SignupEmail.new(email: params[:email])
+    if(@signup_email.email =~ /extension\.org$/i)
+      @signup_email.errors.add(:email, "For technical reasons, signing up with an eXtension.org email address is not possible.".html_safe)
+      return render(:action => "signup")
+    end
+
+    if(rt_id = cookies.signed[:rt])
+      @signup_email.referer_track_id = rt_id
+    end
+
+
+    if(@signup_email.save)
+      # @signup_email.send_signup_confirmation
+      # Activity.log_activity(person_id: @person.id, activitycode: Activity::SIGNUP, ip_address: request.remote_ip)
+      # render(template: 'accounts/post_signup')
+    else
+      render(:action => "signup")
+    end
+  end
+
+  def signup_confirm
+    if(params[:token].nil?)
+      return render(:template => 'accounts/invalid_token')
+    end
+
+    if(!(signup_email = SignupEmail.where(token: params[:token]).first))
+      return render(:template => 'accounts/invalid_token')
+    end
+
+    signup_email.update_attribute(:confirmed, true)
+
+    if(signup_email.has_whitelisted_email?)
+      _setup_profile
+      render(template: 'accounts/createprofile', formats: [:html])
+    end
+  end
+
+  def _setup_profile
+    if params[:person]
+      @person = Person.new(params[:person])
+    else
+      @person = Person.new
+    end
+
+    if(!params[:invite].nil?)
+      @invitation = Invitation.find_by_token(params[:invite])
+    end
+
+    @locations = Location.order('entrytype,name')
+    if(!(@person.location.nil?))
+      @countylist = @person.location.counties
+    end
+  end
+
+  def createprofile
+    reset_session
+
+    _setup_profile
+
+    # html only
+    respond_to do |format|
+      format.html
+    end
+  end
 
   def signout
     set_current_person(nil)
@@ -140,6 +231,9 @@ class AccountsController < ApplicationController
     end
   end
 
+
+
+
   def post_signup
   end
 
@@ -147,32 +241,8 @@ class AccountsController < ApplicationController
   end
 
 
-  def signup
-    reset_session
-    if(!request.post?)
-      return render(template: 'accounts/eligibility_notice')
-    end
 
-    if params[:person]
-      @person = Person.new(params[:person])
-    else
-      @person = Person.new
-    end
 
-    if(!params[:invite].nil?)
-      @invitation = Invitation.find_by_token(params[:invite])
-    end
-
-    @locations = Location.order('entrytype,name')
-    if(!(@person.location.nil?))
-      @countylist = @person.location.counties
-    end
-
-    # html only
-    respond_to do |format|
-      format.html
-    end
-  end
 
   def display_eligibility_notice
     return render(template: 'accounts/eligibility_notice')
@@ -182,7 +252,7 @@ class AccountsController < ApplicationController
     @person = Person.new(params[:person])
     if(@person.email =~ /extension\.org$/i)
       @person.errors.add(:email, "For technical reasons, signing up with an eXtension.org email address is not possible.".html_safe)
-      return render(:action => "signup")
+      return render(:action => "createprofile")
     end
 
 
@@ -201,7 +271,7 @@ class AccountsController < ApplicationController
       Activity.log_activity(person_id: @person.id, activitycode: Activity::SIGNUP, ip_address: request.remote_ip)
       render(template: 'accounts/post_signup')
     else
-      render(:action => "signup")
+      render(:action => "createprofile")
     end
   end
 
