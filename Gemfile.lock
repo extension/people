@@ -318,6 +318,8 @@ GEM
     valid_email (0.0.4)
       activemodel
       mail
+    voight_kampff (1.1.2)
+      rack (>= 1.4, < 3.0)
 
 PLATFORMS
   ruby
@@ -381,6 +383,7 @@ DEPENDENCIES
   unscoped_associations
   useragent
   valid_email
+  voight_kampff
 
 BUNDLED WITH
    1.16.0

@@ -132,6 +132,10 @@ gem 'test-unit'
 # handle the issue with the community scoping
 gem 'unscoped_associations'
 
+# bot detection
+gem 'voight_kampff'
+
+
 group :development do
   # require the powder gem
   gem 'powder'
