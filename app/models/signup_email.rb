@@ -13,7 +13,13 @@ class SignupEmail < ActiveRecord::Base
 
   before_create :generate_token
 
+  def has_whitelisted_email?
+    (self.email =~ /edu$|gov$|mil$/i)
+  end
 
+  def send_signup_confirmation
+   Notification.create(notifiable: self, notification_type: Notification::CONFIRM_SIGNUP)
+  end
 
   def generate_token
     self.token = SecureRandom.urlsafe_base64
