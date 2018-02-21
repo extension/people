@@ -92,11 +92,11 @@
             <div class="dashmodule">
               <%- if(gg = @community.joined_google_group) -%>
               <dl>
-                <dt><%= link_to('Google Group Forum',gg.forum_url) %></dt>
-                <dd>Post to forum by email: <%= link_to(gg.group_email_address, "mailto:#{gg.group_email_address}") %></dd>
+                <dt>Post to forum by email: </dt>
+                  <dd><%= link_to(gg.group_email_address, "mailto:#{gg.group_email_address}") %></dd>
                   <%- if(lg = @community.leaders_google_group) -%>
-                  <dt><%= link_to('Google Group Forum - Leaders',lg.forum_url) %></dt>
-                  <dd>Post to leader forum by email: <%= link_to(lg.group_email_address, "mailto:#{lg.group_email_address}") %></dd>
+                  <dt>Post to forum by email: </dt>
+                    <dd><%= link_to(lg.group_email_address, "mailto:#{lg.group_email_address}") %></dd>
                   <%- end -%>
               </dl>
               <%- else -%>
