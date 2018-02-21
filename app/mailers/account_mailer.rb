@@ -19,6 +19,20 @@ class AccountMailer < BaseMailer
     return_email
   end
 
+  def moderated_signup(options = {})
+    @recipient = options[:recipient]
+    @subject = "eXtension: You must be invited to get an account"
+    @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
+
+    if(!@recipient.email.blank?)
+      return_email = create_mail(to: @recipient.email, subject: @subject, send_in_demo: true)
+      save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
+    end
+
+    return_email
+  end
+
+
   def confirm(options = {})
     @recipient = options[:recipient]
     @subject = "eXtension: Please confirm your email address"

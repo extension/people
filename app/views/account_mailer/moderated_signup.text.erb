@@ -1,0 +1,26 @@
+<%= render(:partial => 'shared_mailer/demo_notice') if is_demo? -%>
+Hi <%= @recipient.email -%>,
+
+eXtensionID’s are currently limited to individuals closely associated with the U.S. Cooperative Extension system (either those working at a Land-Grant Institution, State college or U.S. Government personnel affiliated with Cooperative Extension), or individuals in Extension-related organizations working on projects with Cooperative Extension staff.
+
+In order to verify your account, you must be invited by a colleague that currently has an eXtension Account.
+
+Just forward the information below to your colleague, the link within the email will allow your colleague to easily sign-in and invite you to get an eXtensionID.
+
+---
+
+Dear Colleague,
+
+I'd like to be a part of the National eXtension Directory at https://people.extension.org which provides access to various extension.org tools and platforms, including the eXtension Ask an Expert.
+
+In order to do so, my email address must be invited to join eXtension.
+
+Just click this URL:
+
+<%= invite_people_token_url(token: @recipient.token) %>
+
+which will send me an email to start the signup process at eXtension.
+
+---
+
+<%= render(:partial => 'shared_mailer/help_footer') %>
