@@ -9,19 +9,17 @@
 
         <div class="alert alert-info">
           <h3>Please check your email and confirm your address</h3>
-          <p>We just sent an email to: <strong class="mono"><%= current_person.email %></strong> (<%= link_to('edit', edit_person_path(current_person))%>).</p>
-          <br />
+          <p>We just sent an email to: <strong class="mono"><%= @signup_email.email %></strong>.</p>
+          <br/>
+          <%- if !@signup_email.has_whitelisted_email? -%>
+          <p>Because your email address was not issued by an organization <strong class="mono">.edu</strong> or <strong class="mono">.gov</strong>
+            email addresses, we've also provided instructions for sending your confirmation email to a colleague to send you an invitation for
+            an eXtension account.  Just follow the instructions in the confirmation email.</p>
+          <%- else -%>
           <p>Please follow the instructions to confirm your email address.</p>
-      </div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-md-12">
-        <h4>While you are waiting...</h4>
-        <p><%= link_to('View your Profile',person_path(current_person), class: 'btn btn-default btn-lg') -%></p>
+          <%- end -%>
+        </div>
       </div>
     </div>
-
   </div>
 </div>
