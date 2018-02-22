@@ -26,6 +26,8 @@
 
       <%- if(@invitation) -%>
         <%= hidden_field_tag('invite',@invitation.token) %>
+      <%- elsif(@signup_email) -%>
+        <%= hidden_field_tag('token',@signup_email.token) %>
       <%- end -%>
 
       <div class="form-group">
@@ -39,13 +41,6 @@
         <label for="last_name" class="col-md-4 control-label">* Last name</label>
         <div class="col-md-6">
           <%= f.text_field :last_name, :class => "form-control", :placeholder => 'Last name' %>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="email" class="col-md-4 control-label">* Email</label>
-        <div class="col-md-6">
-          <%= f.text_field :email, :class => "form-control", :placeholder => 'Email' %>
         </div>
       </div>
 
