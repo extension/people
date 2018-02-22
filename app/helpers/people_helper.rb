@@ -177,9 +177,13 @@ module PeopleHelper
 
     # note space on the end of link - required in string formatting
 
-    if(activity.person_id.blank? and activity.activitycode == Activity::AUTH_LOCAL_FAILURE)
-      # special case of showing additional information for authentication failures
-      text_macro_options[:persontext]  = hide_person_text ? '' : "#{activity.additionalinfo} (unknown account) "
+    if(activity.person_id.blank?)
+      if(activity.activitycode == Activity::SIGNUP_EMAIL)
+        text_macro_options[:persontext]  = hide_person_text ? '' : "#{activity.additionalinfo} "
+      elsif(activity.activitycode == Activity::AUTH_LOCAL_FAILURE)
+        # special case of showing additional information for authentication failures
+        text_macro_options[:persontext]  = hide_person_text ? '' : "#{activity.additionalinfo} (unknown account) "
+      end
     else
       text_macro_options[:persontext]  = hide_person_text ? '' : "#{link_to_person(activity.person,{nolink: nolink})} "
     end
