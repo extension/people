@@ -46,7 +46,14 @@ class AccountsController < ApplicationController
       @signup_email.referer_track_id = rt_id
     end
 
-    if(@signup_email.save)
+    # check for existing signup
+
+    if(@existing_signup_email = SignupEmail.find_by_email(@signup_email.email))
+      @signup_email = @existing_signup_email
+      @signup_email.send_signup_confirmation
+      Activity.log_signup_email(email: @signup_email.email, ip_address: request.remote_ip)
+      render(template: 'accounts/post_signup')
+    elsif(@signup_email.save)
       @signup_email.send_signup_confirmation
       Activity.log_signup_email(email: @signup_email.email, ip_address: request.remote_ip)
       render(template: 'accounts/post_signup')
