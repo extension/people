@@ -67,10 +67,6 @@ class Person < ActiveRecord::Base
   UNAVAILABLE_CONFIRM_EMAIL = 2
   UNAVAILABLE_TOU_HALT = 3
 
-
-
-
-
   ## validations
   validates :first_name, :presence => true
   validates :last_name, :presence => true
