@@ -289,29 +289,6 @@ class AccountsController < ApplicationController
 
   protected
 
-  def set_referer_track
-    # ignore bots
-    return true if request.bot?
-
-    # ignore StatusCake
-    return true if(request.env['HTTP_USER_AGENT'] =~ %r{StatusCake}i)
-
-    if(rtid = cookies.signed[:rt] and referer_track = RefererTrack.where(id: rtid).first)
-      referer_track.increment!(:load_count)
-    else
-      expires = 1.day.from_now
-      referer_track = RefererTrack.create(ipaddr: request.remote_ip,
-                                          referer: request.env["HTTP_REFERER"],
-                                          user_agent: request.env['HTTP_USER_AGENT'],
-                                          expires_at: expires)
-
-      cookies.signed[:rt] = {
-        value: referer_track.id,
-        expires: expires
-      }
-    end
-  end
-
   def _setup_profile
     if params[:person]
       @person = Person.new(params[:person])
