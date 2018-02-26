@@ -26,6 +26,18 @@ class CronTasks < Thor
       puts "Removed accounts: #{idlist.join(', ')}"
     end
 
+    def cleanup_signup_email_accounts
+      selist = SignupEmail.cleanup_signup_accounts
+      idlist = selist.map{|a| "##{a.id}"}
+      puts "Removed signup emails: #{idlist.join(', ')}"
+    end
+
+    def cleanup_referer_tracks
+      rtlist = RefererTrack.cleanup_unused_tracks
+      idlist = rtlist.map{|a| "##{a.id}"}
+      puts "Removed referer tracks: #{idlist.join(', ')}"
+    end
+
     def cleanup_pending_accounts
       accounts = Person.cleanup_pending_accounts
       idlist = accounts.map{|a| "##{a.id}"}
@@ -65,6 +77,8 @@ class CronTasks < Thor
   def daily
     load_rails(options[:environment])
     cleanup_signup_accounts
+    cleanup_signup_email_accounts
+    cleanup_referer_tracks
     cleanup_pending_accounts
     cleanup_invitations
     expire_passwords

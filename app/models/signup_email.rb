@@ -25,4 +25,10 @@ class SignupEmail < ActiveRecord::Base
     self.token = SecureRandom.hex
   end
 
+  def self.cleanup_signup_accounts
+    self.where(confirmed: false).where("created_at < ?",Time.now - 14.day).each do |signup_email|
+      signup_email.destroy
+    end
+  end
+
 end
