@@ -571,10 +571,6 @@ class Person < ActiveRecord::Base
     self.communities.institutions.where(id: self.institution_id).first
   end
 
-  def send_signup_confirmation
-   Notification.create(notifiable: self, notification_type: Notification::CONFIRM_SIGNUP)
-  end
-
   def rename_account_to(new_idstring)
     self.update_attribute(:idstring, new_idstring)
   end
