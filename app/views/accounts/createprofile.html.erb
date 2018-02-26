@@ -31,6 +31,14 @@
       <%- end -%>
 
       <div class="form-group">
+          <label for="email" class="col-md-4 control-label">Email</label>
+          <div class="col-md-6">
+            <p id="email" class="larger"><strong><%= @person.email -%></p>
+            <span class="help-block">Your email can be changed after you create your profile.</span>
+          </div>
+      </div>
+
+      <div class="form-group">
         <label for="first_name" class="col-md-4 control-label">* First name</label>
         <div class="col-md-6">
           <%= f.text_field :first_name, :class => "form-control", :placeholder => 'First name' %>
