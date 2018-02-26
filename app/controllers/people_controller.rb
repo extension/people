@@ -228,9 +228,14 @@ class PeopleController < ApplicationController
   def invite
     collection_breadcrumbs([['Invitations',invitations_people_path],'Invite colleague'])
 
+
     @invite_communities = current_person.invite_communities
     if(request.post?)
       @invitation = Invitation.new(params[:invitation])
+
+      if(!params[:token].nil? and @signup_email = SignupEmail.find_by_token(params[:token]))
+        @invitation.email = @signup_email.email
+      end
 
       # check for existing person with same email
       if(person = Person.find_by_email(@invitation.email))
@@ -245,6 +250,9 @@ class PeopleController < ApplicationController
       end
     else
       @invitation = Invitation.new()
+      if(!params[:token].nil? and @signup_email = SignupEmail.find_by_token(params[:token]))
+        @invitation.email = @signup_email.email
+      end
       if(params[:community])
         @check_community = Community.where(id: params[:community]).first
       end
