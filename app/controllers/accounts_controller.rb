@@ -9,7 +9,7 @@ class AccountsController < ApplicationController
   skip_before_filter :update_last_activity, only: [:signin]
   skip_before_filter :signin_required, except: [:confirm, :resend_confirmation, :pending_confirmation, :review]
   before_filter :signin_optional
-  before_filter :set_referer_track, only: [:signup, :signup_email]
+  before_filter :set_referer_track, only: [:signin, :signup, :signup_email]
 
   def display_eligibility_notice
     return render(template: 'accounts/eligibility_notice')

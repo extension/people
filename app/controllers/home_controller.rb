@@ -9,6 +9,7 @@ class HomeController < ApplicationController
   skip_before_filter :signin_required, only: [:help]
   skip_before_filter :check_hold_status, only: [:pending, :help]
   before_filter :signin_optional, only: [:help]
+  before_filter :set_referer_track, only: [:index]
 
   before_filter :set_tab
 
@@ -41,5 +42,5 @@ class HomeController < ApplicationController
 
 
 
-  
+
 end
