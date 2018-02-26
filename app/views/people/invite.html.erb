@@ -24,6 +24,11 @@
         </div>
       <%- end -%>
 
+      <%- if(@signup_email) -%>
+        <%= hidden_field_tag('token',@signup_email.token) %>
+      <%- end -%>
+
+      <%- if @signup_email.nil? -%>
       <div class="form-group">
         <label for="email" class="col-md-4 control-label">* Your colleague's email</label>
         <div class="col-md-8">
@@ -31,6 +36,15 @@
           <span class="help-block">Double-check that you have the correct address. We don't have an automated means of detecting invalid email addresses.</span>
         </div>
       </div>
+      <%- else -%>
+        <div class="form-group">
+          <label for="email" class="col-md-4 control-label">Your colleague's email</label>
+          <div class="col-md-8">
+            <p id="email" class="larger"><%= @invitation.email -%></p>
+            <span class="help-block">This is the email address your colleague signed up with. It cannot be changed for the invitation.</span>
+          </div>
+      </div>
+      <%- end -%>
 
       <div class="form-group">
         <label for="message" class="col-md-4 control-label">Message</label>
@@ -44,7 +58,7 @@
         <fieldset>
           <div class="col-md-offset-4 col-md-8">
             <legend>Communities</legend>
-            <p><span class="help-block">Include an invitation for your colleague to join one or more of the following communities.</p>
+            <span class="help-block">Include an invitation for your colleague to join one or more of the following communities.</span>
           </div>
 
           <div class="form-group">
