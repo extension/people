@@ -235,6 +235,7 @@ class PeopleController < ApplicationController
 
       if(!params[:token].nil? and @signup_email = SignupEmail.find_by_token(params[:token]))
         @invitation.email = @signup_email.email
+        @signup_email.update_attribute(:confirmed, true)
       end
 
       # check for existing person with same email
@@ -245,6 +246,7 @@ class PeopleController < ApplicationController
 
       @invitation.person = current_person
       if(@invitation.save)
+        @signup_email.update_attribute(:invitation_id, @invitation.id) if(@signup_email)
         Activity.log_activity(person_id: current_person.id, activitycode: Activity::INVITATION, additionalinfo: @invitation.email, additionaldata: {'invitation_id' => @invitation.id}, ip_address: request.remote_ip)
         return render(template: 'people/sentinvite')
       end

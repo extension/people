@@ -254,6 +254,12 @@ class AccountsController < ApplicationController
       set_current_person(@person)
       current_person.confirm_signup({ip_address: request.remote_ip})
       Activity.log_activity(person_id: @person.id, activitycode: Activity::SIGNUP, ip_address: request.remote_ip)
+      if(@signup_email)
+        @signup_email.update_attribute(:person_id, @person.id)
+      elsif(signup_email = SignupEmail.find_by_email(@person.email))
+        # by invitation, go find the matching email
+        signup_email.update_attribute(:person_id, @person.id)
+      end
       return redirect_to(root_url)
     else
       render(:action => "createprofile")
