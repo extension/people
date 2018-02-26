@@ -22,7 +22,7 @@ class SignupEmail < ActiveRecord::Base
   end
 
   def generate_token
-    self.token = SecureRandom.urlsafe_base64
+    self.token = SecureRandom.hex
   end
 
 end
