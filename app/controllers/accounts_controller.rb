@@ -11,22 +11,14 @@ class AccountsController < ApplicationController
   before_filter :signin_optional
   before_filter :set_referer_track, only: [:signup, :signup_email]
 
+  def display_eligibility_notice
+    return render(template: 'accounts/eligibility_notice')
+  end
+
   def signup
     reset_session
     if(!request.post?)
-      # check for invitation
-      if(!params[:invite].nil?)
-        if(invitation = Invitation.find_by_token(params[:invite]))
-          # check invitation to see if already accepted
-
-        else
-          # invitation code no longer available or valid, just start over
-          # ToDo: log in case it comes up as a support issue?
-          return render(template: 'accounts/eligibility_notice')
-        end
-      else
-        return render(template: 'accounts/eligibility_notice')
-      end
+      return render(template: 'accounts/eligibility_notice')
     end
 
     if params[:signup_email]
@@ -38,6 +30,13 @@ class AccountsController < ApplicationController
 
   def signup_email
     @signup_email = SignupEmail.new(params[:signup_email])
+
+    # check for existing account
+    if(@person = Person.find_by_email(@signup_email.email))
+      flash[:notice] = "You already have registered an eXtension Account with the email address: #{@person.email}"
+      return redirect_to(signin_url)
+    end
+
     if(@signup_email.email =~ /extension\.org$/i)
       @signup_email.errors.add(:email, "For technical reasons, signing up with an eXtension.org email address is not possible.".html_safe)
       return render(:action => "signup")
@@ -79,6 +78,13 @@ class AccountsController < ApplicationController
     reset_session
 
     _setup_profile
+    if(@invitation)
+      if(!request.post?)
+        return render(template: 'accounts/eligibility_notice')
+      end
+    elsif(!@signup_email)
+      return render(:template => 'accounts/invalid_token')
+    end
 
     # html only
     respond_to do |format|
@@ -221,10 +227,6 @@ class AccountsController < ApplicationController
   def pending_confirmation
   end
 
-  def display_eligibility_notice
-    return render(template: 'accounts/eligibility_notice')
-  end
-
   def create
     @person = Person.new(params[:person])
 
@@ -243,7 +245,7 @@ class AccountsController < ApplicationController
     if(@person.save)
       # automatically log them in
       set_current_person(@person)
-      current_person.send_signup_confirmation
+      current_person.confirm_signup({ip_address: request.remote_ip})
       Activity.log_activity(person_id: @person.id, activitycode: Activity::SIGNUP, ip_address: request.remote_ip)
       return redirect_to(root_url)
     else
