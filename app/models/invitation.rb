@@ -81,8 +81,7 @@ class Invitation < ActiveRecord::Base
   protected
 
   def generate_token
-    randval = rand
-    self.token = Digest::SHA1.hexdigest(Settings.session_token+self.email+randval.to_s)
+    self.token = SecureRandom.hex
   end
 
 
