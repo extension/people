@@ -77,7 +77,6 @@ class Person < ActiveRecord::Base
   validates :idstring, :presence => true, :uniqueness => {:case_sensitive => false}
   validates :email, :presence => true, :email => true, :uniqueness => {:case_sensitive => false}
   validates :password, :length => { :in => 8..40 }, :presence => true, :on => :create
-  validates :involvement, :presence => true, :on => :create
   validate :check_idstring_emailalias_conflicts
   validate :check_for_prior_rename, :on => :update
 
