@@ -296,7 +296,7 @@ class AccountsController < ApplicationController
     # ignore StatusCake
     return true if(request.env['HTTP_USER_AGENT'] =~ %r{StatusCake}i)
 
-    if(cookies.signed[:rt] and referer_track = RefererTrack.where(id: session[:rt]).first)
+    if(rtid = cookies.signed[:rt] and referer_track = RefererTrack.where(id: rtid).first)
       referer_track.increment!(:load_count)
     else
       expires = 1.day.from_now
