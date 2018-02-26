@@ -12,6 +12,10 @@ class RefererTrack < ActiveRecord::Base
     where("expires_at < ?",Time.now)
   end
 
+  def self.not_expired
+    where("expires_at >= ?",Time.now)
+  end
+
   def self.cleanup_unused_tracks
     used = SignupEmail.pluck(:referer_track_id)
     self.expired.where("id NOT IN (?)",used).each do |rt|
