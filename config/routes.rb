@@ -36,7 +36,7 @@ People::Application.routes.draw do
   controller :accounts do
     # non accounts/blah paths
     match "signup", action: "signup", via: [:get,:post]
-    match "signup/:invite", action: "signup", via: [:get], as: "invited_signup"
+    match "signup/:invite", action: "createprofile", via: [:get], as: "invited_signup"
     match "signup/confirm/:token", action: "signup_confirm", via: [:get,:post], as: "confirm_signup"
 
 
@@ -48,7 +48,7 @@ People::Application.routes.draw do
     # everything else
     simple_named_route 'signup_email', via: [:post]
     simple_named_route 'confirmsignup', via: [:get,:post]
-
+    simple_named_route 'createprofile', via: [:get,:post]
     simple_named_route 'create', via: [:post]
     simple_named_route 'send_confirmation'
     simple_named_route 'reset_password', via: [:get,:post]
@@ -62,9 +62,8 @@ People::Application.routes.draw do
     simple_named_route 'tou_notice', via: [:get,:post]
   end
 
+  match "people/invite/:token" =>"people#invite", :via => [:get], as: "invite_people_token"
   resources :people, only: [:index, :show, :edit, :update] do
-
-    match "invite/:token", action: "invite", via: [:get], as: "invite_people_token"
 
     member do
       get :activity
