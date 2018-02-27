@@ -1119,7 +1119,7 @@ class Person < ActiveRecord::Base
     if(self.is_systems_account?)
       true
     else
-      (self.email =~ /edu$|gov$|mil$/i)
+      (self.email =~ /edu$|gov$/i)
     end
   end
 

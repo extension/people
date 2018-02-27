@@ -14,7 +14,7 @@ class SignupEmail < ActiveRecord::Base
   before_create :generate_token
 
   def has_whitelisted_email?
-    (self.email =~ /edu$|gov$|mil$/i)
+    (self.email =~ /edu$|gov$/i)
   end
 
   def send_signup_confirmation
