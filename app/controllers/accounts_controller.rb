@@ -86,7 +86,7 @@ class AccountsController < ApplicationController
 
     _setup_profile
     if(@invitation)
-      if(!request.post?)
+      if(!request.post? and !(signup_email = SignupEmail.find_by_email(@invitation.email)))
         return render(template: 'accounts/eligibility_notice')
       end
     elsif(!@signup_email)
