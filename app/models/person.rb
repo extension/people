@@ -885,8 +885,6 @@ class Person < ActiveRecord::Base
           self.join_community(self.institution, {ip_address: options[:ip_address]})
         end
         Notification.create(:notification_type => Notification::WELCOME, :notifiable => self)
-      else
-        self.post_account_review_request(options)
       end
       return true
     else
@@ -916,43 +914,6 @@ class Person < ActiveRecord::Base
     else
       return false
     end
-  end
-
-  def post_account_review_request(options = {})
-    if(self.vouched?)
-      return true
-    end
-
-    request_options = {}
-    request_options['account_review_key'] = Settings.account_review_key
-    request_options['idstring'] = self.idstring
-    request_options['email'] = self.email
-    request_options['fullname'] = self.fullname
-    if (!self.involvement.blank?)
-      request_options['additional_information'] = self.involvement
-    end
-
-    begin
-    raw_result = RestClient.post(Settings.account_review_url,
-                             request_options.to_json,
-                             :content_type => :json, :accept => :json)
-    rescue StandardError => e
-      raw_result = e.response
-    end
-    result = ActiveSupport::JSON.decode(raw_result.gsub(/'/,"\""))
-    if(result['success'])
-      postresults = {:success => true, :request_id => result['question_id']}
-      loginfo = "SUCCESS: #{result['question_id']}"
-    else
-      postresults = {:success => false, :error => result['message']}
-      loginfo = "FAILURE: #{result['message']}"
-    end
-
-    if(options[:nolog].nil? or !options[:nolog])
-      Activity.log_activity(person_id: self.id, activitycode: Activity::REVIEW_REQUEST, ip_address: options[:ip_address], additionalinfo: loginfo, additionaldata: postresults)
-    end
-
-    result['success']
   end
 
   # meant as an api call, sets or modifies the connection without
