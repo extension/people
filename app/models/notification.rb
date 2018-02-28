@@ -107,7 +107,12 @@ class Notification < ActiveRecord::Base
   end
 
   def confirm_signup
-    AccountMailer.signup({recipient: self.notifiable, notification: self}).deliver
+    recipient = self.notifiable
+    if(recipient.has_whitelisted_email?)
+      AccountMailer.signup({recipient: recipient, notification: self}).deliver
+    else
+      AccountMailer.moderated_signup({recipient: recipient, notification: self}).deliver
+    end
   end
 
   def confirm_email

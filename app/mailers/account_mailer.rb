@@ -13,11 +13,25 @@ class AccountMailer < BaseMailer
 
     if(!@recipient.email.blank?)
       return_email = create_mail(to: @recipient.email, subject: @subject, send_in_demo: true)
-      save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
+      save_sent_email_for_recipient(return_email,@recipient.email,options) if @save_sent_email
     end
 
     return_email
   end
+
+  def moderated_signup(options = {})
+    @recipient = options[:recipient]
+    @subject = "eXtension: You must be invited to get an account"
+    @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
+
+    if(!@recipient.email.blank?)
+      return_email = create_mail(to: @recipient.email, subject: @subject, send_in_demo: true)
+      save_sent_email_for_recipient(return_email,@recipient.email,options) if @save_sent_email
+    end
+
+    return_email
+  end
+
 
   def confirm(options = {})
     @recipient = options[:recipient]
@@ -65,7 +79,7 @@ class AccountMailer < BaseMailer
     @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
 
     if(!@invitation.email.blank?)
-      mail_options = {to: @invitation.email, subject: @subject}
+      mail_options = {to: @invitation.email, subject: @subject, send_in_demo: true}
       mail_options[:cc] = @invitation.person.email if !@invitation.person.email.blank?
       return_email = create_mail(mail_options)
       save_sent_email_for_recipient(return_email,@invitation.email,options) if @save_sent_email
@@ -80,7 +94,7 @@ class AccountMailer < BaseMailer
     @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
 
     if(!@invitation.person.email.blank?)
-      mail_options = {to: @invitation.person.email, subject: @subject}
+      mail_options = {to: @invitation.person.email, subject: @subject, send_in_demo: true}
       mail_options[:cc] = @invitation.colleague.email if (@invitation.colleague && !@invitation.colleague.email.blank?)
       return_email = create_mail(mail_options)
       save_sent_email_for_recipient(return_email,@invitation.email,options) if @save_sent_email

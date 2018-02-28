@@ -7,8 +7,97 @@
 class AccountsController < ApplicationController
   skip_before_filter :check_hold_status
   skip_before_filter :update_last_activity, only: [:signin]
-  skip_before_filter :signin_required, except: [:post_signup, :confirm, :resend_confirmation, :pending_confirmation, :review]
+  skip_before_filter :signin_required, except: [:confirm, :resend_confirmation, :pending_confirmation, :review]
   before_filter :signin_optional
+  before_filter :set_referer_track, only: [:signin, :signup, :signup_email]
+
+  def display_eligibility_notice
+    return render(template: 'accounts/eligibility_notice')
+  end
+
+  def signup
+    reset_session
+    if(!request.post?)
+      return render(template: 'accounts/eligibility_notice')
+    end
+
+    if params[:signup_email]
+      @signup_email = SignupEmail.new(params[:signup_email])
+    else
+      @signup_email = SignupEmail.new
+    end
+  end
+
+  def signup_email
+    @signup_email = SignupEmail.new(params[:signup_email])
+
+    # check for existing account
+    if(@person = Person.find_by_email(@signup_email.email))
+      flash[:notice] = "You already have registered an eXtension Account with the email address: #{@person.email}"
+      return redirect_to(signin_url)
+    end
+
+    if(@signup_email.email =~ /extension\.org$/i)
+      @signup_email.errors.add(:email, "For technical reasons, signing up with an eXtension.org email address is not possible.".html_safe)
+      return render(:action => "signup")
+    end
+
+    if(rt_id = cookies.signed[:rt])
+      @signup_email.referer_track_id = rt_id
+    end
+
+    # check for existing signup
+
+    if(@existing_signup_email = SignupEmail.find_by_email(@signup_email.email))
+      @signup_email = @existing_signup_email
+      @signup_email.send_signup_confirmation
+      Activity.log_signup_email(email: @signup_email.email, ip_address: request.remote_ip)
+      render(template: 'accounts/post_signup')
+    elsif(@signup_email.save)
+      @signup_email.send_signup_confirmation
+      Activity.log_signup_email(email: @signup_email.email, ip_address: request.remote_ip)
+      render(template: 'accounts/post_signup')
+    else
+      render(:action => "signup")
+    end
+  end
+
+  def signup_confirm
+    if(params[:token].nil?)
+      return render(:template => 'accounts/invalid_token')
+    end
+
+    if(!(signup_email = SignupEmail.find_by_token(params[:token])))
+      return render(:template => 'accounts/invalid_token')
+    end
+
+    signup_email.update_attribute(:confirmed, true)
+
+    if(signup_email.has_whitelisted_email?)
+      _setup_profile
+      render(template: 'accounts/createprofile', formats: [:html])
+    else
+      # ToDo: hold message
+    end
+  end
+
+  def createprofile
+    reset_session
+
+    _setup_profile
+    if(@invitation)
+      if(!request.post? and !(signup_email = SignupEmail.find_by_email(@invitation.email)))
+        return render(template: 'accounts/eligibility_notice')
+      end
+    elsif(!@signup_email)
+      return render(:template => 'accounts/invalid_token')
+    end
+
+    # html only
+    respond_to do |format|
+      format.html
+    end
+  end
 
   def signout
     set_current_person(nil)
@@ -145,62 +234,35 @@ class AccountsController < ApplicationController
   def pending_confirmation
   end
 
-
-  def signup
-    reset_session
-    if(!request.post?)
-      return render(template: 'accounts/eligibility_notice')
-    end
-
-    if params[:person]
-      @person = Person.new(params[:person])
-    else
-      @person = Person.new
-    end
-
-    if(!params[:invite].nil?)
-      @invitation = Invitation.find_by_token(params[:invite])
-    end
-
-    @locations = Location.order('entrytype,name')
-    if(!(@person.location.nil?))
-      @countylist = @person.location.counties
-    end
-
-    # html only
-    respond_to do |format|
-      format.html
-    end
-  end
-
-  def display_eligibility_notice
-    return render(template: 'accounts/eligibility_notice')
-  end
-
   def create
     @person = Person.new(params[:person])
-    if(@person.email =~ /extension\.org$/i)
-      @person.errors.add(:email, "For technical reasons, signing up with an eXtension.org email address is not possible.".html_safe)
-      return render(:action => "signup")
-    end
-
 
     if(!params[:invite].nil? and @invitation = Invitation.find_by_token(params[:invite]))
+      @person.email = @invitation.email
       @person.invitation = @invitation
+    elsif(!params[:token].nil? and @signup_email = SignupEmail.find_by_token(params[:token]))
+      @person.email = @signup_email.email
+    else
+      return render(:template => 'accounts/invalid_token')
     end
 
-    # STATUS_SIGNUP
     @person.account_status = Person::STATUS_SIGNUP
     @person.last_activity_at = Time.zone.now
 
     if(@person.save)
       # automatically log them in
       set_current_person(@person)
-      current_person.send_signup_confirmation
+      current_person.confirm_signup({ip_address: request.remote_ip})
       Activity.log_activity(person_id: @person.id, activitycode: Activity::SIGNUP, ip_address: request.remote_ip)
-      render(template: 'accounts/post_signup')
+      if(@signup_email)
+        @signup_email.update_attribute(:person_id, @person.id)
+      elsif(signup_email = SignupEmail.find_by_email(@person.email))
+        # by invitation, go find the matching email
+        signup_email.update_attribute(:person_id, @person.id)
+      end
+      return redirect_to(root_url)
     else
-      render(:action => "signup")
+      render(:action => "createprofile")
     end
   end
 
@@ -230,7 +292,27 @@ class AccountsController < ApplicationController
     end
   end
 
-  private
+
+  protected
+
+  def _setup_profile
+    if params[:person]
+      @person = Person.new(params[:person])
+    else
+      @person = Person.new
+    end
+
+    if(!params[:invite].nil? and @invitation = Invitation.find_by_token(params[:invite]))
+      @person.email = @invitation.email
+    elsif(!params[:token].nil? and @signup_email = SignupEmail.find_by_token(params[:token]))
+      @person.email = @signup_email.email
+    end
+
+    @locations = Location.order('entrytype,name')
+    if(!(@person.location.nil?))
+      @countylist = @person.location.counties
+    end
+  end
 
   def confirm_signup
     # signup status check

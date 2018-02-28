@@ -67,17 +67,12 @@ class Person < ActiveRecord::Base
   UNAVAILABLE_CONFIRM_EMAIL = 2
   UNAVAILABLE_TOU_HALT = 3
 
-
-
-
-
   ## validations
   validates :first_name, :presence => true
   validates :last_name, :presence => true
   validates :idstring, :presence => true, :uniqueness => {:case_sensitive => false}
   validates :email, :presence => true, :email => true, :uniqueness => {:case_sensitive => false}
   validates :password, :length => { :in => 8..40 }, :presence => true, :on => :create
-  validates :involvement, :presence => true, :on => :create
   validate :check_idstring_emailalias_conflicts
   validate :check_for_prior_rename, :on => :update
 
@@ -570,10 +565,6 @@ class Person < ActiveRecord::Base
 
   def primary_institution
     self.communities.institutions.where(id: self.institution_id).first
-  end
-
-  def send_signup_confirmation
-   Notification.create(notifiable: self, notification_type: Notification::CONFIRM_SIGNUP)
   end
 
   def rename_account_to(new_idstring)
@@ -1128,7 +1119,7 @@ class Person < ActiveRecord::Base
     if(self.is_systems_account?)
       true
     else
-      (self.email =~ /edu$|gov$|mil$/i)
+      (self.email =~ /edu$|gov$/i)
     end
   end
 

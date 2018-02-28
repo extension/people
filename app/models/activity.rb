@@ -53,6 +53,7 @@ class Activity < ActiveRecord::Base
   REVIEW_REQUEST                      = 110
   UPDATE_COLLEAGUE_PROFILE            = 111
   UPDATE_SOCIAL_NETWORKS              = 112
+  SIGNUP_EMAIL                        = 113
 
 
   PASSWORD_RESET_REQUEST              = 120
@@ -95,6 +96,7 @@ class Activity < ActiveRecord::Base
   AUTH_LOCAL_FAILURE                  => 'auth_local_failure',
   AUTH_REMOTE_SUCCESS                 => 'auth_remote_success',
   SIGNUP                              => 'signup',
+  SIGNUP_EMAIL                        => 'signup_email',
   INVITATION                          => 'invitation',
   VOUCHED_FOR                         => 'vouched_for',
   UPDATE_PROFILE                      => 'update_profile',
@@ -177,6 +179,26 @@ class Activity < ActiveRecord::Base
     end
   end
 
+  def self.log_signup_email(options = {})
+    required = [:email]
+    required.each do |required_option|
+      if(options[required_option].nil?)
+        return false
+      end
+    end
+
+    create_parameters = {}
+    create_parameters[:person_id] = nil
+    create_parameters[:site] = 'local'
+    create_parameters[:activityclass] = PEOPLE
+    create_parameters[:activitycode] = SIGNUP_EMAIL
+    create_parameters[:additionalinfo] = options[:email]
+    create_parameters[:ip_address] = options[:ip_address] || 'unknown'
+
+    self.create(create_parameters)
+
+  end
+
   def self.log_activity(options = {})
     required = [:person_id,:activitycode]
     required.each do |required_option|
@@ -201,6 +223,8 @@ class Activity < ActiveRecord::Base
 
     self.create(create_parameters)
   end
+
+
 
   def self.log_community_removal(options = {})
     required = [:colleague_id,:community_id,:oldconnectiontype]
@@ -481,9 +505,13 @@ class Activity < ActiveRecord::Base
 
     # note space on the end of link - required in string formatting
 
-    if(self.person_id.blank? and self.activitycode == Activity::AUTH_LOCAL_FAILURE)
-      # special case of showing additional information for authentication failures
-      text_macro_options[:persontext]  = hide_person_text ? '' : "#{self.additionalinfo} (unknown account) "
+    if(self.person_id.blank?)
+      if(self.activitycode == Activity::SIGNUP_EMAIL)
+        text_macro_options[:persontext]  = hide_person_text ? '' : "#{self.additionalinfo} "
+      elsif(self.activitycode == Activity::AUTH_LOCAL_FAILURE)
+        # special case of showing additional information for authentication failures
+        text_macro_options[:persontext]  = hide_person_text ? '' : "#{self.additionalinfo} (unknown account) "
+      end
     else
       text_macro_options[:persontext]  = hide_person_text ? '' : "#{self.link_to_person(self.person,{nolink: nolink})} "
     end

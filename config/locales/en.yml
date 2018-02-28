@@ -36,6 +36,7 @@ en:
     auth_invalid_password: 'todo: auth_invalid_password'
     auth_account_retired: 'todo: auth_account_retired'
     signup: "%{persontext}signed up for an account"
+    signup_email: "%{persontext}signed up for an account"
     invitation: "%{persontext}invited %{emailaddress} to get an account"
     vouched_for: "%{persontext}vouched for %{colleaguetext}"
     update_profile: "%{persontext}updated their profile"

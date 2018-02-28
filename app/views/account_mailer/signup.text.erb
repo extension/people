@@ -1,12 +1,10 @@
 <%= render(:partial => 'shared_mailer/demo_notice') if is_demo? -%>
-Hi <%= @recipient.first_name %>,
+Hi <%= @recipient.email -%>,
 
-Thank you for signing up for your eXtensionID! We are sending this confirmation email to verify that your email address is correct.
+We are sending this confirmation email to verify that your email address is correct.
 
 To confirm your email address, please click the following link:
 
-<%= confirm_account_url(token: @recipient.status_token) %>
+<%= confirm_signup_url(token: @recipient.token) %>
 
 <%= render(:partial => 'shared_mailer/help_footer') %>
-
-

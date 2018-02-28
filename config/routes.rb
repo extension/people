@@ -31,21 +31,24 @@ People::Application.routes.draw do
     match "accounts/change_password", action: 'password', via: [:get]
     match "sp/:token", action: "reset", via: [:get]
     match "account/set_password", action: "reset", via: [:get]
-    match "signup/confirm", action: "confirm", via: [:get]
-    match "signup/confirmemail", action: "confirm", via: [:get]
   end
 
   controller :accounts do
     # non accounts/blah paths
+    match "signup", action: "signup", via: [:get,:post]
+    match "signup/:invite", action: "createprofile", via: [:get], as: "invited_signup"
+    match "signup/confirm/:token", action: "signup_confirm", via: [:get,:post], as: "confirm_signup"
+
+
     match "signin", action: "signin", via: [:get,:post]
     match "signout", action: "signout", via: [:get]
-    match "signup", action: "signup", via: [:get,:post]
-    match "signup/:invite", action: "signup", via: [:get], as: "invited_signup"
     match "confirm/:token", action: "confirm", via: [:get,:post], as: "confirm_account"
-
     match "reset/:token", action: "set_password", via: [:get], as: "set_password"
 
     # everything else
+    simple_named_route 'signup_email', via: [:post]
+    simple_named_route 'confirmsignup', via: [:get,:post]
+    simple_named_route 'createprofile', via: [:get,:post]
     simple_named_route 'create', via: [:post]
     simple_named_route 'send_confirmation'
     simple_named_route 'reset_password', via: [:get,:post]
@@ -59,7 +62,9 @@ People::Application.routes.draw do
     simple_named_route 'tou_notice', via: [:get,:post]
   end
 
+  match "people/invite/:token" =>"people#invite", :via => [:get], as: "invite_people_token"
   resources :people, only: [:index, :show, :edit, :update] do
+
     member do
       get :activity
       get :retire

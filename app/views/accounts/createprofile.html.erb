@@ -1,0 +1,181 @@
+<%- @page_title = "Sign up - eXtension" -%>
+
+<div class="page-header">
+  <h2>eXtension Sign Up <a name="signup_top"></a></h2>
+</div>
+
+
+<div class="row">
+  <div class="col-md-7">
+
+    <%= form_for @person, url: accounts_create_path, :html => { :class => 'form-horizontal' } do |f| -%>
+
+      <%- if @person.errors.present? -%>
+        <div class="col-md-offset-4 col-md-8">
+        <div class="alert alert-danger alert-dismissible fade in" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4>Please fix the issue below:</h4>
+          <ul>
+          <% @person.errors.full_messages.each do |error_message| %>
+            <li><%= error_message %></li>
+          <% end %>
+        </ul>
+        </div>
+        </div>
+      <%- end -%>
+
+      <%- if(@invitation) -%>
+        <%= hidden_field_tag('invite',@invitation.token) %>
+      <%- elsif(@signup_email) -%>
+        <%= hidden_field_tag('token',@signup_email.token) %>
+      <%- end -%>
+
+      <div class="form-group">
+          <label for="email" class="col-md-4 control-label">Email</label>
+          <div class="col-md-6">
+            <p id="email" class="larger"><strong><%= @person.email -%></p>
+            <span class="help-block">Your email can be changed after you create your profile.</span>
+          </div>
+      </div>
+
+      <div class="form-group">
+        <label for="first_name" class="col-md-4 control-label">* First name</label>
+        <div class="col-md-6">
+          <%= f.text_field :first_name, :class => "form-control", :placeholder => 'First name' %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="last_name" class="col-md-4 control-label">* Last name</label>
+        <div class="col-md-6">
+          <%= f.text_field :last_name, :class => "form-control", :placeholder => 'Last name' %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="col-md-4 control-label">* Password</label>
+        <div class="col-md-6">
+          <%= f.password_field :password, :class => "form-control" %>
+          <span class="help-block">Minimum 8 characters.</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="phone" class="col-md-4 control-label">Phone number</label>
+        <div class="col-md-4">
+          <%= f.text_field :phone, :class => "form-control", :placeholder => 'Phone number' %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="title" class="col-md-4 control-label">Title</label>
+        <div class="col-md-6">
+          <%= f.text_field :title, :class => "form-control", :placeholder => 'Title' %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="time_zone" class="col-md-4 control-label">Time zone</label>
+        <div class="col-md-8">
+          <%= time_zone_select(:person, :time_zone, ActiveSupport::TimeZone.us_zones, {}, {:class => "form-control"}) %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="position" class="col-md-4 control-label">Position</label>
+        <div class="col-md-8">
+          <% Position.find(:all, :order => 'name').each do |p| %>
+            <div class="radio">
+              <label>
+                <%= f.radio_button :position_id, p.id, :checked => (p.id == @person.position_id ?  true : false) %> <%= p.name %>
+              </label>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="location" class="col-md-4 control-label">Location</label>
+        <div class="col-md-8">
+          <%= f.select(:location_id, options_for_select(get_location_options, @person.location.present? ? @person.location.id : nil), {:include_blank => true}, {:class => "form-control"}) %>
+        </div>
+      </div>
+
+
+      <div id="county_select" class="form-group" style="<%= @person.location.blank? ? 'display:none;' : '' %>">
+        <label for="county" class="col-md-4 control-label">County</label>
+        <div class="col-md-8">
+
+            <%= f.select(:county_id, options_from_collection_for_select(@person.location.blank? ? [] : @person.location.counties.order("name"), :id, :name, @person.county.present? ? @person.county.id : nil), {:include_blank => true}, {:class => "form-control"}) %>
+
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="institution" class="col-md-4 control-label">Institution</label>
+        <div class="col-md-8">
+          <%= f.select(:institution_id, options_from_collection_for_select(institution_collection_for_edit(@person), :id, :name, @person.institution_id), {:include_blank => true}, {:class => "form-control"}) %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="affiliation" class="col-md-4 control-label">Affiliation</label>
+        <div class="col-md-6">
+          <%= f.text_field :affiliation, :class => "form-control", :placeholder => 'Department or affiliation' %>
+          <span class="help-block">Department or other affiliation at your institution or another institution if yours was not listed.</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-md-offset-4 col-md-8">
+          <p><%= f.submit "Sign up", :class => "btn btn-default btn-primary" %> <%= link_to "Cancel", root_path, :class => "btn btn-default btn-link" %></p>
+        </div>
+      </div>
+
+      <div class="col-md-offset-4 col-md-7">
+        <p><span class="help-block">Fields marked with an asterisk (<em class="required">*</em>) are required</span></p>
+      </div>
+    <%- end # end form -%>
+
+  </div>
+
+    <div class="col-md-offset-1 col-md-4">
+        <div class="well">
+        <h4>Registration Help</h4>
+        <p><%= link_to('I forgot my password?', accounts_reset_password_path) %></p>
+        <p>Already registered? <%= link_to('Sign-in', signin_path) %></p>
+        </div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    $("#person_location_id").change(function() {
+
+      $.post('<%= locations_counties_path %>', { location: $(this).val() }, function(data) {
+        if(!$.isEmptyObject(data)) {
+          $("#county_select").show();
+          populateDropdown($("#person_county_id"), data);
+        } else {
+          $("#county_select").hide();
+        }
+      });
+
+      $.post('<%= locations_institutions_path %>', { location: $(this).val() }, function(data) {
+        if(!$.isEmptyObject(data)) {
+          populateDropdown($("#person_institution_id"), data);
+        } else {
+          var data = <%= Community.institutions.order(:name).map{|institution| Hash[id: institution.id, name: institution.name]}.to_json.html_safe %>;
+          populateDropdown($("#person_institution_id"), data);
+        }
+      });
+
+    });
+
+    function populateDropdown(select, data) {
+        select.html('');
+        select.append($('<option></option>').val('').html(''));
+        $.each(data, function(id, option) {
+            select.append($('<option></option>').val(option.id).html(option.name));
+        });
+    }
+</script>

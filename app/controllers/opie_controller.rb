@@ -26,6 +26,8 @@ class OpieController < ApplicationController
   skip_before_filter :verify_authenticity_token
   skip_before_filter :signin_required, except: [:decision]
   skip_before_filter :check_hold_status
+  before_filter :set_referer_track, only: [:index]
+
 
   def delegate
     @person = Person.find_by_idstring(params[:extensionid])

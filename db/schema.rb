@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20180208140925) do
+ActiveRecord::Schema.define(:version => 20180221135557) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -373,6 +373,16 @@ ActiveRecord::Schema.define(:version => 20180208140925) do
 
   add_index "profile_public_settings", ["person_id"], :name => "person_ndx"
 
+  create_table "referer_tracks", :force => true do |t|
+    t.string   "ipaddr"
+    t.text     "referer"
+    t.text     "user_agent"
+    t.integer  "load_count", :default => 1, :null => false
+    t.datetime "expires_at",                :null => false
+    t.datetime "created_at",                :null => false
+    t.datetime "updated_at",                :null => false
+  end
+
   create_table "retired_accounts", :force => true do |t|
     t.integer  "person_id",             :null => false
     t.integer  "retiring_colleague_id"
@@ -405,6 +415,17 @@ ActiveRecord::Schema.define(:version => 20180208140925) do
   end
 
   add_index "share_accounts", ["person_id"], :name => "person_ndx", :unique => true
+
+  create_table "signup_emails", :force => true do |t|
+    t.string   "token"
+    t.string   "email",            :limit => 96
+    t.boolean  "confirmed"
+    t.integer  "referer_track_id"
+    t.integer  "invitation_id"
+    t.integer  "person_id"
+    t.datetime "created_at",                     :null => false
+    t.datetime "updated_at",                     :null => false
+  end
 
   create_table "site_roles", :force => true do |t|
     t.integer  "permissable_id"
