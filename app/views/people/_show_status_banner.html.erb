@@ -7,15 +7,6 @@
     </div>
   </div>
 </div>
-<%- elsif @person.is_signup? -%>
-<div class="row">
-  <div class="col-md-12">
-    <div class='alert alert-warning'>
-     <h4>This account is waiting email confirmation.</h4>
-     <p><%= @person.first_name %> has not yet confirmed their email address from signup. They'll need to confirm their email address to use eXtension sites and services.</p>
-    </div>
-  </div>
-</div>
 <%- elsif @person.retired? -%>
 <div class="row">
   <div class="col-md-12">

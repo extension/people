@@ -40,9 +40,7 @@ class Person < ActiveRecord::Base
 
 
   # account status
-  # states 4,5,6,8 no longer used
   STATUS_PLACEHOLDER   = 999
-  STATUS_SIGNUP        = 7
   STATUS_REVIEW        = 1
   STATUS_CONFIRM_EMAIL = 2
   STATUS_TOU_PENDING   = 3
@@ -52,7 +50,6 @@ class Person < ActiveRecord::Base
 
   STATUS_STRINGS = {
     STATUS_PLACEHOLDER => 'Placeholder',
-    STATUS_SIGNUP => 'Waiting Signup Confirmation',
     STATUS_REVIEW => 'Account Review',
     STATUS_CONFIRM_EMAIL => 'Waiting Email Confirmation',
     STATUS_TOU_PENDING => 'Terms of Use Pending',
@@ -140,7 +137,7 @@ class Person < ActiveRecord::Base
   scope :vouched, -> {where(vouched: true)}
   scope :email_confirmed, -> {where(email_confirmed: true)}
   scope :validaccounts, -> {not_retired.vouched}
-  scope :pendingreview, -> {where("retired = #{false} and vouched = #{false} and account_status != #{STATUS_SIGNUP} && email_confirmed = #{true}")}
+  scope :pendingreview, -> {where("retired = #{false} and vouched = #{false} and email_confirmed = #{true}")}
   scope :not_system, -> {where("people.is_systems_account = ?",false)}
   scope :display_accounts, validaccounts.not_system
   scope :inactive, -> { where('DATE(last_activity_at) < ?',Date.today - Settings.months_for_inactive_flag.months) }
@@ -277,24 +274,17 @@ class Person < ActiveRecord::Base
     Notification.create(notifiable: self, notification_type: Notification::ACCOUNT_REMINDER)
   end
 
-
-  def is_signup?
-    self.account_status == STATUS_SIGNUP
-  end
-
   def pendingreview?
-    (!self.vouched? && !self.retired? && !self.is_signup? && self.email_confirmed?)
+    (!self.vouched? && !self.retired? && self.email_confirmed?)
   end
 
   def validaccount?
-    if(self.retired? or !self.vouched? or self.is_signup?)
+    if(self.retired? or !self.vouched?)
       return false
     else
       return true
     end
   end
-
-
 
   def signin_allowed?
     if self.retired?
@@ -627,9 +617,7 @@ class Person < ActiveRecord::Base
       self.previous_email = self.previous_changes['email'][0]
       self.email_confirmed = false
       self.email_confirmed_at = nil
-      if(self.account_status != STATUS_SIGNUP)
-        self.account_status = STATUS_CONFIRM_EMAIL
-      end
+      self.account_status = STATUS_CONFIRM_EMAIL
       if(self.save)
         Activity.log_activity(options.merge({person_id: self.id,
                                             activitycode: Activity::EMAIL_CHANGE,
@@ -818,18 +806,19 @@ class Person < ActiveRecord::Base
     self.interests.map(&:name)
   end
 
-  def self.cleanup_signup_accounts
-    self.where(account_status: STATUS_SIGNUP).where("created_at < ?",Time.now - 14.day).each do |person|
-      person.destroy
-    end
-  end
-
   # goes through and retires all accounts that have been ignored in review for the last 14 days
   #
   # @param [String] retired_reason Retiring reason
   def self.cleanup_pending_accounts(retired_reason = 'No one vouched for the account within 14 days')
     the_system = Person.system_account
     self.pendingreview.where("email_confirmed_at < ?",Time.now - 14.day).each do |person|
+      person.retire(colleague: the_system, explanation: retired_reason, ip_address: '127.0.0.1')
+    end
+  end
+
+  def self.cleanup_unconfirmedemail_accounts(retired_reason = 'Person never confirmed their email address change and has not been active')
+    the_system = Person.system_account
+    self.not_system.not_retired.inactive.where(account_status: STATUS_CONFIRM_EMAIL).each do |person|
       person.retire(colleague: the_system, explanation: retired_reason, ip_address: '127.0.0.1')
     end
   end
@@ -870,7 +859,6 @@ class Person < ActiveRecord::Base
     # email settings
     self.email_confirmed = true
     self.email_confirmed_at = now
-    self.account_status = STATUS_PLACEHOLDER # will get reset before_save via :check_account_status if not valid
 
     if(self.save)
 
@@ -885,9 +873,8 @@ class Person < ActiveRecord::Base
           self.join_community(self.institution, {ip_address: options[:ip_address]})
         end
         Notification.create(:notification_type => Notification::WELCOME, :notifiable => self)
-      else
-        self.post_account_review_request(options)
       end
+
       return true
     else
       return false
@@ -916,43 +903,6 @@ class Person < ActiveRecord::Base
     else
       return false
     end
-  end
-
-  def post_account_review_request(options = {})
-    if(self.vouched?)
-      return true
-    end
-
-    request_options = {}
-    request_options['account_review_key'] = Settings.account_review_key
-    request_options['idstring'] = self.idstring
-    request_options['email'] = self.email
-    request_options['fullname'] = self.fullname
-    if (!self.involvement.blank?)
-      request_options['additional_information'] = self.involvement
-    end
-
-    begin
-    raw_result = RestClient.post(Settings.account_review_url,
-                             request_options.to_json,
-                             :content_type => :json, :accept => :json)
-    rescue StandardError => e
-      raw_result = e.response
-    end
-    result = ActiveSupport::JSON.decode(raw_result.gsub(/'/,"\""))
-    if(result['success'])
-      postresults = {:success => true, :request_id => result['question_id']}
-      loginfo = "SUCCESS: #{result['question_id']}"
-    else
-      postresults = {:success => false, :error => result['message']}
-      loginfo = "FAILURE: #{result['message']}"
-    end
-
-    if(options[:nolog].nil? or !options[:nolog])
-      Activity.log_activity(person_id: self.id, activitycode: Activity::REVIEW_REQUEST, ip_address: options[:ip_address], additionalinfo: loginfo, additionaldata: postresults)
-    end
-
-    result['success']
   end
 
   # meant as an api call, sets or modifies the connection without
@@ -1144,6 +1094,7 @@ class Person < ActiveRecord::Base
     return false if(self.retired? and !forceretire)
     colleague = options[:colleague]
     self.retired = true
+    self.retired_at = Time.zone.now
     # set is_admin to false
     self.is_admin = false
     self.save
@@ -1176,6 +1127,7 @@ class Person < ActiveRecord::Base
     return false if(!self.retired? and !forcerestore)
     colleague = options[:colleague]
     self.retired = false
+    self.retired_at = nil
     self.save
 
     if(self.retired_account)
@@ -1561,7 +1513,7 @@ class Person < ActiveRecord::Base
   private
 
   def check_account_status
-    if (!self.retired? and !([STATUS_SIGNUP,STATUS_TOU_HALT,STATUS_TOU_GRACE,STATUS_TOU_PENDING].include?(self.account_status)))
+    if (!self.retired? and !([STATUS_TOU_HALT,STATUS_TOU_GRACE,STATUS_TOU_PENDING].include?(self.account_status)))
       if(!self.email_confirmed?)
         self.account_status = STATUS_CONFIRM_EMAIL
       elsif(!self.vouched?)

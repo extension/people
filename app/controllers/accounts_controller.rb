@@ -195,7 +195,7 @@ class AccountsController < ApplicationController
   end
 
   def resend_confirmation
-    if([Person::STATUS_SIGNUP,Person::STATUS_CONFIRM_EMAIL].include?(current_person.account_status) and !current_person.email_confirmed?)
+    if(current_person.account_status == Person::STATUS_CONFIRM_EMAIL and !current_person.email_confirmed?)
       current_person.resend_confirmation
       flash[:notice] = 'Confirmation email resent.'
       return redirect_to(accounts_pending_confirmation_url)
@@ -215,14 +215,8 @@ class AccountsController < ApplicationController
     end
 
     case status_code
-    when Person::STATUS_SIGNUP
-      confirm_signup
     when Person::STATUS_CONFIRM_EMAIL
-      if(current_person.account_status == Person::STATUS_SIGNUP)
-        confirm_signup
-      else
-        confirm_email
-      end
+      confirm_email
     else
       return render(:template => 'accounts/invalid_token')
     end
@@ -246,7 +240,7 @@ class AccountsController < ApplicationController
       return render(:template => 'accounts/invalid_token')
     end
 
-    @person.account_status = Person::STATUS_SIGNUP
+    @person.account_status = Person::STATUS_TOU_PENDING
     @person.last_activity_at = Time.zone.now
 
     if(@person.save)
@@ -311,22 +305,6 @@ class AccountsController < ApplicationController
     @locations = Location.order('entrytype,name')
     if(!(@person.location.nil?))
       @countylist = @person.location.counties
-    end
-  end
-
-  def confirm_signup
-    # signup status check
-    if(current_person.account_status != Person::STATUS_SIGNUP)
-      flash[:notice] = "You have already confirmed your email address"
-      return redirect_to(root_url)
-    end
-
-    flash[:notice] = "Thank you for confirming your email address"
-    current_person.confirm_signup({ip_address: request.remote_ip})
-    if(current_person.vouched?)
-      return redirect_to(root_url)
-    else
-      return redirect_to(accounts_review_url)
     end
   end
 

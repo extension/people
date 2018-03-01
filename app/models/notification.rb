@@ -30,7 +30,6 @@ class Notification < ActiveRecord::Base
   # individual
   WELCOME                             = 101
   CONFIRM_SIGNUP                      = 102
-  RECONFIRM_SIGNUP                    = 103
   CONFIRM_EMAIL                       = 104
   RECONFIRM_EMAIL                     = 105
   ACCOUNT_REMINDER                    = 106

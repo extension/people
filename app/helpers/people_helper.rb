@@ -210,11 +210,7 @@ module PeopleHelper
   end
 
   def status_icon(person)
-    if(person.is_signup?)
-      icon = "<i class='fa fa-info-circle'></i>".html_safe
-      title = 'Pending email confirmation from signup'
-      link_to(icon,'#',data: {toggle: "tooltip"},title: title, class: 'status_icon').html_safe
-    elsif(person.retired?)
+    if(person.retired?)
       icon = "<i class='fa fa-info-circle'></i>".html_safe
       title = 'Retired account.'
       link_to(icon,'#',data: {toggle: "tooltip"},title: title, class: 'status_icon').html_safe

@@ -37,8 +37,6 @@ module AccountsHelper
     case account_status
     when Person::STATUS_REVIEW
       explanation = "<p>Your account is pending review. #{link_to('Learn more about account reviews',accounts_review_path)}</p>"
-    when Person::STATUS_SIGNUP
-      explanation = "<h4>You need to confirm your email address.</h4> <p>#{link_to('Learn how',accounts_pending_confirmation_path, class: 'btn btn-default btn-primary')}</p>"
     when Person::STATUS_CONFIRM_EMAIL
       explanation = "<p>You need to confirm your email address. #{link_to('Learn more about email confirmation',accounts_pending_confirmation_path)}</p>"
     when Person::STATUS_TOU_HALT

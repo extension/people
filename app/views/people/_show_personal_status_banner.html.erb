@@ -1,14 +1,4 @@
-<%- if current_person.is_signup? -%>
-<div class="row">
-  <div class="col-md-12">
-    <div class='alert alert-warning'>
-     <h4>Your account is waiting email confirmation.</h4>
-     <p>You have not yet confirmed your email address from signup. You'll need to confirm your email address to use eXtension sites and services.</p>
-     <p><%= link_to('Learn more about email confirmation',accounts_pending_confirmation_path) -%></p>
-    </div>
-  </div>
-</div>
-<%- elsif current_person.pendingreview? -%>
+<%- if current_person.pendingreview? -%>
 <div class="row">
   <div class="col-md-12">
     <div class='alert alert-warning'>
