@@ -816,6 +816,13 @@ class Person < ActiveRecord::Base
     end
   end
 
+  def self.cleanup_unconfirmedemail_accounts(retired_reason = 'Person never confirmed their email address change and has not been active')
+    the_system = Person.system_account
+    self.not_system.not_retired.inactive.where(account_status: STATUS_CONFIRM_EMAIL).each do |person|
+      person.retire(colleague: the_system, explanation: retired_reason, ip_address: '127.0.0.1')
+    end
+  end
+
   def self.expire_retired_account_passwords
     retire_pool = RetiredAccount.includes(:person).where('retired_accounts.created_at <= ?',Time.now.utc - 1.week).where('people.legacy_password is NOT NULL or people.password_hash IS NOT NULL').map(&:person)
     retire_pool.each do |p|
