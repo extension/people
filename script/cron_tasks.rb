@@ -20,8 +20,8 @@ class CronTasks < Thor
       require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
     end
 
-    def cleanup_signup_email_accounts
-      selist = SignupEmail.cleanup_signup_accounts
+    def cleanup_signups
+      selist = SignupEmail.cleanup_signups
       idlist = selist.map{|a| "##{a.id}"}
       puts "Removed signup emails: #{idlist.join(', ')}"
     end
@@ -70,7 +70,7 @@ class CronTasks < Thor
   method_option :environment,:default => 'production', :aliases => "-e", :desc => "Rails environment"
   def daily
     load_rails(options[:environment])
-    cleanup_signup_email_accounts
+    cleanup_signups
     cleanup_referer_tracks
     cleanup_pending_accounts
     cleanup_invitations
