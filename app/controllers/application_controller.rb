@@ -54,6 +54,10 @@ class ApplicationController < ActionController::Base
 
     # ignore StatusCake
     return true if(request.env['HTTP_USER_AGENT'] =~ %r{StatusCake}i)
+    # ignore openid
+    return true if(request.env['HTTP_USER_AGENT'] =~ %r{ruby-openid}i)
+    return true if(request.env['HTTP_USER_AGENT'] =~ %r{php-openid}i)
+
 
     if(rtid = cookies.signed[:rt] and referer_track = RefererTrack.not_expired.where(id: rtid).first)
       referer_track.increment!(:load_count)
