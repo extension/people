@@ -191,6 +191,7 @@ GEM
       method_source (~> 0.8)
       slop (~> 3.4)
     public_suffix (3.0.1)
+    puma (3.11.3)
     quiet_assets (1.0.2)
       railties (>= 3.1, < 5.0)
     rack (1.4.7)
@@ -360,6 +361,7 @@ DEPENDENCIES
   php_serialize
   powder
   pry
+  puma
   quiet_assets
   rack-robustness
   rails (= 3.2.22.5)

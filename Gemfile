@@ -137,8 +137,10 @@ gem 'voight_kampff'
 
 
 group :development do
-  # require the powder gem
+  # require the powder gem for those still using pow.cx
   gem 'powder'
+  # require puma for those switching to puma
+  gem 'puma'
    # including httpclient explicitly so that we can use httplog in development for google api requests
   gem 'httpclient'
   gem 'httplog'
