@@ -49,6 +49,7 @@
     </div>
   </div>
 
+  <%- if current_person.is_admin? -%>
   <div class="form-group">
     <label for="connect_to_drupal" class="col-md-4 control-label">CMS integration</label>
     <div class="col-md-8">
@@ -61,7 +62,6 @@
     </div>
   </div>
 
-  <%- if current_person.is_admin? -%>
   <fieldset>
     <div class="col-md-offset-4 col-md-8">
       <legend>Administrative Options:</legend>
