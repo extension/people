@@ -34,6 +34,11 @@ class Invitation < ActiveRecord::Base
     end
   end
 
+  # override email to force downcase
+  def email=(email_address)
+    write_attribute(:email, email_address.downcase)
+  end
+
   # override invitedcommunities= to remove blanks
   def invitedcommunities=(list)
     return if(!list.is_a?(Array))

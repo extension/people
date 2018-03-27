@@ -182,6 +182,11 @@ class Person < ActiveRecord::Base
     {:conditions => conditions}
   }
 
+  # attr_writer override to force email address downcase
+  def email=(email_address)
+    write_attribute(:email, email_address.downcase)
+  end
+
   # runs as validation
   def check_idstring_emailalias_conflicts
     if self.new_record?
