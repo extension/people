@@ -250,4 +250,10 @@ class GoogleGroup < ActiveRecord::Base
     self.update_all("has_error = 0","has_error = 1")
   end
 
+  def self.queue_members_update_for_all_groups
+    GoogleGroup.all.each do |gg|
+      gg.queue_members_update
+    end
+  end
+
 end
