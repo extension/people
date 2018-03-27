@@ -1328,10 +1328,10 @@ class Person < ActiveRecord::Base
         self.google_account.queue_account_update
       end
     elsif(self.retired?)
-      self.google_account.update_attributes({suspended: true})
+      self.google_account.update_attributes({suspended: true, updated_at: Time.now})
       self.google_account.queue_account_update
     else
-      self.google_account.update_attributes({suspended: false})
+      self.google_account.update_attributes({suspended: false, updated_at: Time.now})
       self.google_account.queue_account_update
     end
     true
