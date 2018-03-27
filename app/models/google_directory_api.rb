@@ -116,6 +116,21 @@ class GoogleDirectoryApi
     end
   end
 
+  def delete_account(account_idstring)
+    api_method = 'directory.delete_user'
+    begin
+      @service.delete_user(account_idstring)
+      @api_log = GoogleApiLog.log_success_request(api_method: api_method,
+                                                  user_key: user_key)
+      return true
+    rescue StandardError => e
+      @api_log = GoogleApiLog.log_error_request(api_method: api_method,
+                                                user_key: user_key,
+                                                error_class: e.class.to_s,
+                                                error_message: e.message)
+      return false
+    end
+  end
 
 
   def retrieve_group(group_key)

@@ -17,6 +17,7 @@ class GoogleAccount < ActiveRecord::Base
   scope :has_ga_login, ->{where(has_ga_login: true)}
   scope :active, -> { where('DATE(last_ga_login_at) >= ?',Date.today - Settings.months_for_inactive_flag.months) }
 
+  before_destroy :delete_apps_account
 
   # if I restructure update_account, this method exists to use the account data
   # we have from the account update, it now just gets it again when it already
@@ -78,6 +79,16 @@ class GoogleAccount < ActiveRecord::Base
   def self.delayed_update_apps_account(record_id)
     if(record = find_by_id(record_id))
       record.update_apps_account
+    end
+  end
+
+  def delete_apps_account
+    gda = GoogleDirectoryApi.new
+    found_account = gda.retrieve_account(self.username)
+    if(!found_account)
+      return true
+    else
+      gda.delete_account(self.username)
     end
   end
 
