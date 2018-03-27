@@ -95,7 +95,7 @@
                 <dt>Post to forum by email: </dt>
                   <dd><%= link_to(gg.group_email_address, "mailto:#{gg.group_email_address}") %></dd>
                   <%- if(lg = @community.leaders_google_group) -%>
-                  <dt>Post to forum by email: </dt>
+                  <dt>Post to the leaders-only forum by email: </dt>
                     <dd><%= link_to(lg.group_email_address, "mailto:#{lg.group_email_address}") %></dd>
                   <%- end -%>
               </dl>
