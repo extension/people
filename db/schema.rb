@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20180221135557) do
+ActiveRecord::Schema.define(:version => 20180327190756) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -199,6 +199,7 @@ ActiveRecord::Schema.define(:version => 20180221135557) do
     t.boolean  "has_ga_login"
     t.integer  "last_api_request"
     t.text     "last_google_data"
+    t.boolean  "marked_for_removal",       :default => false, :null => false
   end
 
   add_index "google_accounts", ["person_id"], :name => "person_ndx", :unique => true
@@ -339,6 +340,7 @@ ActiveRecord::Schema.define(:version => 20180221135557) do
     t.boolean  "display_extension_email",                :default => false, :null => false
     t.integer  "campus_id"
     t.datetime "retired_at"
+    t.boolean  "connect_to_google",                      :default => false, :null => false
   end
 
   add_index "people", ["email"], :name => "email_ndx", :unique => true
