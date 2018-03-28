@@ -6,7 +6,7 @@
 #  see LICENSE file
 class GoogleGroup < ActiveRecord::Base
   attr_accessible :community, :community_id, :group_id, :group_name, :email_permission, :apps_updated_at
-  attr_accessible :has_error, :last_api_request, :connectiontype, :lists_alias
+  attr_accessible :has_error, :last_api_request, :connectiontype
   attr_accessible :use_groups_domain, :migrated_to_groups_domain
 
   before_save  :set_values_from_community

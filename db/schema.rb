@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20180327190756) do
+ActiveRecord::Schema.define(:version => 20180328135650) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -217,7 +217,6 @@ ActiveRecord::Schema.define(:version => 20180327190756) do
   create_table "google_groups", :force => true do |t|
     t.integer  "community_id",              :default => 0,        :null => false
     t.string   "connectiontype",            :default => "joined"
-    t.string   "lists_alias"
     t.string   "group_id",                                        :null => false
     t.string   "group_name",                                      :null => false
     t.string   "email_permission",                                :null => false
