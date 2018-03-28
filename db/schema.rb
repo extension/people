@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20180328135650) do
+ActiveRecord::Schema.define(:version => 20180328154138) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -41,8 +41,10 @@ ActiveRecord::Schema.define(:version => 20180328135650) do
     t.datetime "created_at"
   end
 
+  add_index "activities", ["colleague_id"], :name => "colleague_id_ndx"
   add_index "activities", ["created_at", "person_id", "activityclass", "activitycode", "reasoncode", "community_id"], :name => "recordsignature"
   add_index "activities", ["ip_address"], :name => "ip_ndx"
+  add_index "activities", ["person_id"], :name => "person_id_ndx"
 
   create_table "activity_imports", :force => true do |t|
     t.string   "item"
@@ -408,14 +410,6 @@ ActiveRecord::Schema.define(:version => 20180328135650) do
 
   add_index "sent_emails", ["hashvalue"], :name => "hashvalue_ndx"
   add_index "sent_emails", ["person_id", "open_count"], :name => "person_view_ndx"
-
-  create_table "share_accounts", :force => true do |t|
-    t.integer "person_id", :default => 0, :null => false
-    t.string  "username",                 :null => false
-    t.string  "password",                 :null => false
-  end
-
-  add_index "share_accounts", ["person_id"], :name => "person_ndx", :unique => true
 
   create_table "signup_emails", :force => true do |t|
     t.string   "token"
