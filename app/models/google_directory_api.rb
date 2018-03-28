@@ -247,7 +247,7 @@ class GoogleDirectoryApi
 
       if(!group_members.members.blank?)
         group_members.members.each do |member_object|
-          member_email_addresses << member_object.email
+          member_email_addresses << member_object.email.downcase
         end
       end
     end # caught them all!
