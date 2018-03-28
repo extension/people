@@ -299,6 +299,7 @@ class Notification < ActiveRecord::Base
 
 
   def google_group_migration
+    CommunityMailer.google_group_migration({google_group: self.notifiable, notification: self}).deliver
   end
 
   def self.code_to_constant_string(code)
