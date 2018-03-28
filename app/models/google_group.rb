@@ -253,12 +253,4 @@ class GoogleGroup < ActiveRecord::Base
     end
   end
 
-  def self.send_group_migration_notification
-    GoogleGroup.where(migrate_to_groups_domain: true).each do |gg|
-      # schedule notifications
-      Notification.create(:notification_type => Notification::GOOGLE_GROUP_MIGRATION, :notifiable => gg)
-    end
-  end
-
-
 end
