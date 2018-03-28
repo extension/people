@@ -214,10 +214,6 @@ module PeopleHelper
       icon = "<i class='fa fa-info-circle'></i>".html_safe
       title = 'Retired account.'
       link_to(icon,'#',data: {toggle: "tooltip"},title: title, class: 'status_icon').html_safe
-    elsif(person.pendingreview?)
-      icon = "<i class='fa fa-info-circle'></i>".html_safe
-      title = 'Pending review.'
-      link_to(icon,'#',data: {toggle: "tooltip"},title: title, class: 'status_icon').html_safe
     elsif(!person.email_confirmed?)
       icon = "<i class='fa fa-info-circle'></i>".html_safe
       title = 'Pending email confirmation from email change'

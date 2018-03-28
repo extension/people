@@ -41,7 +41,6 @@ class Person < ActiveRecord::Base
 
   # account status
   STATUS_PLACEHOLDER   = 999
-  STATUS_REVIEW        = 1
   STATUS_CONFIRM_EMAIL = 2
   STATUS_TOU_PENDING   = 3
   STATUS_TOU_GRACE     = 4
@@ -50,7 +49,6 @@ class Person < ActiveRecord::Base
 
   STATUS_STRINGS = {
     STATUS_PLACEHOLDER => 'Placeholder',
-    STATUS_REVIEW => 'Account Review',
     STATUS_CONFIRM_EMAIL => 'Waiting Email Confirmation',
     STATUS_TOU_PENDING => 'Terms of Use Pending',
     STATUS_TOU_GRACE => 'Terms of Use Grace Login',
@@ -133,10 +131,8 @@ class Person < ActiveRecord::Base
   ## scopes
   scope :retired, -> {where(retired: true)}
   scope :not_retired, -> {where(retired: false)}
-  scope :vouched, -> {where(vouched: true)}
   scope :email_confirmed, -> {where(email_confirmed: true)}
-  scope :validaccounts, -> {not_retired.vouched}
-  scope :pendingreview, -> {where("retired = #{false} and vouched = #{false} and email_confirmed = #{true}")}
+  scope :validaccounts, -> {not_retired}
   scope :not_system, -> {where("people.is_systems_account = ?",false)}
   scope :display_accounts, validaccounts.not_system
   scope :inactive, -> { where('DATE(last_activity_at) < ?',Date.today - Settings.months_for_inactive_flag.months) }
@@ -278,12 +274,8 @@ class Person < ActiveRecord::Base
     Notification.create(notifiable: self, notification_type: Notification::ACCOUNT_REMINDER)
   end
 
-  def pendingreview?
-    (!self.vouched? && !self.retired? && self.email_confirmed?)
-  end
-
   def validaccount?
-    if(self.retired? or !self.vouched?)
+    if(self.retired?)
       return false
     else
       return true
@@ -301,21 +293,17 @@ class Person < ActiveRecord::Base
   end
 
   def activity_allowed?
-    if(!self.vouched?)
+    case self.account_status
+    when STATUS_CONTRIBUTOR
+      return true
+    when STATUS_TOU_PENDING
+      return true
+    when STATUS_TOU_GRACE
+      return true
+    when STATUS_TOU_HALT
       return false
-    else # status checks
-      case self.account_status
-      when STATUS_CONTRIBUTOR
-        return true
-      when STATUS_TOU_PENDING
-        return true
-      when STATUS_TOU_GRACE
-        return true
-      when STATUS_TOU_HALT
-        return false
-      else
-        return false
-      end
+    else
+      return false
     end
   end
 
@@ -643,8 +631,7 @@ class Person < ActiveRecord::Base
     self.email_confirmed_at = Time.zone.now
     self.account_status = STATUS_PLACEHOLDER
 
-    if(!self.vouched? and self.has_whitelisted_email?)
-      self.vouched = true
+    if(self.has_whitelisted_email?)
       self.vouched_by = self.id
       self.vouched_at = Time.now.utc
     end
@@ -810,16 +797,6 @@ class Person < ActiveRecord::Base
     self.interests.map(&:name)
   end
 
-  # goes through and retires all accounts that have been ignored in review for the last 14 days
-  #
-  # @param [String] retired_reason Retiring reason
-  def self.cleanup_pending_accounts(retired_reason = 'No one vouched for the account within 14 days')
-    the_system = Person.system_account
-    self.pendingreview.where("email_confirmed_at < ?",Time.now - 14.day).each do |person|
-      person.retire(colleague: the_system, explanation: retired_reason, ip_address: '127.0.0.1')
-    end
-  end
-
   def self.cleanup_unconfirmedemail_accounts(retired_reason = 'Person never confirmed their email address change and has not been active')
     the_system = Person.system_account
     self.not_system.not_retired.inactive.where(account_status: STATUS_CONFIRM_EMAIL).each do |person|
@@ -841,7 +818,6 @@ class Person < ActiveRecord::Base
     now = Time.now.utc
 
     if(self.has_whitelisted_email?)
-      self.vouched = true
       self.vouched_by = self.id
       self.vouched_at = now
     end
@@ -849,15 +825,15 @@ class Person < ActiveRecord::Base
     # was this person invited? - even if can self-vouch, this will overwrite vouched_by
     if(invitation = self.invitation)
       invitation.accept(self,now,options)
-      self.vouched = true
       self.vouched_by = invitation.person.id
       self.vouched_at = now
+      Activity.log_activity(person_id: invitation.person.id, activitycode: Activity::VOUCHED_FOR, colleague_id: self.id, ip_address: options[:ip_address])
     elsif(invitation = Invitation.where(email: self.email).pending.first)
       # is there an unaccepted invitation with this email address in it? - then let's call it an accepted invitation
       invitation.accept(self,now,options)
-      self.vouched = true
       self.vouched_by = invitation.person.id
       self.vouched_at = now
+      Activity.log_activity(person_id: invitation.person.id, activitycode: Activity::VOUCHED_FOR, colleague_id: self.id, ip_address: options[:ip_address])
     end
 
     # email settings
@@ -869,33 +845,6 @@ class Person < ActiveRecord::Base
       # log signup
       if(options[:nolog].nil? or !options[:nolog])
         Activity.log_activity(person_id: self.id, activitycode: Activity::CONFIRMED_EMAIL, ip_address: options[:ip_address])
-      end
-
-      if(self.vouched?)
-        # add to institution based on signup.
-        if(!self.institution.nil?)
-          self.join_community(self.institution, {ip_address: options[:ip_address]})
-        end
-        Notification.create(:notification_type => Notification::WELCOME, :notifiable => self)
-      end
-
-      return true
-    else
-      return false
-    end
-  end
-
-  def vouch(options = {})
-    voucher = options[:voucher]
-    self.vouched = true
-    self.vouched_by = voucher.id
-    self.vouched_at = Time.now.utc
-
-
-    if(self.save)
-      # log vouching
-      if(options[:nolog].nil? or !options[:nolog])
-        Activity.log_activity(person_id: voucher.id, activitycode: Activity::VOUCHED_FOR, colleague_id: self.id, additionalinfo: options[:explanation], ip_address: options[:ip_address])
       end
 
       # add to institution based on signup.
@@ -1520,8 +1469,6 @@ class Person < ActiveRecord::Base
     if (!self.retired? and !([STATUS_TOU_HALT,STATUS_TOU_GRACE,STATUS_TOU_PENDING].include?(self.account_status)))
       if(!self.email_confirmed?)
         self.account_status = STATUS_CONFIRM_EMAIL
-      elsif(!self.vouched?)
-        self.account_status = STATUS_REVIEW
       elsif(!self.tou_accepted? and self.account_status != STATUS_TOU_GRACE)
         self.account_status = STATUS_TOU_GRACE
       else

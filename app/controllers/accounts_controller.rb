@@ -263,9 +263,6 @@ class AccountsController < ApplicationController
     end
   end
 
-  def review
-  end
-
   def tou_notice
     if(request.post?)
       if(params[:commit] == 'Remind me next login')

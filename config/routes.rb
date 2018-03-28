@@ -53,7 +53,6 @@ People::Application.routes.draw do
     simple_named_route 'send_confirmation'
     simple_named_route 'reset_password', via: [:get,:post]
     simple_named_route 'missing_token'
-    simple_named_route 'review'
     simple_named_route 'post_signup'
     simple_named_route 'pending_confirmation'
     simple_named_route 'resend_confirmation'
@@ -70,7 +69,6 @@ People::Application.routes.draw do
       get :retire
       post :retire
       post :restore
-      post :vouch
       get  :password
       post :password
       get :public_settings
@@ -90,7 +88,6 @@ People::Application.routes.draw do
       get :invitations
       get :find
       post :find
-      get :pendingreview
       post :change_public_setting
       post :change_social_network_publicity
       get :change_social_networks
