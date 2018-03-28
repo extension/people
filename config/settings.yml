@@ -32,4 +32,4 @@ slack_webhook: 'use_local_settings'
 default_slack_channel: "use_local_settings"
 activity_slack_channel: "use_local_settings"
 slackbot_token: 'use_local_settings'
-google_support_contact: 'contact-us+google@extension.org'
+support_email_address: 'contact-us@extension.org'

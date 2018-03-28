@@ -299,9 +299,7 @@ class Notification < ActiveRecord::Base
 
 
   def google_group_migration
-    self.notifiable.notification_pool.each do |recipient|
-      AccountMailer.google_group_migration({recipient: recipient, google_group: self.notifiable, notification: self}).deliver
-    end
+    CommunityMailer.google_group_migration({google_group: self.notifiable, notification: self}).deliver
   end
 
   def self.code_to_constant_string(code)

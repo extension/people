@@ -6,7 +6,7 @@
 #  see LICENSE file
 class GoogleGroup < ActiveRecord::Base
   attr_accessible :community, :community_id, :group_id, :group_name, :email_permission, :apps_updated_at
-  attr_accessible :has_error, :last_api_request, :connectiontype, :lists_alias
+  attr_accessible :has_error, :last_api_request, :connectiontype
   attr_accessible :use_groups_domain, :migrated_to_groups_domain
 
   before_save  :set_values_from_community
@@ -229,9 +229,6 @@ class GoogleGroup < ActiveRecord::Base
     # update group members
     self.update_apps_group_members
 
-    # schedule notifications
-    Notification.create(:notification_type => Notification::GOOGLE_GROUP_MIGRATION, :notifiable => self)
-
     # delete old group @ google
     if(delete_old_group)
       self.delete_apps_group(true)
@@ -255,5 +252,13 @@ class GoogleGroup < ActiveRecord::Base
       gg.queue_members_update
     end
   end
+
+  def self.send_group_migration_notification
+    GoogleGroup.where(migrate_to_groups_domain: true).each do |gg|
+      # schedule notifications
+      Notification.create(:notification_type => Notification::GOOGLE_GROUP_MIGRATION, :notifiable => gg)
+    end
+  end
+
 
 end

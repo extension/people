@@ -92,8 +92,8 @@ class Person < ActiveRecord::Base
   belongs_to :position
   belongs_to :institution, class_name: 'Community'
   belongs_to :vouching_colleague, class_name: 'Person', foreign_key: 'vouched_by'
-  has_one :retired_account
 
+  has_one :retired_account, dependent: :destroy
   has_many :community_connections, dependent: :destroy
   has_many :communities, through: :community_connections,
                          select:  "community_connections.connectiontype as connectiontype,
@@ -107,10 +107,10 @@ class Person < ActiveRecord::Base
 
 
   belongs_to :invitation
-  has_many :activities
-  has_many :received_activities, class_name: 'Activity', foreign_key: 'colleague_id'
+  has_many :activities, dependent: :destroy
+  has_many :received_activities, class_name: 'Activity', foreign_key: 'colleague_id', dependent: :destroy
 
-  has_many :auth_approvals
+  has_many :auth_approvals, dependent: :destroy
   has_many :profile_public_settings, dependent: :destroy
   has_many :social_network_connections, dependent: :destroy
   has_many :social_networks, through: :social_network_connections,
@@ -121,10 +121,10 @@ class Person < ActiveRecord::Base
                                    social_network_connections.is_public as is_public,
                                    social_networks.*"
 
-  has_many :account_syncs
-  has_many :person_interests
+  has_many :account_syncs, dependent: :destroy
+  has_many :person_interests, dependent: :destroy
   has_many :interests, through: :person_interests
-  has_many :site_roles, as: :permissable
+  has_many :site_roles, as: :permissable, dependent: :destroy
 
   # cross-database associations
   has_one :ask_user, class_name: 'AskUser', :foreign_key => "darmok_id"

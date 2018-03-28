@@ -1,0 +1,22 @@
+<%= render(:partial => 'shared_mailer/demo_notice') if is_demo? -%>
+Hello Group Members!
+
+You are receiving this automated email because you are part of the Google Group for the <%= @community.name %> community at <%= community_url(@community) %>
+
+eXtension uses Google Groups to provide mailing list services to our communities, and we are taking steps to improve how these Google Groups are provisioned and managed.
+
+Your Google Group has a new email address. The new email address to send email to this Google Group is:
+
+<%= @google_group.group_email_address %>
+
+Please start using this new email address.
+
+Beginning April 11, 2018, the old address for the group: <%= @google_group.old_group_email_address -%> will no longer forward to the Google Group.
+
+If you have any questions or concerns, do not hesitate to contact me by email at:
+
+<%= Settings.support_email_address -%>
+
+--
+Jason Young
+eXtension Senior Systems Engineer

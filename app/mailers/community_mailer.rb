@@ -5,20 +5,20 @@
 # see LICENSE file
 
 class CommunityMailer < BaseMailer
-  
+
   def join(options = {})
     @community = options[:community]
     @person = options[:person]
     @recipient = options[:recipient]
     @subject = "eXtension: A colleague has joined the #{@community.name} community"
     @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
-   
+
     if(!@recipient.email.blank?)
       return_email = create_mail(to: @recipient.email, subject: @subject)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
-    
-    return_email  
+
+    return_email
   end
 
   def pending(options = {})
@@ -27,13 +27,13 @@ class CommunityMailer < BaseMailer
     @recipient = options[:recipient]
     @subject = "eXtension: A colleague wants to join the #{@community.name} community"
     @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
-   
+
     if(!@recipient.email.blank?)
       return_email = create_mail(to: @recipient.email, subject: @subject)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
-    
-    return_email     
+
+    return_email
   end
 
 
@@ -48,8 +48,8 @@ class CommunityMailer < BaseMailer
       return_email = create_mail(to: @recipient.email, subject: @subject)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
-    
-    return_email      
+
+    return_email
   end
 
   def accept_invitation(options = {})
@@ -58,13 +58,13 @@ class CommunityMailer < BaseMailer
     @recipient = options[:recipient]
     @subject = "eXtension: A colleague has accepted an invitation to join the #{@community.name} community"
     @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
-   
+
     if(!@recipient.email.blank?)
       return_email = create_mail(to: @recipient.email, subject: @subject)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
-    
-    return_email  
+
+    return_email
   end
 
   def decline_invitation(options = {})
@@ -73,14 +73,14 @@ class CommunityMailer < BaseMailer
     @recipient = options[:recipient]
     @subject = "eXtension: A colleague has accepted an invitation to join the #{@community.name} community"
     @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
-   
+
     if(!@recipient.email.blank?)
       return_email = create_mail(to: @recipient.email, subject: @subject)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
-    
-    return_email  
-  end  
+
+    return_email
+  end
 
   def invited(options = {})
     @community = options[:community]
@@ -101,8 +101,8 @@ class CommunityMailer < BaseMailer
       return_email = create_mail(to: @recipient.email, subject: @subject)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
-    
-    return_email      
+
+    return_email
   end
 
   def invited_person(options = {})
@@ -121,13 +121,13 @@ class CommunityMailer < BaseMailer
 
     if(!@recipient.email.blank?)
       mail_options = {to: @recipient.email, subject: @subject}
-      mail_options[:cc] = @bycolleague.email if !@bycolleague.email.blank?     
+      mail_options[:cc] = @bycolleague.email if !@bycolleague.email.blank?
       return_email = create_mail(mail_options)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
-    
-    return_email      
-  end 
+
+    return_email
+  end
 
   def added(options = {})
     @community = options[:community]
@@ -148,8 +148,8 @@ class CommunityMailer < BaseMailer
       return_email = create_mail(to: @recipient.email, subject: @subject)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
-    
-    return_email      
+
+    return_email
   end
 
   def added_person(options = {})
@@ -168,13 +168,13 @@ class CommunityMailer < BaseMailer
 
     if(!@recipient.email.blank?)
       mail_options = {to: @recipient.email, subject: @subject}
-      mail_options[:cc] = @bycolleague.email if !@bycolleague.email.blank?     
+      mail_options[:cc] = @bycolleague.email if !@bycolleague.email.blank?
       return_email = create_mail(mail_options)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
-    
-    return_email      
-  end    
+
+    return_email
+  end
 
 
   def removed(options = {})
@@ -187,7 +187,7 @@ class CommunityMailer < BaseMailer
     if(connectiontype == 'leader')
       @removed_text = @community.is_institution? ? 'member of the insititutional team' : 'leader'
     elsif(connectiontype == 'pending')
-      @removed_text = 'pending member'      
+      @removed_text = 'pending member'
     else
       @removed_text = 'member'
     end
@@ -198,8 +198,8 @@ class CommunityMailer < BaseMailer
       return_email = create_mail(to: @recipient.email, subject: @subject)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
-    
-    return_email      
+
+    return_email
   end
 
   def removed_person(options = {})
@@ -212,7 +212,7 @@ class CommunityMailer < BaseMailer
       @removed_text = @community.is_institution? ? 'member of the insititutional team' : 'leader'
       @subject = "eXtension: You have been removed as a leader of the #{@community.name} community"
     elsif(connectiontype == 'pending')
-      @removed_text = 'pending member'      
+      @removed_text = 'pending member'
       @subject = "eXtension: You have been removed from the #{@community.name} community"
     else
       @removed_text = 'member'
@@ -221,16 +221,27 @@ class CommunityMailer < BaseMailer
 
     if(!@recipient.email.blank?)
       mail_options = {to: @recipient.email, subject: @subject}
-      mail_options[:cc] = @bycolleague.email if !@bycolleague.email.blank?     
+      mail_options[:cc] = @bycolleague.email if !@bycolleague.email.blank?
       return_email = create_mail(mail_options)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
-    
-    return_email      
-  end  
+
+    return_email
+  end
 
   def not_pending
     #TODO ?
+  end
+
+
+  def google_group_migration(options = {})
+    @google_group = options[:google_group]
+    @community = @google_group.community
+
+    @subject = "eXtension: Your Google Group has a new email address: #{@google_group.group_email_address}"
+    create_mail(to: @google_group.group_email_address,
+                subject: @subject,
+                from: Settings.support_email_address)
   end
 
 end
