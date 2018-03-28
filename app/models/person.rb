@@ -17,7 +17,7 @@ class Person < ActiveRecord::Base
   attr_accessor :password, :current_password, :password_confirmation, :interest_tags
 
   attr_accessible :first_name, :last_name, :email, :title, :phone, :time_zone, :affiliation, :involvement, :biography
-  attr_accessible :password, :interest_tags
+  attr_accessible :password, :interest_tags, :connect_to_google
   attr_accessible :position_id, :position, :location_id, :location, :county_id, :county, :institution_id, :institution
   attr_accessible :invitation, :invitation_id
   attr_accessible :last_account_reminder, :password_reset, :google_apps_email, :display_extension_email
@@ -181,6 +181,11 @@ class Person < ActiveRecord::Base
     end
     {:conditions => conditions}
   }
+
+  # attr_writer override to force email address downcase
+  def email=(email_address)
+    write_attribute(:email, email_address.downcase)
+  end
 
   # runs as validation
   def check_idstring_emailalias_conflicts
@@ -1318,15 +1323,15 @@ class Person < ActiveRecord::Base
 
   def update_google_account
     if(self.google_account.blank?)
-      if(self.validaccount?)
+      if(self.validaccount? and self.connect_to_google?)
         self.create_google_account
         self.google_account.queue_account_update
       end
-    elsif(self.retired?)
-      self.google_account.update_attributes({suspended: true})
-      self.google_account.queue_account_update
     else
-      self.google_account.update_attributes({suspended: false})
+      updated_attributes = {updated_at: Time.now}
+      updated_attributes[:marked_for_removal] = !self.connect_to_google?
+      updated_attributes[:suspended] = self.retired?
+      self.google_account.update_attributes(updated_attributes)
       self.google_account.queue_account_update
     end
     true

@@ -64,6 +64,12 @@ class CronTasks < Thor
         puts "  #{item} #{result ? 'success' : 'failed'}"
       end
     end
+
+    def queue_members_update_for_all_groups
+      puts "Queuing members updates for all groups... "
+      groups = GoogleGroup.queue_members_update_for_all_groups
+      puts "queued update for #{groups.size} groups"
+    end
   end
 
   desc "daily", "All daily cron tasks"
@@ -76,6 +82,7 @@ class CronTasks < Thor
     cleanup_invitations
     expire_passwords
     create_account_reminders
+    queue_members_update_for_all_groups
     #import_activity
   end
 

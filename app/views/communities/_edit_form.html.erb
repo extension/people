@@ -49,23 +49,24 @@
     </div>
   </div>
 
-  <div class="form-group">
-    <label for="connect_to_drupal" class="col-md-4 control-label">CMS integration</label>
-    <div class="col-md-8">
-      <div class="checkbox">
-        <label>
-          <%= f.check_box(:connect_to_drupal, {class: ''}) %> <strong>Connect to Create</strong>
-        </label>
-      </div>
-      <span class="help-block">Add this community as a group to the eXtension Create (create.extension.org) CMS. eXtension Communities of Practice are automatically connected regardless of this setting.</span>
-    </div>
-  </div>
-
   <%- if current_person.is_admin? -%>
   <fieldset>
     <div class="col-md-offset-4 col-md-8">
       <legend>Administrative Options:</legend>
     </div>
+
+    <div class="form-group">
+      <label for="connect_to_drupal" class="col-md-4 control-label">CMS integration</label>
+      <div class="col-md-8">
+        <div class="checkbox">
+          <label>
+            <%= f.check_box(:connect_to_drupal, {class: ''}) %> <strong>Connect to Create</strong>
+          </label>
+        </div>
+        <span class="help-block">Add this community as a group to the eXtension Create (create.extension.org) CMS. eXtension Communities of Practice are automatically connected regardless of this setting.</span>
+      </div>
+    </div>
+
     <div class="form-group">
       <label for="entrytype" class="col-md-4 control-label">Community type</label>
       <div class="col-md-5">

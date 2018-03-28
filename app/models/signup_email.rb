@@ -13,6 +13,12 @@ class SignupEmail < ActiveRecord::Base
 
   before_create :generate_token
 
+
+  # override email to force downcase
+  def email=(email_address)
+    write_attribute(:email, email_address.downcase)
+  end
+  
   def has_whitelisted_email?
     (self.email =~ /edu$|gov$/i)
   end
