@@ -66,7 +66,8 @@ class Notification < ActiveRecord::Base
   COLLEAGUE_DOWNLOAD_AVAILABLE        = 500
 
   # Google Group
-  GOOGLE_GROUP_MIGRATION              = 600
+  # now unused
+  # GOOGLE_GROUP_MIGRATION              = 600
 
 
   def set_delivery_time
@@ -297,10 +298,6 @@ class Notification < ActiveRecord::Base
     self.notifiable.save
   end
 
-
-  def google_group_migration
-    CommunityMailer.google_group_migration({google_group: self.notifiable, notification: self}).deliver
-  end
 
   def self.code_to_constant_string(code)
     constantslist = self.constants
