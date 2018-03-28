@@ -247,7 +247,7 @@ class GoogleDirectoryApi
 
       if(!group_members.members.blank?)
         group_members.members.each do |member_object|
-          member_email_addresses << member_object.email
+          member_email_addresses << member_object.email.downcase
         end
       end
     end # caught them all!
@@ -260,7 +260,7 @@ class GoogleDirectoryApi
     api_method = 'directory.insert_member'
 
     member_object = Google::Apis::AdminDirectoryV1::Member.new
-    member_object.email = email_address
+    member_object.email = email_address.downcase
 
     if(is_owner)
       member_object.role = 'OWNER'
