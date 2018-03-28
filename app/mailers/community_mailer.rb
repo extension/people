@@ -233,15 +233,4 @@ class CommunityMailer < BaseMailer
     #TODO ?
   end
 
-
-  def google_group_migration(options = {})
-    @google_group = options[:google_group]
-    @community = @google_group.community
-
-    @subject = "eXtension: Your Google Group has a new email address: #{@google_group.group_email_address}"
-    create_mail(to: @google_group.group_email_address,
-                subject: @subject,
-                from: Settings.support_email_address)
-  end
-
 end
