@@ -196,13 +196,13 @@ class GoogleGroup < ActiveRecord::Base
     adds = community_members - apps_group_members
     removes = apps_group_members - community_members
 
+    removes.each do |member_email|
+      gda.remove_member_from_group(member_email, self.group_key_for_api)
+    end
+
     adds.each do |member_email|
       is_owner = (member_email == moderator_account.email)
       gda.add_member_to_group(member_email, self.group_key_for_api,is_owner)
-    end
-
-    removes.each do |member_email|
-      gda.remove_member_from_group(member_email, self.group_key_for_api)
     end
 
     self.update_attributes({has_error: false, apps_updated_at: Time.now.utc, :last_api_request => gda.api_log.id})
