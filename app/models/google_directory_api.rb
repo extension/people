@@ -260,7 +260,7 @@ class GoogleDirectoryApi
     api_method = 'directory.insert_member'
 
     member_object = Google::Apis::AdminDirectoryV1::Member.new
-    member_object.email = email_address
+    member_object.email = email_address.downcase
 
     if(is_owner)
       member_object.role = 'OWNER'
