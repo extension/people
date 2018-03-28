@@ -160,29 +160,4 @@ class AccountMailer < BaseMailer
     return_email
   end
 
-
-  def google_group_migration(options = {})
-    @recipient = options[:recipient]
-    @google_group = options[:google_group]
-    @community = @google_group.community
-    @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
-    connectiontype = @google_group.connectiontype
-    if(connectiontype == 'leaders')
-      @recipient_connection = @community.is_institution? ? 'member of the insititutional team' : 'leader'
-    else
-      @recipient_connection = 'member'
-    end
-
-    @subject = "eXtension: Your Google Group has a new email address: #{@google_group.group_email_address}"
-
-    if(!@recipient.email.blank?)
-      return_email = create_mail(to: @recipient.email,
-                                 subject: @subject,
-                                 from: Settings.google_support_contact)
-      save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
-    end
-
-    return_email
-  end
-
 end

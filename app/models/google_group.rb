@@ -229,9 +229,6 @@ class GoogleGroup < ActiveRecord::Base
     # update group members
     self.update_apps_group_members
 
-    # schedule notifications
-    Notification.create(:notification_type => Notification::GOOGLE_GROUP_MIGRATION, :notifiable => self)
-
     # delete old group @ google
     if(delete_old_group)
       self.delete_apps_group(true)
