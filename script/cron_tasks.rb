@@ -32,12 +32,6 @@ class CronTasks < Thor
       puts "Removed referer tracks: #{idlist.join(', ')}"
     end
 
-    def cleanup_pending_accounts
-      accounts = Person.cleanup_pending_accounts
-      idlist = accounts.map{|a| "##{a.id}"}
-      puts "Retired pending accounts: #{idlist.join(', ')}"
-    end
-
     def create_account_reminders
       Person.reminder_pool.each do |person|
         puts "Sending account reminder to #{person.email}"
@@ -78,7 +72,6 @@ class CronTasks < Thor
     load_rails(options[:environment])
     cleanup_signups
     cleanup_referer_tracks
-    cleanup_pending_accounts
     cleanup_invitations
     expire_passwords
     create_account_reminders

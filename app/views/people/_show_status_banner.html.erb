@@ -13,14 +13,6 @@
     <%= render(partial: 'retired_notice', locals: {person: @person, retired_account: @person.retired_account}) %>
   </div>
 </div>
-<%- elsif @person.pendingreview? -%>
-<div class='row'>
-  <div class="col-md-12">
-    <div class='well'>
-      <%= render(partial: 'review_form', locals: {person: @person}) -%>
-    </div>
-  </div>
-</div>
 <%- elsif(!@person.email_confirmed?) -%>
 <div class="row">
   <div class="col-md-12">

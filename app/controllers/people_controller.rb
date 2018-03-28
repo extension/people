@@ -4,7 +4,7 @@
 # === LICENSE:
 #  see LICENSE file
 class PeopleController < ApplicationController
-  skip_before_filter :check_hold_status, except: [:browsefile, :browse, :index, :vouch, :pendingreview, :invitations, :invite]
+  skip_before_filter :check_hold_status, except: [:browsefile, :browse, :index, :invitations, :invite]
   before_filter :set_tab
 
   def personal_edit
@@ -190,32 +190,6 @@ class PeopleController < ApplicationController
 
     if (!params[:q].blank?)
       @colleagues = Person.patternsearch(params[:q]).order('last_name,first_name').page(params[:page])
-    end
-  end
-
-  def pendingreview
-    collection_breadcrumbs(['Pending review'])
-
-    @colleagues = Person.pendingreview.order('updated_at DESC').page(params[:page])
-  end
-
-  def vouch
-    @person = Person.find(params[:id])
-    member_breadcrumbs(['Vouch'])
-
-    if params[:explanation].blank?
-      flash[:failure] = 'An explanation for vouching for this eXtensionID is required'
-      return redirect_to(person_url(@person))
-    else
-      # we limited the field to 255 (when it only shows ~54 - but let's truncate it for good measure)
-      explanation = ((params[:explanation].length > 255) ? params[:explanation].truncate(255) : params[:explanation])
-      if(@person.vouch({voucher: current_person, explanation: explanation, ip_address: request.remote_ip}))
-        flash[:success] = "Vouched for #{@person.fullname}"
-        return redirect_to(person_url(@person))
-      else
-        flash[:failure] = "Failed to vouch for #{@person.first_name}, reported status may not be correct"
-        return redirect_to(person_url(@person))
-      end
     end
   end
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20180328154138) do
+ActiveRecord::Schema.define(:version => 20180328171654) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -314,7 +314,6 @@ ActiveRecord::Schema.define(:version => 20180328154138) do
     t.integer  "location_id",                            :default => 0
     t.integer  "county_id",                              :default => 0
     t.integer  "institution_id",                         :default => 0
-    t.boolean  "vouched",                                :default => false
     t.integer  "vouched_by",                             :default => 0
     t.datetime "vouched_at"
     t.boolean  "email_confirmed",                        :default => false
@@ -347,7 +346,7 @@ ActiveRecord::Schema.define(:version => 20180328154138) do
   add_index "people", ["email"], :name => "email_ndx", :unique => true
   add_index "people", ["idstring"], :name => "idstring_ndx", :unique => true
   add_index "people", ["reset_token"], :name => "token_ndx"
-  add_index "people", ["vouched", "retired"], :name => "validity_ndx"
+  add_index "people", ["retired"], :name => "validity_ndx"
 
   create_table "person_interests", :force => true do |t|
     t.integer  "interest_id"
