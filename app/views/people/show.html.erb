@@ -77,8 +77,11 @@
           <dd><%= tou_status(@person) -%></dd>
           <dt>Google Account:</dt>
           <%- if ga = @person.google_account -%>
-            <dd><%= ga.user_key -%><br/>
-              <%= link_to('Learn more about your eXtension Google Account', 'http://create.extension.org/node/98956') %>
+            <dd><%= ga.user_key -%>
+              <%- if current_person == @person -%>
+                <br/>
+                <%= link_to('Learn more about your eXtension Google Account', 'http://create.extension.org/node/98956') %>
+              <%- end -%>
             </dd>
             <dt>Last Google Login At:</dt>
             <%- if ga.has_ga_login -%>
