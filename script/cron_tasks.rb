@@ -20,6 +20,26 @@ class CronTasks < Thor
       require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
     end
 
+    def clear_out_old_records
+      notifications = Notification.clear_out_old_records
+      puts "Cleared out #{notifications} notification records"
+
+      sent_emails = SentEmail.clear_out_old_records
+      puts "Cleared out #{sent_emails} sent email records"
+
+      google_api_logs = GoogleApiLog.clear_out_old_records
+      puts "Cleared out #{google_api_logs} google api log records"
+
+      account_syncs = AccountSync.clear_out_old_records
+      puts "Cleared out #{account_syncs} account synchronization records"
+
+      community_member_syncs = CommunityMemberSync.clear_out_old_records
+      puts "Cleared out #{community_member_syncs} community member synchronization records"
+
+      community_syncs = CommunitySync.clear_out_old_records
+      puts "Cleared out #{community_syncs} community synchronization records"
+    end
+
     def cleanup_signups
       selist = SignupEmail.cleanup_signups
       idlist = selist.map{|a| "##{a.id}"}
@@ -60,22 +80,29 @@ class CronTasks < Thor
     end
 
     def queue_members_update_for_all_groups
-      puts "Queuing members updates for all groups... "
       groups = GoogleGroup.queue_members_update_for_all_groups
-      puts "queued update for #{groups.size} groups"
+      puts "Queued member updates for #{groups.size} groups"
     end
+
+    def get_google_apps_last_login
+      last_login_data_count = GoogleAccount.set_last_ga_login_at
+      puts "Set the last google login for #{last_login_data_count} google accounts"
+    end
+
   end
 
   desc "daily", "All daily cron tasks"
   method_option :environment,:default => 'production', :aliases => "-e", :desc => "Rails environment"
   def daily
     load_rails(options[:environment])
+    clear_out_old_records
     cleanup_signups
     cleanup_referer_tracks
     cleanup_invitations
     expire_passwords
     create_account_reminders
     queue_members_update_for_all_groups
+    get_google_apps_last_login
     #import_activity
   end
 

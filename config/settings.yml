@@ -1,6 +1,7 @@
 aae_database: 'use_local_settings'
 about_database: 'use_local_settings'
 app_location: 'localdev'
+cleanup_months: 6
 create_database: 'use_local_settings'
 create_password_string: 'use_local_settings'
 default_display_timezone: 'Eastern Time (US & Canada)'
