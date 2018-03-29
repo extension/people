@@ -8,7 +8,7 @@
 class GoogleAccount < ActiveRecord::Base
   serialize :google_account_data
   attr_accessible :person, :person_id, :given_name, :family_name, :is_admin, :suspended, :apps_updated_at, :has_error
-  attr_accessible :last_ga_login_request_at, :last_ga_login_at, :has_ga_login, :last_api_request, :marked_for_removal, :updated_at
+  attr_accessible :last_ga_login_at, :has_ga_login, :last_api_request, :marked_for_removal, :updated_at
   belongs_to :person
   before_save  :set_values_from_person
 
@@ -135,17 +135,19 @@ class GoogleAccount < ActiveRecord::Base
 
   def self.set_last_ga_login_at
     # get the full list of last logins from google
+    return_count = 0
     # load GoogleDirectoryApi
     gda = GoogleDirectoryApi.new
     user_list = gda.retrieve_last_login_for_all_accounts
     user_list.each do |email,last_login|
-      if(email =~ %r{(\w+)@extension.org})
+      if(email =~ %r{([\w|-]+)@extension.org})
         if(ga = self.find_by_username($1))
+          return_count += 1;
           ga.update_attributes({last_ga_login_at: last_login, has_ga_login: true})
         end
       end
     end
-    user_list.size
+    return_count
   end
 
   def self.clear_errors
