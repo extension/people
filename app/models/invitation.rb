@@ -29,7 +29,7 @@ class Invitation < ActiveRecord::Base
   scope :pending, where(accepted: false)
 
   def self.remove_expired_invitations
-    self.where("created_at < ?",Time.now - 90.day).each do |invitation|
+    self.where("created_at < ?",Time.now - Settings.cleanup_months.months).each do |invitation|
       invitation.destroy
     end
   end

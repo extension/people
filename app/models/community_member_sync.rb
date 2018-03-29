@@ -153,6 +153,10 @@ class CommunityMemberSync < ActiveRecord::Base
 
   end
 
-
+  def self.clear_out_old_records
+    record_count = self.where("created_at < ?",Time.now - Settings.cleanup_months.months).count
+    self.delete_all(["created_at < ?",Time.now - Settings.cleanup_months.months])
+    record_count
+  end
 
 end

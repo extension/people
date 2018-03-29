@@ -18,7 +18,7 @@ class SignupEmail < ActiveRecord::Base
   def email=(email_address)
     write_attribute(:email, email_address.downcase)
   end
-  
+
   def has_whitelisted_email?
     (self.email =~ /edu$|gov$/i)
   end
@@ -32,7 +32,7 @@ class SignupEmail < ActiveRecord::Base
   end
 
   def self.cleanup_signups
-    self.where(confirmed: false).where("created_at < ?",Time.now - 14.day).each do |signup_email|
+    self.where("confirmed <> ?",true).where("created_at < ?",Time.now - Settings.cleanup_months.months).each do |signup_email|
       signup_email.destroy
     end
   end
