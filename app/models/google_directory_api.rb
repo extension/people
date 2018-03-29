@@ -49,6 +49,47 @@ class GoogleDirectoryApi
     end
   end
 
+
+  def retrieve_last_login_for_all_accounts
+    # requests are limited to 200 members
+    # so like Pokémon, we gotta catch them all
+    did_we_catch_them_all = false
+    pagination_token = nil
+    last_login_data = {}
+    while(!did_we_catch_them_all)
+      api_method = 'directory.list_users'
+
+      begin
+        user_list = @service.list_users({customer: 'my_customer', max_results: 500, page_token: pagination_token})
+        @api_log = GoogleApiLog.log_success_request(api_method: api_method)
+      rescue StandardError => e
+        @api_log = GoogleApiLog.log_error_request(api_method: api_method,
+                                                  error_class: e.class.to_s,
+                                                  error_message: e.message)
+        return nil
+      end
+
+
+      if(user_list.next_page_token.nil?)
+        did_we_catch_them_all = true
+      else
+        did_we_catch_them_all = false
+        pagination_token = user_list.next_page_token
+      end
+
+      if(!user_list.users.blank?)
+        user_list.users.each do |user_object|
+          ga_last_login_time = user_object.last_login_time
+          if(ga_last_login_time.to_i > 0)
+            last_login_data[user_object.primary_email] = ga_last_login_time
+          end
+        end
+      end
+    end # caught them all!
+
+    last_login_data
+  end
+
   def create_account(account_idstring,account_options)
     user_key = "#{account_idstring}@extension.org"
     if(!(password = account_options[:password]))

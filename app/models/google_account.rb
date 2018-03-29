@@ -19,36 +19,6 @@ class GoogleAccount < ActiveRecord::Base
 
   before_destroy :delete_apps_account
 
-  # if I restructure update_account, this method exists to use the account data
-  # we have from the account update, it now just gets it again when it already
-  # had it in the directory api calls, but in lieu of modifying the directory api calls
-  # for now, it's just abstraction silliness or maybe syntactic sugar, yeah, syntactic semantic sugar
-  def set_last_ga_login_values_from_google_account(google_account,save_values = true)
-    # google_account is expected to be a Google::Apis::AdminDirectoryV1::User
-    if(!google_account.nil?)
-      self.last_ga_login_request_at = Time.now
-      begin
-        ga_last_login_time = Time.parse(google_account.last_login_time)
-        if(ga_last_login_time.to_i > 0)
-          self.last_ga_login_at = ga_last_login_time
-          self.has_ga_login = true
-        else
-          self.last_ga_login_at = nil
-          self.has_ga_login = false
-        end
-      rescue
-        # time parse failure
-        self.last_ga_login_at = nil
-        self.has_ga_login = nil
-      end
-
-      if(save_values)
-        self.save
-      end
-    end
-    self
-  end
-
   def set_values_from_person
     if(!self.new_record?)
       if(self.person.idstring.downcase != self.username)
@@ -92,7 +62,7 @@ class GoogleAccount < ActiveRecord::Base
     end
   end
 
-  def get_apps_account(update_ga_login_data = true)
+  def get_apps_account
     self.update_column(:has_error,false)
     # load GoogleDirectoryApi
     gda = GoogleDirectoryApi.new
@@ -103,9 +73,6 @@ class GoogleAccount < ActiveRecord::Base
     else
       self.has_error = false
       self.last_api_request = gda.api_log.id
-      if(update_ga_login_data)
-        self.set_last_ga_login_values_from_google_account(found_account,false)
-      end
       self.save
       return found_account  #Google::Apis::AdminDirectoryV1::User
     end
@@ -152,7 +119,6 @@ class GoogleAccount < ActiveRecord::Base
       else
         self.has_error = false
         self.last_api_request = gda.api_log.id
-        self.set_last_ga_login_values_from_google_account(updated_account,false)
       end
     end
 
@@ -161,6 +127,21 @@ class GoogleAccount < ActiveRecord::Base
     self.save
     self.person.clear_password_reset
     return self
+  end
+
+  def self.set_last_ga_login_at
+    # get the full list of last logins from google
+    # load GoogleDirectoryApi
+    gda = GoogleDirectoryApi.new
+    user_list = gda.retrieve_last_login_for_all_accounts
+    user_list.each do |email,last_login|
+      if(email =~ %r{(\w+)@extension.org})
+        if(ga = self.find_by_username($1))
+          ga.update_attributes({last_ga_login_at: last_login, has_ga_login: true})
+        end
+      end
+    end
+    user_list.size
   end
 
   def self.clear_errors

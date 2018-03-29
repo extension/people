@@ -83,6 +83,12 @@ class CronTasks < Thor
       groups = GoogleGroup.queue_members_update_for_all_groups
       puts "Queued member updates for #{groups.size} groups"
     end
+
+    def get_google_apps_last_login
+      last_login_data_count = GoogleAccount.set_last_ga_login_at
+      puts "Set the last google login for #{last_login_data_count} google accounts"
+    end
+
   end
 
   desc "daily", "All daily cron tasks"
@@ -96,6 +102,7 @@ class CronTasks < Thor
     expire_passwords
     create_account_reminders
     queue_members_update_for_all_groups
+    get_google_apps_last_login
     #import_activity
   end
 
@@ -105,6 +112,7 @@ class CronTasks < Thor
     load_rails(options[:environment])
     #no-op
   end
+
 end
 
 CronTasks.start
