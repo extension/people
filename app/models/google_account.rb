@@ -19,6 +19,10 @@ class GoogleAccount < ActiveRecord::Base
 
   before_destroy :delete_apps_account
 
+  def user_key
+    "#{self.username}@extension.org"
+  end
+
   def set_values_from_person
     if(!self.new_record?)
       if(self.person.idstring.downcase != self.username)
