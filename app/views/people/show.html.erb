@@ -84,10 +84,10 @@
             <%- if ga.has_ga_login -%>
               <dd><%= display_time(ga.last_ga_login_at) -%></dd>
             <%- else -%>
-              <dd><em>Never used</em></dd>
+              <dd>n/a</dd>
             <%- end -%>
           <%- else -%>
-            <dd>N/A</dd>
+            <dd>n/a</dd>
           <%- end -%>
           <dt>Email:</dt>
           <dd><%= @person.display_email%></dd>
