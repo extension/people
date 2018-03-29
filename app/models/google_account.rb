@@ -135,17 +135,19 @@ class GoogleAccount < ActiveRecord::Base
 
   def self.set_last_ga_login_at
     # get the full list of last logins from google
+    return_count = 0
     # load GoogleDirectoryApi
     gda = GoogleDirectoryApi.new
     user_list = gda.retrieve_last_login_for_all_accounts
     user_list.each do |email,last_login|
       if(email =~ %r{(\w+)@extension.org})
         if(ga = self.find_by_username($1))
+          return_count += 1;
           ga.update_attributes({last_ga_login_at: last_login, has_ga_login: true})
         end
       end
     end
-    user_list.size
+    return_count
   end
 
   def self.clear_errors
