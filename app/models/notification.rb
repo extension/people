@@ -154,7 +154,7 @@ class Notification < ActiveRecord::Base
     if(!(colleague = Person.find(self.additionaldata[:colleague_id])))
       raise NotificationError, 'Invalid colleague_id'
     end
-    AccountMailer.create_colleague_google_account({recipient: self.notifiable, colleague: colleague, notification: self).deliver
+    AccountMailer.create_colleague_google_account({recipient: self.notifiable, colleague: colleague, notification: self}).deliver
   end
 
 
