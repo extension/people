@@ -89,7 +89,7 @@ class PeopleController < ApplicationController
     # prevent setting email to @extension.org unless it already is @extension.org
     if(update_params[:email])
       if(update_params[:email] =~ /extension\.org$/i)
-        if(@person.email =~ /extension\.org$/i)
+        if(@person.email =~ /@extension\.org$/i)
           if(@person.email.downcase != update_params[:email].strip.downcase)
             @person.attributes = update_params
             @person.errors.add(:email, "For technical reasons, changing to a different extension.org email address is not possible.".html_safe)

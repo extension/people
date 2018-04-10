@@ -563,7 +563,7 @@ class Person < ActiveRecord::Base
       "#{self.primary_account.idstring}@extension.org"
     elsif(self.google_apps_email?)
       "#{self.idstring}@apps.extension.org"
-    elsif(self.email =~ /extension\.org$/i)
+    elsif(self.email =~ /@extension\.org$/i)
       EmailAlias::NOWHERE_LOCATION
     else
       self.email
@@ -579,7 +579,7 @@ class Person < ActiveRecord::Base
   end
 
   def display_email_is_extension?
-    (!(self.display_email =~ /extension\.org$/i).nil?)
+    (!(self.display_email =~ /@extension\.org$/i).nil?)
   end
 
   def all_email_aliases
