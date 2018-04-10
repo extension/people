@@ -120,7 +120,7 @@ class AccountMailer < BaseMailer
     return_email
   end
 
-  def create_google_account(options={})
+  def create_colleague_google_account(options={})
     @bycolleague = options[:colleague]
     @recipient = options[:recipient]
     @subject = "eXtension: Your colleagued created an eXtension Google Account for you"
