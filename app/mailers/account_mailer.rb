@@ -120,6 +120,23 @@ class AccountMailer < BaseMailer
     return_email
   end
 
+  def create_google_account(options={})
+    @bycolleague = options[:colleague]
+    @recipient = options[:recipient]
+    @subject = "eXtension: Your colleagued created an eXtension Google Account for you"
+    @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
+
+    if(!@recipient.email.blank?)
+      mail_options = {to: @recipient.email, subject: @subject}
+      mail_options[:cc] = @bycolleague.email if !@bycolleague.email.blank?
+      return_email = create_mail(mail_options)
+      save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
+    end
+
+    return_email
+  end
+
+
   def password_reset_request(options = {})
     @recipient = options[:recipient]
     @subject = "eXtension: Please confirm your email address"
