@@ -1,0 +1,41 @@
+<%- @page_title = "eXtension Community of Practice Contacts" -%>
+
+<div class="page-header">
+  <h2><%= @page_title %></h2>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+        <th>Community</th>
+        <th>Colleague</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Institutional Membership</th>
+        </tr>
+      </thead>
+
+      <tbody>
+      <%- for community in @communities -%>
+        <%- for person in community.leaders -%>
+          <tr>
+            <td><%= link_to(community.name,community_url(community)) %></td>
+            <td><%= link_to_person(person) -%></td>
+            <td><%= link_to(person.email, "mailto:#{person.email}") -%></td>
+            <td><%= (person.phone.blank?) ? '&nbsp;'.html_safe : number_to_phone(person.phone, :area_code => true)  -%> </td>
+            <td>
+            <%= if(!person.institution.nil?)
+                  "#{person.institution.membership_level_label}".html_safe
+                else
+                  'n/a'.html_safe
+                end -%>
+            </td>
+          </tr>
+        <%- end -%>
+      <%- end -%>
+      </tbody>
+    </table>
+  </div>
+</div>
