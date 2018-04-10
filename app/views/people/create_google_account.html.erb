@@ -13,7 +13,7 @@
     <%- elsif current_person == @person -%>
       <h4>Create Your eXtension Google Account?</h4>
       <p>Ready to create your eXtension Google Account?</p>
-      <p><%= link_to('Learn more about your eXtension Google Account', 'http://create.extension.org/node/98956', {target: "_blank"}) %></p>
+      <p><%= link_to('Learn more about your eXtension Google Account', Settings.google_account_help_page, {target: "_blank"}) %></p>
       <%= form_tag(create_google_account_person_path(@person), class: 'form-inline') do -%>
         <fieldset>
         <p><%= submit_tag "Create My eXtension Google Account", :class => "btn btn-default btn-primary" %> <%= link_to "Cancel", person_path(@person), :class => "btn" %></p>
@@ -22,7 +22,7 @@
     <%- else -%>
       <h4>Create an eXtension Google Account?</h4>
       <p>You can help <%= @person.fullname %> my creating an eXtension Google Account for them.</p>
-      <p><%= link_to('Learn more about eXtension Google Accounts', 'http://create.extension.org/node/98956', {target: "_blank"}) %></p>
+      <p><%= link_to('Learn more about eXtension Google Accounts', Settings.google_account_help_page, {target: "_blank"}) %></p>
       <%= form_tag(create_google_account_person_path(@person)) do -%>
         <fieldset>
         <p><%= submit_tag "Create eXtension Google Account", :class => "btn btn-default btn-primary" %> <%= link_to "Cancel", person_path(@person), :class => "btn" %></p>
