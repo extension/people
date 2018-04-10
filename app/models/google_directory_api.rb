@@ -157,10 +157,10 @@ class GoogleDirectoryApi
     end
   end
 
-  def delete_account(account_idstring)
+  def delete_account(user_key)
     api_method = 'directory.delete_user'
     begin
-      @service.delete_user(account_idstring)
+      @service.delete_user(user_key)
       @api_log = GoogleApiLog.log_success_request(api_method: api_method,
                                                   user_key: user_key)
       return true

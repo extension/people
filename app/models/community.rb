@@ -206,6 +206,10 @@ class Community < ActiveRecord::Base
     self.google_groups.where(connectiontype: 'joined').first
   end
 
+  def has_google_account_group?
+    self.google_groups.where(use_groups_domain: false).count > 0
+  end
+
   def create_leaders_google_group(use_groups_domain = true)
     if(!(gg = self.leaders_google_group))
       if(gg = self.google_groups.create(connectiontype: 'leaders', use_groups_domain: use_groups_domain))

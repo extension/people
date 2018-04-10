@@ -90,7 +90,9 @@
               <dd>n/a</dd>
             <%- end -%>
           <%- else -%>
-            <dd>n/a</dd>
+            <dd>N/A<br/>
+              <%= link_to('Create eXtension Google Account',create_google_account_person_path(@person), class: "btn btn-default btn-sm") %>
+            </dd>
           <%- end -%>
           <dt>Email:</dt>
           <dd><%= @person.display_email%></dd>

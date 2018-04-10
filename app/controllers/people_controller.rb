@@ -283,6 +283,26 @@ class PeopleController < ApplicationController
     end
   end
 
+  def create_google_account
+    @person = Person.find(params[:id])
+    member_breadcrumbs(['Create eXtension Google Account'])
+
+    if(@person != current_person)
+      # manual check_hold_status
+      return redirect_to home_pending_url if (!current_person.activity_allowed?)
+    end
+
+    if(request.post?)
+      if(@person.update_attribute(:connect_to_google, true))
+        flash[:success] = "Created the eXtension Google Account for #{@person.fullname}"
+        return redirect_to(person_url(@person))
+      else
+        flash[:failure] = 'Failed to create the eXtension Google Account, reported status may not be correct'
+        return redirect_to(person_url(@person))
+      end
+    end
+  end
+
   def password
     @person = Person.find_by_email_or_idstring_or_id(params[:id])
     member_breadcrumbs(['Change password'])

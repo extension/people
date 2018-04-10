@@ -1432,6 +1432,10 @@ class Person < ActiveRecord::Base
     GoogleGroup.where(community_id: self.connected_communities.map(&:id)).uniq
   end
 
+  def google_account_groups
+    self.google_groups.where(use_groups_domain: false)
+  end
+
   def update_google_groups_on_email_change
     if(self.changes.keys.include?('email') and !self.email_confirmed?)
       # do nothing

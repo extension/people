@@ -16,6 +16,7 @@ class GoogleAccount < ActiveRecord::Base
   scope :suspended, ->{where(suspended: true)}
   scope :has_ga_login, ->{where(has_ga_login: true)}
   scope :active, -> { where('DATE(last_ga_login_at) >= ?',Date.today - Settings.months_for_inactive_flag.months) }
+  scope :marked_for_removal, -> {where(marked_for_removal: true)}
 
   before_destroy :delete_apps_account
 
@@ -62,7 +63,7 @@ class GoogleAccount < ActiveRecord::Base
     if(!found_account)
       return true
     else
-      gda.delete_account(self.username)
+      gda.delete_account(self.user_key)
     end
   end
 
