@@ -89,7 +89,7 @@ class PeopleController < ApplicationController
     # prevent setting email to @extension.org unless it already is @extension.org
     if(update_params[:email])
       if(update_params[:email] =~ /extension\.org$/i)
-        if(@person.email =~ /extension\.org$/i)
+        if(@person.email =~ /@extension\.org$/i)
           if(@person.email.downcase != update_params[:email].strip.downcase)
             @person.attributes = update_params
             @person.errors.add(:email, "For technical reasons, changing to a different extension.org email address is not possible.".html_safe)
@@ -215,6 +215,12 @@ class PeopleController < ApplicationController
       # check for existing person with same email
       if(person = Person.find_by_email(@invitation.email))
         @invitation.errors.add(:base, "#{view_context.link_to(person.fullname, person_path(person))} already has an eXtensionID".html_safe)
+        return render
+      end
+
+
+      if(@invitation.email =~ /@extension\.org$/i)
+        @invitation.errors.add(:email, "For technical reasons, inviting an eXtension.org email address is not possible.".html_safe)
         return render
       end
 

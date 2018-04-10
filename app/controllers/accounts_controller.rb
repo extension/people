@@ -37,7 +37,7 @@ class AccountsController < ApplicationController
       return redirect_to(signin_url)
     end
 
-    if(@signup_email.email =~ /extension\.org$/i)
+    if(@signup_email.email =~ /@extension\.org$/i)
       @signup_email.errors.add(:email, "For technical reasons, signing up with an eXtension.org email address is not possible.".html_safe)
       return render(:action => "signup")
     end
