@@ -54,6 +54,8 @@ class Activity < ActiveRecord::Base
   UPDATE_COLLEAGUE_PROFILE            = 111
   UPDATE_SOCIAL_NETWORKS              = 112
   SIGNUP_EMAIL                        = 113
+  CREATE_GOOGLE_ACCOUNT               = 114
+  CREATE_COLLEAGUE_GOOGLE_ACCOUNT     = 115
 
 
   PASSWORD_RESET_REQUEST              = 120
@@ -109,6 +111,8 @@ class Activity < ActiveRecord::Base
   UPDATE_SOCIAL_NETWORKS              => 'update_social_networks',
   PASSWORD_RESET_REQUEST              => 'password_reset_request',
   PASSWORD_RESET                      => 'password_reset',
+  CREATE_COLLEAGUE_GOOGLE_ACCOUNT     => 'create_colleague_google_account',
+  CREATE_GOOGLE_ACCOUNT               => 'create_google_account',
   COMMUNITY_CREATE                    => 'community_create',
   COMMUNITY_JOIN                      => 'community_join',
   COMMUNITY_PENDING                   => 'community_pending',
