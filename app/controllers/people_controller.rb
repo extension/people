@@ -218,6 +218,12 @@ class PeopleController < ApplicationController
         return render
       end
 
+
+      if(@invitation.email =~ /@extension\.org$/i)
+        @invitation.errors.add(:email, "For technical reasons, inviting an eXtension.org email address is not possible.".html_safe)
+        return render
+      end
+
       @invitation.person = current_person
       if(@invitation.save)
         @signup_email.update_attribute(:invitation_id, @invitation.id) if(@signup_email)
