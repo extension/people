@@ -27,6 +27,10 @@ class GoogleAccount < ActiveRecord::Base
                           colleague_id: self.person.id)
   end
 
+  def account_required?
+    (self.person.google_account_groups.count > 0)
+  end
+
   def user_key
     "#{self.username}@extension.org"
   end
@@ -65,6 +69,7 @@ class GoogleAccount < ActiveRecord::Base
   end
 
   def delete_apps_account
+    return false if self.account_required?
     gda = GoogleDirectoryApi.new
     found_account = gda.retrieve_account(self.username)
     if(!found_account)
