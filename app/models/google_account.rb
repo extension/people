@@ -8,7 +8,7 @@
 class GoogleAccount < ActiveRecord::Base
   serialize :google_account_data
   attr_accessible :person, :person_id, :given_name, :family_name, :is_admin, :suspended, :apps_updated_at, :has_error
-  attr_accessible :last_ga_login_at, :has_ga_login, :last_api_request, :marked_for_removal, :updated_at
+  attr_accessible :last_ga_login_at, :has_ga_login, :last_api_request, :updated_at
   belongs_to :person
   before_save  :set_values_from_person
 
@@ -17,7 +17,6 @@ class GoogleAccount < ActiveRecord::Base
   scope :has_ga_login, ->{where(has_ga_login: true)}
   scope :no_ga_login, ->{where(has_ga_login: false)}
   scope :active, -> { where('DATE(last_ga_login_at) >= ?',Date.today - Settings.months_for_inactive_flag.months) }
-  scope :marked_for_removal, -> {where(marked_for_removal: true)}
 
 
   before_destroy :delete_apps_account
