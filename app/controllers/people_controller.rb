@@ -290,25 +290,8 @@ class PeopleController < ApplicationController
     return redirect_to home_pending_url if (!current_person.activity_allowed?)
 
     if(request.post?)
-      if(@person.update_attribute(:connect_to_google, true))
+      if(@person.create_extension_google_account(created_by: current_person, ip_address: request.remote_ip))
         flash[:success] = "Created the eXtension Google Account for #{@person.fullname}"
-
-        if(@person == current_person)
-          Activity.log_activity(person_id: @person.id,
-                                activitycode: Activity::CREATE_GOOGLE_ACCOUNT,
-                                ip_address: request.remote_ip)
-        else
-          # notification
-          Notification.create(notifiable: @person,
-                              notification_type: Notification::CREATE_COLLEAGUE_GOOGLE_ACCOUNT,
-                              additionaldata: {colleague_id: current_person.id})
-
-          # activity log
-          Activity.log_activity(person_id:  current_person.id,
-                                activitycode: Activity::CREATE_COLLEAGUE_GOOGLE_ACCOUNT,
-                                ip_address: request.remote_ip,
-                                colleague_id: @person.id)
-        end
         return redirect_to(person_url(@person))
       else
         flash[:failure] = 'Failed to create the eXtension Google Account, reported status may not be correct'

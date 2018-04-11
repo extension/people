@@ -1436,6 +1436,32 @@ class Person < ActiveRecord::Base
     self.google_groups.where(use_extension_google_accounts: true)
   end
 
+  def create_extension_google_account(options = {})
+    success = self.update_attribute(:connect_to_google, true)
+
+    if(success)
+      created_by = options[:created_by] || Person.system_account
+
+      if(self == created_by)
+        Activity.log_activity(person_id: self.id,
+                              activitycode: Activity::CREATE_GOOGLE_ACCOUNT,
+                              ip_address: options[:ip_address])
+      else
+        # notification
+        Notification.create(notifiable: self,
+                            notification_type: Notification::CREATE_COLLEAGUE_GOOGLE_ACCOUNT,
+                            additionaldata: {colleague_id: created_by.id})
+
+        # activity log
+        Activity.log_activity(person_id:  created_by.id,
+                              activitycode: Activity::CREATE_COLLEAGUE_GOOGLE_ACCOUNT,
+                              ip_address: options[:ip_address],
+                              colleague_id: self.id)
+      end
+    end
+    return success
+  end
+
   def update_google_groups_on_email_change
     if(self.changes.keys.include?('email') and !self.email_confirmed?)
       # do nothing
@@ -1462,8 +1488,7 @@ class Person < ActiveRecord::Base
                                   .where("google_accounts.has_ga_login = 1") \
                                   .where('DATE(google_accounts.last_ga_login_at) >= ?',Date.today - Settings.months_for_inactive_flag.months).count
       no_ga_login_count = self.joins(:google_account).where("google_accounts.has_ga_login = 0").count
-      unknown_ga_login_count = self.joins(:google_account).where("google_accounts.has_ga_login IS NULL").count
-      {yes: has_ga_login_count, no: no_ga_login_count, unknown: unknown_ga_login_count, active: active_ga_login_count }
+      {yes: has_ga_login_count, no: no_ga_login_count, active: active_ga_login_count }
     end
   end
 
