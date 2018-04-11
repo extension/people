@@ -892,6 +892,17 @@ class Person < ActiveRecord::Base
     # force cache update
     community.joined_count(force: true)
 
+    # google community checks to auto-create google account
+    if(['leader','member'].include?(connectiontype))
+      if(gg = community.joined_google_group and gg.use_extension_google_accounts?)
+        self.create_extension_google_account(connected_by: Person.system_account) if !self.connect_to_google?
+      elsif(connectiontype == 'leader')
+        if(gg = community.leaders_google_group and gg.use_extension_google_accounts?)
+          self.create_extension_google_account(connected_by: Person.system_account) if !self.connect_to_google?
+        end
+      end
+    end
+
     # sync members with whatever we sync with
     if(options[:nosync].nil? or !options[:nosync])
       if(Settings.sync_communities)
