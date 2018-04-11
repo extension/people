@@ -1,0 +1,21 @@
+<%= render(:partial => 'shared_mailer/demo_notice') if is_demo? -%>
+Hi <%= @recipient.first_name %>,
+
+Your colleague has created an eXtension Google Account for you.
+
+<%- if !@bycolleague.is_system_account? -%>
+The colleague that performed this action is:
+
+ <%= @bycolleague.fullname %>
+ <%= @bycolleague.email %>
+ <%= person_url(@bycolleague) %>
+
+<%- else -%>
+This action was performed by an automated script.
+<%- end -%>
+
+Learn more about eXtension Google Accounts at:
+
+<%= Settings.google_account_help_page -%>
+
+<%= render(:partial => 'shared_mailer/help_footer') %>

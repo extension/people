@@ -1,0 +1,34 @@
+<%- @page_title = "Create eXtension Google Account for #{@person.fullname}" -%>
+
+<div class="page-header">
+  <h2><%= @page_title %></h2>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <%- if ga = @person.google_account -%>
+      <h4>eXtension Google Account Exists</h4>
+      <p><%= @person.fullname %> already has a google account, no need to create it!</p>
+      <p><%= link_to "Cancel", person_path(@person), :class => "btn" %></p>
+    <%- elsif current_person == @person -%>
+      <h4>Create Your eXtension Google Account?</h4>
+      <p>Ready to create your eXtension Google Account?</p>
+      <p><%= link_to('Learn more about your eXtension Google Account', Settings.google_account_help_page, {target: "_blank"}) %></p>
+      <%= form_tag(create_google_account_person_path(@person), class: 'form-inline') do -%>
+        <fieldset>
+        <p><%= submit_tag "Create My eXtension Google Account", :class => "btn btn-default btn-primary" %> <%= link_to "Cancel", person_path(@person), :class => "btn" %></p>
+        </fieldset>
+      <%- end -%>
+    <%- else -%>
+      <h4>Create an eXtension Google Account?</h4>
+      <p>You can help <%= @person.fullname %> my creating an eXtension Google Account for them.</p>
+      <p><%= link_to('Learn more about eXtension Google Accounts', Settings.google_account_help_page, {target: "_blank"}) %></p>
+      <%= form_tag(create_google_account_person_path(@person)) do -%>
+        <fieldset>
+        <p><%= submit_tag "Create eXtension Google Account", :class => "btn btn-default btn-primary" %> <%= link_to "Cancel", person_path(@person), :class => "btn" %></p>
+        </fieldset>
+
+      <%- end -%>
+    <%- end -%>
+  </div>
+</div>

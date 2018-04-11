@@ -844,7 +844,7 @@ class Person < ActiveRecord::Base
 
       # log signup
       if(options[:nolog].nil? or !options[:nolog])
-        Activity.log_activity(person_id: self.id, activitycode: Activity::CONFIRMED_EMAIL, ip_address: options[:ip_address])
+        Activity.log_activity(person_id: self.id, activitycode: Activity::SIGNUP, ip_address: options[:ip_address])
       end
 
       # add to institution based on signup.
@@ -891,6 +891,17 @@ class Person < ActiveRecord::Base
 
     # force cache update
     community.joined_count(force: true)
+
+    # google community checks to auto-create google account
+    if(['leader','member'].include?(connectiontype))
+      if(gg = community.joined_google_group and gg.use_extension_google_accounts?)
+        self.update_attribute(connect_to_google, true)
+      elsif(connectiontype == 'leader')
+        if(gg = community.leaders_google_group and gg.use_extension_google_accounts?)
+          self.update_attribute(connect_to_google, true)
+        end
+      end
+    end
 
     # sync members with whatever we sync with
     if(options[:nosync].nil? or !options[:nosync])
@@ -1272,12 +1283,17 @@ class Person < ActiveRecord::Base
   def update_google_account
     if(self.google_account.blank?)
       if(self.validaccount? and self.connect_to_google?)
-        self.create_google_account
-        self.google_account.queue_account_update
+        self._create_extension_google_account
+      end
+    elsif(!self.connect_to_google?)
+      # handles the case where connect_to_google got set to false
+      ga = self.google_account
+      if(!ga.destroy)
+        # couldn't delete google account, so force connect_to_google back to true
+        self.update_column(:connect_to_google, true)
       end
     else
       updated_attributes = {updated_at: Time.now}
-      updated_attributes[:marked_for_removal] = !self.connect_to_google?
       updated_attributes[:suspended] = self.retired?
       self.google_account.update_attributes(updated_attributes)
       self.google_account.queue_account_update
@@ -1432,11 +1448,48 @@ class Person < ActiveRecord::Base
     GoogleGroup.where(community_id: self.connected_communities.map(&:id)).uniq
   end
 
+  def google_account_groups
+    self.google_groups.where(use_extension_google_accounts: true)
+  end
+
+  def _create_extension_google_account(options = {})
+    if(self.connect_to_google? and self.create_google_account)
+      self.google_account.queue_account_update
+      created_by = options[:created_by] || Person.system_account
+
+      if(self == created_by)
+        Activity.log_activity(person_id: self.id,
+                              activitycode: Activity::CREATE_GOOGLE_ACCOUNT,
+                              ip_address: options[:ip_address])
+      else
+        # notification
+        Notification.create(notifiable: self,
+                            notification_type: Notification::CREATE_COLLEAGUE_GOOGLE_ACCOUNT,
+                            additionaldata: {colleague_id: created_by.id})
+
+        # activity log
+        Activity.log_activity(person_id:  created_by.id,
+                              activitycode: Activity::CREATE_COLLEAGUE_GOOGLE_ACCOUNT,
+                              ip_address: options[:ip_address],
+                              colleague_id: self.id)
+      end
+    end
+  end
+
+  def create_extension_google_account(options = {})
+    if(self.google_account.blank?)
+      self.update_column(:connect_to_google, true)
+      self._create_extension_google_account(options)
+    else
+      true
+    end
+  end
+
   def update_google_groups_on_email_change
     if(self.changes.keys.include?('email') and !self.email_confirmed?)
       # do nothing
     else
-      self.google_groups.where(use_groups_domain: true).each do |gg|
+      self.google_groups.where(use_extension_google_accounts: false).each do |gg|
         gg.queue_group_update
         gg.queue_members_update
       end
@@ -1458,8 +1511,7 @@ class Person < ActiveRecord::Base
                                   .where("google_accounts.has_ga_login = 1") \
                                   .where('DATE(google_accounts.last_ga_login_at) >= ?',Date.today - Settings.months_for_inactive_flag.months).count
       no_ga_login_count = self.joins(:google_account).where("google_accounts.has_ga_login = 0").count
-      unknown_ga_login_count = self.joins(:google_account).where("google_accounts.has_ga_login IS NULL").count
-      {yes: has_ga_login_count, no: no_ga_login_count, unknown: unknown_ga_login_count, active: active_ga_login_count }
+      {yes: has_ga_login_count, no: no_ga_login_count, active: active_ga_login_count }
     end
   end
 

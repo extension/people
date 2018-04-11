@@ -34,3 +34,4 @@ default_slack_channel: "use_local_settings"
 activity_slack_channel: "use_local_settings"
 slackbot_token: 'use_local_settings'
 support_email_address: 'contact-us@extension.org'
+google_account_help_page: 'http://create.extension.org/node/98956'

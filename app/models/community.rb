@@ -191,10 +191,10 @@ class Community < ActiveRecord::Base
     return true
   end
 
-  def create_joined_google_group(use_groups_domain = true)
+  def create_joined_google_group(use_extension_google_accounts = false)
     if(!(gg = self.joined_google_group))
       # create 'joined' group  - all new groups go to the groups domain
-      if(gg = self.google_groups.create(use_groups_domain: use_groups_domain))
+      if(gg = self.google_groups.create(use_extension_google_accounts: use_extension_google_accounts))
         gg.queue_group_update
         gg.queue_members_update
       end
@@ -206,9 +206,13 @@ class Community < ActiveRecord::Base
     self.google_groups.where(connectiontype: 'joined').first
   end
 
-  def create_leaders_google_group(use_groups_domain = true)
+  def has_google_account_group?
+    self.google_groups.where(use_extension_google_accounts: true).count > 0
+  end
+
+  def create_leaders_google_group(use_extension_google_accounts = false)
     if(!(gg = self.leaders_google_group))
-      if(gg = self.google_groups.create(connectiontype: 'leaders', use_groups_domain: use_groups_domain))
+      if(gg = self.google_groups.create(connectiontype: 'leaders', use_extension_google_accounts: use_extension_google_accounts))
         gg.queue_group_update
         gg.queue_members_update
       end

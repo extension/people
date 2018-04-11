@@ -8,16 +8,30 @@
 class GoogleAccount < ActiveRecord::Base
   serialize :google_account_data
   attr_accessible :person, :person_id, :given_name, :family_name, :is_admin, :suspended, :apps_updated_at, :has_error
-  attr_accessible :last_ga_login_at, :has_ga_login, :last_api_request, :marked_for_removal, :updated_at
+  attr_accessible :last_ga_login_at, :has_ga_login, :last_api_request, :updated_at
   belongs_to :person
   before_save  :set_values_from_person
 
   scope :not_suspended, ->{where(suspended: false)}
   scope :suspended, ->{where(suspended: true)}
   scope :has_ga_login, ->{where(has_ga_login: true)}
+  scope :no_ga_login, ->{where(has_ga_login: false)}
   scope :active, -> { where('DATE(last_ga_login_at) >= ?',Date.today - Settings.months_for_inactive_flag.months) }
 
+
   before_destroy :delete_apps_account
+  after_destroy  :update_person_and_log_removal
+
+  def update_person_and_log_removal
+    self.person.update_column(:connect_to_google, false)
+    Activity.log_activity(person_id:  Person.system_id,
+                          activitycode: Activity::REMOVE_COLLEAGUE_GOOGLE_ACCOUNT,
+                          colleague_id: self.person.id)
+  end
+
+  def account_required?
+    (self.person.google_account_groups.count > 0)
+  end
 
   def user_key
     "#{self.username}@extension.org"
@@ -57,12 +71,13 @@ class GoogleAccount < ActiveRecord::Base
   end
 
   def delete_apps_account
+    return false if self.account_required?
     gda = GoogleDirectoryApi.new
     found_account = gda.retrieve_account(self.username)
     if(!found_account)
       return true
     else
-      gda.delete_account(self.username)
+      gda.delete_account(self.user_key)
     end
   end
 

@@ -66,6 +66,8 @@ People::Application.routes.draw do
 
     member do
       get :activity
+      get :create_google_account
+      post :create_google_account
       get :retire
       post :retire
       post :restore

@@ -7,7 +7,7 @@
 class GoogleGroup < ActiveRecord::Base
   attr_accessible :community, :community_id, :group_id, :group_name, :email_permission, :apps_updated_at
   attr_accessible :has_error, :last_api_request, :connectiontype
-  attr_accessible :use_groups_domain, :migrated_to_groups_domain
+  attr_accessible :use_extension_google_accounts, :migrated_to_groups_domain
 
   before_save  :set_values_from_community
   after_save :update_email_alias
@@ -27,16 +27,16 @@ class GoogleGroup < ActiveRecord::Base
       else
         self.email_alias.update_attribute(:alias_type, EmailAlias::GOOGLEAPPS)
       end
-    elsif(!self.use_groups_domain)
+    elsif(self.use_extension_google_accounts)
       self.create_email_alias(:alias_type => EmailAlias::GOOGLEAPPS)
     end
   end
 
   def forum_url
-    if(self.use_groups_domain)
-      "https://groups.google.com/a/#{Settings.googleapps_groups_domain}/d/forum/#{self.group_id}?hl=en"
-    else
+    if(self.use_extension_google_accounts)
       "https://groups.google.com/a/extension.org/d/forum/#{self.group_id}?hl=en"
+    else
+      "https://groups.google.com/a/#{Settings.googleapps_groups_domain}/d/forum/#{self.group_id}?hl=en"
     end
   end
 
@@ -45,10 +45,10 @@ class GoogleGroup < ActiveRecord::Base
   end
 
   def group_email_address
-    if(self.use_groups_domain)
-      "#{self.group_id}@#{Settings.googleapps_groups_domain}"
-    else
+    if(self.use_extension_google_accounts)
       self.extension_domain_email
+    else
+      "#{self.group_id}@#{Settings.googleapps_groups_domain}"
     end
   end
 
@@ -156,20 +156,20 @@ class GoogleGroup < ActiveRecord::Base
   end
 
   def map_community_members_to_emails
-    if(self.use_groups_domain)
+    if(self.use_extension_google_accounts)
+      # map the community members to an array of idstring@extension.org emails
+      if(self.connectiontype == 'leaders')
+        community_members = self.community.leaders.map{|person| "#{person.idstring}@extension.org"}
+      else
+        community_members = self.community.joined.map{|person| "#{person.idstring}@extension.org"}
+      end
+    else
       # map the community members to an array of profile emails
       # - actual email *not* the display email
       if(self.connectiontype == 'leaders')
         community_members = self.community.leaders.map{|person| "#{person.email}"}
       else
         community_members = self.community.joined.map{|person| "#{person.email}"}
-      end
-    else
-      # map the community members to an array of idstring@extension.org emails
-      if(self.connectiontype == 'leaders')
-        community_members = self.community.leaders.map{|person| "#{person.idstring}@extension.org"}
-      else
-        community_members = self.community.joined.map{|person| "#{person.idstring}@extension.org"}
       end
     end
     community_members
@@ -221,7 +221,7 @@ class GoogleGroup < ActiveRecord::Base
   # does not background requests, meant to be run from console
   def migrate_to_groups_domain(delete_old_group = true)
     # set flags
-    self.update_attributes(use_groups_domain: true, migrated_to_groups_domain: true)
+    self.update_attributes(use_extension_google_accounts: false, migrated_to_groups_domain: true)
 
     # create new group @ google
     self.update_apps_group

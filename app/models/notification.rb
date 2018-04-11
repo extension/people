@@ -36,6 +36,7 @@ class Notification < ActiveRecord::Base
 
   # colleague profile
   UPDATE_COLLEAGUE_PROFILE            = 111
+  CREATE_COLLEAGUE_GOOGLE_ACCOUNT     = 112
 
   # passwords
   PASSWORD_RESET_REQUEST              = 120
@@ -148,6 +149,14 @@ class Notification < ActiveRecord::Base
     end
     AccountMailer.profile_update({recipient: self.notifiable, colleague: colleague, notification: self, what_changed: self.additionaldata[:what_changed]}).deliver
   end
+
+  def create_colleague_google_account
+    if(!(colleague = Person.find(self.additionaldata[:colleague_id])))
+      raise NotificationError, 'Invalid colleague_id'
+    end
+    AccountMailer.create_colleague_google_account({recipient: self.notifiable, colleague: colleague, notification: self}).deliver
+  end
+
 
   def community_join
     validate_community_notification_data
