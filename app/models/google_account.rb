@@ -18,8 +18,6 @@ class GoogleAccount < ActiveRecord::Base
   scope :no_ga_login, ->{where(has_ga_login: false)}
   scope :active, -> { where('DATE(last_ga_login_at) >= ?',Date.today - Settings.months_for_inactive_flag.months) }
   scope :marked_for_removal, -> {where(marked_for_removal: true)}
-  scope :recently_created, -> { where('DATE(created_at) >= ?',Date.today - Settings.months_for_inactive_flag.months) }
-  scope :not_recently_created, -> { where('DATE(created_at) < ?',Date.today - Settings.months_for_inactive_flag.months) }
 
 
   before_destroy :delete_apps_account
