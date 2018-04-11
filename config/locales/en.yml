@@ -47,6 +47,7 @@ en:
     review_request: "%{persontext}has submitted a review request for an eXtension account"
     update_colleague_profile: "%{persontext}updated the profile for %{colleaguetext}"
     create_colleague_google_account: "%{persontext}created an eXtension Google Account for %{colleaguetext}"
+    remove_colleague_google_account: "%{persontext}removed the eXtension Google Account for %{colleaguetext}"
     create_google_account: "%{persontext}created an eXtension Google Account"
     update_social_networks: "%{persontext}updated their social network connections"
     password_reset_request: "%{persontext}requested a password reset"

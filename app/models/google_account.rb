@@ -19,6 +19,13 @@ class GoogleAccount < ActiveRecord::Base
   scope :marked_for_removal, -> {where(marked_for_removal: true)}
 
   before_destroy :delete_apps_account
+  after_destroy  :update_person_and_log_removal
+  def update_person_and_log_removal
+    self.person.update_attribute(:connect_to_google, false)
+    Activity.log_activity(person_id:  Person.system_id,
+                          activitycode: Activity::REMOVE_COLLEAGUE_GOOGLE_ACCOUNT,
+                          colleague_id: self.person.id)
+  end
 
   def user_key
     "#{self.username}@extension.org"

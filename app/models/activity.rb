@@ -56,6 +56,7 @@ class Activity < ActiveRecord::Base
   SIGNUP_EMAIL                        = 113
   CREATE_GOOGLE_ACCOUNT               = 114
   CREATE_COLLEAGUE_GOOGLE_ACCOUNT     = 115
+  REMOVE_COLLEAGUE_GOOGLE_ACCOUNT     = 116
 
 
   PASSWORD_RESET_REQUEST              = 120
@@ -112,6 +113,7 @@ class Activity < ActiveRecord::Base
   PASSWORD_RESET_REQUEST              => 'password_reset_request',
   PASSWORD_RESET                      => 'password_reset',
   CREATE_COLLEAGUE_GOOGLE_ACCOUNT     => 'create_colleague_google_account',
+  REMOVE_COLLEAGUE_GOOGLE_ACCOUNT     => 'remove_colleague_google_account',
   CREATE_GOOGLE_ACCOUNT               => 'create_google_account',
   COMMUNITY_CREATE                    => 'community_create',
   COMMUNITY_JOIN                      => 'community_join',
