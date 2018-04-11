@@ -243,9 +243,6 @@ class AccountsController < ApplicationController
     @person.account_status = Person::STATUS_TOU_PENDING
     @person.last_activity_at = Time.zone.now
 
-    # always connect to google apps for now
-    @person.connect_to_google = true;
-
     if(@person.save)
       # automatically log them in
       set_current_person(@person)
