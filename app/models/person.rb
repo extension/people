@@ -1433,14 +1433,14 @@ class Person < ActiveRecord::Base
   end
 
   def google_account_groups
-    self.google_groups.where(use_groups_domain: false)
+    self.google_groups.where(use_extension_google_accounts: true)
   end
 
   def update_google_groups_on_email_change
     if(self.changes.keys.include?('email') and !self.email_confirmed?)
       # do nothing
     else
-      self.google_groups.where(use_groups_domain: true).each do |gg|
+      self.google_groups.where(use_extension_google_accounts: false).each do |gg|
         gg.queue_group_update
         gg.queue_members_update
       end
