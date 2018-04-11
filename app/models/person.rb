@@ -895,10 +895,10 @@ class Person < ActiveRecord::Base
     # google community checks to auto-create google account
     if(['leader','member'].include?(connectiontype))
       if(gg = community.joined_google_group and gg.use_extension_google_accounts?)
-        self.create_extension_google_account(connected_by: Person.system_account) if self.google_account.blank?
+        self.update_attribute(connect_to_google, true)
       elsif(connectiontype == 'leader')
         if(gg = community.leaders_google_group and gg.use_extension_google_accounts?)
-          self.create_extension_google_account(connected_by: Person.system_account) if self.google_account.blank?
+          self.update_attribute(connect_to_google, true)
         end
       end
     end
@@ -1283,12 +1283,17 @@ class Person < ActiveRecord::Base
   def update_google_account
     if(self.google_account.blank?)
       if(self.validaccount? and self.connect_to_google?)
-        self.create_google_account
-        self.google_account.queue_account_update
+        self._create_extension_google_account
+      end
+    elsif(!self.connect_to_google?)
+      # handles the case where connect_to_google got set to false
+      ga = self.google_account
+      if(!ga.destroy)
+        # couldn't delete google account, so force connect_to_google back to true
+        self.update_column(:connect_to_google, true)
       end
     else
       updated_attributes = {updated_at: Time.now}
-      updated_attributes[:marked_for_removal] = !self.connect_to_google?
       updated_attributes[:suspended] = self.retired?
       self.google_account.update_attributes(updated_attributes)
       self.google_account.queue_account_update
@@ -1447,10 +1452,9 @@ class Person < ActiveRecord::Base
     self.google_groups.where(use_extension_google_accounts: true)
   end
 
-  def create_extension_google_account(options = {})
-    success = self.update_attribute(:connect_to_google, true)
-
-    if(success)
+  def _create_extension_google_account(options = {})
+    if(self.connect_to_google? and self.create_google_account)
+      self.google_account.queue_account_update
       created_by = options[:created_by] || Person.system_account
 
       if(self == created_by)
@@ -1470,7 +1474,15 @@ class Person < ActiveRecord::Base
                               colleague_id: self.id)
       end
     end
-    return success
+  end
+
+  def create_extension_google_account(options = {})
+    if(self.google_account.blank?)
+      self.update_column(:connect_to_google, true)
+      self._create_extension_google_account(options)
+    else
+      true
+    end
   end
 
   def update_google_groups_on_email_change
