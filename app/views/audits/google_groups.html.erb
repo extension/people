@@ -8,7 +8,16 @@
   <div class="col-md-12">
     <p>The following google groups and their communities are implemented at google</p>
     <table class="table table-striped">
-    <%- GoogleGroup.unscoped.includes(:community).order(:group_name).each do |gg| -%>
+      <thead>
+        <tr>
+        <th>Name</th>
+        <th>Forum Link</th>
+        <th>Community</th>
+        <th>eXtension Google Account Members?</th>
+        </tr>
+      </thead>
+      <tbody>
+    <%- GoogleGroup.includes(:community).order("use_extension_google_accounts DESC, group_name").each do |gg| -%>
       <tr>
         <td>
           <%= gg.group_name -%>
@@ -17,9 +26,9 @@
           <%= link_to(gg.group_key_for_api,gg.forum_url) -%>
         </td>
         <td><%= link_to_community(gg.community) -%></td>
-        <td>
-          <%- if gg.community.active? -%>
-            <%= image_tag('green_dot.png') -%>
+        <td align="center">
+          <%- if gg.use_extension_google_accounts? -%>
+            <i class='fa fa-check'></i>
           <%- else -%>
             &nbsp;
           <%- end -%>
