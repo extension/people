@@ -844,7 +844,7 @@ class Person < ActiveRecord::Base
 
       # log signup
       if(options[:nolog].nil? or !options[:nolog])
-        Activity.log_activity(person_id: self.id, activitycode: Activity::CONFIRMED_EMAIL, ip_address: options[:ip_address])
+        Activity.log_activity(person_id: self.id, activitycode: Activity::SIGNUP, ip_address: options[:ip_address])
       end
 
       # add to institution based on signup.
