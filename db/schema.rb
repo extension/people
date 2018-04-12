@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20180411151252) do
+ActiveRecord::Schema.define(:version => 20180412133223) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -185,20 +185,21 @@ ActiveRecord::Schema.define(:version => 20180411151252) do
   end
 
   create_table "google_accounts", :force => true do |t|
-    t.integer  "person_id",             :default => 0,     :null => false
-    t.string   "username",                                 :null => false
-    t.string   "given_name",                               :null => false
-    t.string   "family_name",                              :null => false
-    t.boolean  "is_admin",              :default => false
-    t.boolean  "suspended",             :default => false
+    t.integer  "person_id",                  :default => 0,     :null => false
+    t.string   "username",                                      :null => false
+    t.string   "given_name",                                    :null => false
+    t.string   "family_name",                                   :null => false
+    t.boolean  "is_admin",                   :default => false
+    t.boolean  "suspended",                  :default => false
     t.datetime "apps_updated_at"
-    t.boolean  "has_error",             :default => false
+    t.boolean  "has_error",                  :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "renamed_from_username"
     t.datetime "last_ga_login_at"
-    t.boolean  "has_ga_login",          :default => false, :null => false
+    t.boolean  "has_ga_login",               :default => false, :null => false
     t.integer  "last_api_request"
+    t.boolean  "random_google_password_set", :default => false, :null => false
   end
 
   add_index "google_accounts", ["person_id"], :name => "person_ndx", :unique => true
@@ -338,6 +339,7 @@ ActiveRecord::Schema.define(:version => 20180411151252) do
     t.integer  "campus_id"
     t.datetime "retired_at"
     t.boolean  "connect_to_google",                      :default => false, :null => false
+    t.boolean  "next_signin_required",                   :default => false, :null => false
   end
 
   add_index "people", ["email"], :name => "email_ndx", :unique => true

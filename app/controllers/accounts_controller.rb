@@ -113,7 +113,13 @@ class AccountsController < ApplicationController
         begin
           person = Person.authenticate(params[:email],params[:password])
           set_current_person(person)
-          person.update_attribute(:last_activity_at,Time.now.utc)
+          if(person.connect_to_google? and ga = person.google_account and ga.random_google_password_set?)
+            # connected to google? and the google_account was flagged for a random password?
+            # set the google password now to make sure that it's in synchronization
+            person.password_reset = params[:password]
+          end
+          person.last_activity_at = Time.now.utc
+          person.save
           flash[:success] = "Login successful"
           Activity.log_local_auth_success(person_id: person.id, authname: params[:email], ip_address: request.remote_ip)
           if(session[:last_opierequest].blank? and person.present_tou_interstitial?)

@@ -333,7 +333,9 @@ class Person < ActiveRecord::Base
   def set_hashed_password(options = {})
     if(!@password.blank?)
       self.password_hash = Password.create(@password)
-      self.password_reset = @password
+      if(self.connect_to_google?)
+        self.password_reset = @password
+      end
       if(options[:save])
         self.save!
       end
@@ -443,6 +445,7 @@ class Person < ActiveRecord::Base
     elsif(!check_person.check_password(password))
       raise AuthenticationError.new(error_code: Activity::AUTH_INVALID_PASSWORD, person_id: check_person.id)
     end
+
     check_person
   end
 
@@ -895,10 +898,10 @@ class Person < ActiveRecord::Base
     # google community checks to auto-create google account
     if(['leader','member'].include?(connectiontype))
       if(gg = community.joined_google_group and gg.use_extension_google_accounts?)
-        self.update_attribute(connect_to_google, true)
+        self.update_attribute(:connect_to_google, true)
       elsif(connectiontype == 'leader')
         if(gg = community.leaders_google_group and gg.use_extension_google_accounts?)
-          self.update_attribute(connect_to_google, true)
+          self.update_attribute(:connect_to_google, true)
         end
       end
     end
@@ -1462,6 +1465,8 @@ class Person < ActiveRecord::Base
                               activitycode: Activity::CREATE_GOOGLE_ACCOUNT,
                               ip_address: options[:ip_address])
       else
+        # require a signin next time
+        self.update_column(:next_signin_required, true)
         # notification
         Notification.create(notifiable: self,
                             notification_type: Notification::CREATE_COLLEAGUE_GOOGLE_ACCOUNT,

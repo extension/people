@@ -19,7 +19,7 @@ class GoogleAccount < ActiveRecord::Base
   scope :active, -> { where('DATE(last_ga_login_at) >= ?',Date.today - Settings.months_for_inactive_flag.months) }
 
 
-  before_destroy :delete_apps_account
+  before_destroy :delete_apps_account_if_google_sync_mode
   after_destroy  :update_person_and_log_removal
 
   def update_person_and_log_removal
@@ -70,6 +70,16 @@ class GoogleAccount < ActiveRecord::Base
     end
   end
 
+  def delete_apps_account_if_google_sync_mode
+    # make sure we can destroy accounts if needed in dev
+    # without actually deleting the google account
+    if(Settings.sync_google)
+      self.delete_apps_account
+    else
+      true
+    end
+  end
+
   def delete_apps_account
     return false if self.account_required?
     gda = GoogleDirectoryApi.new
@@ -112,10 +122,19 @@ class GoogleAccount < ActiveRecord::Base
 
     # create the account if it didn't exist
     if(found_account.nil?)
+      # is the password_reset field nil? create a random password
+      if(self.person.password_reset.blank?)
+        google_password = Digest::SHA1.hexdigest(SecureRandom.hex(16))
+        self.random_google_password_set = true
+      else
+        google_password = self.person.password_reset
+        self.random_google_password_set = false
+      end
+
       created_account = gda.create_account(self.username,
                                            {given_name: self.given_name,
                                             family_name: self.family_name,
-                                            password: self.person.password_reset,
+                                            password: google_password,
                                             suspended: self.suspended?})
       if(!created_account)
         Honeybadger.notify("Google Account Sync Error", error_class: 'GoogleAccount', context: {google_account_id: self.id})
@@ -126,6 +145,10 @@ class GoogleAccount < ActiveRecord::Base
         self.last_api_request = gda.api_log.id
       end
     else
+      if(!self.person.password_reset.nil?)
+        self.random_google_password_set = false
+      end
+
       updated_account = gda.update_account(self.username,
                                              {given_name: self.given_name,
                                               family_name: self.family_name,
