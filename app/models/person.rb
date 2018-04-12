@@ -895,10 +895,10 @@ class Person < ActiveRecord::Base
     # google community checks to auto-create google account
     if(['leader','member'].include?(connectiontype))
       if(gg = community.joined_google_group and gg.use_extension_google_accounts?)
-        self.update_attribute(connect_to_google, true)
+        self.update_attribute(:connect_to_google, true)
       elsif(connectiontype == 'leader')
         if(gg = community.leaders_google_group and gg.use_extension_google_accounts?)
-          self.update_attribute(connect_to_google, true)
+          self.update_attribute(:connect_to_google, true)
         end
       end
     end
