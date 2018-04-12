@@ -1,0 +1,24 @@
+<%- @page_title = "Your eXtension Google Account Has Been Created" -%>
+
+<div class="page-header">
+  <h2><%= @page_title %></h2>
+</div>
+
+
+<div class="row">
+  <div class="col-md-8">
+    <h4>What's Next?</h4>
+    <p>Your eXtension Google Account is now created. But there's one more step you'll need to take.
+      Because of the way we protect your password at this website, we couldn't synchronize
+      your People password to Google when we created the account.  The Google password has
+      been set to a random value.</p>
+    <p>In order to do that password synchronization, you have two options</p>
+    <p>
+    <ol>
+      <li>You can set a <%= link_to('new password', password_person_path(current_person)) -%> for your account.</li>
+      <li>You can <%= link_to('sign out',signout_path) %> and sign back in again.</li>
+    </ol>
+    </p>
+    <p>Either option will set the password for your eXtension Google Account.</p>
+  </div>
+</div>

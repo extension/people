@@ -24,27 +24,33 @@ module AuthLib
       session[:person_id] = person.id
     end
   end
-  
-    
+
+
   def signin_required
-    if session[:person_id]      
+    if session[:person_id]
       person = Person.find_by_id(session[:person_id])
       if(person and person.signin_allowed?)
-        @current_person = person
-        return true
+        # is next_signin_required flag set? clear it, but return false
+        if(person.next_signin_required?)
+          person.update_column(:next_signin_required, false)
+          session[:person_id] = nil
+        else
+          @current_person = person
+          return true
+        end
       else
         session[:person_id] = nil
       end
     end
 
-    # store current location so that we can 
+    # store current location so that we can
     # come back after the user logged in
     store_location
     return access_denied
   end
-  
+
   def signin_optional
-    if session[:person_id]      
+    if session[:person_id]
       person = Person.find_by_id(session[:person_id])
       if(person and person.signin_allowed?)
         @current_person = person
@@ -63,7 +69,7 @@ module AuthLib
   end
 
   def admin_required
-    if session[:person_id]      
+    if session[:person_id]
       person = Person.find_by_id(session[:person_id])
       if(person and person.signin_allowed? and person.is_admin?)
         @current_person = person
@@ -71,7 +77,7 @@ module AuthLib
       end
     end
 
-    # store current location so that we can 
+    # store current location so that we can
     # come back after the user logged in
     store_location
     return access_denied
@@ -108,7 +114,7 @@ module AuthLib
 </xrds:XRDS>
     END
 
-    render(:text => yadis, :content_type => 'application/xrds+xml')    
+    render(:text => yadis, :content_type => 'application/xrds+xml')
   end
 
   def openid_xrds_header
@@ -131,13 +137,13 @@ module AuthLib
     return returnlinks.join("\n").html_safe
   end
 
-  
+
   # store current uri in  the session.
   # we can return to this location by calling return_location
   def store_location
     cookies[:return_to] = request.fullpath
   end
-  
+
   def clear_location
     cookies.delete(:return_to)
   end

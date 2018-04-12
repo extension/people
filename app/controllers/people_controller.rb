@@ -291,8 +291,12 @@ class PeopleController < ApplicationController
 
     if(request.post?)
       if(@person.create_extension_google_account(created_by: current_person, ip_address: request.remote_ip))
-        flash[:success] = "Created the eXtension Google Account for #{@person.fullname}"
-        return redirect_to(person_url(@person))
+        if(@person == current_person)
+          return render(template: "people/post_create_google_account")
+        else
+          flash[:success] = "Created the eXtension Google Account for #{@person.fullname}"
+          return redirect_to(person_url(@person))
+        end
       else
         flash[:failure] = 'Failed to create the eXtension Google Account, reported status may not be correct'
         return redirect_to(person_url(@person))
