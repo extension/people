@@ -168,4 +168,22 @@ class GoogleAccount < ActiveRecord::Base
   def self.clear_errors
     self.update_all("has_error = 0","has_error = 1")
   end
+
+  def self.queue_destroys
+    with_scope do
+      self.all.each do |ga|
+        if(!Settings.redis_enabled)
+          ga.destroy
+        else
+          self.delay_for(5.seconds).delayed_destroy(ga.id)
+        end
+      end
+    end
+  end
+
+  def self.delayed_destroy(record_id)
+    if(record = find_by_id(record_id))
+      record.destroy
+    end
+  end
 end
