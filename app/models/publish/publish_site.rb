@@ -27,6 +27,14 @@ class PublishSite < ActiveRecord::Base
     returnhash
   end
 
+  def management_community
+    Community.where(blog_id: self.blog_id).first
+  end
+
+  def site_url
+    "https://#{self.domain}#{self.path}"
+  end
+
   def name
     if(self.path == '/')
       'Blogs Root'

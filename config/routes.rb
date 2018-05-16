@@ -136,6 +136,7 @@ People::Application.routes.draw do
       get :google_groups
       get :account_status
       get :account_status_list
+      get :publish_sites
     end
   end
 
