@@ -31,6 +31,9 @@ class AuditsController < ApplicationController
     @account_list = Person.not_system.not_retired.where(account_status: params[:account_status]).page(params[:page]).order('last_name ASC')
   end
 
+  def publish_sites
+  end
+
   private
 
   def set_tab
