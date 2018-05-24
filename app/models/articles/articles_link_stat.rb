@@ -5,8 +5,10 @@
 #
 #  see LICENSE file
 
-class ArticlesPublishingCommunity < ActiveRecord::Base
+class ArticlesLinkStat < ActiveRecord::Base
   # connects to the articles database
   self.establish_connection :articles
-  self.table_name= 'publishing_communities'
+  self.table_name= 'link_stats'
+
+  belongs_to :articles_page, :foreign_key => "page_id"
 end
