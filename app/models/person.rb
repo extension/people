@@ -11,6 +11,7 @@ class Person < ActiveRecord::Base
   include BCrypt
   include CacheTools
   include MarkupScrubber
+  extend CreateActivityTools
 
   serialize :password_reset
   serialize :admin_flags
