@@ -20,7 +20,6 @@ module CreateActivityTools
       next if (published_content_only and !published_create_nodes.include?(cwe.node_id))
       if(workflow_counts[cwe.user_id])
         workflow_counts[cwe.user_id][:workflow_count] += 1
-        # not likely based on query ordering
         if(cwe.created_at > workflow_counts[cwe.user_id][:latest_workflow_activity])
           workflow_counts[cwe.user_id][:latest_workflow_activity] = cwe.created_at
         end
@@ -33,11 +32,11 @@ module CreateActivityTools
   end
 
 
-  def create_workflow_counts_csv(published_content_only = true)
+  def create_workflow_counts_csv(published_content_only = true,exportfile = "./data/create_workflow_counts.csv")
     workflow_counts = create_workflow_counts(published_content_only)
 
-    CSV.open("./data/create_workflow_counts.csv", "wb") do |csv|
-      csv << ['person_id','name','email','retired account?','workflow_changes','latest_workflow_activity_at']
+    CSV.open(exportfile, "wb") do |csv|
+      csv << ['person_id','name','email','retired account?','last_active_at','workflow_changes','latest_workflow_activity_at']
       workflow_counts.each do |person_id,values|
         if(p = Person.find_by_id(person_id))
           row = []
@@ -45,6 +44,7 @@ module CreateActivityTools
           row << p.fullname
           row << p.email
           row << (p.retired? ? 'Yes' : ' No')
+          row << p.last_activity_at.to_s
           row << values[:workflow_count]
           row << values[:latest_workflow_activity].to_s
           csv << row
@@ -65,7 +65,6 @@ module CreateActivityTools
       next if (published_content_only and !published_create_nodes.include?(cr.nid))
       if(revision_counts[cr.uid])
         revision_counts[cr.uid][:revision_count] += 1
-        # not likely based on query ordering
         if(cr.created_at > revision_counts[cr.uid][:latest_revision_activity])
           revision_counts[cr.uid][:latest_revision_activity] = cr.created_at
         end
@@ -78,11 +77,11 @@ module CreateActivityTools
   end
 
 
-  def create_revision_counts_csv(published_content_only = true)
+  def create_revision_counts_csv(published_content_only = true,exportfile = "./data/create_revision_counts.csv")
     revision_counts = create_revision_counts(published_content_only)
 
-    CSV.open("./data/create_revision_counts.csv", "wb") do |csv|
-      csv << ['person_id','name','email','retired account?','revisions','latest_revision_activity_at']
+    CSV.open(exportfile, "wb") do |csv|
+      csv << ['person_id','name','email','retired account?','last_active_at','revisions','latest_revision_activity_at']
       revision_counts.each do |person_id,values|
         if(p = Person.find_by_id(person_id))
           row = []
@@ -90,6 +89,7 @@ module CreateActivityTools
           row << p.fullname
           row << p.email
           row << (p.retired? ? 'Yes' : ' No')
+          row << p.last_activity_at.to_s
           row << values[:revision_count]
           row << values[:latest_revision_activity].to_s
           csv << row
