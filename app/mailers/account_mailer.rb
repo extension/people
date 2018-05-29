@@ -123,7 +123,7 @@ class AccountMailer < BaseMailer
   def create_colleague_google_account(options={})
     @bycolleague = options[:colleague]
     @recipient = options[:recipient]
-    @subject = "eXtension: Your colleagued created an eXtension Google Account for you"
+    @subject = "eXtension: Your colleague created an eXtension Google Account for you"
     @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
 
     if(!@recipient.email.blank?)
