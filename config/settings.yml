@@ -16,7 +16,6 @@ googleapps_impersonation_account: 'use_local_settings'
 googleapps_groups_domain: 'groups.extension.org'
 learn_database: 'use_local_settings'
 max_live_dump_count: 200
-milfam_database: 'use_local_settings'
 months_for_inactive_flag: 6
 inactive_limit: 100
 openid_endpoint: 'http://people.test/opie'
