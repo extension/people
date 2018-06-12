@@ -99,15 +99,6 @@ class AccountSync < ActiveRecord::Base
     self.connection.execute(wordpress_usermeta_wysiwyg_insert_query(site))
   end
 
-  def sync_milfam(site)
-    update_database = site.sync_database
-    self.connection.execute(wordpress_user_replace_query(site))
-    self.connection.execute(wordpress_openid_replace_query(site))
-    self.connection.execute(wordpress_usermeta_role_insert_update_query(site))
-    self.connection.execute(wordpress_usermeta_userlevel_insert_update_query(site))
-    self.connection.execute(wordpress_usermeta_wysiwyg_insert_query(site))
-  end
-
   def sync_blogs(site)
     update_database = site.sync_database
     self.connection.execute(wordpress_user_replace_query(site))
