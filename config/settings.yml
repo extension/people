@@ -1,5 +1,3 @@
-aae_database: 'use_local_settings'
-about_database: 'use_local_settings'
 app_location: 'localdev'
 cleanup_months: 6
 create_database: 'use_local_settings'
@@ -14,7 +12,6 @@ googleapps_domain: 'apps.extension.org'
 googleapps_service_credentials: 'use_local_settings'
 googleapps_impersonation_account: 'use_local_settings'
 googleapps_groups_domain: 'groups.extension.org'
-learn_database: 'use_local_settings'
 max_live_dump_count: 200
 months_for_inactive_flag: 6
 inactive_limit: 100
