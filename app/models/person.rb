@@ -136,6 +136,7 @@ class Person < ActiveRecord::Base
   scope :email_confirmed, -> {where(email_confirmed: true)}
   scope :validaccounts, -> {not_retired}
   scope :not_system, -> {where("people.is_systems_account = ?",false)}
+  scope :systems_accounts, -> {where("people.is_systems_account = ?",true)}
   scope :display_accounts, validaccounts.not_system
   scope :inactive, -> { where('DATE(last_activity_at) < ?',Date.today - Settings.months_for_inactive_flag.months) }
   scope :active, -> { where('DATE(last_activity_at) >= ?',Date.today - Settings.months_for_inactive_flag.months) }

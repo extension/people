@@ -9,7 +9,38 @@
     <p>The following are the accounts that are utilizing eXtension Google Apps Email services.  For all other email addresses associated with a Google Account
       our email servers forward email sent to <code>idstring@extension.org</code> to the email address listed in their profile</p>
     <table class="table table-striped">
-    <%- Person.validaccounts.google_apps_email.order(:last_name).each do |p| -%>
+      <thead>
+        <th>Person</th>
+        <th>Email</th>
+        <th>Backup email?</th>
+    <%- Person.not_system.validaccounts.google_apps_email.order(:last_name).each do |p| -%>
+      <tr>
+        <td><%= link_to_person(p) -%></td>
+        <td><%= p.email -%></td>
+        <td>
+          <%- if !p.require_backup_email? -%>
+            Not required.
+          <%- elsif p.backup_email.blank? -%>
+            <span class="label label-warning">Not provided</span>
+          <%- else -%>
+            <span class="label label-success">Provided</span>
+          <%- end -%>
+        </td>
+      </tr>
+    <%- end -%>
+    </table>
+
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <p>The following are the systems accounts that are utilizing eXtension Google Apps Email services.</p>
+    <table class="table table-striped">
+      <thead>
+        <th>Person</th>
+        <th>Email</th>
+    <%- Person.systems_accounts.validaccounts.google_apps_email.order(:last_name).each do |p| -%>
       <tr>
         <td><%= link_to_person(p) -%></td>
         <td><%= p.email -%></td>
