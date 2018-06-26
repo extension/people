@@ -570,7 +570,8 @@ class Person < ActiveRecord::Base
   end
 
   def change_to_google_apps_email
-    self.update_attributes(email: "#{self.idstring}@extension.org", google_apps_email: true)
+    current_email = self.email
+    self.update_attributes(email: "#{self.idstring}@extension.org", google_apps_email: true, backup_email: current_email)
   end
 
 
