@@ -103,6 +103,17 @@ class PeopleController < ApplicationController
       end
     end
 
+    # deal with backup email error since
+    # we can't really require it in the model
+    # without preventing colleague edits
+    if(current_person == @person and @person.require_backup_email?)
+      if(update_params["backup_email"].blank?)
+        @person.attributes = update_params
+        @person.errors.add(:backup_email, "A backup email address is required for your account.".html_safe)
+        return render :action => 'edit'
+      end
+    end
+
     if @person.update_attributes(params[:person])
       what_changed = @person.previous_changes.reject{|attribute,value| (['updated_at'].include?(attribute) or (value[0].blank? and value[1].blank?))}
       @person.check_profile_changes({colleague_id: current_person.id, ip_address: request.remote_ip})
