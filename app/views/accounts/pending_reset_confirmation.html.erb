@@ -3,7 +3,11 @@
 <div class="row">
   <div class="col-md-12">
     <h2>Password Reset Confirmation</h2>
-    <p>In order to reset your password, we have sent a reset link to: <code class="email"><%= @person.email %></code></p>
+    <%- if @person.require_backup_email? -%>
+      <p>In order to reset your password, we have sent a reset link to your backup email address: <code class="email"><%= @person.backup_email %></code></p>
+    <%- else -%>
+      <p>In order to reset your password, we have sent a reset link to: <code class="email"><%= @person.email %></code></p>
+    <%- end -%>
     <p>This link includes a special "code" to validate the email address on your account and to allow you to set a new password f</p>
   </div>
 </div>
@@ -19,8 +23,8 @@
 
       <p>with the subject: <code><%= I18n.translate("email.subjects.email_confirmation") %></code></p>
 
-      <p>If you don't receive the email within the next 24 hours,  
-        please try <%= link_to("sending another confirmation email", accounts_reset_password_path) %> or 
+      <p>If you don't receive the email within the next 24 hours,
+        please try <%= link_to("sending another confirmation email", accounts_reset_password_path) %> or
         <%= link_to("contact us", help_path) %> for more information.</p>
     </div>
   </div>

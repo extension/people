@@ -160,6 +160,8 @@ class AccountsController < ApplicationController
           flash.now[:warning] = "The password for that account can't be reset"
         elsif(@person.retired?)
           flash.now[:warning] = "Your account has been retired. #{view_context.link_to('Contact us for more information.',help_path)}".html_safe
+        elsif(@person.google_apps_email? and @person.backup_email.blank?)
+          flash.now[:warning] = "Your password cannot be reset because you use eXtension Google Apps email and have no backup email address saved."
         else
           Activity.log_activity(person_id: @person.id, activitycode: Activity::PASSWORD_RESET_REQUEST, ip_address: request.remote_ip)
           Notification.create(:notification_type => Notification::PASSWORD_RESET_REQUEST, :notifiable => @person)

@@ -142,7 +142,10 @@ class AccountMailer < BaseMailer
     @subject = "eXtension: Please confirm your email address"
     @save_sent_email = options[:save_sent_email].nil? ? true : options[:save_sent_email]
 
-    if(!@recipient.email.blank?)
+    if(@recipient.google_apps_email? and !@recipient.backup_email.blank?)
+      return_email = create_mail(to: @recipient.backup_email, subject: @subject, send_in_demo: true)
+      save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
+    elsif(!@recipient.email.blank?)
       return_email = create_mail(to: @recipient.email, subject: @subject, send_in_demo: true)
       save_sent_email_for_recipient(return_email,@recipient,options) if @save_sent_email
     end
