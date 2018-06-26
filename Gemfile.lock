@@ -166,7 +166,7 @@ GEM
     mobile-fu (1.2.1)
       rack-mobile-detect
       rails
-    multi_json (1.13.0)
+    multi_json (1.13.1)
     multipart-post (2.0.0)
     mysql2 (0.3.21)
     net-scp (1.2.1)

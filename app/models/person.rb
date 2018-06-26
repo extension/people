@@ -21,7 +21,7 @@ class Person < ActiveRecord::Base
   attr_accessible :password, :interest_tags, :connect_to_google
   attr_accessible :position_id, :position, :location_id, :location, :county_id, :county, :institution_id, :institution
   attr_accessible :invitation, :invitation_id
-  attr_accessible :last_account_reminder, :password_reset, :google_apps_email, :display_extension_email
+  attr_accessible :last_account_reminder, :password_reset, :google_apps_email, :display_extension_email, :backup_email
   attr_accessible :avatar, :avatar_cache, :remove_avatar
 
 
@@ -68,6 +68,7 @@ class Person < ActiveRecord::Base
   validates :last_name, :presence => true
   validates :idstring, :presence => true, :uniqueness => {:case_sensitive => false}
   validates :email, :presence => true, :email => true, :uniqueness => {:case_sensitive => false}
+  validates :backup_email, :email => true, :uniqueness => {:case_sensitive => false}
   validates :password, :length => { :in => 8..40 }, :presence => true, :on => :create
   validate :check_idstring_emailalias_conflicts
   validate :check_for_prior_rename, :on => :update
@@ -135,6 +136,7 @@ class Person < ActiveRecord::Base
   scope :email_confirmed, -> {where(email_confirmed: true)}
   scope :validaccounts, -> {not_retired}
   scope :not_system, -> {where("people.is_systems_account = ?",false)}
+  scope :systems_accounts, -> {where("people.is_systems_account = ?",true)}
   scope :display_accounts, validaccounts.not_system
   scope :inactive, -> { where('DATE(last_activity_at) < ?',Date.today - Settings.months_for_inactive_flag.months) }
   scope :active, -> { where('DATE(last_activity_at) >= ?',Date.today - Settings.months_for_inactive_flag.months) }
@@ -182,6 +184,17 @@ class Person < ActiveRecord::Base
   def email=(email_address)
     write_attribute(:email, email_address.downcase)
   end
+
+  # attr_writer override to force email address downcase
+  def backup_email=(email_address)
+    write_attribute(:backup_email, email_address.downcase)
+  end
+
+  def require_backup_email?
+    self.google_apps_email? and !self.is_systems_account?
+  end
+
+
 
   # runs as validation
   def check_idstring_emailalias_conflicts
@@ -558,7 +571,8 @@ class Person < ActiveRecord::Base
   end
 
   def change_to_google_apps_email
-    self.update_attributes(email: "#{self.idstring}@extension.org", google_apps_email: true)
+    current_email = self.email
+    self.update_attributes(email: "#{self.idstring}@extension.org", google_apps_email: true, backup_email: current_email)
   end
 
 

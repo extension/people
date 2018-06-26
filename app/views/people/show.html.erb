@@ -101,6 +101,10 @@
             <dd>Forwards to: <%= @person.email_forward %></dd>
             <%- end -%>
           <%- end -%>
+          <%- if @person == current_person or current_person.is_admin? -%>
+          <dt>Backup Email:</dt>
+          <dd><%= @person.backup_email.blank? ? '<span class="label label-warning">Not provided</span>'.html_safe : @person.backup_email %></dd>
+          <%- end -%>
           <%- if @person.all_email_aliases.count > 0 -%>
           <dt>Email Aliases:</dt>
           <dd>
