@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20180412133223) do
+ActiveRecord::Schema.define(:version => 20180626131422) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -340,6 +340,7 @@ ActiveRecord::Schema.define(:version => 20180412133223) do
     t.datetime "retired_at"
     t.boolean  "connect_to_google",                      :default => false, :null => false
     t.boolean  "next_signin_required",                   :default => false, :null => false
+    t.string   "backup_email",             :limit => 96
   end
 
   add_index "people", ["email"], :name => "email_ndx", :unique => true

@@ -81,7 +81,17 @@
         </div>
       </div>
 
-
+      <%- if(current_person == @person or current_person.is_admin? ) -%>
+        <%- if(@person.google_apps_email? and !@person.is_systems_account?) -%>
+          <div class="form-group">
+            <label for="backup_email" class="col-md-4 control-label">* Backup Email</label>
+            <div class="col-md-6">
+              <%= f.text_field :backup_email, :class => "form-control", :placeholder => 'Backup Email' %>
+              <span class="help-block">Because you use eXtension Google Apps email, you need to provide a personal backup email address for password resets</span>
+            </div>
+          </div>
+        <%- end -%>
+      <%- end -%>
 
 
       <div class="form-group">
