@@ -1,7 +1,7 @@
 <%= render(:partial => 'shared_mailer/demo_notice') if is_demo? -%>
 Hi <%= @recipient.first_name %>,
 
-You have been removed as a <%= @added_text %> of the <%= @community.name %> community.
+You have been removed as a <%= @removed_text %> of the <%= @community.name %> community.
 
 <% if !@bycolleague.is_system_account? %>
 The colleague that performed this action is:
