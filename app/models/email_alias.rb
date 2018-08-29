@@ -81,9 +81,19 @@ class EmailAlias < ActiveRecord::Base
     end
   end
 
-  def self.add_mirror_alias(mail_alias)
+  def self.get_mirror_alias(mail_alias)
     mirror_account = Person.find(Person::MIRROR_ACCOUNT)
-    if(!(existing = self.where(aliasable_id: mirror_account.id).where(aliasable_type: 'Person').where(mail_alias: mail_alias).first))
+    self.where(aliasable_id: mirror_account.id).where(aliasable_type: 'Person').where(mail_alias: mail_alias).first
+  end
+
+  def self.mirror_alias_exists?(mail_alias)
+    (found = self.get_mirror_alias(mail_alias)) ? true : false    
+  end
+
+
+  def self.add_mirror_alias(mail_alias)
+    if(!(existing = self.get_mirror_alias(mail_alias)))
+      mirror_account = Person.find(Person::MIRROR_ACCOUNT)
       self.create(aliasable: mirror_account, destination: mirror_account.idstring, alias_type: SYSTEM_ALIAS, disabled: false, mail_alias: mail_alias)
     else
       existing
