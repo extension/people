@@ -109,7 +109,7 @@
           <dt>Email Aliases:</dt>
           <dd>
           <%- @person.all_email_aliases.order("alias_type DESC,mail_alias").each do |ea| -%>
-            <%= ea.mail_alias -%>@extension.org<br/>
+            <%= ea.mail_alias_address -%><br/>
           <%- end -%>
           </dd>
           <%- end -%>

@@ -51,6 +51,11 @@ class EmailAlias < ActiveRecord::Base
     count_scope.count > 0
   end
 
+  def mail_alias_address
+    "#{self.mail_alias}@extension.org"
+  end
+
+
   def check_road_to_nowhere
     # override disabled flag if on the road to nowhere
     if(self.destination == NOWHERE_LOCATION)
@@ -97,6 +102,8 @@ class EmailAlias < ActiveRecord::Base
 
     returnalias
   end
+
+
 
 
 end
