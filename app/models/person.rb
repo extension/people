@@ -1413,6 +1413,10 @@ class Person < ActiveRecord::Base
   end
 
   def add_email_alias(mail_alias, options = {})
+    # because jayoung is always typing "alias@extension.org" for this method
+    # and creating alias@extension.org@extension.org - just get the LHS if
+    # there's an '@'
+    mail_alias = mail_alias.split('@').first  # side effect, serves the caller right
     is_personal = (options[:is_personal].nil? ? false : options[:is_personal])
     add_mirror = (options[:add_mirror].nil? ? true : options[:add_mirror])
     alias_type = is_personal ? EmailAlias::PERSONAL_ALIAS : EmailAlias::ALIAS
@@ -1427,6 +1431,10 @@ class Person < ActiveRecord::Base
   end
 
   def remove_email_alias(mail_alias)
+    # because jayoung is always typing "alias@extension.org" for this method
+    # and searching for alias@extension.org@extension.org - just get the LHS if
+    # there's an '@'
+    mail_alias = mail_alias.split('@').first  # side effect, serves the caller right
     if(ea = self.email_aliases.where(mail_alias: mail_alias).first)
       ea.destroy
     end
