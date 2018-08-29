@@ -1413,8 +1413,8 @@ class Person < ActiveRecord::Base
   end
 
   def add_email_alias(mail_alias, options = {})
-    is_personal = options[:is_personal] || false
-    add_mirror = options[:add_mirror] || true
+    is_personal = (options[:is_personal].nil? ? false : options[:is_personal])
+    add_mirror = (options[:add_mirror].nil? ? true : options[:add_mirror])
     alias_type = is_personal ? EmailAlias::PERSONAL_ALIAS : EmailAlias::ALIAS
     ea = self.email_aliases.create({mail_alias: mail_alias, destination: self.idstring, alias_type: alias_type, disabled: !self.validaccount?})
     if(add_mirror)
