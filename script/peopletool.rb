@@ -26,7 +26,7 @@ class PeopleTool < Thor
     # this utility method is named the same as the Person class method
     # Do not be led astray by any confusion there.  Embrace the consistency
     def find_by_email_or_idstring_or_id(email_idstring_id)
-      if(!(person = Person.find_by_email_or_idstring_or_id(email_idstring_id)))
+      if(!(person = Person.find_by_email_or_idstring_or_id(email_idstring_id,false)))
         say("Unable to find anyone with the email address or idstring or id number: #{email_idstring_id}", :red)
         exit(1)
       end
