@@ -56,6 +56,17 @@ class PeopleTool < Thor
       say("Unable to add #{email_alias}@extension.org to #{person.fullname} (#{person.idstring})", :yellow)
     end
   end
+
+  desc "remove_email_alias <idstring_or_idnumber> <email_alias>", "Remove an email alias <email_alias> from a people account (idstring or id#) e."
+  def remove_email_alias(email_idstring_id, email_alias)
+    load_rails(options[:environment])
+    person = find_by_email_or_idstring_or_id(email_idstring_id)
+    if(!person.has_email_alias?(email_alias))
+      say("#{email_alias}@extension.org is not delivering to #{person.fullname} (#{person.idstring})",:yellow)
+    elsif(person.remove_email_alias(email_alias))
+      say("Removed #{email_alias}@extension.org from #{person.fullname} (#{person.idstring})", :green)
+    else
+      say("Unable to remove #{email_alias}@extension.org from #{person.fullname} (#{person.idstring})", :yellow)
     end
   end
 
