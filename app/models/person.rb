@@ -1420,14 +1420,26 @@ class Person < ActiveRecord::Base
     is_personal = (options[:is_personal].nil? ? false : options[:is_personal])
     add_mirror = (options[:add_mirror].nil? ? true : options[:add_mirror])
     alias_type = is_personal ? EmailAlias::PERSONAL_ALIAS : EmailAlias::ALIAS
-    ea = self.email_aliases.create({mail_alias: mail_alias, destination: self.idstring, alias_type: alias_type, disabled: !self.validaccount?})
-    if(add_mirror)
-      mirror_account = Person.find(MIRROR_ACCOUNT)
-      if(!ea = mirror_account.email_aliases.where(mail_alias: mail_alias).first)
-        mirror_account.email_aliases.create({mail_alias: mail_alias, destination: mirror_account.idstring, alias_type: EmailAlias::MIRROR, disabled: false})
+    if(!self.has_email_alias?(mail_alias))
+      ea = self.email_aliases.create({mail_alias: mail_alias, destination: self.idstring, alias_type: alias_type, disabled: !self.validaccount?})
+      if(add_mirror)
+        mirror_account = Person.find(MIRROR_ACCOUNT)
+        if(!mirror_alias = mirror_account.email_aliases.where(mail_alias: mail_alias).first)
+          mirror_account.email_aliases.create({mail_alias: mail_alias, destination: mirror_account.idstring, alias_type: EmailAlias::MIRROR, disabled: false})
+        end
       end
+      return ea
+    else
+      self.email_aliases.where(mail_alias: mail_alias).first
     end
-    ea
+  end
+
+  def has_email_alias?(mail_alias)
+    # because jayoung is always typing "alias@extension.org" for this method
+    # and creating alias@extension.org@extension.org - just get the LHS if
+    # there's an '@'
+    mail_alias = mail_alias.split('@').first  # side effect, serves the caller right
+    (ea = self.email_aliases.where(mail_alias: mail_alias).first) ? true : false
   end
 
   def remove_email_alias(mail_alias)

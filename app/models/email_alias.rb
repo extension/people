@@ -87,7 +87,11 @@ class EmailAlias < ActiveRecord::Base
   end
 
   def self.mirror_alias_exists?(mail_alias)
-    (found = self.get_mirror_alias(mail_alias)) ? true : false    
+    # because jayoung is always typing "alias@extension.org" for this method
+    # and creating alias@extension.org@extension.org - just get the LHS if
+    # there's an '@'
+    check_alias = mail_alias.split('@').first 
+    (found = self.get_mirror_alias(check_alias)) ? true : false
   end
 
 
