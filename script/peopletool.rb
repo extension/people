@@ -1,4 +1,3 @@
-#!/usr/bin/env bundle exec ruby
 # === COPYRIGHT:
 # Copyright (c) North Carolina State University
 # Developed with funding for the National eXtension Initiative.
