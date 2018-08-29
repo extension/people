@@ -53,7 +53,9 @@ class PeopleTool < Thor
       mirror_op = add_mirror ? 'with mirroring' : 'without mirroring'
       say("Added #{ea.mail_alias_address} to #{person.fullname} (#{person.idstring}) #{mirror_op}", :green)
     else
-      say("Unable to add #{ea.mail_alias_address} to #{person.fullname} (#{person.idstring})", :yellow)
+      say("Unable to add #{email_alias}@extension.org to #{person.fullname} (#{person.idstring})", :yellow)
+    end
+  end
     end
   end
 
