@@ -23,7 +23,7 @@
     <%- EmailAlias.active.system_forwards.order(:mail_alias).each do |ea| -%>
       <tr>
         <td>
-          <%= "#{ea.mail_alias}@extension.org" -%>
+          <%= ea.mail_alias_address -%>
           <%- if ea.alias_type == EmailAlias::MIRROR -%>
             <em>(mirror)</em>
           <%- end -%>
@@ -39,7 +39,7 @@
     <%- EmailAlias.active.aliases.where(aliasable_type: 'Person').includes(:aliasable).order(:mail_alias).each do |ea| -%>
       <tr>
         <td>
-          <%= "#{ea.mail_alias}@extension.org" -%>
+          <%= ea.mail_alias_address -%>
           <%- if ea.alias_type == EmailAlias::MIRROR -%>
             <em>(mirror)</em>
           <%- end -%>
@@ -55,7 +55,7 @@
     <%- EmailAlias.active.system_aliases.where(aliasable_type: 'Person').includes(:aliasable).order(:mail_alias).each do |ea| -%>
       <tr>
         <td>
-          <%= "#{ea.mail_alias}@extension.org" -%>
+          <%= ea.mail_alias_address -%>
         </td>
         <td><%= link_to_person(ea.aliasable) -%></td>
       </tr>
