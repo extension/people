@@ -10,7 +10,7 @@ class Community < ActiveRecord::Base
   include MarkupScrubber
   attr_accessible :creator, :created_by
   attr_accessible :name, :description, :location, :location_id, :memberfilter, :connect_to_drupal
-  attr_accessible :connect_to_google_apps, :entrytype, :shortname, :publishing_community, :is_public
+  attr_accessible :entrytype, :shortname, :publishing_community, :is_public
   attr_accessible :community_masthead, :community_masthead_cache, :remove_community_masthead
   attr_accessible :blog_id, :primary_contact_id, :membership_level
 
