@@ -44,24 +44,9 @@ class CommunityMemberSync < ActiveRecord::Base
     if(!self.processed?)
       begin
         self.create_database
-        self.publish_database
         self.update_attributes({processed: true, success: true})
       rescue StandardError => e
         self.update_attributes({processed: true, success: false, errors: e.message})
-      end
-    end
-  end
-
-  def publish_database
-    person = self.person
-    community = self.community
-    return if(community.blog_id.nil?)
-    if(ps = PublishSite.find(community.blog_id) and pu = person.publish_user)
-      connection = person.connection_with_community(community)
-      if(['leader','member'].include?(connection))
-        pu.add_to_publish_site(ps,connection)
-      else
-        pu.remove_from_publish_site(ps)
       end
     end
   end
