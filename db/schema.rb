@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20180626131422) do
+ActiveRecord::Schema.define(:version => 20180905132931) do
 
   create_table "account_syncs", :force => true do |t|
     t.integer  "person_id"
@@ -102,7 +102,6 @@ ActiveRecord::Schema.define(:version => 20180626131422) do
     t.datetime "created_at",                              :null => false
     t.datetime "updated_at",                              :null => false
     t.string   "community_masthead"
-    t.integer  "blog_id"
     t.integer  "primary_contact_id"
     t.integer  "membership_level",     :default => 0,     :null => false
   end

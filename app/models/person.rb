@@ -1452,10 +1452,6 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def publish_user
-    PublishUser.where(ID: self.id).first
-  end
-
   def last_login_activity_for_site(site)
     self.activities.site_logins.where("site LIKE '%#{site.uri}%'").last
   end

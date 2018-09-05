@@ -9,8 +9,6 @@ class ActivityImport < ActiveRecord::Base
   serialize :additionaldata
   attr_accessible :item, :operation, :started, :finished, :run_time, :additionaldata, :success
 
-  PUBLISH_IMPORT = []
-
   HOMEPAGE_IMPORT = []
 
   LEARN_IMPORT    = []
@@ -41,11 +39,9 @@ class ActivityImport < ActiveRecord::Base
   def self.go_and_import(group = 'all')
     case group
     when 'all'
-      list = PUBLISH_IMPORT + HOMEPAGE_IMPORT + LEARN_IMPORT + CREATE_IMPORT + ASK_IMPORT
+      list = HOMEPAGE_IMPORT + LEARN_IMPORT + CREATE_IMPORT + ASK_IMPORT
     when 'create'
       list = CREATE_IMPORT
-    when 'publish'
-      list = PUBLISH_IMPORT
     when 'homepage'
       list = HOMEPAGE_IMPORT
     when 'learn'
