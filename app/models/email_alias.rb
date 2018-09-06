@@ -36,7 +36,9 @@ class EmailAlias < ActiveRecord::Base
   scope :forwards, ->{where(alias_type: FORWARD)}
   scope :system_forwards, ->{where(alias_type: SYSTEM_FORWARD)}
   scope :notforwards, ->{ where("alias_type != #{FORWARD}") }
-  scope :aliases, ->{ where("alias_type IN (#{ALIAS},#{MIRROR})") }
+  scope :notmirror, ->{ where("alias_type != #{MIRROR}") }
+  scope :mirror, ->{ where("alias_type = #{MIRROR}") }
+  scope :aliases, ->{ where("alias_type = #{ALIAS}") }
   scope :system_aliases, ->{where(alias_type: SYSTEM_ALIAS)}
 
 
@@ -90,7 +92,7 @@ class EmailAlias < ActiveRecord::Base
     # because jayoung is always typing "alias@extension.org" for this method
     # and creating alias@extension.org@extension.org - just get the LHS if
     # there's an '@'
-    check_alias = mail_alias.split('@').first 
+    check_alias = mail_alias.split('@').first
     (found = self.get_mirror_alias(check_alias)) ? true : false
   end
 
@@ -98,13 +100,13 @@ class EmailAlias < ActiveRecord::Base
   def self.add_mirror_alias(mail_alias)
     if(!(existing = self.get_mirror_alias(mail_alias)))
       mirror_account = Person.find(Person::MIRROR_ACCOUNT)
-      self.create(aliasable: mirror_account, destination: mirror_account.idstring, alias_type: SYSTEM_ALIAS, disabled: false, mail_alias: mail_alias)
+      self.create(aliasable: mirror_account, destination: mirror_account.idstring, alias_type: MIRROR, disabled: false, mail_alias: mail_alias)
     else
       existing
     end
   end
 
-  def self.create_external_forward(mail_alias, destination, create_mirror_alias = false)
+  def self.create_external_forward(mail_alias, destination, create_mirror_alias = true)
     returnalias = EmailAlias.create(aliasable_type: 'Person',
                                     aliasable_id: 1,
                                     mail_alias: mail_alias,

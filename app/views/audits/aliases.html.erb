@@ -40,9 +40,19 @@
       <tr>
         <td>
           <%= ea.mail_alias_address -%>
-          <%- if ea.alias_type == EmailAlias::MIRROR -%>
-            <em>(mirror)</em>
-          <%- end -%>
+        </td>
+        <td><%= link_to_person(ea.aliasable) -%></td>
+      </tr>
+    <%- end -%>
+    </table>
+
+    <a href="#aliases"><h3>Mirror Aliases</h3></a>
+    <p>These are generic aliases that are designated as a "mirror alias"</p>
+    <table class="table table-striped">
+    <%- EmailAlias.active.mirror.where(aliasable_type: 'Person').includes(:aliasable).order(:mail_alias).each do |ea| -%>
+      <tr>
+        <td>
+          <%= ea.mail_alias_address -%>
         </td>
         <td><%= link_to_person(ea.aliasable) -%></td>
       </tr>
