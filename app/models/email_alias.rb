@@ -104,7 +104,7 @@ class EmailAlias < ActiveRecord::Base
     end
   end
 
-  def self.create_external_forward(mail_alias, destination, create_mirror_alias = false)
+  def self.create_external_forward(mail_alias, destination, create_mirror_alias = true)
     returnalias = EmailAlias.create(aliasable_type: 'Person',
                                     aliasable_id: 1,
                                     mail_alias: mail_alias,
