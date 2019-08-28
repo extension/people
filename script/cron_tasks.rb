@@ -100,7 +100,7 @@ class CronTasks < Thor
     cleanup_referer_tracks
     cleanup_invitations
     expire_passwords
-    create_account_reminders
+    # create_account_reminders
     queue_members_update_for_all_groups
     get_google_apps_last_login
     #import_activity
