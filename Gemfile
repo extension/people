@@ -39,7 +39,7 @@ gem 'mobile-fu'
 gem "rails_config"
 
 # jquery magick
-gem 'jquery-rails'
+gem 'jquery-rails', '~> 3.1.3'
 
 # pagination
 gem 'kaminari'
@@ -85,7 +85,7 @@ gem "inline-style", "0.5.2ex", :source => 'https://engineering.extension.org/rub
 gem 'hashids'
 
 # html scrubbing
-gem "loofah"
+gem "loofah", "~> 2.2.3"
 
 # useragent analysis
 gem 'useragent'
