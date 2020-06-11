@@ -85,7 +85,7 @@ gem "inline-style", "0.5.2ex", :source => 'https://engineering.extension.org/rub
 gem 'hashids'
 
 # html scrubbing
-gem "loofah", "~> 2.2.3"
+gem "loofah", "~> 2.3.1"
 
 # useragent analysis
 gem 'useragent'
