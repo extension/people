@@ -20,7 +20,7 @@ group :assets do
   gem 'coffee-rails', '~> 3.2.1'
   gem 'jquery-ui-rails'
   # files for bootstrap-in-asset-pipeline integration
-  gem 'bootstrap-sass', '~> 3.1.1.1'
+  gem 'bootstrap-sass', '~> 3.4.1'
   # extension's packaging of html5shiv for the asset pipeline
   gem 'extension-html5shiv-rails', :require => 'html5shiv-rails', :source => 'https://engineering.extension.org/rubygems/'
   # replaces glyphicons
