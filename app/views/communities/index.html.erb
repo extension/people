@@ -1,75 +1,46 @@
 <%- @page_title = "eXtension Communities" -%>
 
-<div class="page-header">
-  <h2>eXtension Communities and Institutions</h2>
-</div>
 
-<div class="row">
-  <div class="col-md-6">
-    <%= render(:partial => 'communities/find_form') %>
-    <p>Can't find a community? <%= link_to("Create a new one",new_community_path)%>.</p>
+  <h2>People Communities are now managed in Google Groups</h2>
 
-    <%- if current_person.invited_communities.count > 0 -%>
-    <h3>Pending Invitations</h3>
-    <ul class="list-unstyled">
-      <% current_person.community_invitations.each do |community|%>
-        <li>
-          <%= community_icon(community) %>
-          <%= link_to(community.name,community_url(community)) %> 
-          <small><%= display_invited_as(community.connectiontype) %></small>
-        </li>
-      <% end %>
-    </ul>
-    <%- end -%>
+<h3>Communities created in People had the option of being connected to Google Groups to function as a listserv. These groups were managed via the People interface.</h3>
 
-    <%- if current_person.pending_communities.count > 0 -%>
-    <h3>Pending Approvals</h3>
-     <ul class="list-unstyled">
-      <% current_person.pending_communities.each do |community|%>
-        <li>
-          <%= link_to(community.name,community_url(community)) %> 
-        </li>
-      <% end %>
-    </ul>   
-    <%- end -%>
+<p>People is being decommissioned this summer and we are starting the process by removing the People interface "wrapper" and allowing all communities (groups) to be directly managed with Google Groups.</p>
 
+<p>If you need help, please contact us at <strong>contact-us@extension.org</strong></p>
 
-    <h3>Your Communities and Institutions</h3>
+<br />
+<h4>For reference, here's a list of your current Communities and Institutions</h4>
     <%- if current_person.connected_communities.count > 0 -%>
 
-      <ul class="list-unstyled">
+    <table class="gglist table table-bordered">
+
         <%- current_person.connected_communities.each do |community| -%>
-          <li>
-            <%= community_icon(community) %>
-            <%= link_to(community.name, community) %> 
-            <small><%= current_person.connection_with_community_expanded(community)%></small>
-          </li>
+            <%- if(gg = community.joined_google_group) -%>
+            <tr class="connected-group">
+              <td>
+                <%= community.name %>
+                <small>(<%= current_person.connection_with_community_expanded(community)%>)</small>
+              </td>
+              <td>
+                <p><strong>Is a Google Group</strong></p>
+              </td>
+            </tr>
+            <%- else -%>
+            <tr>
+            <td>
+              <%= community.name %>
+              <small>(<%= current_person.connection_with_community_expanded(community)%>)</small>
+            </td>
+            <td>
+              <p>Not connected to Google Groups</p>
+            </td>
+            </tr>
+            <%- end -%>
+
+
         <%- end -%>
-      </ul>    
+      </table>
     <%- else -%>
       <p>You haven't yet joined or indicated an interest in any communities</p>
     <%- end -%>
-
-    <h3>Newest Communities</h3>
-    <dl class='community'>
-      <%- Community.order('created_at DESC').limit(5).each do |community| -%>
-      <dt><%= link_to(community.name,community_url(community)) %></dt>
-      <dd class='type'><%= community.entrytype_to_s %> - <%= community.memberfilter_to_s %></dd>
-      <dd class='description'><%= description_for_community(community) %></dd>
-      <%- end -%>
-    </dl>
-    <p><%= link_to("More...",newest_communities_path)%></p>
-  </div>
-
-  <div class="col-md-6">
-    <h3>eXtension Communities of Practice</h3>
-    <ul class='list-unstyled'>
-      <%- Community.approved.order('name ASC').each do |community| -%>
-      <li class='community'>
-        <span><%= @approved_joined_counts[community.id] || 0 %> joined</span>
-        <%= link_to(community.name,community_url(community)) %>
-      </li>
-      <%- end -%>
-    </ul>
-  </div>
-</div>
