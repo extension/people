@@ -19,7 +19,6 @@ class CommunitiesController < ApplicationController
   end
 
   def show
-    return redirect_to(communities_path)
     # will raise ActiveRecord::RecordNotFound on not found
     @community = Community.find_by_shortname_or_id(params[:id])
     member_breadcrumbs
@@ -125,7 +124,6 @@ class CommunitiesController < ApplicationController
   end
 
   def connections
-    return redirect_to(communities_path)
     # will raise ActiveRecord::RecordNotFound on not found
     @community = Community.find_by_shortname_or_id(params[:id])
     allowed_connections = Community::CONNECTION_CONDITIONS.keys
@@ -231,7 +229,6 @@ class CommunitiesController < ApplicationController
   end
 
   def activity
-    return redirect_to(communities_path)
     if(params[:id])
       @community = Community.find_by_shortname_or_id(params[:id])
       member_breadcrumbs(['Activity'])

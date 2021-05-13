@@ -5,7 +5,7 @@
 
 <h3>Communities created in People had the option of being connected to Google Groups to function as a listserv. These groups were managed via the People interface.</h3>
 
-<p>People is being decommissioned this summer and we are starting the process by removing the People interface "wrapper" and allowing all communities (groups) to be directly managed with Google Groups.</p>
+<p>People is being decommissioned this summer and we are starting the process by removing the People interface "wrapper" and allowing all communities (groups) to be directly managed with Google Groups. <a href="https://docs.google.com/document/d/1tAyt9DvpcdGz2z7K5kV1lskkHCIp1SNITUJXzuc__to/edit">Additional information is available here</a>.</p>
 
 <p>If you need help, please contact us at <strong>contact-us@extension.org</strong></p>
 
@@ -19,7 +19,7 @@
             <%- if(gg = community.joined_google_group) -%>
             <tr class="connected-group">
               <td>
-                <%= community.name %>
+                <%= link_to(community.name,community_url(community)) %>
                 <small>(<%= current_person.connection_with_community_expanded(community)%>)</small>
               </td>
               <td>
@@ -29,7 +29,7 @@
             <%- else -%>
             <tr>
             <td>
-              <%= community.name %>
+              <%= link_to(community.name,community_url(community)) %>
               <small>(<%= current_person.connection_with_community_expanded(community)%>)</small>
             </td>
             <td>
