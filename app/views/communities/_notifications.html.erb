@@ -1,12 +1,4 @@
 <div class="dashmodule">
   <p><%= link_to("View connection activity", activity_community_path(@community), class: '') -%></p>
-<%- if (current_person.is_community_member?(@community)) -%>
-  <%- if @thisconnection.sendnotifications? -%>
-    <p><strong>Activity Notifications:</strong> <span class="badge badge-success">ON</span></p>
-    <p><%= link_to('Turn Off',change_notification_communities_path({id: @thisconnection.id, is_on: 'no'}), :class => "btn btn-default btn-sm", :remote => true, :method => :post) -%></p>
-  <%- else -%>
-    <p><strong>Activity Notifications:</strong> <span class="badge badge-warning">OFF</span></p>
-    <p><%= link_to('Turn On',change_notification_communities_path({id: @thisconnection.id, is_on: 'yes'}), :class => "btn btn-default btn-sm", :remote => true, :method => :post) -%></p>
-  <%- end -%>
-<%- end -%>
+
 </div>

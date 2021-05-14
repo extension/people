@@ -21,11 +21,6 @@
           <%= description_for_community(@community) -%>
         </div>
       </div>
-      <%- if (@community.active?) -%>
-      <div id="connectiontocommunity" class="col-md-3 col-md-offset-1">
-        <%= render :partial => 'make_connection' %>
-      </div>
-      <%- end -%>
     </div>
 
 
@@ -73,19 +68,6 @@
       </div>
 
       <div class="col-md-5">
-
-        <%- if (@community.connect_to_drupal? and @community.drupal_node_id) -%>
-          <h3>Elsewhere in eXtension</h3>
-          <div class="dashmodule">
-            <p><em>Links to information for this community in other eXtension applications</em></p>
-            <dl>
-            <%- if (@community.connect_to_drupal? and @community.drupal_node_id) -%>
-              <dt>create.extension.org</dt>
-              <dd><a href="http://create.extension.org/node/<%= @community.drupal_node_id %>">Community Dashboard</a></dd>
-            <%- end -%>
-            </dl>
-          </div>
-        <%- end -%>
 
         <div id="communityforums">
           <h3>Google Group Forum</h3>
